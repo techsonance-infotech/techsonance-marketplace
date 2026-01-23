@@ -17,7 +17,7 @@ export function CustomerLogin() {
     customer_email: null,
     password: null,
   })
-const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const dispatch = useDispatch()
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value }: { name: string; value: string } = e.target;
@@ -61,7 +61,7 @@ const [errorMessage, setErrorMessage] = useState<string | null>(null);
     <>
       <main className="flex justify-center items-center border h-[100vh]">
         <img src={CUSTOMER_LOGIN_POSTER} alt="" className="lg:h-[380px] lg:w-[380px] md:h-[300px] md:w-[300px] rounded-l-[4rem] rounded-r-0" />
-        <form onSubmit={(e) => submitHandler(e)} className="flex bg-white  flex-col border rounded-xl     px-12  py-8 justify-center w-[430px]  " >
+        <form onSubmit={(e) => submitHandler(e)} className="flex bg-white  flex-col border rounded-xl     px-12  py-8 justify-center w-[400px] h-[460px]  " >
           <h1 className="  lg:text-[1.5rem] md:text-[1rem] text-center  my-1">Welcome</h1>
           <p className=" text-[.7rem] text-slate-600 mb-6 text-center">Welcome back! Find great products.</p>
           <div className="flex flex-col gap-4 mb-4">
@@ -71,21 +71,21 @@ const [errorMessage, setErrorMessage] = useState<string | null>(null);
             </div>
             <div className="flex flex-col text-[.8rem] gap-2">
               <span className="flex justify-between">
-              <label htmlFor="confirm password">Password</label>
-<Link to={`/${CUSTOMER_BASE_URL}/forgot-password`} className="text-blue-500 underline text-[.7rem] ml-auto">Forget Password?</Link>
+                <label htmlFor="confirm password">Password</label>
+                <Link to={`/${CUSTOMER_BASE_URL}/forgot-password`} className="text-blue-500 underline text-[.7rem] ml-auto">Forget Password?</Link>
               </span>
               <input type="password" placeholder='Password' name="password" id="" required className="border rounded-[.5rem] py-1 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500" onChange={(e) => handleChange(e)} />
-            
-                  {errorMessage ? <p className="text-red-500 text-[.7rem]">{errorMessage}</p> :   <p className="text-[.6rem] text-slate-500  ">Must be at least 8 characters.</p>}
+
+              {errorMessage ? <p className="text-red-500 text-[.7rem]">{errorMessage}</p> : <p className="text-[.6rem] text-slate-500  ">Must be at least 8 characters.</p>}
             </div>
-        
+
           </div>
           <button type="submit" className="bg-blue-500 text-[.8rem] text-center  text-white py-[.3rem]  rounded-xl mb-3 ">
             Login
           </button>
           <p className="w-full flex justify-center text-center items-center   text-[.6rem] text-slate-800 ">
             don't have an account?
-            <Link to={`/vendorRegister`} className=" ml-1 text-blue-500 underline  ">Create account</Link>
+            <Link to={`/customerRegister`} className=" ml-1 text-blue-500 underline  ">Create account</Link>
           </p>
         </form>
       </main>

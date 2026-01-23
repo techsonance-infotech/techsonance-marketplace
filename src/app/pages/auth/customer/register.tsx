@@ -105,7 +105,7 @@ export function CustomerRegister() {
 
                     <p className="w-full flex justify-center text-center items-center   text-[.6rem] text-slate-800 ">
                         Already have an account?
-                        <Link to={`/vendorRegister`} className=" ml-1 *:
+                        <Link to={`/customerLogin`} className=" ml-1 *:
                         
                         text-blue-500 underline  ">Log in</Link>
                     </p>

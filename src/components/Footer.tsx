@@ -8,9 +8,11 @@ export function Footer({ }) {
     const [showElement, setShowElement] = useState(false);
     const [activeLink, setActiveLink] = useState('/');
     const path = useLocation().pathname;
-    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister') {
+ 
+       if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister'||path==='/adminDashboard') {
         return <Outlet />
     }
+    //
     return (
         <>
             <footer className="flex flex-col    xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-4">

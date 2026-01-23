@@ -14,7 +14,7 @@ export function Navbar({ }) {
     const searchImg = false ? searchImgLight : searchImgDark;
     const wishlistCount = 0;
     const path = useLocation().pathname;
-    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister') {
+    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister'||path==='/adminDashboard') {
         return <Outlet />
     }
     //    if(path === '/' || path === '/shop' || path === '/about' || path === '/contact'){

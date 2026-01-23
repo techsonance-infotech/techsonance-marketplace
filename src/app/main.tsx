@@ -13,6 +13,7 @@ import { Navbar } from '../components/Navbar'
 import { CustomerRegister } from './pages/auth/customer/register'
 import { CustomerLogin } from './pages/auth/customer/login'
 import { Footer } from '../components/Footer'
+import { DashBoard } from './pages/admin/DashBoard'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
@@ -25,7 +26,9 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/vendorRegister" element={<VendorRegister />} />
           <Route path="/customerRegister" element={<CustomerRegister />} />
           <Route path="/customerLogin" element={<CustomerLogin />} />
-
+          <Route path="/adminDashboard" element={<DashBoard />} >
+          // Add more admin child routes here as needed
+          </Route>
         </Routes>
         <Footer />
       </BrowserRouter>
