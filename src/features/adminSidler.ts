@@ -1,14 +1,14 @@
 ﻿import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  isAdminSidlerOpen: false,
+  isAdminSliderOpen: false,
 };
 const adminSliderReducer=createSlice({
     name:"adminSlider",
     initialState,   
     reducers:{
         toggleAdminSlider:(state)=>{
-            state.isAdminSidlerOpen=!state.isAdminSidlerOpen;
+            state.isAdminSliderOpen=!state.isAdminSliderOpen;
         }
     }
 });

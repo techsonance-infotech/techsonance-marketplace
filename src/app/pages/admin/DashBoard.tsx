@@ -3,6 +3,7 @@ import { Navbar } from "../../../components/admin/Navbar";
 import { Sidebar } from "../../../components/admin/Sidebar";
 import "./Dashboard.css"
 import { DashboardChart } from "../../../components/admin/dashboardChart";
+import { Outlet } from "react-router";
  
 const data={
   totalVendors:120,
@@ -27,34 +28,41 @@ const active_instances = [
 ];
 
 export function DashBoard() {
-  const {isAdminSidlerOpen} = useSelector((state:any) => state.adminSidler);
+  const {isAdminSliderOpen} = useSelector((state:any) => state.adminSidler);
   return(
     <>
- <Navbar/>
+ <Navbar title="Dashboard"/>
  <Sidebar />
- <main className={  `admin-dashboard-main mr-6  ${isAdminSidlerOpen ? 'ml-50 ' : 'ml-24 ' }`}>
-  <div className="stats my-4 flex justify-between ">
+ <main className={  `admin_dashboard mr-6  ${isAdminSliderOpen ? 'ml-50 ' : 'ml-24 ' }`}>
+  <div className="stats">
     <div className="stat ">
-      <div className="stat-title text-gray-500 font-bold text-xs ">Total Vendors</div>
-      <div className="stat-value text-2xl font-bold">{data.totalVendors}</div>
-      <div className="stat-desc text-green-600 text-xs font-medium">↗︎ {data.vendorGrowth}% this month</div>
+      <div className="stat_title   ">Total Vendors</div>
+      <div className="stat_value ">{data.totalVendors}</div>
+      <div className="stat_desc text-green-600  ">↗︎ {data.vendorGrowth}% this month</div>
     </div>
     <div className="stat ">
-      <div className="stat-title text-gray-500 font-bold text-xs ">Total Customers</div>
-      <div className="stat-value text-2xl font-bold">{data.totalCustomers}</div>
-      <div className="stat-desc   ">Across all instances</div>
+      <div className="stat_title   ">Total Customers</div>
+      <div className="stat_value  ">{data.totalCustomers}</div>
+      <div className="stat_desc   ">Across all instances</div>
     </div>
     <div className="stat ">
-      <div className="stat-title text-gray-500 font-bold text-xs ">Systems Operations</div>
-      <div className="stat-value text-2xl font-bold  text-green-600">{data.systemsOperations}%</div>
-      <div className="stat-desc  ">
+      <div className="stat_title   ">Systems Operations</div>
+      <div className="stat_value  text-green-600">{data.systemsOperations}%</div>
+      <div className="stat_desc  ">
+        All systems operational
+      </div>
+    </div>
+    <div className="stat ">
+      <div className="stat_title   ">Systems Operations</div>
+      <div className="stat_value  text-green-600">{data.systemsOperations}%</div>
+      <div className="stat_desc  ">
         All systems operational
       </div>
     </div>
   </div>
-    <section className="mid_section flex  md:flex-nowrap  sm:flex-wrap justify-between my-5 gap-6">
+    <section className="mid_section flex    justify-between my-5 gap-6">
       <DashboardChart />
-      <div className="active_card lg:w-[50%] md:w-[50%] sm:w-full h-1B15     bg-white
+      <div className="active_card lg:w-[50%] md:w-[50%]  sm:w-full h-1B15     bg-white
         py-4 px-6 rounded-lg border-2 border-gray-300 ">
         <h2 className="font-bold text-lg mb-4">Active Instances</h2>
         <span className="instance_container overflow-y-scroll h-96  block">        
@@ -65,13 +73,13 @@ export function DashBoard() {
           <p className="card_email text-sm font-light text-gray-500">{instance.email}</p>
           </span>
           <button className={`py-1 px-3 text-nowrap-sm   items-center ${ instance.status === "Healthy" ? "bg-green-100 text-green-500" : "bg-yellow-100 text-yellow-500" }  `} >{instance.status}</button>
-    
         </div>
         ))}
         </span>
         </div>
     </section>
  </main>
+ <Outlet/>
     </>
   )
 }

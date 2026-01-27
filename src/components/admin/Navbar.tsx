@@ -3,14 +3,15 @@ import { searchImgDark, toggle_dark, toggle_light, TS_LOGO, userIcon } from "../
 import { toggleTheme } from "../../features/theme/adminThemeSlice";
 
 import type { RootState } from "../../app/store";
-export function Navbar() {
+export function Navbar({ title }: { title: string }) {
     const dispatch = useDispatch()
     const { theme } = useSelector((state: RootState) => state.adminTheme)
     return (
         <>
             <nav className={"flex border-b-2 border-gray-200 py-2 transition-colors duration-300 ease-in-out items-center justify-between px-6   " + (theme === 'light' ? 'bg-white' : 'bg-gray-800')}>
-                <div className="nav_lift">
+                <div className="nav_lift flex items-center">
                     <img src={TS_LOGO} alt="Techsonance Logo" className=" h-6 w-8 ml-16 " />
+                    {title && <span className={"ml-4 font-medium text-xl " + (theme === 'light' ? 'text-black' : 'text-white')}>{title}</span>}
                 </div>
                 <div className="nav_right flex items-center gap-4">
                     <div className={`border-2  text-[.8rem] border-black/40 rounded-full flex items-center px-3  gap-2  filter ${theme == 'light' ? '':'invert'  }  `}>

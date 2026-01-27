@@ -1,8 +1,33 @@
 ﻿import { createSlice } from '@reduxjs/toolkit';
+export const UserRole = {
+    Admin: 'admin',
+    Vendor: 'vendor',
+    Customer: 'customer'
+} as const;
+
+// This creates a type from the object values
+export type UserRole = typeof UserRole[keyof typeof UserRole];
+type Permission = 'read' | 'create' | 'delete' | 'update';
+interface RoleDefinition {
+    can: Permission[];
+}
+export const role: Record<UserRole, RoleDefinition> = {
+    [UserRole.Admin]: {
+        can: ['read', 'create', 'delete', 'update']
+    },
+    [UserRole.Vendor]: {
+        can: ['read', 'create', 'update']
+    },
+    [UserRole.Customer]: {
+        can: ['read']
+    }
+}
+
+
 export interface User {
     user_id: String;
     company_id: String;
-    user_role_type: 'customer' | 'vendor' | 'admin';
+    user_role_type: UserRole;
     name: String;
     email: String;
     phone: String;
@@ -15,6 +40,7 @@ export interface AuthType {
     loading: boolean;
     error: string | null;
     token: string | null;
+    role: Record<UserRole, RoleDefinition>;
 }
 
 const AUTH_TOKEN = 'authToken';

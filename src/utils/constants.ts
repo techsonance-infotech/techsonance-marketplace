@@ -13,11 +13,13 @@ import searchImgLight from "../assets/Search light.png"
 import heartLight from "../assets/icons-heart-light.png"
 import heartDark from "../assets/icons-heart-dark.png"
 import cartImgDark from "../assets/shoppingCart.png"
-import userIcon from "../assets/user icon.png"
+import userIcon from "../assets/user icon.png";
+import delete_icon from "../assets/delete_icon.png"
 // Social Media Icons
 import instagram from "../assets/instagram icon.png"
 import facebook from "../assets/facebook icon.png"
 import youtube from "../assets/youtube icon.png"
+
 // Theme Toggle Icons
 import toggle_light from '../assets/toggle-light.png';  
 import toggle_dark from '../assets/toggle-dark.png';  
@@ -28,8 +30,8 @@ export const FOOTER_TEXT = "Copyright © 2026 Sound Sphere. All rights reserved.
 
 
 export const ADMIN_NAV_LINKS = [
-  { Dashboard: '/admin/dashboard', icon: dashboard_icon },
-  { Vendor: '/admin/vendor', icon: vendor_icon },
+  { Dashboard: '/admin', icon: dashboard_icon },
+  { Vendor: '/admin/vendorManagement', icon: vendor_icon },
   { Customers: '/admin/customers', icon: customers_icon },
   { Analytics: '/admin/analytics', icon: analytics_icon },
   { "Customer Care": '/admin/customer-care', icon: customer_care_icon },
@@ -47,4 +49,4 @@ export const ADMIN_BASE_URL = import.meta.env.VITE_ADMIN_BASE_URL;
 
 
 // Exporting all constants
-export { CUSTOMER_LOGIN_POSTER, BRAND_LOGO, BAR_TOGGLE_ICON ,TS_LOGO, toggle_light, toggle_dark, vendor_icon, customers_icon, analytics_icon, settings_icon, customer_care_icon, dashboard_icon, instagram, facebook, youtube, searchImgDark, searchImgLight, heartLight, heartDark, cartImgDark, userIcon ,};
+export { CUSTOMER_LOGIN_POSTER, BRAND_LOGO, BAR_TOGGLE_ICON ,TS_LOGO, toggle_light, toggle_dark, vendor_icon, customers_icon, analytics_icon, settings_icon, customer_care_icon, dashboard_icon, instagram, facebook, youtube, searchImgDark, searchImgLight, heartLight, heartDark, cartImgDark, userIcon ,delete_icon};

@@ -7,7 +7,8 @@ export function Navbar({ }) {
     const searchImg = false ? searchImgLight : searchImgDark;
     const wishlistCount = 0;
     const path = useLocation().pathname;
-    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister' || path === '/adminDashboard') {
+ 
+    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister' || path.startsWith('/admin')) {
         return <Outlet />
     }
     return (

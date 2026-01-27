@@ -52,11 +52,10 @@ export function DashboardChart() {
     const currentData = dataSets[timeframe]
 
     return (
-        <Card className="border-2 border-gray-300 w-full h-115  ">
+        <Card className="border-2 border-gray-300 lg:w-[60%] md:w-[60%] h-115  ">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
                 <div className="space-y-1.5">
                     <CardTitle>Vendor Growth</CardTitle>
-                    {/* <CardDescription>Dynamic view for {timeframe}</CardDescription> */}
                 </div>
 
                 <div className="relative">

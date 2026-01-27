@@ -5,7 +5,7 @@ export function Footer({ }) {
 
     const path = useLocation().pathname;
 
-    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister' || path === '/adminDashboard') {
+    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister' || path.startsWith('/admin')) {
         return <Outlet />
     }
     //
