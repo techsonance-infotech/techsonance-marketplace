@@ -9,16 +9,16 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import { Login } from './pages/auth/admin/login';
 import { VendorLogin } from './pages/auth/vendor/login'
 import { VendorRegister } from './pages/auth/vendor/register'
-import { Navbar } from '../components/Navbar'
+import { Navbar } from '../components/customer/Navbar'
 import { CustomerRegister } from './pages/auth/customer/register'
 import { CustomerLogin } from './pages/auth/customer/login'
-import { Footer } from '../components/Footer'
+import { Footer } from '../components/customer/Footer'
 import { DashBoard } from './pages/admin/DashBoard'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-          <Navbar />
+        <Navbar />
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/adminLogin" element={<Login />} />

@@ -1,12 +1,26 @@
 ﻿import BRAND_LOGO from "../assets/e-commerce_brand_logo.png"
 import CUSTOMER_LOGIN_POSTER from '../assets/customer form poster 2.png'
+import TS_LOGO from '../assets/TS_Logo.png'
 import BAR_TOGGLE_ICON from "../assets/bar toggle icon.png"
 import vendor_icon from "../assets/vendor icon.png"
 import customers_icon from '../assets/customers icon.png'
 import analytics_icon from '../assets/analytics icon.png'
 import settings_icon from '../assets/settings icon.png'
 import customer_care_icon from '../assets/customer care icon.png'
-import dashboard_icon from '../assets/dashboard icon.png'
+import dashboard_icon from '../assets/dashboard icon.png';
+import searchImgDark from "../assets/Search dark.png"
+import searchImgLight from "../assets/Search light.png"
+import heartLight from "../assets/icons-heart-light.png"
+import heartDark from "../assets/icons-heart-dark.png"
+import cartImgDark from "../assets/shoppingCart.png"
+import userIcon from "../assets/user icon.png"
+// Social Media Icons
+import instagram from "../assets/instagram icon.png"
+import facebook from "../assets/facebook icon.png"
+import youtube from "../assets/youtube icon.png"
+// Theme Toggle Icons
+import toggle_light from '../assets/toggle-light.png';  
+import toggle_dark from '../assets/toggle-dark.png';  
 // Navigation Links
 export const NAV_LINKS = [{ Home: '/' }, { Shop: '/shop' }, { About: '/about' }, { Contact: '/contact' }]
 // Footer Text
@@ -33,4 +47,4 @@ export const ADMIN_BASE_URL = import.meta.env.VITE_ADMIN_BASE_URL;
 
 
 // Exporting all constants
-export { CUSTOMER_LOGIN_POSTER, BRAND_LOGO, BAR_TOGGLE_ICON };
+export { CUSTOMER_LOGIN_POSTER, BRAND_LOGO, BAR_TOGGLE_ICON ,TS_LOGO, toggle_light, toggle_dark, vendor_icon, customers_icon, analytics_icon, settings_icon, customer_care_icon, dashboard_icon, instagram, facebook, youtube, searchImgDark, searchImgLight, heartLight, heartDark, cartImgDark, userIcon ,};

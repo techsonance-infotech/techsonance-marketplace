@@ -1,0 +1,50 @@
+﻿@import "tailwindcss";
+
+@layer components {
+  .stat {
+    @apply border-2 border-gray-300 rounded-md py-4 px-6 bg-white  min-w-60 ;
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .stat:hover {
+    @apply border-gray-500;
+    transform: translateY(-2px);
+  }
+  .stat-desc{
+    @apply  mt-2 text-xs font-medium text-gray-500  ;
+  }
+.instance_container{
+     scrollbar-width: none; /* Firefox */
+     -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+/* Webkit browsers (Chrome, Safari, Edge) */
+@layer base {
+  /* Global Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 6px;  /* Slimmer width for a modern look */
+    height: 6px; /* For horizontal scrolling */
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent; 
+  }
+
+  ::-webkit-scrollbar-thumb {
+    /* Matches the subtle gray of your table borders */
+    background: #E5E7EB; 
+    border-radius: 10px;
+    transition: background 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    /* Matches your sidebar icons or secondary text */
+    background: #9CA3AF; 
+  }
+
+  /* Firefox Support */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #E5E7EB transparent;
+  }
+}
+}

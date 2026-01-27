@@ -1,25 +1,15 @@
 ﻿import { Link, Outlet, useLocation } from "react-router";
-
-import { useState } from "react";
-import searchImgDark from "../../src/assets/Search dark.png"
-import searchImgLight from "../../src/assets/Search light.png"
-import heartLight from "../../src/assets/icons-heart-light.png"
-import heartDark from "../../src/assets/icons-heart-dark.png"
-import cartImgDark from "../../src/assets/shppingCart.png"
-import userIcon from "../../src/assets/user icon.png"
-import { BRAND_LOGO, NAV_LINKS } from "../utils/constants";
+ 
+import { BRAND_LOGO, NAV_LINKS,cartImgDark,heartDark,heartLight,searchImgDark,searchImgLight, userIcon } from "../../utils/constants";
 
 export function Navbar({ }) {
     const heartImg = true ? heartDark : heartLight
     const searchImg = false ? searchImgLight : searchImgDark;
     const wishlistCount = 0;
     const path = useLocation().pathname;
-    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister'||path==='/adminDashboard') {
+    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister' || path === '/adminDashboard') {
         return <Outlet />
     }
-    //    if(path === '/' || path === '/shop' || path === '/about' || path === '/contact'){
-    //         setShowElement(true);
-    //    }
     return (
         <>
             <nav className="flex justify-between items-center  align-middle border-b xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-1   ">
@@ -38,7 +28,7 @@ export function Navbar({ }) {
                 </ul>
                 <span className="flex gap-4">
                     <div className="border-2  text-[.8rem] border-black/40 rounded-full flex items-center px-5 py-1 gap-2   ">
-                        <input type="text" name="search" id="" placeholder="Search..." className="focus:outline-none text-[12px]  w-[120px] py-1" /> <button className="focus:outline-none">
+                        <input type="text" name="search" id="" placeholder="Search..." className="focus:outline-none text-[12px]  w-30 py-1" /> <button className="focus:outline-none">
                             <img src={searchImg} alt="" className="h-4 w-4" />
                         </button>
                     </div>

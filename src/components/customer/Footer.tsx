@@ -1,15 +1,11 @@
 ﻿import { Link, Outlet, useLocation } from "react-router";
-import { useState } from "react";
-import instagram from "../assets/instgram icon.png"
-import facebook from "../assets/facebook icon.png"
-import youtube from "../assets/youtube icon.png"
-import { BRAND_LOGO, FOOTER_TEXT, NAV_LINKS } from "../utils/constants";
-export function Footer({ }) {
-    const [showElement, setShowElement] = useState(false);
-    const [activeLink, setActiveLink] = useState('/');
-    const path = useLocation().pathname;
  
-       if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister'||path==='/adminDashboard') {
+import { BRAND_LOGO, FOOTER_TEXT, NAV_LINKS,instagram,youtube, facebook} from "../../utils/constants";
+export function Footer({ }) {
+
+    const path = useLocation().pathname;
+
+    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister' || path === '/adminDashboard') {
         return <Outlet />
     }
     //
@@ -25,9 +21,9 @@ export function Footer({ }) {
                             <ul className="flex space-x-4   md:text-[12px] lg:text-[.8rem] font-medium">
 
                                 {NAV_LINKS.map((item) => {
-                                    const key =  Object.keys(item)[0];
+                                    const key = Object.keys(item)[0];
                                     const value = Object.values(item)[0];
-                                    
+
                                     return (
                                         <li key={key} className={`${path === value ? ' hover:text-white bg-[#04b0ffc1] ' : ''} py-1 px-3 rounded-full cursor-pointer`} >
                                             <Link to={`${value}`}>{key}</Link>
@@ -50,9 +46,9 @@ export function Footer({ }) {
                         </Link>
                     </div>
                 </span>
-               <span className="h-[1px] w-[85%] my-1 bg-black/30 mx-auto " ></span>
+                <span className="h-[1px] w-[85%] my-1 bg-black/30 mx-auto " ></span>
                 <span className=" font-light  text-center">
-                   { FOOTER_TEXT }
+                    {FOOTER_TEXT}
                 </span>
             </footer>
             <Outlet />
