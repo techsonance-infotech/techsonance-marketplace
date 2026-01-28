@@ -15,6 +15,10 @@ import heartDark from "../assets/icons-heart-dark.png"
 import cartImgDark from "../assets/shoppingCart.png"
 import userIcon from "../assets/user icon.png";
 import delete_icon from "../assets/delete_icon.png"
+import arrow from '../assets/arrow_icon.png'
+import down_arrow from'../assets/down_arrow.png';
+import internet_icon from'../assets/internet_icon.png'
+import file_icon from '../assets/file_icon.png'
 // Social Media Icons
 import instagram from "../assets/instagram icon.png"
 import facebook from "../assets/facebook icon.png"
@@ -49,4 +53,4 @@ export const ADMIN_BASE_URL = import.meta.env.VITE_ADMIN_BASE_URL;
 
 
 // Exporting all constants
-export { CUSTOMER_LOGIN_POSTER, BRAND_LOGO, BAR_TOGGLE_ICON ,TS_LOGO, toggle_light, toggle_dark, vendor_icon, customers_icon, analytics_icon, settings_icon, customer_care_icon, dashboard_icon, instagram, facebook, youtube, searchImgDark, searchImgLight, heartLight, heartDark, cartImgDark, userIcon ,delete_icon};
+export { CUSTOMER_LOGIN_POSTER, BRAND_LOGO, BAR_TOGGLE_ICON ,TS_LOGO, toggle_light, toggle_dark, vendor_icon, customers_icon, analytics_icon, settings_icon, customer_care_icon, dashboard_icon, instagram, facebook, youtube, searchImgDark, searchImgLight, heartLight, heartDark, cartImgDark, userIcon ,delete_icon,arrow,down_arrow, internet_icon, file_icon};

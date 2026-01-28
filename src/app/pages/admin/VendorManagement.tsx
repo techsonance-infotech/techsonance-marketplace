@@ -2,7 +2,7 @@
 import { Navbar } from "../../../components/admin/Navbar";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
-import "./Dashboard.css"
+import "./index.css"
 import { delete_icon, searchImgDark } from "../../../utils/constants";
 import { useState } from "react";
 import { Pagination } from "../../../components/common/Pagination";
@@ -105,7 +105,7 @@ const data = [
     }
 ]
 export function VendorManagement() {
-    const { isAdminSliderOpen } = useSelector((state: any) => state.adminSidler);
+    const { isAdminSliderOpen } = useSelector((state: any) => state.adminSlider);
     const { theme } = useSelector((state: any) => state.adminTheme);
     const [count, setCount] = useState(1);
 
@@ -146,14 +146,17 @@ export function VendorManagement() {
                         </select>
                     </span>
                 </div>
-                <table className="w-full border-2 my-6 border-gray-300  ">
+                <div 
+  className="my-6 relative flex flex-col w-full h-full overflow-scroll  bg-white border rounded-xl bg-clip-border"> 
+  
+                <table className="w-full text-left table-auto min-w-max  ">
                     <thead  >
-                        <tr>
-                            <th className="text-left p-4 border-b-2 border-gray-300">VENDOR NAME</th>
-                            <th className="text-left p-4 border-b-2 border-gray-300">DOMAIN</th>
-                            <th className="text-left p-4 border-b-2 border-gray-300">STATUS</th>
-                            <th className="text-left p-4 border-b-2 border-gray-300">REVENUE(YTD)</th>
-                            <th className="text-left p-4 border-b-2 border-gray-300">Actions</th>
+                        <tr className="">
+                            <th className="p-4 border-b   border-gray-400">VENDOR NAME</th>
+                            <th className="p-4 border-b   border-gray-400">DOMAIN</th>
+                            <th className="p-4 border-b   border-gray-400">STATUS</th>
+                            <th className="p-4 border-b   border-gray-400">REVENUE(YTD)</th>
+                            <th className="p-4 border-b   border-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -161,19 +164,19 @@ export function VendorManagement() {
                             currentData.map((vendor) => (
                                 <>
                                     <tr key={vendor.id} className="hover:bg-gray-100   ">
-                                        <td className="p-4 border-b-2 border-gray-300">{vendor.name}<br /><span className="text-sm font-light text-gray-500">{vendor.email}</span></td>
-                                        <td className="p-4 border-b-2 border-gray-300">{vendor.domain}</td>
-                                        <td className="p-4 border-b-2 border-gray-300">
-                                            <span className={`py-1 px-3 text-nowrap-sm   items-center ${vendor.status === "Active" ? "bg-green-100 text-green-500" : vendor.status === "Pending" ? "bg-yellow-100 text-yellow-500" : "bg-red-100 text-red-500"}  `} >
+                                        <td className={`p-4  ${vendor.id ===currentData[4].id?'border-b-0':'border-b border-gray-400'}`}>{vendor.name}<br /><span className="text-sm font-light text-gray-500">{vendor.email}</span></td>
+                                        <td className={`p-4  ${vendor.id ===currentData[4].id?'border-b-0':'border-b border-gray-400'}`}>{vendor.domain}</td>
+                                        <td className={`py-4    ${vendor.id ===currentData[4].id?'border-b-0':'border-b border-gray-400'}`}>
+                                            <div className={`py-1 px-3 rounded-lg w-28 text-center items-center ${vendor.status === "Active" ? "bg-green-100 text-green-500" : vendor.status === "Pending" ? "bg-yellow-100 text-yellow-500" : "bg-red-100 text-red-500"}  `} >
                                                 {vendor.status}
-                                            </span>
+                                            </div>
                                         </td>
-                                        <td className="p-4 border-b-2 border-gray-300">₹ {vendor.revenue.toLocaleString()}</td>
-                                        <td className="p-4 items-center border-b-2 border-gray-300  ">
+                                        <td className={`p-4  ${vendor.id ===currentData[4].id?'border-b-0':'border-b border-gray-400'}`}>₹ {vendor.revenue.toLocaleString()}</td>
+                                        <td className={`p-4 items-center ${vendor.id ===currentData[4].id?'border-b-0':'border-b border-gray-400'}  `}>
                                             <Link to={`/admin/vendorManagement/vendorDetails/${vendor.id}`} className="text-blue-600 hover:underline">View Details</Link>
                                             <button className=" text-red-500 hover:underline mx-4 my-0 h-7 w-7 items-center ">
                                                 delete
-                                                {/* <img src={delete_icon} className="h-6 w-6" alt="delete icon" /> */}
+                                               
                                             </button>
                                         </td>
                                     </tr>
@@ -183,7 +186,10 @@ export function VendorManagement() {
                     </tbody >
 
                 </table>
-                <Pagination setCount={setCount} count={count} totalPages={totalPages} />
+                </div>
+<span className="flex justify-end">
+                <Pagination setCount={setCount} count={count} totalPages={totalPages} style="relative right-0 w-54" />
+</span>
             </main>
         </>
     )

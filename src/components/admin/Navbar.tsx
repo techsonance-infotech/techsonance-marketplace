@@ -15,7 +15,8 @@ export function Navbar({ title }: { title: string }) {
                 </div>
                 <div className="nav_right flex items-center gap-4">
                     <div className={`border-2  text-[.8rem] border-black/40 rounded-full flex items-center px-3  gap-2  filter ${theme == 'light' ? '':'invert'  }  `}>
-                        <input type="text" name="search" id="" placeholder="Search system..." className="focus:outline-none text-[12px]  w-30 py-1" /> <button className="focus:outline-none">
+                        <input type="text" name="search"  placeholder="Search system..." className="focus:outline-none text-[1rem] px-2
+                          w-30 py-1" /> <button className="focus:outline-none">
                             <img src={searchImgDark} alt="" className="h-4 w-4" />
                         </button>
                     </div>

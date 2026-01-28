@@ -1,6 +1,8 @@
 ﻿import { createSlice } from "@reduxjs/toolkit";
-
-const initialState = {
+export type isAdminSliderType={
+    isAdminSliderOpen:boolean
+}
+const initialState: isAdminSliderType = {
   isAdminSliderOpen: false,
 };
 const adminSliderReducer=createSlice({

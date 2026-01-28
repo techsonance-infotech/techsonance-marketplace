@@ -16,6 +16,8 @@ import { DashBoard } from './pages/admin/DashBoard'
 import { VendorManagement } from './pages/admin/VendorManagement.tsx'
 import { ProtectedRoute } from '../components/common/ProtectedRoute.tsx'
 import { UserRole } from '../features/auth/authSlice.ts'
+import { CreateVendor } from './pages/admin/CreateVendor.tsx'
+import { ApproveVendor } from './pages/admin/ApproveVendor.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -33,7 +35,12 @@ createRoot(document.getElementById('root')!).render(
 
           <Route path='admin' >
             <Route index element={<DashBoard />} />
-            <Route path="vendorManagement" element={<VendorManagement />} />
+            <Route path='vendorManagement' >
+              <Route index element={<VendorManagement />} />
+              <Route path="createVendor" element={<CreateVendor />} />
+              <Route path="approveVendors" element={<ApproveVendor />} />
+            </Route>
+
           </Route>
         </Routes>
         <Footer />

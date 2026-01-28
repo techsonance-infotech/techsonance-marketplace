@@ -1,10 +1,10 @@
 ﻿import { ADMIN_NAV_LINKS, BAR_TOGGLE_ICON, TS_LOGO } from "../../utils/constants"
 import { useDispatch, useSelector } from "react-redux";
-import { toggleAdminSlider } from "../../features/adminSidler";
+import { toggleAdminSlider, type isAdminSliderType } from "../../features/adminSidler";
 
 
 export function Sidebar() {
-    const {isAdminSliderOpen} = useSelector((state:any) => state.adminSidler);
+    const {isAdminSliderOpen}: isAdminSliderType = useSelector((state:any) => state.adminSlider);
     const dispatch=useDispatch()
     return (
         <>

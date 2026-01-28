@@ -1,8 +1,8 @@
 ﻿import { useSelector } from "react-redux";
 import { Navbar } from "../../../components/admin/Navbar";
 import { Sidebar } from "../../../components/admin/Sidebar";
-import "./Dashboard.css"
-import { DashboardChart } from "../../../components/admin/dashboardChart";
+import "./index.css"
+import { DashboardChart } from "../../../components/admin/DashboardChart";
 import { Outlet } from "react-router";
  
 const data={
@@ -28,7 +28,7 @@ const active_instances = [
 ];
 
 export function DashBoard() {
-  const {isAdminSliderOpen} = useSelector((state:any) => state.adminSidler);
+  const {isAdminSliderOpen} = useSelector((state:any) => state.adminSlider);
   return(
     <>
  <Navbar title="Dashboard"/>
