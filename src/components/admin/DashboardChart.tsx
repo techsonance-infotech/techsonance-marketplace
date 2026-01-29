@@ -7,7 +7,6 @@ import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts" // 1. Ad
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle,
 } from "../../components/ui/card"

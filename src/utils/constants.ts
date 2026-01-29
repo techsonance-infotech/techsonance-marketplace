@@ -31,14 +31,12 @@ import toggle_dark from '../assets/toggle-dark.png';
 export const NAV_LINKS = [{ Home: '/' }, { Shop: '/shop' }, { About: '/about' }, { Contact: '/contact' }]
 // Footer Text
 export const FOOTER_TEXT = "Copyright © 2026 Sound Sphere. All rights reserved."
-
-
 export const ADMIN_NAV_LINKS = [
   { Dashboard: '/admin', icon: dashboard_icon },
   { Vendor: '/admin/vendorManagement', icon: vendor_icon },
   { Customers: '/admin/customers', icon: customers_icon },
-  { Analytics: '/admin/analytics', icon: analytics_icon },
-  { "Customer Care": '/admin/customer-care', icon: customer_care_icon },
+  { Analytics: '/admin/auditLog', icon: analytics_icon },
+  { "Support Tickets": '/admin/supportTickets', icon: customer_care_icon },
   { Settings: '/admin/settings', icon: settings_icon },
 ]
 

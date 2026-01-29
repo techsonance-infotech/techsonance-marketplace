@@ -3,7 +3,7 @@ import { Sidebar } from "../../../components/admin/Sidebar"
 import { useForm } from "react-hook-form"
 import { passwordValidation, passwordValidationSchema } from "../../../utils/validation"
 import { useSelector } from "react-redux"
-import type { isAdminSliderType } from "../../../features/adminSidler"
+import type { isAdminSidebarType } from "../../../features/adminSidebar"
 import { Link } from "react-router"
 
 const isEmailValid = true
@@ -22,13 +22,13 @@ export function CreateVendor() {
             confirmPassword: null,
         }
     })
-    const { isAdminSliderOpen }: isAdminSliderType = useSelector((state: any) => state.adminSlider);
+    const { isAdminSidebarOpen }: isAdminSidebarType = useSelector((state: any) => state.adminSidebar);
 
     return (
         <>
             <Navbar title={"Vendor Create"} />
             <Sidebar />
-            <main className={`admin_vendorManagement mr-6  ${isAdminSliderOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            <main className={`admin_vendorManagement mr-6  ${isAdminSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
                 <header className="flex justify-between items-center my-6">
                     <h1 className="font-bold text-2xl " >Manage Vendor domains, and platform access.</h1>
                 </header>

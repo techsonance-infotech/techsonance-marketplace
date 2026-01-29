@@ -105,7 +105,7 @@ const data = [
     }
 ]
 export function VendorManagement() {
-    const { isAdminSliderOpen } = useSelector((state: any) => state.adminSlider);
+    const { isAdminSidebarOpen } = useSelector((state: any) => state.adminSidebar);
     const { theme } = useSelector((state: any) => state.adminTheme);
     const [count, setCount] = useState(1);
 
@@ -120,7 +120,7 @@ export function VendorManagement() {
         <>
             <Navbar title={"Vendor Management"} />
             <Sidebar />
-            <main className={`admin_vendorManagement mr-6  ${isAdminSliderOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            <main className={`admin_vendorManagement mr-6  ${isAdminSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
                 <header className="flex justify-between items-center my-6">
                     <h1 className="font-bold text-2xl " >Manage Vendor domains, and platform access.</h1>
                     <span className="flex gap-4">

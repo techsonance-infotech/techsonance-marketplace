@@ -1,13 +1,13 @@
 ﻿import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '../features/auth/authSlice';
 import { adminThemeReducer } from '../features/theme/adminThemeSlice';
-import adminSliderReducer from "../features/adminSidler"
+import adminSidebarReducer from "../features/adminSidebar"
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
-        adminTheme:adminThemeReducer,
-        adminSlider:adminSliderReducer,
+        adminTheme: adminThemeReducer,
+        adminSidebar: adminSidebarReducer,
     },
 });
 

@@ -18,7 +18,8 @@ import { ProtectedRoute } from '../components/common/ProtectedRoute.tsx'
 import { UserRole } from '../features/auth/authSlice.ts'
 import { CreateVendor } from './pages/admin/CreateVendor.tsx'
 import { ApproveVendor } from './pages/admin/ApproveVendor.tsx'
-
+import { SupportTickets } from './pages/admin/SupportTickets.tsx'
+import { AuditLog } from './pages/admin/AuditLog.tsx';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
@@ -41,6 +42,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="approveVendors" element={<ApproveVendor />} />
             </Route>
 
+            <Route path="supportTickets" element={<SupportTickets />} />
+            <Route path="auditLog" element={<AuditLog />} />
           </Route>
         </Routes>
         <Footer />
