@@ -2,20 +2,21 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Navbar } from "../../../components/admin/Navbar";
-import { Sidebar } from "../../../components/admin/Sidebar";
-import { searchImgDark } from "../../../utils/constants";
+import { Sidebar } from "../../../components/common/Sidebar";
+import { ADMIN_NAV_LINKS, searchImgDark } from "../../../utils/constants";
 import { Pagination } from "../../../components/common/Pagination";
 
 import { Calendar } from "../../../components/ui/calendar"
+import { ChevronDown, ChevronUp } from "lucide-react";
 export interface AuditLogEntry {
-  id: number;
-  timestamp: string;
-  actor: string;
-  tenant: string;
-  actionType: 'Active' | 'Inactive' | 'Pending' | 'Suspended'; // Expanded types for realism
-  targetEntity: string;
-  details: string;
-  ipAddress: string;
+    id: number;
+    timestamp: string;
+    actor: string;
+    tenant: string;
+    actionType: 'Active' | 'Inactive' | 'Pending' | 'Suspended'; // Expanded types for realism
+    targetEntity: string;
+    details: string;
+    ipAddress: string;
 }
 
 const data: AuditLogEntry[] = [
@@ -121,7 +122,7 @@ const data: AuditLogEntry[] = [
     }
 ];
 export function AuditLog() {
-    const { isAdminSidebarOpen } = useSelector((state: any) => state.adminSidebar);
+    const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [isOpen, setIsOpen] = useState(false);
     const [logs, setLogs] = useState<AuditLogEntry[]>(data);
@@ -141,8 +142,8 @@ export function AuditLog() {
     return (
         <>
             <Navbar title={"Audit Log"} />
-            <Sidebar />
-            <main className={`admin_vendorManagement mr-6  ${isAdminSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} />
+            <main className={`admin_vendorManagement mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
                 <header className="flex justify-between items-center my-6">
                     <h1 className="font-bold text-2xl " >Manage Vendor domains, and platform access.</h1>
 
@@ -164,8 +165,8 @@ export function AuditLog() {
                             <option value="date_oldest">Oldest</option>
                         </select>
                         {
-                            isOpen ? <button onClick={() => setIsOpen(false)} className="vendor_filter bg-blue-100 text-blue-600"> {date ? date.toDateString() : "Select Date"} &#9650; </button> :
-                                <button onClick={() => setIsOpen(true)} className="vendor_filter  "> {date ? date.toDateString() : "Select Date"} &#9660; </button>
+                            isOpen ? <button onClick={() => setIsOpen(false)} className="vendor_filter bg-blue-100 text-blue-600"> {date ? date.toDateString() : "Select Date"}<ChevronUp size={40} strokeWidth={3} absoluteStrokeWidth /> </button> :
+                                <button onClick={() => setIsOpen(true)} className="vendor_filter  "> {date ? date.toDateString() : "Select Date"}<ChevronDown size={40} strokeWidth={3} absoluteStrokeWidth />  </button>
                         }
                         {isOpen && (<Calendar
                             mode="single"
@@ -198,16 +199,16 @@ export function AuditLog() {
                             {
                                 currentData.map((log) => (
                                     <>
-                                        <tr key={log.id} className="hover:bg-gray-100   ">
-                                            <td className={`p-4  ${log.id === currentData[4].id ? 'border-b-0' : 'border-b border-gray-400'}`}>{log.timestamp}</td>
-                                            <td className={`p-4  ${log.id === currentData[4].id ? 'border-b-0' : 'border-b border-gray-400'}`}>{log.actor}</td>
-                                            <td className={`p-4  ${log.id === currentData[4].id ? 'border-b-0' : 'border-b border-gray-400'}`}>{log.tenant}</td>
-                                            <td className={`p-4  ${log.id === currentData[4].id ? 'border-b-0' : 'border-b border-gray-400'}`}>
+                                        <tr key={log.id} className={`hover:bg-gray-100  border-b border-gray-400   `}>
+                                            <td className={`p-4   `}>{log.timestamp}</td>
+                                            <td className={`p-4  `}>{log.actor}</td>
+                                            <td className={`p-4  `}>{log.tenant}</td>
+                                            <td className={`p-4  `}>
                                                 <span className={`py-1 px-3 text-nowrap-sm   items-center ${log.actionType === "Active" ? "bg-green-100 text-green-500" : log.actionType === "Pending" ? "bg-yellow-100 text-yellow-500" : "bg-gray-100 text-gray-500"}  `} >{log.actionType}</span>
                                             </td>
-                                            <td className={`p-4  ${log.id === currentData[4].id ? 'border-b-0' : 'border-b border-gray-400'}`}>{log.targetEntity}</td>
-                                            <td className={`p-4  ${log.id === currentData[4].id ? 'border-b-0' : 'border-b border-gray-400'}`}><a href="#" className="text-blue-600 underline">View JSON</a></td>
-                                            <td className={`p-4  ${log.id === currentData[4].id ? 'border-b-0' : 'border-b border-gray-400'}`}>{log.ipAddress}</td>
+                                            <td className={`p-4  `}>{log.targetEntity}</td>
+                                            <td className={`p-4  `}><a href="#" className="text-blue-600 underline">View JSON</a></td>
+                                            <td className={`p-4   `}>{log.ipAddress}</td>
 
                                         </tr>
                                     </>

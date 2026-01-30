@@ -1,9 +1,10 @@
 ﻿import { Navbar } from "../../../components/admin/Navbar";
-import { Sidebar } from "../../../components/admin/Sidebar";
+import { Sidebar } from "../../../components/common/Sidebar";
 import React, { useState, useEffect } from 'react';
 import { useSelector } from "react-redux";
 import "./index.css"
 import { SendHorizontal } from "lucide-react";
+import { ADMIN_NAV_LINKS } from "../../../utils/constants";
 // --- MOCK DATA (Simulating your JSON DB) ---
 const MOCK_TICKETS = [
     {
@@ -172,22 +173,22 @@ const ChatWindow = ({ ticket }) => {
                     })
                 }
                 <div className="chat_input_container bg-gray-100 flex w-full  border-t-2 border-gray-200  px-6 py-4   items-center gap-4 ">
-                    <input type="text" placeholder="Type your reply here..." onChange={(e)=>setInputText(e.target.value)} value={inputText} onKeyDown={(e)=>e.key === 'Enter' && handleSend()}  className="form_input flex-1"  />  
-                    <button onClick={()=>handleSend()} className="form_input bg-blue-500 text-white py-2 px-4 rounded-xl   flex items-center gap-2">Send <SendHorizontal   size={40} strokeWidth={3} absoluteStrokeWidth />  </button>
-                     </div>
+                    <input type="text" placeholder="Type your reply here..." onChange={(e) => setInputText(e.target.value)} value={inputText} onKeyDown={(e) => e.key === 'Enter' && handleSend()} className="form_input flex-1" />
+                    <button onClick={() => handleSend()} className="form_input bg-blue-500 text-white py-2 px-4 rounded-xl   flex items-center gap-2">Send <SendHorizontal size={40} strokeWidth={3} absoluteStrokeWidth />  </button>
+                </div>
             </section>
         </>
     );
 };
 export function SupportTickets() {
     const [selectedTicket, setSelectedTicket] = useState(MOCK_TICKETS[0]);
-    const { isAdminSidebarOpen } = useSelector((state: any) => state.adminSidebar);
+    const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
     return (
         <>
             <Navbar title="Support Tickets" />
-            <Sidebar />
+            <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} />
 
-            <main className={`flex  ${isAdminSidebarOpen ? 'ml-45 ' : 'ml-18 '}`}>
+            <main className={`flex  ${isSidebarOpen ? 'ml-45 ' : 'ml-18 '}`}>
                 {/* 2. Ticket List Panel */}
                 <TicketList
                     tickets={MOCK_TICKETS}

@@ -8,7 +8,7 @@ export function Navbar({ }) {
     const wishlistCount = 0;
     const path = useLocation().pathname;
  
-    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister' || path.startsWith('/admin')) {
+   if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister' || path.startsWith('/admin') || path.startsWith('/vendor')) {
         return <Outlet />
     }
     return (

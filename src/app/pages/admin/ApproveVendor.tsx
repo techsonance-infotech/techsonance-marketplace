@@ -1,7 +1,7 @@
 ﻿import { useSelector } from "react-redux";
 import { Navbar } from "../../../components/admin/Navbar";
-import { Sidebar } from "../../../components/admin/Sidebar";
-import { down_arrow, file_icon, internet_icon } from "../../../utils/constants";
+import { Sidebar } from "../../../components/common/Sidebar";
+import { ADMIN_NAV_LINKS, down_arrow, file_icon, internet_icon } from "../../../utils/constants";
 import { useState } from "react";
 import { Check, Dot, File, X } from "lucide-react";
 interface BusinessProfile {
@@ -114,13 +114,13 @@ const vendorApplications: VendorApplicationList = [
 ]
 
 export function ApproveVendor() {
-    const { isAdminSidebarOpen } = useSelector((state: any) => state.adminSidebar);
+    const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
     const [isOpen, setIsOpen] = useState<number | null>(null);
     return (
         <>
             <Navbar title="Vendors Applications" />
-            <Sidebar />
-            <main className={`admin_approveVendor mr-6  ${isAdminSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} />
+            <main className={`admin_approveVendor mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
                 <div>
                     {vendorApplications.map((application, index) => (
                         <section key={index} className="border-2 border-gray-400 my-6 rounded-xl">

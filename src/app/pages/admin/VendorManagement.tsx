@@ -1,9 +1,9 @@
-﻿import { Sidebar } from "../../../components/admin/Sidebar";
+﻿import { Sidebar } from "../../../components/common/Sidebar";
 import { Navbar } from "../../../components/admin/Navbar";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import "./index.css"
-import { delete_icon, searchImgDark } from "../../../utils/constants";
+import { ADMIN_NAV_LINKS, delete_icon, searchImgDark } from "../../../utils/constants";
 import { useState } from "react";
 import { Pagination } from "../../../components/common/Pagination";
 const data = [
@@ -105,7 +105,7 @@ const data = [
     }
 ]
 export function VendorManagement() {
-    const { isAdminSidebarOpen } = useSelector((state: any) => state.adminSidebar);
+    const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
     const { theme } = useSelector((state: any) => state.adminTheme);
     const [count, setCount] = useState(1);
 
@@ -119,8 +119,8 @@ export function VendorManagement() {
     return (
         <>
             <Navbar title={"Vendor Management"} />
-            <Sidebar />
-            <main className={`admin_vendorManagement mr-6  ${isAdminSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} />
+            <main className={`admin_vendorManagement mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
                 <header className="flex justify-between items-center my-6">
                     <h1 className="font-bold text-2xl " >Manage Vendor domains, and platform access.</h1>
                     <span className="flex gap-4">
@@ -146,50 +146,50 @@ export function VendorManagement() {
                         </select>
                     </span>
                 </div>
-                <div 
-  className="my-6 relative flex flex-col w-full h-full overflow-scroll  bg-white border rounded-xl bg-clip-border"> 
-  
-                <table className="w-full text-left table-auto min-w-max  ">
-                    <thead  >
-                        <tr className="">
-                            <th className="p-4 border-b   border-gray-400">VENDOR NAME</th>
-                            <th className="p-4 border-b   border-gray-400">DOMAIN</th>
-                            <th className="p-4 border-b   border-gray-400">STATUS</th>
-                            <th className="p-4 border-b   border-gray-400">REVENUE(YTD)</th>
-                            <th className="p-4 border-b   border-gray-400">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            currentData.map((vendor) => (
-                                <>
-                                    <tr key={vendor.id} className="hover:bg-gray-100   ">
-                                        <td className={`p-4  ${vendor.id ===currentData[4].id?'border-b-0':'border-b border-gray-400'}`}>{vendor.name}<br /><span className="text-sm font-light text-gray-500">{vendor.email}</span></td>
-                                        <td className={`p-4  ${vendor.id ===currentData[4].id?'border-b-0':'border-b border-gray-400'}`}>{vendor.domain}</td>
-                                        <td className={`py-4    ${vendor.id ===currentData[4].id?'border-b-0':'border-b border-gray-400'}`}>
-                                            <div className={`py-1 px-3 rounded-lg w-28 text-center items-center ${vendor.status === "Active" ? "bg-green-100 text-green-500" : vendor.status === "Pending" ? "bg-yellow-100 text-yellow-500" : "bg-red-100 text-red-500"}  `} >
-                                                {vendor.status}
-                                            </div>
-                                        </td>
-                                        <td className={`p-4  ${vendor.id ===currentData[4].id?'border-b-0':'border-b border-gray-400'}`}>₹ {vendor.revenue.toLocaleString()}</td>
-                                        <td className={`p-4 items-center ${vendor.id ===currentData[4].id?'border-b-0':'border-b border-gray-400'}  `}>
-                                            <Link to={`/admin/vendorManagement/vendorDetails/${vendor.id}`} className="text-blue-600 hover:underline">View Details</Link>
-                                            <button className=" text-red-500 hover:underline mx-4 my-0 h-7 w-7 items-center ">
-                                                delete
-                                               
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </>
-                            ))
-                        }
-                    </tbody >
+                <div
+                    className="my-6 relative flex flex-col w-full h-full overflow-scroll  bg-white border rounded-xl bg-clip-border">
 
-                </table>
+                    <table className="w-full text-left table-auto min-w-max  ">
+                        <thead  >
+                            <tr className="">
+                                <th className="p-4 border-b   border-gray-400">VENDOR NAME</th>
+                                <th className="p-4 border-b   border-gray-400">DOMAIN</th>
+                                <th className="p-4 border-b   border-gray-400">STATUS</th>
+                                <th className="p-4 border-b   border-gray-400">REVENUE(YTD)</th>
+                                <th className="p-4 border-b   border-gray-400">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                currentData.map((vendor) => (
+                                    <>
+                                        <tr key={vendor.id} className={`hover:bg-gray-100 ${vendor.id === currentData[pageSize - 1].id ? 'border-b-0' : 'border-b border-gray-400'} border-b border-gray-400   `}>
+                                            <td className="p-4   border-gray-400">{vendor.name}<br /><span className="text-sm font-light text-gray-500">{vendor.email}</span></td>
+                                            <td className="p-4   border-gray-400">{vendor.domain}</td>
+                                            <td className="py-4   border-gray-400">
+                                                <div className={`py-1 px-3 rounded-lg w-28 text-center items-center ${vendor.status === "Active" ? "bg-green-100 text-green-500" : vendor.status === "Pending" ? "bg-yellow-100 text-yellow-500" : "bg-red-100 text-red-500"}  `} >
+                                                    {vendor.status}
+                                                </div>
+                                            </td>
+                                            <td className="p-4  border-gray-400">₹ {vendor.revenue.toLocaleString()}</td>
+                                            <td className="p-4 items-center ">
+                                                <Link to={`/admin/vendorManagement/vendorDetails/${vendor.id}`} className="text-blue-600 hover:underline">View Details</Link>
+                                                <button className=" text-red-500 hover:underline mx-4 my-0 h-7 w-7 items-center ">
+                                                    delete
+
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </>
+                                ))
+                            }
+                        </tbody >
+
+                    </table>
                 </div>
-<span className="flex justify-end">
-                <Pagination setCount={setCount} count={count} totalPages={totalPages} style="relative right-0 w-54" />
-</span>
+                <span className="flex justify-end">
+                    <Pagination setCount={setCount} count={count} totalPages={totalPages} style="relative right-0 w-54" />
+                </span>
             </main>
         </>
     )

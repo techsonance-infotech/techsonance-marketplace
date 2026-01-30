@@ -1,10 +1,11 @@
 ﻿import { Navbar } from "../../../components/admin/Navbar"
-import { Sidebar } from "../../../components/admin/Sidebar"
+import { Sidebar } from "../../../components/common/Sidebar"
 import { useForm } from "react-hook-form"
 import { passwordValidation, passwordValidationSchema } from "../../../utils/validation"
 import { useSelector } from "react-redux"
-import type { isAdminSidebarType } from "../../../features/adminSidebar"
+import type { isSidebarType } from "../../../features/sidebar"
 import { Link } from "react-router"
+import { ADMIN_NAV_LINKS } from "../../../utils/constants"
 
 const isEmailValid = true
 export function CreateVendor() {
@@ -22,13 +23,13 @@ export function CreateVendor() {
             confirmPassword: null,
         }
     })
-    const { isAdminSidebarOpen }: isAdminSidebarType = useSelector((state: any) => state.adminSidebar);
+    const { isSidebarOpen }: isSidebarType = useSelector((state: any) => state.sidebar);
 
     return (
         <>
             <Navbar title={"Vendor Create"} />
-            <Sidebar />
-            <main className={`admin_vendorManagement mr-6  ${isAdminSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} />
+            <main className={`admin_vendorManagement mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
                 <header className="flex justify-between items-center my-6">
                     <h1 className="font-bold text-2xl " >Manage Vendor domains, and platform access.</h1>
                 </header>
