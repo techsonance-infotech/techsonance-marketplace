@@ -121,7 +121,7 @@ export const vendorStats = {
   lowStock: 5,
   activeOrders: 320,
 }
-export default function Dashboard() {
+export   function Dashboard() {
   const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
   const [count, setCount] = useState(1);
   const pageSize = 5;

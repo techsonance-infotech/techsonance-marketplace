@@ -245,7 +245,7 @@ const productData: Product[] = [
     imageUrl: "https://picsum.photos/seed/AUD-HDP-015/200/200"
   }
 ];
-export default function Inventory() {
+export   function Inventory() {
   const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
   const [count, setCount] = useState(1);
   const pageSize = 5;

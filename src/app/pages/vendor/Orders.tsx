@@ -118,7 +118,7 @@ const ordersData: Order[] = [
     "paymentMethod": "Paid (UPI)"
   }
 ]
-export default function Orders() {
+export  function Orders() {
   const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [isOpen, setIsOpen] = useState(false);

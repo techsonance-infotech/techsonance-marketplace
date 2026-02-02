@@ -1,10 +1,10 @@
 ﻿import { useSelector } from "react-redux";
-import { Pagination } from "../../../components/common/Pagination";
+import { Pagination } from "../../../../components/common/Pagination";
 import { useState } from "react";
 import { Edit } from "lucide-react";
-import { searchImgDark, VENDOR_NAV_LINKS } from "../../../utils/constants";
-import Navbar from "../../../components/vendor/Navbar";
-import { Sidebar } from "../../../components/common/Sidebar";
+import { searchImgDark, VENDOR_NAV_LINKS } from "../../../../utils/constants";
+import Navbar from "../../../../components/vendor/Navbar";
+import { Sidebar } from "../../../../components/common/Sidebar";
 import { Link } from "react-router";
 
 
@@ -156,7 +156,7 @@ const productData: Product[] = [
     "imageUrl": "https://picsum.photos/seed/AUD-HDP-015/200/200"
   }
 ]
-export default function Products() {
+export   function Products() {
   const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
   const [count, setCount] = useState(1);
   const pageSize = 5;
@@ -173,7 +173,7 @@ export default function Products() {
       <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
       <main className={`admin_dashboard mr-6 pt-3  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
         <div className="flex gap-6 my-6 justify-end">
-          <Link className="rounded-xl bg-black text-white px-4 py-2" to={'/vendor/products/newProduct'}>+ Add New Product</Link>
+          <Link className="rounded-xl bg-black text-white px-4 py-2" to={'/vendor/products/createProduct'}>+ Add New Product</Link>
           <button className="rounded-xl bg-blue-500 text-white px-4 py-2"> Export CSV</button>
         </div>
         <div className={" mt-2 justify-between rounded-2xl flex border-gray-300    items-center  py-2 gap-4   bg-white  filter  "}>
@@ -200,7 +200,7 @@ export default function Products() {
 
             <thead className=" w-full " >
               <tr className="text-left bg-gray-200 ">
-                <th className="p-4 border-b   border-gray-400"><input className="w-4 h-4" type="checkbox" /></th>
+                <th className="p-4 border-b  text-center  border-gray-400"><input className="w-4  h-4 text-center" type="checkbox" /></th>
                 <th className="p-4 border-b   border-gray-400"></th>
                 <th className="p-4 border-b   border-gray-400">PRODUCT NAME</th>
                 <th className="p-4 border-b   border-gray-400">SKU</th>

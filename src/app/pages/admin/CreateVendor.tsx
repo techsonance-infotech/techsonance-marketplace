@@ -1,7 +1,7 @@
 ﻿import { Navbar } from "../../../components/admin/Navbar"
 import { Sidebar } from "../../../components/common/Sidebar"
 import { useForm } from "react-hook-form"
-import { passwordValidation, passwordValidationSchema } from "../../../utils/validation"
+import {  passwordValidationSchema } from "../../../utils/validation"
 import { useSelector } from "react-redux"
 import type { isSidebarType } from "../../../features/sidebar"
 import { Link } from "react-router"

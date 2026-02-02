@@ -20,10 +20,13 @@ import { CreateVendor } from './pages/admin/CreateVendor.tsx'
 import { ApproveVendor } from './pages/admin/ApproveVendor.tsx'
 import { SupportTickets } from './pages/admin/SupportTickets.tsx'
 import { AuditLog } from './pages/admin/AuditLog.tsx';
-import Dashboard from './pages/vendor/Dashboard.tsx'
-import Orders from './pages/vendor/Orders.tsx'
-import Inventory from './pages/vendor/Inventory.tsx'
-import Products from './pages/vendor/Products.tsx'
+import { Dashboard } from './pages/vendor/Dashboard.tsx'
+import { Orders } from './pages/vendor/Orders.tsx'
+import { Inventory } from './pages/vendor/Inventory.tsx'
+import { Products } from './pages/vendor/Products/Products.tsx'
+import { ProductForm } from './pages/vendor/Products/ProductForm.tsx'
+import {ProductUpdateForm } from './pages/vendor/Products/ProductUpdateForm .tsx'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
@@ -50,7 +53,11 @@ createRoot(document.getElementById('root')!).render(
           </Route>
           <Route path='vendor'>
             <Route index element={<Dashboard />} />
-            <Route path='products' element={<Products />} />
+            <Route path='products'   >
+              <Route index element={<Products />} />
+              <Route path='productForm' element={<ProductForm />} />
+              <Route path='productUpdateForm/:id' element={<ProductUpdateForm />} />
+            </Route>
             <Route path='orders' element={<Orders />} />
             <Route path='inventory' element={<Inventory />} />
           </Route>
