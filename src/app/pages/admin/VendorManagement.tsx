@@ -3,7 +3,7 @@ import { Navbar } from "../../../components/admin/Navbar";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import "./index.css"
-import { ADMIN_NAV_LINKS, delete_icon, searchImgDark } from "../../../utils/constants";
+import { ADMIN_NAV_LINKS,  searchImgDark } from "../../../utils/constants";
 import { useState } from "react";
 import { Pagination } from "../../../components/common/Pagination";
 const data = [
@@ -124,7 +124,7 @@ export function VendorManagement() {
                 <header className="flex justify-between items-center my-6">
                     <h1 className="font-bold text-2xl " >Manage Vendor domains, and platform access.</h1>
                     <span className="flex gap-4">
-                        <Link className="vendor_manage_link text-white font-medium bg-blue-600 hover:bg-blue-700" to="/admin/vendorManagement/createVendor">+ Create Vendors</Link>
+                        <Link className="vendor_manage_link text-white font-medium bg-blue-600 hover:bg-blue-700" to="/admin/vendorManagement/vendorForm">+ Create Vendors</Link>
                         <Link className="vendor_manage_link font-medium " to="/admin/vendorManagement/approveVendors">Approve Vendor <span className="bg-yellow-300 py-1 px-3 rounded-full">{vendorRequests}</span> </Link>
                     </span>
                 </header>

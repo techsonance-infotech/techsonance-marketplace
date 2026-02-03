@@ -336,7 +336,7 @@ export   function Inventory() {
               {
                 currentData.map((item, index) => (
                   <>
-                    <tr key={index} className={`hover:bg-gray-100 ${item.id === currentData[pageSize - 1].id ? 'border-b-0' : 'border-b border-gray-400'} border-b border-gray-400   `}>
+                    <tr key={index} className={`hover:bg-gray-100 ${item.id === currentData[currentData.length - 1].id ? 'border-b-0' : 'border-b border-gray-400'} border-b border-gray-400   `}>
                       <td className={`p-4  `}> <img className="w-16 h-16" src={item.imageUrl} alt="product image" /> </td>
                       <td className={`p-4 w-56  `}>{item.productName}</td>
                       <td className={`p-4  `}>

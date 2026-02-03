@@ -118,7 +118,7 @@ const ordersData: Order[] = [
     "paymentMethod": "Paid (UPI)"
   }
 ]
-export  function Orders() {
+export function Orders() {
   const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [isOpen, setIsOpen] = useState(false);
@@ -141,7 +141,7 @@ export  function Orders() {
     <>
       <Navbar title={"Orders"} />
       <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-      <main className={`admin_vendorManagement mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+      <main className={` mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
         <header className="flex justify-end items-center my-6">
           <button className="font-medium text-xl bg-blue-500 text-white rounded-xl px-4 py-2" >Export CSV</button>
 
@@ -194,39 +194,39 @@ export  function Orders() {
             </thead>
             <tbody className="text-center">
               {
-                currentData.map((item, index) => (
+                currentData?.map((item, index) => (
                   <>
-                    {item &&
-                      <tr key={item.id} className={`hover:bg-gray-100 ${item.id === currentData[pageSize - 1].id ? 'border-b-0' : 'border-b border-gray-400'} border-b border-gray-400   `}>
 
-                        <td className={`p-4 w-56  `}>{item.orderNumber}
-                          <br /><span className="text-sm font-light text-gray-500">{item.dateTime}</span>
-                        </td>
-                        <td className={`p-4  `}>
-                          {item.customer.name} <br /><span className="text-sm font-light text-gray-500">{item.customer.location}</span>
-                        </td>
-                        <td className={`p-4  `}>
+                    <tr key={item.id} className={`hover:bg-gray-100 ${item.id === currentData[currentData.length - 1].id ? 'border-b-0' : 'border-b border-gray-400'} border-b border-gray-400   `}>
 
-
-                          {
-                            item.status === "Pending" ? <span className="bg-yellow-100 text-yellow-800 py-1 px-3 rounded-lg text-sm">Active</span> :
-                              item.status === "Shipped" ? <span className="bg-green-100 text-green-800 py-1 px-3 rounded-lg text-sm">In Active</span> :
-                                <span className="bg-gray-100 text-gray-800 py-1 px-3 rounded-lg text-sm">Delivered</span>
-                          }
-                        </td>
+                      <td className={`p-4 w-56  `}>{item.orderNumber}
+                        <br /><span className="text-sm font-light text-gray-500">{item.dateTime}</span>
+                      </td>
+                      <td className={`p-4  `}>
+                        {item.customer.name} <br /><span className="text-sm font-light text-gray-500">{item.customer.location}</span>
+                      </td>
+                      <td className={`p-4  `}>
 
 
-                        <td className={`p-4  `}>₹ {item.total}</td>
-                        <td className={`p-4  `}>
-                          {
-                            item.paymentMethod === "Paid (UPI)" ? <span className="bg-green-100 text-green-800 py-1 px-3 rounded-lg text-sm">{item.paymentMethod}</span> :
-                              <span className="bg-gray-200 text-black py-1 px-3 rounded-lg text-sm">{item.paymentMethod}</span>
-                          }
-                        </td>
+                        {
+                          item.status === "Pending" ? <span className="bg-yellow-100 text-yellow-800 py-1 px-3 rounded-lg text-sm">Active</span> :
+                            item.status === "Shipped" ? <span className="bg-green-100 text-green-800 py-1 px-3 rounded-lg text-sm">In Active</span> :
+                              <span className="bg-gray-100 text-gray-800 py-1 px-3 rounded-lg text-sm">Delivered</span>
+                        }
+                      </td>
 
 
-                      </tr>
-                    }
+                      <td className={`p-4  `}>₹ {item.total}</td>
+                      <td className={`p-4  `}>
+                        {
+                          item.paymentMethod === "Paid (UPI)" ? <span className="bg-green-100 text-green-800 py-1 px-3 rounded-lg text-sm">{item.paymentMethod}</span> :
+                            <span className="bg-gray-200 text-black py-1 px-3 rounded-lg text-sm">{item.paymentMethod}</span>
+                        }
+                      </td>
+
+
+                    </tr>
+
                   </>
                 ))
               }

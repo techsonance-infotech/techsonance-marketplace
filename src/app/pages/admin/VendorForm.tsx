@@ -8,7 +8,7 @@ import { Link } from "react-router"
 import { ADMIN_NAV_LINKS } from "../../../utils/constants"
 
 const isEmailValid = true
-export function CreateVendor() {
+export function VendorForm() {
     const { register, handleSubmit, watch, formState: { errors } } = useForm({
         defaultValues: {
             legalBusinessName: null,
@@ -27,7 +27,7 @@ export function CreateVendor() {
 
     return (
         <>
-            <Navbar title={"Vendor Create"} />
+            <Navbar title={"Vendor  Form"} />
             <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} />
             <main className={`admin_vendorManagement mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
                 <header className="flex justify-between items-center my-6">

@@ -233,8 +233,10 @@ export   function Products() {
                               <></>
                         }
                       </td>
-                      <td className={`p-4  `}>
+                      <td className={`p-4`}>
+                        <Link to={`/vendor/products/productUpdateForm/${item.id}`}>
                         <Edit />
+                        </Link>
                       </td>
 
                     </tr>

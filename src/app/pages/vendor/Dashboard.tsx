@@ -121,7 +121,7 @@ export const vendorStats = {
   lowStock: 5,
   activeOrders: 320,
 }
-export   function Dashboard() {
+export function Dashboard() {
   const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
   const [count, setCount] = useState(1);
   const pageSize = 5;
@@ -181,18 +181,18 @@ export   function Dashboard() {
               {
                 currentData.map((order, index) => (
                   <>
-                    <tr key={index} className="hover:bg-gray-100   ">
-                      <td className={`p-4  ${order.orderId === currentData[4].orderId ? 'border-b-0' : 'border-b border-gray-400'}`}>{order.orderId}</td>
-                      <td className={`p-4  ${order.orderId === currentData[4].orderId ? 'border-b-0' : 'border-b border-gray-400'}`}>{order.customerName}</td>
-                      <td className={`p-4  ${order.orderId === currentData[4].orderId ? 'border-b-0' : 'border-b border-gray-400'}`}>
+                    <tr key={index} className={`hover:bg-gray-100 ${order.orderId === currentData[currentData.length - 1].orderId ? 'border-b-0' : 'border-b border-gray-400'}  `}>
+                      <td className={`p-4  `}>{order.orderId}</td>
+                      <td className={`p-4   `}>{order.customerName}</td>
+                      <td className={`p-4   `}>
                         {
                           order.status === "Pending" ? <span className="bg-yellow-100 text-yellow-800 py-1 px-3 rounded-lg text-sm">Pending</span> :
                             order.status === "Shipped" ? <span className="bg-green-100 text-green-800 py-1 px-3 rounded-lg text-sm">Shipped</span> :
                               <span className="bg-gray-100 text-gray-800 py-1 px-3 rounded-lg text-sm">Delivered</span>
                         }
                       </td>
-                      <td className={`p-4  ${order.orderId === currentData[4].orderId ? 'border-b-0' : 'border-b border-gray-400'}`}>₹ {order.amount}</td>
-                      <td className={`p-4  ${order.orderId === currentData[4].orderId ? 'border-b-0' : 'border-b border-gray-400'}`}>
+                      <td className={`p-4  `}>₹ {order.amount}</td>
+                      <td className={`p-4  `}>
                         {order.action === "Ship Now" ? <button className="text-blue-500 underline  py-1 px-3 rounded-lg hover:bg-blue-100">Ship Now</button> : <button className="text-gray-500 underline py-1 px-3 rounded-lg hover:bg-gray-100">View</button>}
                       </td>
 

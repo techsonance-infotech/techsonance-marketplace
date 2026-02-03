@@ -16,7 +16,7 @@ import { DashBoard } from './pages/admin/DashBoard'
 import { VendorManagement } from './pages/admin/VendorManagement.tsx'
 import { ProtectedRoute } from '../components/common/ProtectedRoute.tsx'
 import { UserRole } from '../features/auth/authSlice.ts'
-import { CreateVendor } from './pages/admin/CreateVendor.tsx'
+import {  VendorForm } from './pages/admin/VendorForm.tsx'
 import { ApproveVendor } from './pages/admin/ApproveVendor.tsx'
 import { SupportTickets } from './pages/admin/SupportTickets.tsx'
 import { AuditLog } from './pages/admin/AuditLog.tsx';
@@ -26,6 +26,9 @@ import { Inventory } from './pages/vendor/Inventory.tsx'
 import { Products } from './pages/vendor/Products/Products.tsx'
 import { ProductForm } from './pages/vendor/Products/ProductForm.tsx'
 import {ProductUpdateForm } from './pages/vendor/Products/ProductUpdateForm .tsx'
+import { Finances } from './pages/vendor/Finances.tsx'
+import { Marketing } from './pages/vendor/Marketing.tsx'
+import { CustomerCare } from './pages/vendor/CustomerCare.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -45,7 +48,7 @@ createRoot(document.getElementById('root')!).render(
             <Route index element={<DashBoard />} />
             <Route path='vendorManagement' >
               <Route index element={<VendorManagement />} />
-              <Route path="createVendor" element={<CreateVendor />} />
+              <Route path="vendorForm" element={<VendorForm />} />
               <Route path="approveVendors" element={<ApproveVendor />} />
             </Route>
             <Route path="supportTickets" element={<SupportTickets />} />
@@ -60,6 +63,9 @@ createRoot(document.getElementById('root')!).render(
             </Route>
             <Route path='orders' element={<Orders />} />
             <Route path='inventory' element={<Inventory />} />
+            <Route path='finances' element={<Finances />} />
+            <Route path='marketing' element={<Marketing />} />
+            <Route path='customerCare' element={<CustomerCare />} />
           </Route>
         </Routes>
         <Footer />
