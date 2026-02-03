@@ -4,10 +4,10 @@ import { Sidebar } from "../../../components/common/Sidebar";
 import { VENDOR_NAV_LINKS } from "../../../utils/constants";
 import { useState } from "react";
 import { Pagination } from "../../../components/common/Pagination";
-
 import { DotIcon } from "lucide-react";
-import { data, Link } from "react-router";
+import { Link } from "react-router";
 import { useForm } from "react-hook-form";
+
 
 interface CustomerTicket {
     id: number;
@@ -71,7 +71,7 @@ const customerTicketData: CustomerTicket[] = [
     }
 ];
 export function CustomerCare() {
-    const { handleSubmit, register, formState: { errors } } = useForm({
+    const { handleSubmit, register, setValue, formState: { errors } } = useForm({
         defaultValues: {
             subject: '',
             description: '',
@@ -90,7 +90,11 @@ export function CustomerCare() {
     const currentData = customerTicketData.slice(startIndex, endIndex);
     console.log(currentData)
     const onSubmit = (data: any) => {
-        console.log(data)
+        console.log('customer care form data:', data)
+        setValue('subject', '')
+        setValue('description', '')
+        setValue('priority', 'Medium')
+        setValue('attachment', null);
     }
     return (
         <>

@@ -69,7 +69,7 @@ export function ProductForm() {
                         </span>
                     </header>
                     <div className="border-2 border-gray-300 p-4 rounded-lg">
-                        <h1>
+                        <h1 className="text-xl font-semibold mb-4">
                             General Information
                         </h1>
                         <div>
@@ -87,42 +87,46 @@ export function ProductForm() {
                                 <button type="button" onClick={() => append({ title: '', description: '' })}
                                     className="border-2 border-gray-300 py-2 px-4 rounded-lg">+ Add Product features </button>
                             </label>
-                            {
-                                fields.map(
-                                    (field, index) => (
-                                        <div key={field.id}  >
+                            <div className="flex  flex-wrap   justify-between">
 
-                                            <div className="my-4">
-                                                <span className="flex justify-between items-center   mt-4 ">
-                                                    <label className="  font-medium ">
-                                                        Feature Title
 
-                                                    </label>
-                                                    <button type="button" onClick={() => remove(index)}
-                                                        className="border-2 border-red-500 py-2 px-4 rounded-lg mb-2"><img src={delete_icon} alt="" /></button>
-                                                </span>
-                                                <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="Enter feature title" {...register(`features.${index}.title` as const, { required: "Feature Title is required" })} />
-                                                {errors.features && errors.features[index]?.title && <p className="text-red-500">{errors.features[index]?.title?.message}</p>}
+                                {
+                                    fields.map(
+                                        (field, index) => (
+                                            <div  key={field.id} className="w-[30%]  border-2 border-gray-300 rounded-lg px-4 py-2 my-4 ">
+
+                                                <div className="my-4 ">
+                                                    <span className="flex justify-between items-center   mt-4 ">
+                                                        <label className="  font-medium ">
+                                                            Feature Title
+
+                                                        </label>
+                                                        <button type="button" onClick={() => remove(index)}
+                                                            className="border-2 border-red-500 py-2 px-4 rounded-lg mb-2"><img src={delete_icon} alt="" /></button>
+                                                    </span>
+                                                    <input type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="Enter feature title" {...register(`features.${index}.title` as const, { required: "Feature Title is required" })} />
+                                                    {errors.features && errors.features[index]?.title && <p className="text-red-500">{errors.features[index]?.title?.message}</p>}
+                                                </div>
+
+                                                <div className="mb-4">
+                                                    <label className="block mb-2 font-medium">Feature Description</label>
+                                                    <textarea className="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="Enter feature description"
+                                                        {
+                                                        ...register(`features.${index}.description` as const, { required: "Feature Description is required" })
+                                                        } />
+                                                    {errors.features && errors.features[index]?.description && <p className="text-red-500">{errors.features[index]?.description?.message}</p>}
+                                                </div>
+
+
                                             </div>
-
-                                            <div className="mb-4">
-                                                <label className="block mb-2 font-medium">Feature Description</label>
-                                                <textarea className="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="Enter feature description"
-                                                    {
-                                                    ...register(`features.${index}.description` as const, { required: "Feature Description is required" })
-                                                    } />
-                                                {errors.features && errors.features[index]?.description && <p className="text-red-500">{errors.features[index]?.description?.message}</p>}
-                                            </div>
-
-
-                                        </div>
+                                        )
                                     )
-                                )
-                            }
+                                }
+                            </div>
                         </div>
                     </div>
                     <div className="border-2 border-gray-300 p-4 rounded-lg my-4">
-                        <h1>Pricing & Inventory </h1>
+                        <h1 className="text-xl font-semibold mb-4">Pricing & Inventory </h1>
                         <span className="flex  w-full gap-6 justify-between">
 
 

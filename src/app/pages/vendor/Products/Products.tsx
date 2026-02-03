@@ -173,7 +173,7 @@ export   function Products() {
       <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
       <main className={`admin_dashboard mr-6 pt-3  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
         <div className="flex gap-6 my-6 justify-end">
-          <Link className="rounded-xl bg-black text-white px-4 py-2" to={'/vendor/products/createProduct'}>+ Add New Product</Link>
+          <Link className="rounded-xl bg-black text-white px-4 py-2" to={'/vendor/products/productForm'}>+ Add New Product</Link>
           <button className="rounded-xl bg-blue-500 text-white px-4 py-2"> Export CSV</button>
         </div>
         <div className={" mt-2 justify-between rounded-2xl flex border-gray-300    items-center  py-2 gap-4   bg-white  filter  "}>

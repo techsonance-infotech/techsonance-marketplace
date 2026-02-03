@@ -235,7 +235,7 @@ export function Marketing() {
                             <div className=" flex flex-col justify-center items-center h-full  ">
                                 <div className=" bg-white  p-6 rounded-lg shadow-lg flex flex-col   w-96 ">
                                     <h2 className=" text-2xl font-bold my-2 ">Create Coupon & promo</h2>
-                                    <select name="type" className="my-2 border-2 py-1 px-2  border-gray-300 rounded-md"
+                                    <select   className="my-2 border-2 py-1 px-2  border-gray-300 rounded-md"
                                         {...register('type')}
                                     >
                                         <option value="percentage">Percentage Discount</option>
@@ -244,11 +244,11 @@ export function Marketing() {
                                     <div className="flex flex-col my-2 gap-2">
                                         <label htmlFor="code">Coupon Code</label>
                                         <input className="py-1 px-2 border-2 border-gray-300 rounded-md" type="text"
-                                            name="code"  {...register('code', { required: true })} />
+                                               {...register('code', { required: true })} />
                                     </div>
                                     <div className="flex flex-col my-2 gap-2">
                                         <label htmlFor="value">Discount Value</label>
-                                        <input className="py-1 px-2 border-2 border-gray-300 rounded-md" type="number" name="value" id="value" {...register('value', { required: true, validate: value => value > 0 })} />
+                                        <input className="py-1 px-2 border-2 border-gray-300 rounded-md" type="number"   id="value" {...register('value', { required: true, validate: value => value > 0 })} />
                                     </div>
                                     <input className="mt-2 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 " value="Create" type="submit" />
                                 </div>
