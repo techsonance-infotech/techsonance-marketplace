@@ -32,6 +32,7 @@ import youtube from "../assets/youtube icon.png"
 // Theme Toggle Icons
 import toggle_light from '../assets/toggle-light.png';
 import toggle_dark from '../assets/toggle-dark.png';
+import type { Link } from "../components/common/InnerSideBar"
 // Navigation Links
 export const NAV_LINKS = [{ Home: '/' }, { Shop: '/shop' }, { About: '/about' }, { Contact: '/contact' }]
 // Footer Text
@@ -60,6 +61,31 @@ export const ADMIN_NAV_LINKS: NavLinkType[] = [
   { Settings: '/admin/settings', icon: settings_icon },
 ]
 
+export const VENDOR_SETTINGS_LINKS: Link[] = [
+    {
+        section: "general",
+        list: [
+            { title: 'Store Profile', path: '/vendor/settings', icon: 'profile' },
+            { title: 'Locations & Warehouses', path: '/vendor/settings/locations', icon: 'locations' },
+
+        ],
+    },
+    {
+        section: "organization",
+        list: [
+            { title: 'Billing & Banking', path: '/vendor/settings/billing', icon: 'billing' },
+        ],
+    },
+    {
+        section: "account",
+        list: [
+            { title: 'Business Profile', path: '/vendor/settings/businessProfile', icon: 'businessProfile' },
+            { title: 'Security & Password', path: '/vendor/settings/security', icon: 'usersRoles' },
+            { title: 'Preferences', path: '/vendor/settings/preferences', icon: 'preferences' },
+
+        ]
+    }
+]
 
 
 // Base URLs from environment variables//

@@ -16,19 +16,22 @@ import { DashBoard } from './pages/admin/DashBoard'
 import { VendorManagement } from './pages/admin/VendorManagement.tsx'
 import { ProtectedRoute } from '../components/common/ProtectedRoute.tsx'
 import { UserRole } from '../features/auth/authSlice.ts'
-import {  VendorForm } from './pages/admin/VendorForm.tsx'
+import { VendorForm } from './pages/admin/VendorForm.tsx'
 import { ApproveVendor } from './pages/admin/ApproveVendor.tsx'
 import { SupportTickets } from './pages/admin/SupportTickets.tsx'
 import { AuditLog } from './pages/admin/AuditLog.tsx';
 import { Dashboard } from './pages/vendor/Dashboard.tsx'
 import { Orders } from './pages/vendor/Orders.tsx'
 import { Inventory } from './pages/vendor/Inventory.tsx'
-import { Products } from './pages/vendor/Products/Products.tsx'
-import { ProductForm } from './pages/vendor/Products/ProductForm.tsx'
-import {ProductUpdateForm } from './pages/vendor/Products/ProductUpdateForm .tsx'
+import { Products } from './pages/vendor/products/Products.tsx'
+import { ProductForm } from './pages/vendor/products/ProductForm.tsx'
+import { ProductUpdateForm } from './pages/vendor/products/ProductUpdateForm .tsx'
 import { Finances } from './pages/vendor/Finances.tsx'
 import { Marketing } from './pages/vendor/Marketing.tsx'
 import { CustomerCare } from './pages/vendor/CustomerCare.tsx'
+import { Profile } from './pages/vendor/settings/Profile.tsx'
+import { Locations } from './pages/vendor/settings/Locations.tsx'
+import { BillingAndBanking } from './pages/vendor/settings/BillingAndBanking.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -66,6 +69,12 @@ createRoot(document.getElementById('root')!).render(
             <Route path='finances' element={<Finances />} />
             <Route path='marketing' element={<Marketing />} />
             <Route path='customerCare' element={<CustomerCare />} />
+            <Route path='settings' >
+              <Route   index element={<Profile />} />
+              <Route path='locations' element={<Locations />} />
+              <Route path='billing' element={<BillingAndBanking />} />
+
+            </Route>
           </Route>
         </Routes>
         <Footer />
