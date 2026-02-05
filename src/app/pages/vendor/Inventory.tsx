@@ -259,7 +259,7 @@ export   function Inventory() {
     <>
       <Navbar title="Inventory Management" />
       <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-      <main className={`admin_dashboard mr-6 pt-3  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+      <main className={`admin_dashboard mr-6  mt-24  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
         <div className="flex gap-6 my-6 justify-end">
           <button className="rounded-xl border-2 border-gray-300 text-gray-700 px-4 py-2">Transfer Stock</button>
           <button className="rounded-xl bg-blue-500 text-white px-4 py-2"> Update Stock</button>
@@ -269,14 +269,12 @@ export   function Inventory() {
           {
             warehouseData.map((warehouse) => (
               <>
-                <div key={warehouse.warehouse_id} className="mb-4 p-4 border-2 border-gray-300 rounded-lg bg-white w-1/5 hover:border-blue-500 hover:shadow-lg cursor-pointer">
+                <div key={warehouse.warehouse_id} className="mb-4  p-4 border-2 border-gray-300 rounded-lg bg-white w-1/5 hover:border-blue-500 hover:shadow-lg cursor-pointer">
 
 
                   <div className="flex flex-col justify-between min-h-36 w-full
                    ">
                     <span>
-
-
                       <div className="text-xl font-semibold flex justify-between items-start">
                         <p className="text-balance">{warehouse.name}</p>
                         {warehouse.is_default && (
@@ -297,9 +295,7 @@ export   function Inventory() {
               </>
             ))
           }
-
         </div>
-
         <div className={" mt-2 justify-between rounded-2xl flex border-gray-300    items-center  py-2 gap-4   bg-white  filter  "}>
           <span className="border flex   flex-3 items-center justify-between gap-0 border-gray-400 px-4 rounded-lg ">
             <button className="rounded-full w-8 h-8"><img className="w-6 h-6" src={searchImgDark} alt="search icon" /></button>

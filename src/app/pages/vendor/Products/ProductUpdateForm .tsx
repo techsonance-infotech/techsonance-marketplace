@@ -57,7 +57,7 @@ export function ProductUpdateForm() {
 
       <Navbar title="Product Form" />
       <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-      <main className={` mr-6 pt-3  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+      <main className={` mr-6  mt-26 ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
         <form onSubmit={handleSubmit(onSubmit)} >
 
 

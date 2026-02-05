@@ -120,7 +120,7 @@ export function ApproveVendor() {
         <>
             <Navbar title="Vendors Applications" />
             <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} />
-            <main className={`admin_approveVendor mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            <main className={`admin_approveVendor mt-26 mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
                 <div>
                     {vendorApplications.map((application, index) => (
                         <section key={index} className="border-2 border-gray-400 my-6 rounded-xl">

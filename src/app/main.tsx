@@ -32,6 +32,8 @@ import { CustomerCare } from './pages/vendor/CustomerCare.tsx'
 import { Profile } from './pages/vendor/settings/Profile.tsx'
 import { Locations } from './pages/vendor/settings/Locations.tsx'
 import { BillingAndBanking } from './pages/vendor/settings/BillingAndBanking.tsx'
+import { BusinessProfile } from './pages/vendor/settings/BusinessProfile.tsx'
+import { Security } from './pages/vendor/settings/Security.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -72,8 +74,11 @@ createRoot(document.getElementById('root')!).render(
             <Route path='settings' >
               <Route   index element={<Profile />} />
               <Route path='locations' element={<Locations />} />
-              <Route path='billing' element={<BillingAndBanking />} />
 
+
+              <Route path='security' element={<Security />} />
+              <Route path='businessProfile' element={<BusinessProfile />} />
+              <Route path='billing' element={<BillingAndBanking />} />
             </Route>
           </Route>
         </Routes>

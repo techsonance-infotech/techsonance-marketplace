@@ -141,9 +141,9 @@ export function Orders() {
     <>
       <Navbar title={"Orders"} />
       <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-      <main className={` mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+      <main className={` mr-6 mt-26 ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
         <header className="flex justify-end items-center my-6">
-          <button className="font-medium text-xl bg-blue-500 text-white rounded-xl px-4 py-2" >Export CSV</button>
+          <button className="font-medium text-xl bg-blue-500 text-white rounded-xl px-6 py-2" >Export CSV</button>
 
         </header>
         <div className={" justify-between rounded-lg flex border-gray-300  items-center  py-2 gap-4   bg-white  filter  "}>

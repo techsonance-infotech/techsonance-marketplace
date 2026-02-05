@@ -259,7 +259,7 @@ export function Marketing() {
 
             }
 
-            <main className={` mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            <main className={` mr-6 mt-26  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
                 <header className="flex justify-end">
                     <button className="py-2 px-4 bg-blue-500 text-white rounded-lg my-6" onClick={() => setClosedCouponForm(true)}>
                         + Add New Coupon

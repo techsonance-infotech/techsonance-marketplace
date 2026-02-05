@@ -4,7 +4,6 @@ import Navbar from "../../../../components/vendor/Navbar";
 import { VENDOR_NAV_LINKS, VENDOR_SETTINGS_LINKS } from "../../../../utils/constants";
 import { InnerSideBar } from "../../../../components/common/InnerSideBar";
 import { useState } from "react";
-import { url } from "zod";
 
 export function Profile() {
   const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
@@ -14,19 +13,19 @@ export function Profile() {
     storeDescription: '',
   });
   const saveChanges = () => {
-console.log(formData,bandImg)
+    console.log(formData, bandImg)
   }
   return (
     <>
       <Navbar title="Global Settings" />
       <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-      <main className={`admin_dashboard mr-6 pt-3  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+      <main className={`admin_dashboard  mt-24 mr-6 pt-3  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
         <InnerSideBar links={VENDOR_SETTINGS_LINKS} style={isSidebarOpen ? 'ml-50' : 'ml-24'} />
         <section className="vendor_settings_content ml-70 p-6 bg-white rounded-lg border-2 border-gray-300 ">
-<div className="flex justify-between">
-          <h2 className="text-2xl font-bold mb-4">Store Profile</h2>
-<button onClick={saveChanges} className="px-6 py-2 bg-blue-500 text-white font-medium rounded-xl" >Save Changes</button>
-</div>
+          <div className="flex justify-between">
+            <h2 className="text-2xl font-bold mb-4">Store Profile</h2>
+            <button onClick={saveChanges} className="px-6 py-2 bg-blue-500 text-white font-medium rounded-xl" >Save Changes</button>
+          </div>
 
           <section className="space-y-4 flex justify-between gap-12">
             <div className="band-image-section mb-4 ">
@@ -52,12 +51,12 @@ console.log(formData,bandImg)
             <span className="flex-1 flex flex-col gap-4">
               <div className="my-0">
                 <label className="block text-gray-700 mb-2 font-bold">Store Name</label>
-                <input type="text" className="w-full border border-gray-300 rounded-lg py-2 px-4" placeholder="Enter store name" value={formData.storeName} onChange={(e) => setFormData({...formData, storeName: e.target.value})} />
+                <input type="text" className="w-full border border-gray-300 rounded-lg py-2 px-4" placeholder="Enter store name" value={formData.storeName} onChange={(e) => setFormData({ ...formData, storeName: e.target.value })} />
                 <p className="mt-2 text-sm text-gray-500">This name will be visible to customers on your storefront.</p>
               </div>
               <div className="my-1">
                 <label className="block text-gray-700 mb-2 font-bold">Store Description</label>
-                <textarea className="w-full border border-gray-300 rounded-lg py-2 px-4" placeholder="Enter store description" value={formData.storeDescription} onChange={(e) => setFormData({...formData, storeDescription: e.target.value})}></textarea>
+                <textarea className="w-full border border-gray-300 rounded-lg py-2 px-4" placeholder="Enter store description" value={formData.storeDescription} onChange={(e) => setFormData({ ...formData, storeDescription: e.target.value })}></textarea>
               </div>
             </span>
           </section>

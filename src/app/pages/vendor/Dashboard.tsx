@@ -135,7 +135,7 @@ export function Dashboard() {
     <>
       <Navbar title="Dashboard" />
       <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-      <main className={`vendor_dashboard mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+      <main className={`vendor_dashboard  mt-24 mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
 
         <div className="stats justify-evenly">
           <div className="stat ">

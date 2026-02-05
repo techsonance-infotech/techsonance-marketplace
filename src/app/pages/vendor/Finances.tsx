@@ -119,7 +119,7 @@ export function Finances() {
         <>
             <Navbar title="Finances" />
             <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-            <main className={`admin_dashboard mr-6 pt-3  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            <main className={`admin_dashboard mr-6  mt-26    ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
                 <div className="flex gap-6 my-6 justify-end">
                     {/* <button className="rounded-xl border-2 border-gray-300 text-gray-700 px-4 py-2">Transfer Stock</button> */}
                     <button className="flex gap-4 items-center rounded-xl bg-blue-500 text-white px-4 py-2"><Download />Download GSTR-1    </button>

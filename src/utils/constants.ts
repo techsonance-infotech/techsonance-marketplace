@@ -81,7 +81,7 @@ export const VENDOR_SETTINGS_LINKS: Link[] = [
         list: [
             { title: 'Business Profile', path: '/vendor/settings/businessProfile', icon: 'businessProfile' },
             { title: 'Security & Password', path: '/vendor/settings/security', icon: 'usersRoles' },
-            { title: 'Preferences', path: '/vendor/settings/preferences', icon: 'preferences' },
+            // { title: 'Preferences', path: '/vendor/settings/preferences', icon: 'preferences' },
 
         ]
     }

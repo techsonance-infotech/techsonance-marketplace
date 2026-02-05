@@ -100,7 +100,7 @@ export function CustomerCare() {
         <>
             <Navbar title={"Customer Care"} />
             <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-            <main className={` mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            <main className={` mr-6  mt-24  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
                 <section>
                     <div className="support_tickets_container   my-6">
                         {
@@ -116,7 +116,7 @@ export function CustomerCare() {
 
                                         </div>
                                         <div className="flex flex-col justify-between">
-                                            <span className={`px-2 py-1 text-center rounded-full text-sm font-medium ${ticket.status === 'Open' ? 'bg-red-200 text-red-800' : ticket.status === 'In Progress' ? 'bg-yellow-200 text-yellow-800' : ticket.status === 'Resolved' ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-800'}`}>
+                                            <span className={`px-3 py-2 text-center rounded-full text-sm font-medium ${ticket.status === 'Open' ? 'bg-red-200 text-red-800' : ticket.status === 'In Progress' ? 'bg-yellow-200 text-yellow-800' : ticket.status === 'Resolved' ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-800'}`}>
                                                 {ticket.status}
                                             </span>
                                             <Link to={'/viewConversation'} className="text-blue-500" >
