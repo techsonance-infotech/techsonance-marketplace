@@ -1,19 +1,37 @@
 ﻿import { Link, Outlet, useLocation } from "react-router";
- 
-import { BRAND_LOGO, NAV_LINKS,cartImgDark,heartDark,heartLight,searchImgDark,searchImgLight, userIcon } from "../../utils/constants";
+
+import { BRAND_LOGO, NAV_LINKS, cartImgDark, heartDark, heartLight, searchImgDark, searchImgLight, userIcon } from "../../utils/constants";
+import { useSelector } from "react-redux";
 
 export function Navbar({ }) {
     const heartImg = true ? heartDark : heartLight
     const searchImg = false ? searchImgLight : searchImgDark;
+    const {toggleMenu }=useSelector((state:any)=>state.menu )
+    
     const wishlistCount = 0;
     const path = useLocation().pathname;
- 
-   if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister' || path.startsWith('/admin') || path.startsWith('/vendor')) {
+
+    if (path.startsWith('/admin') || path.startsWith('/vendor')) {
         return <Outlet />
     }
     return (
         <>
-            <nav className="flex justify-between items-center  align-middle border-b xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-1   ">
+ 
+           { 
+           
+           toggleMenu ? <div className="absolute top-16 left-0 w-full bg-white z-50 flex flex-col items-center space-y-4 py-4">
+                {NAV_LINKS.map((item) => {
+                    const key = Object.keys(item)[0];
+                    const value = Object.values(item)[0];
+                    return (
+                        <Link key={key} to={`${value}`} className={`${path === value ? 'text-white bg-[#04b0ffc1] ' : ''} py-1 px-3 rounded-full cursor-pointer`} >
+                            {key}
+                        </Link>
+                    )
+                })}
+            </div> :  
+               
+           <nav className="flex justify-between items-center  align-middle  xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-1   ">
                 <img src={BRAND_LOGO} alt="brand logo" className="h-10  " />
                 <ul className="flex space-x-4   md:text-[12px] lg:text-[.8rem] font-medium">
                     {NAV_LINKS.map((item) => {
@@ -49,7 +67,7 @@ export function Navbar({ }) {
                         </div>}
                 </span>
 
-            </nav>
+            </nav>}
             <Outlet />
         </>
     )

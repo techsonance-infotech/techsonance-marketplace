@@ -1,11 +1,11 @@
 ﻿import { Link, Outlet, useLocation } from "react-router";
- 
-import { BRAND_LOGO, FOOTER_TEXT, NAV_LINKS,instagram,youtube, facebook} from "../../utils/constants";
+
+import { BRAND_LOGO, FOOTER_TEXT, NAV_LINKS, instagram, youtube, facebook } from "../../utils/constants";
 export function Footer({ }) {
 
     const path = useLocation().pathname;
 
-    if (path === '/adminLogin' || path === '/vendorLogin' || path === '/vendorRegister' || path.startsWith('/admin') || path.startsWith('/vendor')) {
+    if (path.startsWith('/admin') || path.startsWith('/vendor')) {
         return <Outlet />
     }
     //

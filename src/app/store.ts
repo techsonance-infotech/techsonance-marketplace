@@ -2,12 +2,15 @@
 import authReducer from '../features/auth/authSlice';
 import { adminThemeReducer } from '../features/theme/adminThemeSlice';
 import sidebarReducer from "../features/sidebar"
+import menuReducer from "../features/menuBar"
+ 
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
         adminTheme: adminThemeReducer,
         sidebar: sidebarReducer,
+        menu: menuReducer
     },
 });
 

@@ -28,37 +28,82 @@ import inventory_icon from '../assets/notes_icon.png'
 import instagram from "../assets/instagram icon.png"
 import facebook from "../assets/facebook icon.png"
 import youtube from "../assets/youtube icon.png"
-
 // Theme Toggle Icons
 import toggle_light from '../assets/toggle-light.png';
 import toggle_dark from '../assets/toggle-dark.png';
-import type { Link } from "../components/common/InnerSideBar"
+import type { Link } from "../components/common/InnerSideBar";
+
+
+// Pages and components
+// Auth Pages
+import { Login } from '../app/pages/auth/admin/login.tsx';
+import { VendorLogin } from '../app/pages/auth/vendor/login.tsx'
+import { VendorRegister } from '../app/pages/auth/vendor/register'
+import { CustomerRegister } from '../app/pages/auth/customer/register'
+import { CustomerLogin } from '../app/pages/auth/customer/login'
+//
+
+//
+// Admin Pages
+import { DashBoard } from '../app/pages/admin/DashBoard'
+import { VendorManagement } from '../app/pages/admin/VendorManagement.tsx'
+import { VendorForm } from '../app/pages/admin/VendorForm.tsx'
+import { ApproveVendor } from '../app/pages/admin/ApproveVendor.tsx'
+import { SupportTickets } from '../app/pages/admin/SupportTickets.tsx'
+import { AuditLog } from '../app/pages/admin/AuditLog.tsx';
+//
+// Vendor Pages
+import { Dashboard } from '../app/pages/vendor/Dashboard.tsx'
+import { Orders } from '../app/pages/vendor/Orders.tsx'
+import { Inventory } from '../app/pages/vendor/Inventory.tsx'
+import { Products } from '../app/pages/vendor/products/Products.tsx'
+import { ProductForm } from '../app/pages/vendor/products/ProductForm.tsx'
+import { ProductUpdateForm } from '../app/pages/vendor/products/ProductUpdateForm .tsx'
+import { Finances } from '../app/pages/vendor/Finances.tsx'
+import { Marketing } from '../app/pages/vendor/Marketing.tsx'
+import { CustomerCare } from '../app/pages/vendor/CustomerCare.tsx'
+import { Profile } from '../app/pages/vendor/settings/Profile.tsx'
+import { Locations } from '../app/pages/vendor/settings/Locations.tsx'
+import { BillingAndBanking } from '../app/pages/vendor/settings/BillingAndBanking.tsx'
+import { BusinessProfile } from '../app/pages/vendor/settings/BusinessProfile.tsx'
+import { Security } from '../app/pages/vendor/settings/Security.tsx'
+//
+// Customer component Pages
+import { Navbar } from '../components/customer/Navbar'
+import { Footer } from '../components/customer/Footer'
+//Customer Pages
+import { Home } from '../app/pages/customer/index.tsx'
+
+export { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, Navbar, Footer, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home };
+
+
+
 // Navigation Links
 export const NAV_LINKS = [{ Home: '/' }, { Shop: '/shop' }, { About: '/about' }, { Contact: '/contact' }]
 // Footer Text
 
 export const FOOTER_TEXT = "Copyright © 2026 Sound Sphere. All rights reserved."
 export interface NavLinkType {
-  [key: string]: string;
+    [key: string]: string;
 }
 export const VENDOR_NAV_LINKS: NavLinkType[] = [
-  { Dashboard: '/vendor', icon: dashboard_icon },
-  { Products: '/vendor/products', icon: product_icon },
-  { Orders: '/vendor/orders', icon: order_icon },
-  { Inventory: '/vendor/inventory', icon: inventory_icon },
-  { Analytics: '/vendor/finances', icon: finance_icon },
-  { Marketing: '/vendor/marketing', icon: marketing_icon },
-  { 'Customer Care': '/vendor/customerCare', icon: customer_care_icon },
-  { Settings: '/vendor/settings', icon: settings_icon },
+    { Dashboard: '/vendor', icon: dashboard_icon },
+    { Products: '/vendor/products', icon: product_icon },
+    { Orders: '/vendor/orders', icon: order_icon },
+    { Inventory: '/vendor/inventory', icon: inventory_icon },
+    { Analytics: '/vendor/finances', icon: finance_icon },
+    { Marketing: '/vendor/marketing', icon: marketing_icon },
+    { 'Customer Care': '/vendor/customerCare', icon: customer_care_icon },
+    { Settings: '/vendor/settings', icon: settings_icon },
 ]
 
 export const ADMIN_NAV_LINKS: NavLinkType[] = [
-  { Dashboard: '/admin', icon: dashboard_icon },
-  { Vendor: '/admin/vendorManagement', icon: vendor_icon },
-  // { Customers: '/admin/customers', icon: customers_icon },
-  { Analytics: '/admin/auditLog', icon: analytics_icon },
-  { "Support Tickets": '/admin/supportTickets', icon: customer_care_icon },
-  { Settings: '/admin/settings', icon: settings_icon },
+    { Dashboard: '/admin', icon: dashboard_icon },
+    { Vendor: '/admin/vendorManagement', icon: vendor_icon },
+    // { Customers: '/admin/customers', icon: customers_icon },
+    { Analytics: '/admin/auditLog', icon: analytics_icon },
+    { "Support Tickets": '/admin/supportTickets', icon: customer_care_icon },
+    { Settings: '/admin/settings', icon: settings_icon },
 ]
 
 export const VENDOR_SETTINGS_LINKS: Link[] = [
@@ -93,6 +138,9 @@ export const VENDOR_BASE_URL = import.meta.env.VITE_VENDOR_BASE_URL;
 export const CUSTOMER_BASE_URL = import.meta.env.VITE_CUSTOMER_BASE_URL;
 export const ADMIN_BASE_URL = import.meta.env.VITE_ADMIN_BASE_URL;
 
+//Cusomter Home hero title and description
+export const HOME_HERO_TITLE = "Welcome to Sound Sphere - Your Ultimate Music Marketplace";
+export const HOME_HERO_DESC = "Discover, buy, and sell music products with ease. Join our vibrant community of music lovers and elevate your sound experience today!";
 
 
 

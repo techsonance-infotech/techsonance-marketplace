@@ -1,12 +1,10 @@
 ﻿import { useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router";
-import { set } from "zod";
 import { passwordValidationSchema } from "../../../../utils/validation";
 import poster from "../../../../assets/customer form poster.png";
 import axios from "axios";
 import { CUSTOMER_BASE_URL } from "../../../../utils/constants";
 import { useDispatch } from "react-redux";
-CUSTOMER_BASE_URL
 interface FormData {
     customer_name: string | null,
     customer_email: string | null,
