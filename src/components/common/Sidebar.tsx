@@ -1,6 +1,7 @@
 ﻿import { BAR_TOGGLE_ICON, TS_LOGO, type NavLinkType } from "../../utils/constants"
 import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar, type isSidebarType } from "../../features/sidebar";
+import { Link, useLocation } from "react-router";
 type SidebarProps = {
     NAV_LINKS: NavLinkType[];
 }
@@ -8,6 +9,7 @@ type SidebarProps = {
 export function Sidebar({ NAV_LINKS }: SidebarProps) {
     const { isSidebarOpen }: isSidebarType = useSelector((state: any) => state.sidebar);
     const dispatch = useDispatch()
+    const path=useLocation().pathname;
     return (
         <>
             <aside className={`fixed flex flex-col top-0 left-0 h-full transition ease-in-out bg-gray-800 text-white shadow-lg px-2 `}>
@@ -20,13 +22,13 @@ export function Sidebar({ NAV_LINKS }: SidebarProps) {
                 {
                     NAV_LINKS.map((linkObj, index) => (
 
-                        <a href={Object.values(linkObj)[0]} key={index} className={"flex gap-2 rounded-2xl items-center px-4 py-2 my-2 hover:bg-gray-700 transition ease-in-out " + (isSidebarOpen ? "px-4" : "px-2")}>
+                        <Link to={Object.values(linkObj)[0]}  key={index} className={`flex gap-2 rounded-2xl items-center px-4 py-2 my-2 ${path === Object.values(linkObj)[0] ? "bg-gray-700" : ""} hover:bg-gray-700 transition ease-in-out ` + (isSidebarOpen ? "px-4" : "px-2")}>
                             <img src={Object.values(linkObj)[1]} alt={Object.keys(linkObj)[0]} className="w-6 h-6 " />
                             {
                                 isSidebarOpen && <span className="text-sm">{Object.keys(linkObj)[0]}</span>
                             }
 
-                        </a>
+                        </Link>
 
                     ))
                 }

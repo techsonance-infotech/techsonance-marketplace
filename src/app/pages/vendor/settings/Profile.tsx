@@ -1,7 +1,7 @@
 ﻿import { useSelector } from "react-redux";
 import { Sidebar } from "../../../../components/common/Sidebar";
 import Navbar from "../../../../components/vendor/Navbar";
-import { VENDOR_NAV_LINKS, VENDOR_SETTINGS_LINKS } from "../../../../utils/constants";
+import {   VENDOR_SETTINGS_LINKS } from "../../../../utils/constants";
 import { InnerSideBar } from "../../../../components/common/InnerSideBar";
 import { useState } from "react";
 
@@ -17,9 +17,9 @@ export function Profile() {
   }
   return (
     <>
-      <Navbar title="Global Settings" />
-      <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-      <main className={`admin_dashboard  mt-24 mr-6 pt-3  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+     
+      
+      <main className={`mt-6 `}>
         <InnerSideBar links={VENDOR_SETTINGS_LINKS} style={isSidebarOpen ? 'ml-50' : 'ml-24'} />
         <section className="vendor_settings_content ml-70 p-6 bg-white rounded-lg border-2 border-gray-300 ">
           <div className="flex justify-between">

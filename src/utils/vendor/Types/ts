@@ -1,0 +1,22 @@
+﻿
+export type LayoutTemplate = 'classic' | 'modern' | 'minimal';
+
+export interface VendorThemeConfig {
+    vendorId: string;
+    subdomain?: string; // for custom domain support
+    branding: {
+        primaryColor: string;
+        secondaryColor: string;
+        fontFamily: string;
+        logoUrl: string;
+    };
+    layout: {
+        template: LayoutTemplate;
+        showBanner: boolean;
+        navbarStyle: 'sticky' | 'static' | 'floating';
+    };
+    components: {
+        heroSection: 'carousel' | 'static-image' | 'video';
+        productCard: 'standard' | 'compact' | 'detailed';
+    }
+} 

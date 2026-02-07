@@ -5,7 +5,7 @@ export default function Navbar({ title }: { title: string }) {
     const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
     return (
 
-        <section className={`admin_dashboard py-2 px-4 border-b-2 border-gray-300 flex justify-between items-center  ${isSidebarOpen ? 'ml-43 ' : 'ml-18 fixed top-0 w-full z-10 bg-white'}`}>
+        <nav className={` w-full  py-2   border-b-2   border-gray-300 flex   justify-between items-center `}>
             {title && <h1 className='text-2xl font-bold'>{title}</h1>}
             <div className="right_side flex gap-4 items-center mt-4">
                 <span>
@@ -14,6 +14,6 @@ export default function Navbar({ title }: { title: string }) {
                 </span>
                 <img src={userIcon} alt="" className='w-8 h-8' />
             </div>
-        </section>
+        </nav>
     )
 }

@@ -52,9 +52,9 @@ export function BillingAndBanking() {
     }, [signatureUrl]);
     return (
         <>
-            <Navbar title="Global Settings" />
-            <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-            <main className={` mt-24  mr-6 pt-3  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+          
+             
+            <main className={`mt-6 `}>
                 <InnerSideBar links={VENDOR_SETTINGS_LINKS} style={isSidebarOpen ? 'ml-50' : 'ml-24'} />
                 <form className="vendor_settings_content ml-70   " onSubmit={handleSubmit((data) => {
                     console.log(data);

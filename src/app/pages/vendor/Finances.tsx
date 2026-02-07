@@ -2,9 +2,7 @@
 import { Pagination } from "../../../components/common/Pagination";
 import { useState } from "react";
 import Navbar from "../../../components/vendor/Navbar";
-import { Sidebar } from "../../../components/common/Sidebar";
-import { searchImgDark, VENDOR_NAV_LINKS } from "../../../utils/constants";
-import { warehouseData } from "./Inventory";
+ 
 import { Download } from "lucide-react";
 /**
  * Interface representing a single GST Invoice record.
@@ -106,7 +104,7 @@ const gst_invoices: GstInvoice[] = [
     }
 ];
 export function Finances() {
-    const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
+    
     const [count, setCount] = useState(1);
     const pageSize = 5;
     const totalPages = Math.ceil(gst_invoices.length / pageSize);
@@ -118,8 +116,8 @@ export function Finances() {
     return (
         <>
             <Navbar title="Finances" />
-            <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-            <main className={`admin_dashboard mr-6  mt-26    ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            
+            <main className={`  `}>
                 <div className="flex gap-6 my-6 justify-end">
                     {/* <button className="rounded-xl border-2 border-gray-300 text-gray-700 px-4 py-2">Transfer Stock</button> */}
                     <button className="flex gap-4 items-center rounded-xl bg-blue-500 text-white px-4 py-2"><Download />Download GSTR-1    </button>

@@ -36,7 +36,7 @@ const businessProfileData: BusinessProfile =
 
 
 export function BusinessProfile() {
-    const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
+         const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
     const { register, getValues, setValue, watch, handleSubmit } = useForm({
         defaultValues: {
             full_name: businessProfileData.full_name,
@@ -49,9 +49,9 @@ export function BusinessProfile() {
     })
     return (
         <>
-            <  Navbar title="Global Settings" />
-            <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-            <main className={`  mt-24 mr-6 pt-3  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+             
+           
+              <main className={`mt-6 `}>
                 <InnerSideBar links={VENDOR_SETTINGS_LINKS} style={isSidebarOpen ? 'ml-50' : 'ml-24'} />
                 <form className="vendor_settings_content ml-70   rounded-2xl border-gray-300 p-6 bg-white  border-2 " onSubmit={handleSubmit((data) => {
                     console.log(data);

@@ -182,13 +182,13 @@ const ChatWindow = ({ ticket }) => {
 };
 export function SupportTickets() {
     const [selectedTicket, setSelectedTicket] = useState(MOCK_TICKETS[0]);
-    const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
+ 
     return (
         <>
             <Navbar title="Support Tickets" />
-            <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} />
+        
 
-            <main className={`flex  ${isSidebarOpen ? 'ml-45 ' : 'ml-18 '}`}>
+            <main className={`flex  `}>
                 {/* 2. Ticket List Panel */}
                 <TicketList
                     tickets={MOCK_TICKETS}

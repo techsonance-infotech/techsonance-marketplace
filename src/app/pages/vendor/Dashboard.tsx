@@ -1,6 +1,6 @@
 ﻿import { useSelector } from "react-redux";
-import { Sidebar } from "../../../components/common/Sidebar";
-import { VENDOR_NAV_LINKS } from "../../../utils/constants";
+ 
+ 
 import "./index.css"
 import Navbar from "../../../components/vendor/Navbar";
 import { Pagination } from "../../../components/common/Pagination";
@@ -122,7 +122,7 @@ export const vendorStats = {
   activeOrders: 320,
 }
 export function Dashboard() {
-  const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
+ 
   const [count, setCount] = useState(1);
   const pageSize = 5;
   const totalPages = Math.ceil(orderData.length / pageSize);
@@ -134,8 +134,8 @@ export function Dashboard() {
   return (
     <>
       <Navbar title="Dashboard" />
-      <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-      <main className={`vendor_dashboard  mt-24 mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+
+      <main className={`  `}>
 
         <div className="stats justify-evenly">
           <div className="stat ">

@@ -119,7 +119,7 @@ const ordersData: Order[] = [
   }
 ]
 export function Orders() {
-  const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
+ 
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [isOpen, setIsOpen] = useState(false);
   const [count, setCount] = useState(1);
@@ -140,8 +140,8 @@ export function Orders() {
   return (
     <>
       <Navbar title={"Orders"} />
-      <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-      <main className={` mr-6 mt-26 ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+ 
+      <main className={`  `}>
         <header className="flex justify-end items-center my-6">
           <button className="font-medium text-xl bg-blue-500 text-white rounded-xl px-6 py-2" >Export CSV</button>
 

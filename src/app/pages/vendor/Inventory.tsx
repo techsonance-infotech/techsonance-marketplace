@@ -1,9 +1,9 @@
-﻿import { useSelector } from "react-redux";
+﻿ 
 import { Pagination } from "../../../components/common/Pagination";
 import { useState } from "react";
-import { searchImgDark, VENDOR_NAV_LINKS } from "../../../utils/constants";
+import { searchImgDark  } from "../../../utils/constants";
 import Navbar from "../../../components/vendor/Navbar";
-import { Sidebar } from "../../../components/common/Sidebar";
+ 
 
 export interface Warehouse {
   warehouse_id: number;
@@ -246,7 +246,7 @@ const productData: Product[] = [
   }
 ];
 export   function Inventory() {
-  const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
+  
   const [count, setCount] = useState(1);
   const pageSize = 5;
   const totalPages = Math.ceil(productData.length / pageSize);
@@ -258,8 +258,8 @@ export   function Inventory() {
   return (
     <>
       <Navbar title="Inventory Management" />
-      <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-      <main className={`admin_dashboard mr-6  mt-24  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+ 
+      <main className={` `}>
         <div className="flex gap-6 my-6 justify-end">
           <button className="rounded-xl border-2 border-gray-300 text-gray-700 px-4 py-2">Transfer Stock</button>
           <button className="rounded-xl bg-blue-500 text-white px-4 py-2"> Update Stock</button>

@@ -72,7 +72,7 @@ import { Security } from '../app/pages/vendor/settings/Security.tsx'
 import { Navbar } from '../components/customer/Navbar'
 import { Footer } from '../components/customer/Footer'
 //Customer Pages
-import { Home } from '../app/pages/customer/index.tsx'
+import { Home } from '../app/pages/shop/index.tsx'
 
 export { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, Navbar, Footer, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home };
 

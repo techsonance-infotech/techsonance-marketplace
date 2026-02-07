@@ -164,7 +164,7 @@ export function Marketing() {
             value: 0
         }
     });
-    const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
+    
     const [count, setCount] = useState(1);
     const pageSize = 5;
     const totalPages = Math.ceil(ReviewData.length / pageSize);
@@ -226,7 +226,7 @@ export function Marketing() {
     return (
         <>
             <Navbar title={"Marketing & Reviews"} />
-            <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
+            
             {
                 closedCouponForm && (
 
@@ -259,7 +259,7 @@ export function Marketing() {
 
             }
 
-            <main className={` mr-6 mt-26  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+            <main className={`  `}>
                 <header className="flex justify-end">
                     <button className="py-2 px-4 bg-blue-500 text-white rounded-lg my-6" onClick={() => setClosedCouponForm(true)}>
                         + Add New Coupon

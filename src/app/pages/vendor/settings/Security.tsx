@@ -55,9 +55,9 @@ export function Security() {
     }
     return (
         <>
-            <Navbar title="Global Settings" />
-            <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-            <main className={` mt-24 mr-6 pt-3 overflow-y-scroll ${isSidebarOpen ? 'ml-50 ' : 'ml-100 '} `}>
+             
+           
+            <main className={` mt-6   ml-70  `}>
                 <InnerSideBar links={VENDOR_SETTINGS_LINKS} style={isSidebarOpen ? 'ml-50' : 'ml-24'} />
                 <form className="vendor_settings_content   mt-0  px-6 py-6 bg-white border-2 border-gray-300 rounded-lg" onSubmit={handleSubmit((data) => {
                     console.log(data);

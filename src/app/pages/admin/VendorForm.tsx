@@ -23,13 +23,13 @@ export function VendorForm() {
             confirmPassword: null,
         }
     })
-    const { isSidebarOpen }: isSidebarType = useSelector((state: any) => state.sidebar);
+ 
 
     return (
         <>
             <Navbar title={"Vendor  Form"} />
-            <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} />
-            <main className={`admin_vendorManagement mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+      
+            <main className={`admin_vendorManagement  `}>
                 <header className="flex justify-between items-center my-6">
                     <h1 className="font-bold text-2xl " >Manage Vendor domains, and platform access.</h1>
                 </header>

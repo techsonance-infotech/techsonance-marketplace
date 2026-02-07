@@ -114,13 +114,12 @@ const vendorApplications: VendorApplicationList = [
 ]
 
 export function ApproveVendor() {
-    const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
+
     const [isOpen, setIsOpen] = useState<number | null>(null);
     return (
         <>
             <Navbar title="Vendors Applications" />
-            <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} />
-            <main className={`admin_approveVendor mt-26 mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+           
                 <div>
                     {vendorApplications.map((application, index) => (
                         <section key={index} className="border-2 border-gray-400 my-6 rounded-xl">
@@ -220,7 +219,7 @@ export function ApproveVendor() {
                         </section>)
                     )}
                 </div>
-            </main>
+             
 
         </>
     )

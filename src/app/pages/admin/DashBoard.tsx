@@ -29,12 +29,11 @@ const active_instances = [
 ];
 
 export function DashBoard() {
-  const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
+ 
   return (
     <>
       <Navbar title="Dashboard" />
-      <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} />
-      <main className={`admin_dashboard mr-6  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+      <main className={`admin_dashboard  `}>
         <div className="stats">
           <div className="stat ">
             <div className="stat_title   ">Total Vendors</div>

@@ -146,9 +146,9 @@ export function Locations() {
     console.log(chooseExist('name'))
     return (
         <>
-            <Navbar title="Global Settings" />
-            <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} />
-            <main className={` mt-26  mr-6 pt-3  ${isSidebarOpen ? 'ml-50 ' : 'ml-24 '}`}>
+        
+             
+    <main className={`mt-6 `}>
                 <InnerSideBar links={VENDOR_SETTINGS_LINKS} style={isSidebarOpen ? 'ml-50' : 'ml-24'} />
                 {
                     closedLocationForm && (
@@ -207,7 +207,7 @@ export function Locations() {
                     )
 
                 }
-                <section className="vendor_settings_content ml-70   p-6 bg-white rounded-lg border-2 border-gray-300 ">
+                <section className="vendor_settings_content ml-74   p-6 bg-white rounded-lg border-2 border-gray-300 ">
 
                     <div className=' flex justify-between items-center mb-6'>
                         <h1 className='text-2xl font-bold'>Pickup Locations</h1>

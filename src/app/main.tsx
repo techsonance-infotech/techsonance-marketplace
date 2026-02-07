@@ -7,7 +7,11 @@ import { store } from './store'
 import { BrowserRouter, Route, Routes } from "react-router";
 import { ProtectedRoute } from '../components/common/ProtectedRoute.tsx'
 import { UserRole } from '../features/auth/authSlice.ts'
-import { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, Navbar, Footer, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security , Home} from '../utils/constants';
+import { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, Navbar, Footer, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home } from '../utils/constants';
+import NotFound from './not-found.tsx'
+import AdminLayout from './pages/admin/AdminLayout.tsx'
+import { VendorLayout } from './pages/vendor/VendorLayout.tsx'
+import { VendorSettingLayout } from './pages/vendor/settings/VendorSettingLayout.tsx'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
@@ -17,12 +21,16 @@ createRoot(document.getElementById('root')!).render(
           <Route path='/'>
             <Route index element={<Home />} />
           </Route>
-          <Route path="adminLogin" element={<ProtectedRoute allowedRoles={[UserRole.Admin]}><Login /></ProtectedRoute>} />
-          <Route path="vendorLogin" element={<ProtectedRoute allowedRoles={[UserRole.Vendor]}><VendorLogin /></ProtectedRoute>} />
-          <Route path="vendorRegister" element={<ProtectedRoute allowedRoles={[UserRole.Vendor]}><VendorRegister /></ProtectedRoute>} />
-          <Route path="customerRegister" element={<ProtectedRoute allowedRoles={[UserRole.Customer]}><CustomerRegister /></ProtectedRoute>} />
-          <Route path="customerLogin" element={<ProtectedRoute allowedRoles={[UserRole.Customer]}><CustomerLogin /></ProtectedRoute>} />
-          <Route path='admin' >
+          <Route path='auth'>
+            <Route path="*" element={<NotFound />} />
+            <Route path="adminLogin" element={<ProtectedRoute allowedRoles={[UserRole.Admin]}><Login /></ProtectedRoute>} />
+            <Route path="vendorLogin" element={<ProtectedRoute allowedRoles={[UserRole.Vendor]}><VendorLogin /></ProtectedRoute>} />
+            <Route path="vendorRegister" element={<ProtectedRoute allowedRoles={[UserRole.Vendor]}><VendorRegister /></ProtectedRoute>} />
+            <Route path="customerRegister" element={<ProtectedRoute allowedRoles={[UserRole.Customer]}><CustomerRegister /></ProtectedRoute>} />
+            <Route path="customerLogin" element={<ProtectedRoute allowedRoles={[UserRole.Customer]}><CustomerLogin /></ProtectedRoute>} />
+          </Route>
+          <Route path='admin'  element={<AdminLayout />} >
+            <Route path="*" element={<NotFound />} />
             <Route index element={<DashBoard />} />
             <Route path='vendorManagement' >
               <Route index element={<VendorManagement />} />
@@ -32,7 +40,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="supportTickets" element={<SupportTickets />} />
             <Route path="auditLog" element={<AuditLog />} />
           </Route>
-          <Route path='vendor'>
+          <Route path='vendor' element={<VendorLayout />}>
             <Route index element={<Dashboard />} />
             <Route path='products'   >
               <Route index element={<Products />} />
@@ -44,8 +52,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path='finances' element={<Finances />} />
             <Route path='marketing' element={<Marketing />} />
             <Route path='customerCare' element={<CustomerCare />} />
-            <Route path='settings' >
-              <Route   index element={<Profile />} />
+            <Route path='settings' element={<VendorSettingLayout />}>
+              <Route index element={<Profile />} />
               <Route path='locations' element={<Locations />} />
               <Route path='security' element={<Security />} />
               <Route path='businessProfile' element={<BusinessProfile />} />
