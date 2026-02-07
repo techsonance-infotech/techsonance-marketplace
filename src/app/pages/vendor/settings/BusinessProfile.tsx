@@ -52,7 +52,7 @@ export function BusinessProfile() {
              
            
               <main className={`mt-6 `}>
-                <InnerSideBar links={VENDOR_SETTINGS_LINKS} style={isSidebarOpen ? 'ml-50' : 'ml-24'} />
+               
                 <form className="vendor_settings_content ml-70   rounded-2xl border-gray-300 p-6 bg-white  border-2 " onSubmit={handleSubmit((data) => {
                     console.log(data);
                 })}>

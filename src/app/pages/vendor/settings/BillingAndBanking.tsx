@@ -1,12 +1,11 @@
-﻿import Navbar from '../../../../components/vendor/Navbar'
-import { Sidebar } from '../../../../components/common/Sidebar'
-import { VENDOR_NAV_LINKS, VENDOR_SETTINGS_LINKS } from '../../../../utils/constants'
+﻿
+import { VENDOR_SETTINGS_LINKS } from '../../../../utils/constants'
 import { InnerSideBar } from '../../../../components/common/InnerSideBar'
 import { useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { Dot, Edit, Landmark } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { set } from 'zod';
+
 
 interface InvoiceSettings {
     gstin: string;              // GSTIN number
@@ -30,7 +29,7 @@ const bankAccounts: BankAccount[] = [{ bankName: "HDFC Bank", accountNumber: "XX
 
 export function BillingAndBanking() {
     const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
-    const { register, getValues, setValue, watch,handleSubmit } = useForm({
+    const { register, getValues, setValue, watch, handleSubmit } = useForm({
         defaultValues: invoiceSettings
     })
     const [signatureUrl, setSignatureUrl] = useState<string | undefined>();
@@ -52,10 +51,10 @@ export function BillingAndBanking() {
     }, [signatureUrl]);
     return (
         <>
-          
-             
+
+
             <main className={`mt-6 `}>
-                <InnerSideBar links={VENDOR_SETTINGS_LINKS} style={isSidebarOpen ? 'ml-50' : 'ml-24'} />
+               
                 <form className="vendor_settings_content ml-70   " onSubmit={handleSubmit((data) => {
                     console.log(data);
                 })}>

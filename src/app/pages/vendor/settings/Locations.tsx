@@ -1,12 +1,12 @@
 ﻿import React, { useEffect, useRef, useState } from 'react'
-import Navbar from '../../../../components/vendor/Navbar'
+
 
 import { VENDOR_NAV_LINKS, VENDOR_SETTINGS_LINKS } from '../../../../utils/constants'
-import { Sidebar } from '../../../../components/common/Sidebar'
+
 import { InnerSideBar } from '../../../../components/common/InnerSideBar'
 import { useSelector } from 'react-redux'
 import { useForm } from 'react-hook-form'
-import { sl } from 'date-fns/locale'
+
 interface LocationType {
     id: string;              // Unique identifier (e.g., WH001, HUB001)
     name: string;            // Display name (e.g., "Main Warehouse (Surat)")
@@ -149,7 +149,7 @@ export function Locations() {
         
              
     <main className={`mt-6 `}>
-                <InnerSideBar links={VENDOR_SETTINGS_LINKS} style={isSidebarOpen ? 'ml-50' : 'ml-24'} />
+               
                 {
                     closedLocationForm && (
 
