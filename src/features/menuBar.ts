@@ -9,16 +9,9 @@ const menuReducer = createSlice({
     name: "menu",
     initialState,
     reducers: {
-        toggleMenu: (state) => {
-            if(window.innerWidth < 768) {
-
-                state.isMenuOpen = true;
-            }
-            else {
-                state.isMenuOpen = false;
-            }
-        }
-        }
-    });
-export const { toggleMenu } = menuReducer.actions;
+        openMenu: (state) => { state.isMenuOpen = true; },
+        closeMenu: (state) => { state.isMenuOpen = false; }
+    }
+});
+export const { openMenu, closeMenu } = menuReducer.actions;
 export default menuReducer.reducer;

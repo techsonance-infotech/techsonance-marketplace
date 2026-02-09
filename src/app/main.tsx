@@ -7,18 +7,19 @@ import { store } from './store'
 import { BrowserRouter, Route, Routes } from "react-router";
 import { ProtectedRoute } from '../components/common/ProtectedRoute.tsx'
 import { UserRole } from '../features/auth/authSlice.ts'
-import { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, Navbar, Footer, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home } from '../utils/constants';
+import { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin,  DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home } from '../utils/constants';
 import NotFound from './not-found.tsx'
 import AdminLayout from './pages/admin/AdminLayout.tsx'
 import { VendorLayout } from './pages/vendor/VendorLayout.tsx'
 import { VendorSettingLayout } from './pages/vendor/settings/VendorSettingLayout.tsx'
+import { ShopLayout } from './pages/shop/ShopLayout.tsx'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <Navbar />
         <Routes>
-          <Route path='/'>
+          <Route path='/404' element={<NotFound />} />
+          <Route path='shop' element={<ShopLayout />} >
             <Route index element={<Home />} />
           </Route>
           <Route path='auth'>
@@ -61,7 +62,6 @@ createRoot(document.getElementById('root')!).render(
             </Route>
           </Route>
         </Routes>
-        <Footer />
       </BrowserRouter>
     </Provider>
   </StrictMode>,

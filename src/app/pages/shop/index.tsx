@@ -2,7 +2,8 @@
 import { Carousel } from "../../../components/common/Carousel"
 import { HOME_HERO_DESC, HOME_HERO_TITLE } from "../../../utils/constants"
 import { useDispatch } from "react-redux";
-import { toggleMenu } from "../../../features/menuBar";
+
+import { Button } from "../../../components/ui/button";
 
 const imgs=[
 'https://m.media-amazon.com/images/I/61KcQyhY6SL._SL1200_.jpg',
@@ -11,13 +12,8 @@ const imgs=[
 ]
 export function Home() {
     const dispatch = useDispatch();
-    useEffect(() => {
-        if (window.innerWidth < 768) {
-            dispatch( toggleMenu() );
-        }
-       
-        
-    }, [])
+   
+ 
     return (
         <>
         <main className=" ">
@@ -26,7 +22,8 @@ export function Home() {
             {HOME_HERO_TITLE
             }
         </h1>
-        <p className="lg:text-5xl sm:text-3xl  font-bold text-balance m-auto lg:w-[60vw] sm:w-[70vw] text-center mb-6">{HOME_HERO_DESC}</p>
+        <p className="lg:text-5xl sm:text-3xl  font-bold text-balance m-auto lg:w-[60vw] sm:w-[70vw] text-center mb-16">{HOME_HERO_DESC}</p>
+        <Button className="m-auto block ">Shop Now</Button>
         </main>
         </>
     )
