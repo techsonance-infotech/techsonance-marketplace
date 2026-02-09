@@ -19,7 +19,7 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <Routes>
           <Route path='/404' element={<NotFound />} />
-          <Route path='shop' element={<ShopLayout />} >
+          <Route path='/' element={<ShopLayout />} >
             <Route index element={<Home />} />
           </Route>
           <Route path='auth'>

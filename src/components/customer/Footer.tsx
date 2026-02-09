@@ -1,7 +1,12 @@
 ﻿import { Link, Outlet, useLocation } from "react-router";
 
-import { BRAND_LOGO, FOOTER_TEXT, NAV_LINKS, instagram, youtube, facebook } from "../../utils/constants";
-export function Footer({ }) {
+import { BRAND_LOGO, instagram, youtube, facebook } from "../../utils/constants";
+import { FOOTER_TEXT, NAV_LINKS } from "../../utils/customer/constants";
+ 
+ 
+ 
+ 
+export function Footer({ styles }: { styles?: string }) {
 
     const path = useLocation().pathname;
 
@@ -11,7 +16,7 @@ export function Footer({ }) {
     //
     return (
         <>
-            <footer className="flex flex-col    xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-4">
+            <footer className={`flex flex-col bg-footer      xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-4 ${styles}`}>
                 <span className="flex justify-between items-center  align-middle xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-1   ">
 
 
@@ -51,7 +56,7 @@ export function Footer({ }) {
                     {FOOTER_TEXT}
                 </span>
             </footer>
-            <Outlet />
+
         </>
     )
 }

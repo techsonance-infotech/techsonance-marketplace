@@ -1,12 +1,14 @@
 ﻿import { Link, Outlet, useLocation } from "react-router";
 import { useMediaQuery } from 'react-responsive'
-import { BRAND_LOGO, NAV_LINKS, cartImgDark, heartDark, heartLight, searchImgDark, searchImgLight, userIcon } from "../../utils/constants";
+import { BRAND_LOGO, cartImgDark, heartDark, heartLight, searchImgDark, searchImgLight, userIcon } from "../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { Bell, EllipsisVertical, Menu } from "lucide-react";
 import { closeMenu, openMenu } from "../../features/menuBar";
+import { NAV_LINKS } from "../../utils/customer/constants";
+import { NAVBAR, NAVBAR_FOREGROUND } from "../../utils/customer/theme-constants";
 
 
-export function Navbar({ logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: { logoUrl?: string, menuLinks?: { [key: string]: string }[] }) {
+export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: { styles?: string, logoUrl?: string, menuLinks?: { [key: string]: string }[] }) {
     const heartImg = true ? heartDark : heartLight
     const searchImg = false ? searchImgLight : searchImgDark;
     const { isMenuOpen } = useSelector((state: any) => state.menu)
@@ -14,7 +16,6 @@ export function Navbar({ logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: { logoUr
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const wishlistCount = 0;
     const path = useLocation().pathname;
-
     if (path.startsWith('/admin') || path.startsWith('/vendor')) {
         return <Outlet />
     }
@@ -26,13 +27,11 @@ export function Navbar({ logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: { logoUr
                     <Bell />
                 </Link>
             </nav>
-
-
         )
     }
 
     return (
-        <nav className=" flex justify-between items-center  align-middle  xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-1 h-16   ">
+        <nav className={`bg-navbar text-navbar-foreground flex justify-between items-center  align-middle  xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-1 h-16   `}>
             <Link to="/"><img src={logoUrl} alt="brand logo" className="h-10" /></Link>
             <ul className="flex space-x-4   md:text-[12px] lg:text-[.8rem] font-medium">
                 {menuLinks.map((item) => {

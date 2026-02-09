@@ -19,9 +19,9 @@ export function ShopLayout() {
 
   return (
     <>
-      <Navbar />
+      <Navbar  styles="bg-navbar  " />
       <Outlet />
-      <Footer />
+      <Footer styles="" />
     </>
   )
 }

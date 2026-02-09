@@ -79,11 +79,7 @@ export { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, Na
 
 
 
-// Navigation Links
-export const NAV_LINKS= [{ Home: '/' }, { Shop: '/shop' }, { About: '/about' }, { Contact: '/contact' }]
-// Footer Text
 
-export const FOOTER_TEXT = "Copyright © 2026 Sound Sphere. All rights reserved."
 export interface NavLinkType {
     [key: string]: string;
 }
