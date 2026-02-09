@@ -2,10 +2,10 @@
 import { useMediaQuery } from 'react-responsive'
 import { BRAND_LOGO, cartImgDark, heartDark, heartLight, searchImgDark, searchImgLight, userIcon } from "../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { Bell, EllipsisVertical, Menu } from "lucide-react";
+import { Bell,  Menu } from "lucide-react";
 import { closeMenu, openMenu } from "../../features/menuBar";
 import { NAV_LINKS } from "../../utils/customer/constants";
-import { NAVBAR, NAVBAR_FOREGROUND } from "../../utils/customer/theme-constants";
+ 
 
 
 export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: { styles?: string, logoUrl?: string, menuLinks?: { [key: string]: string }[] }) {
