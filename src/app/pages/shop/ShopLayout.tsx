@@ -21,7 +21,7 @@ export function ShopLayout() {
     <>
       <Navbar  styles="bg-navbar  " />
       <Outlet />
-      <Footer styles="" />
+      <Footer styles="bg-footer-foreground text-primary" />
     </>
   )
 }

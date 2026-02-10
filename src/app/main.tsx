@@ -13,6 +13,8 @@ import AdminLayout from './pages/admin/AdminLayout.tsx'
 import { VendorLayout } from './pages/vendor/VendorLayout.tsx'
 import { VendorSettingLayout } from './pages/vendor/settings/VendorSettingLayout.tsx'
 import { ShopLayout } from './pages/shop/ShopLayout.tsx'
+import { Shopping } from './pages/shop/Shopping.tsx'
+import { Product } from './pages/shop/product.tsx'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
@@ -21,6 +23,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path='/404' element={<NotFound />} />
           <Route path='/' element={<ShopLayout />} >
             <Route index element={<Home />} />
+            <Route path='shopping' element={<Shopping />} />
+            <Route path='shopping/:id' element={<Product />} />
           </Route>
           <Route path='auth'>
             <Route path="*" element={<NotFound />} />

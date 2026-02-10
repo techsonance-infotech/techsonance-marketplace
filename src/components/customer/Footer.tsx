@@ -1,11 +1,11 @@
 ﻿import { Link, Outlet, useLocation } from "react-router";
 
-import { BRAND_LOGO, instagram, youtube, facebook } from "../../utils/constants";
-import { FOOTER_TEXT, NAV_LINKS } from "../../utils/customer/constants";
- 
- 
- 
- 
+import { FOOTER_BOTTOM_TEXT, FOOTER_CONTENT } from "../../utils/customer/constants";
+import { DynamicIcon } from "lucide-react/dynamic";
+
+
+
+
 export function Footer({ styles }: { styles?: string }) {
 
     const path = useLocation().pathname;
@@ -17,43 +17,45 @@ export function Footer({ styles }: { styles?: string }) {
     return (
         <>
             <footer className={`flex flex-col bg-footer      xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-4 ${styles}`}>
-                <span className="flex justify-between items-center  align-middle xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-1   ">
+                <span className="w-full flex justify-center items-start   xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-1   ">
 
 
-                    <img src={BRAND_LOGO} alt="brand logo" className="h-10  " />
+                    {/* <img src={BRAND_LOGO} alt="brand logo" className="h-10  " /> */}
                     {
                         path === '/customerRegister' || path === '/customerLogin' ? null : <>
-                            <ul className="flex space-x-4   md:text-[12px] lg:text-[.8rem] font-medium">
+                            <div className="w-full  space-x-4 flex justify-between  md:text-[12px] lg:text-[.8rem] font-medium">
+                                {
+                                    FOOTER_CONTENT.map((section, index) => (
+                                        <ul key={index} className="flex flex-col gap-2">
+                                            <li className="font-bold text-lg ">{section.header}</li>
 
-                                {NAV_LINKS.map((item) => {
-                                    const key = Object.keys(item)[0];
-                                    const value = Object.values(item)[0];
+                                            {
+                                                section.links.map((link, linkIndex) => (
+                                                    <li key={linkIndex} className={`text-sm  hover:text-gray-400 transition-colors duration-300 w-64 `}>
+                                                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
+                                                            {link.icon && <DynamicIcon name={link.icon} className={link.styles} size={32} />
+                                                            }
 
-                                    return (
-                                        <li key={key} className={`${path === value ? ' hover:text-white bg-[#04b0ffc1] ' : ''} py-1 px-3 rounded-full cursor-pointer`} >
-                                            <Link to={`${value}`}>{key}</Link>
-                                        </li>
+                                                            {link.category === 'social' ? null : link.title}
+                                                        </a>
+                                                    </li>
+                                                ))
+                                            }
+
+                                        </ul>
+
                                     )
-                                })}
-                            </ul>
+                                    )
+
+                                }
+                            </div>
 
                         </>}
-                    <div className="  flex gap-4 items-center ">
-                        <Link to={'/wishlist'} className="relative  ">
-                            <img src={instagram} alt="" className="h-6 w-6" />
-                        </Link>
-                        <Link to={'/cart_page'}>
-                            <img src={facebook
-                            } alt="" className="h-6 w-6 " />
-                        </Link>
-                        <Link to={'/user_profile'}>
-                            <img src={youtube} alt="" className="h-6 w-6 " />
-                        </Link>
-                    </div>
+                     
                 </span>
-                <span className="h-[1px] w-[85%] my-1 bg-black/30 mx-auto " ></span>
-                <span className=" font-light  text-center">
-                    {FOOTER_TEXT}
+                <span className="h-[1px] w-[85%] my-2  bg-black/30 mx-auto " ></span>
+                <span className=" font-light  text-center mb-6">
+                    {FOOTER_BOTTOM_TEXT}
                 </span>
             </footer>
 

@@ -31,6 +31,7 @@ import youtube from "../assets/youtube icon.png"
 // Theme Toggle Icons
 import toggle_light from '../assets/toggle-light.png';
 import toggle_dark from '../assets/toggle-dark.png';
+import replacement_icon from "../assets/replacement icon.png"
 import type { Link } from "../components/common/InnerSideBar";
 
 
@@ -142,4 +143,4 @@ export const HOME_HERO_DESC = "Discover, buy, and sell music products with ease.
 
 
 // Exporting all constants
-export { CUSTOMER_LOGIN_POSTER, BRAND_LOGO, BAR_TOGGLE_ICON, TS_LOGO, toggle_light, toggle_dark, vendor_icon, customers_icon, analytics_icon, settings_icon, customer_care_icon, dashboard_icon, instagram, facebook, youtube, searchImgDark, searchImgLight, heartLight, heartDark, cartImgDark, userIcon, delete_icon, arrow, down_arrow, internet_icon, file_icon };
+export { CUSTOMER_LOGIN_POSTER, BRAND_LOGO, BAR_TOGGLE_ICON, TS_LOGO, toggle_light, toggle_dark, vendor_icon, customers_icon, analytics_icon, settings_icon, customer_care_icon, dashboard_icon, instagram, facebook, youtube, searchImgDark, searchImgLight, heartLight, heartDark, cartImgDark, userIcon, delete_icon, arrow, down_arrow, internet_icon, file_icon, replacement_icon };
