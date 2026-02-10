@@ -18,7 +18,7 @@ export interface FooterSectionType {
     links: FooterLinkType[];
 }
 // Navigation Links
-export const NAV_LINKS: NavLinkType[] = [{ Home: '/' }, { Shop: '/shop' }, { About: '/about' }, { Contact: '/contact' }]
+export const NAV_LINKS: NavLinkType[] = [{ Home: '/' }, { Shop: '/shopping' }, { About: '/about' }, { Contact: '/contact' }]
 export const FOOTER_CONTENT: FooterSectionType[] = [
     {
         header: 'Need Help?',
@@ -196,13 +196,13 @@ export const PRODUCT_LIST: PRODUCT_LIST_TYPE[] = [
         description: "Industry-leading noise cancellation with two processors controlling eight microphones for unprecedented noise cancellation.",
         satisfaction: "4.8/5"
     },
-  {
+    {
         id: "hpx-cloud-stinger-2-core-ps",
         title: "HyperX Cloud Stinger 2 Core Gaming Headset PS White",
         price: 3790,
         discount: 18, // Estimated based on typical MRP vs price
         category: "Gaming Headsets",
-        imgUrl: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=800&q=80", 
+        imgUrl: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=800&q=80",
         description: "Essential Headset for PlayStation Gaming. HyperX Cloud Stinger 2 Core is the essential entry-level headset for the PlayStation gamer who wants great sound at an affordable price. It features a lightweight design, soft ear cushions, and a swivel-to-mute microphone.",
         satisfaction: "4.5/5",
         rating: 4.5,

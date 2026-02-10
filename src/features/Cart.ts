@@ -9,20 +9,20 @@ interface CartItem {
 const loadCartFromLocalStorage = () => {
     try {
         const serializedCart = localStorage.getItem('cart');
-        const serializedTotal = localStorage.getItem('total');
-        if (serializedCart && serializedTotal) {
-            return { items: JSON.parse(serializedCart), total: JSON.parse(serializedTotal) };
+ 
+        if (serializedCart  ) {
+            return { items: JSON.parse(serializedCart) };
         }
     } catch (e) {
         console.error("Could not load cart from localStorage", e);
     }
 }
-const initialState:{
+const initialState: {
     items: CartItem[];
-    total: number;
+    
 } = {
     items: loadCartFromLocalStorage()?.items || [],
-    total: loadCartFromLocalStorage()?.total || 0
+ 
 }
 const CartSlice = createSlice({
     name: 'cart',
@@ -36,12 +36,12 @@ const CartSlice = createSlice({
             else {
                 state.items.push({ ...action.payload, quantity: 1 });
             }
-            state.total += action.payload.price;
+
         },
         removeFromCart: (state, action) => {
             const existingItem = state.items.find(item => item.id === action.payload.id);
             if (existingItem) {
-                state.total -= existingItem.price * existingItem.quantity;
+
                 state.items = state.items.filter(item => item.id !== action.payload.id);
             }
         },
@@ -49,14 +49,14 @@ const CartSlice = createSlice({
         updateQuantity: (state, action) => {
             const existingItem = state.items.find(item => item.id === action.payload.id);
             if (existingItem) {
-                state.total -= existingItem.price * existingItem.quantity;
+
                 existingItem.quantity = action.payload.quantity;
-                state.total += existingItem.price * existingItem.quantity;
+
             }
         },
         clearCart: (state) => {
             state.items = [];
-            state.total = 0;
+
         }
     }
 });

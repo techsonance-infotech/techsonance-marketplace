@@ -4,6 +4,7 @@ import { adminThemeReducer } from '../features/theme/adminThemeSlice';
 import sidebarReducer from "../features/sidebar"
 import menuReducer from "../features/menuBar"
 import { CartReducer } from '../features/Cart';
+import { cartSidebarReducer } from '../features/CartSidebar';
 
 
 
@@ -13,12 +14,15 @@ export const store = configureStore({
         adminTheme: adminThemeReducer,
         sidebar: sidebarReducer,
         menu: menuReducer,
-        Cart: CartReducer
+        cart: CartReducer,
+        cartSidebar: cartSidebarReducer,
+
+        
     },
 });
 store.subscribe(() => {
-    localStorage.setItem('cart', JSON.stringify(store.getState().Cart.items));
-    localStorage.setItem('total', JSON.stringify(store.getState().Cart.total));
+    localStorage.setItem('cart', JSON.stringify(store.getState().cart.items));
+    localStorage.setItem('total', JSON.stringify(store.getState().cart.total));
 })
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

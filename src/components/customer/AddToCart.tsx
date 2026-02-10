@@ -2,11 +2,12 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import { addToCart, removeFromCart, updateQuantity } from "../../features/Cart"; // Ensure you export removeFromCart
+import { toggleCartSidebar } from "../../features/CartSidebar";
 
-export function AddToCart({ productId }: { productId?: string }) {
+export function AddToCart({ productId, styles }: { productId?: string, styles?: string }) {
     const dispatch = useDispatch();
-    const { items } = useSelector((state: RootState) => state.Cart);
-    
+    const { items } = useSelector((state: RootState) => state.cart);
+
     // Find the specific item in the cart
     const cartItem = items.find(item => item.id === productId);
     const quantity = cartItem ? cartItem.quantity : 0;
@@ -15,6 +16,7 @@ export function AddToCart({ productId }: { productId?: string }) {
     const handleIncrement = (e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent navigating if this is inside a product card
         dispatch(addToCart({ id: productId }));
+        dispatch(toggleCartSidebar('open'))
     };
 
     // Handler to decrement
@@ -44,11 +46,11 @@ export function AddToCart({ productId }: { productId?: string }) {
 
     // 2. STATE: Item IS in cart (Counter UI)
     return (
-        <div className="flex items-center justify-between bg-brand-primary text-white rounded-lg shadow-md overflow-hidden w-32 h-11">
+        <div className={`flex items-center justify-between bg-brand-primary text-white rounded-lg shadow-md overflow-hidden ${styles === "small" ? "w-28 h-8" : "w-40 h-14"}`}>
             {/* Decrease Button */}
             <button
                 onClick={handleDecrement}
-                className="h-full px-3 hover:bg-black/10 active:bg-black/20 transition-colors flex items-center justify-center"
+                className="h-full px-2 hover:bg-black/10 active:bg-black/20 transition-colors flex items-center justify-center"
                 aria-label="Decrease quantity"
             >
                 <Minus size={16} />
@@ -62,7 +64,7 @@ export function AddToCart({ productId }: { productId?: string }) {
             {/* Increase Button */}
             <button
                 onClick={handleIncrement}
-                className="h-full px-3 hover:bg-black/10 active:bg-black/20 transition-colors flex items-center justify-center"
+                className="h-full px-2 hover:bg-black/10 active:bg-black/20 transition-colors flex items-center justify-center"
                 aria-label="Increase quantity"
             >
                 <Plus size={16} />

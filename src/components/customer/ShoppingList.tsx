@@ -36,10 +36,10 @@ export function ShoppingList({
                 <ul className={`w-full flex flex-wrap justify-between gap-4 ${styles} items-start`} >
 
                     {productsState && productsState.slice(firstIndex, lastIndex + 1).map((product, idx) => (
-                        <li key={idx} className="text-lg text-gray-700 hover:text-gray-900 cursor-pointer border-2 w-82 border-gray-200 rounded-lg p-4  relative" >
+                        <li key={idx} className=" shrink text-lg text-gray-700 hover:text-gray-900 cursor-pointer border-2 w-82 border-gray-200 rounded-lg p-4  relative" >
                             <WishListBtn productId={product.id} styles="absolute top-2 right-4" />
-                            <Link to={`/shopping/${product.id}`} className="w-full h-full" >
-                                <img className="w-full h-80 object-cover rounded-lg my-2" src={product.imgUrl} alt={product.title.trim()} />
+                            <Link to={`/shopping/${product.id}`} className=" h-full" >
+                                <img className=" w-full   object-cover aspect-square rounded-lg my-2" src={product.imgUrl} alt={product.title.trim()} />
                             </Link>
                             <p>{product.title}</p>
                             <p className="text-sm text-gray-500 line-clamp-3 mb-4">

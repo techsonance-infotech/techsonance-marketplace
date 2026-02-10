@@ -5,12 +5,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { Bell,  Menu } from "lucide-react";
 import { closeMenu, openMenu } from "../../features/menuBar";
 import { NAV_LINKS } from "../../utils/customer/constants";
+import { toggleCartSidebar } from "../../features/CartSidebar";
  
 
 
 export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: { styles?: string, logoUrl?: string, menuLinks?: { [key: string]: string }[] }) {
     const heartImg = true ? heartDark : heartLight
     const searchImg = false ? searchImgLight : searchImgDark;
+    const { isCartOpen } = useSelector((state) => state.cartSidebar)
+      const { items } = useSelector((state) => state.cart)
+    
     const { isMenuOpen } = useSelector((state: any) => state.menu)
     const dispatch = useDispatch();
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
@@ -56,7 +60,8 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
                             {wishlistCount > 0 ? <span className=" absolute top-0 left-3 text-[12px] bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center" >{wishlistCount}</span> : null}
                             <img src={heartImg} alt="" className="h-6 w-6" />
                         </Link>
-                        <Link to={'/cart_page'}>
+                        <Link to={'/#'} onClick={() => dispatch(toggleCartSidebar())}  className=" relative" >
+                        <p className=" absolute -top-3 left-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center">{items.length > 0 && items.length}</p>
                             <img src={cartImgDark} alt="" className="h-6 w-6 " />
                         </Link>
                         <Link to={'/user_profile'}>
