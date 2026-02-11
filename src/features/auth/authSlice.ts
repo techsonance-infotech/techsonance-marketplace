@@ -46,7 +46,7 @@ export interface AuthType {
 const AUTH_TOKEN = 'authToken';
 const initialState = {
     isAuthenticated: !!localStorage.getItem(AUTH_TOKEN),
-    user: null,
+    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
     loading: false,
     error: null,
     token: localStorage.getItem(AUTH_TOKEN) || null,
@@ -79,4 +79,4 @@ const authSlice = createSlice({
     }
 })
 export const { loginStart, loginFailure, loginSuccess, logOut } = authSlice.actions;
-export default authSlice.reducer;
+export const authReducer = authSlice.reducer;

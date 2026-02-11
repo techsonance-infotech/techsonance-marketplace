@@ -5,7 +5,7 @@ export type MenuState = {
 const initialState: MenuState = {
     isMenuOpen: false,
 };
-const menuReducer = createSlice({
+const menuSlice = createSlice({
     name: "menu",
     initialState,
     reducers: {
@@ -13,5 +13,5 @@ const menuReducer = createSlice({
         closeMenu: (state) => { state.isMenuOpen = false; }
     }
 });
-export const { openMenu, closeMenu } = menuReducer.actions;
-export default menuReducer.reducer;
+export const { openMenu, closeMenu } = menuSlice.actions;
+export const menuReducer = menuSlice.reducer;

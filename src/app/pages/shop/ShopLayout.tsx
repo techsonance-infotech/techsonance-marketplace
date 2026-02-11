@@ -20,7 +20,7 @@ export function ShopLayout() {
 
   return (
     <>
-      <Navbar  styles="bg-navbar  " />
+      <Navbar styles="bg-navbar  " />
       <CartSidebar />
       <Outlet />
       <Footer styles="bg-footer-foreground text-primary" />

@@ -7,7 +7,7 @@ import { toggleCartSidebar } from "../../features/CartSidebar";
 export function AddToCart({ productId, styles }: { productId?: string, styles?: string }) {
     const dispatch = useDispatch();
     const { items } = useSelector((state: RootState) => state.cart);
-
+    const { user } = useSelector((state: RootState) => state.auth)
     // Find the specific item in the cart
     const cartItem = items.find(item => item.id === productId);
     const quantity = cartItem ? cartItem.quantity : 0;
@@ -15,8 +15,13 @@ export function AddToCart({ productId, styles }: { productId?: string, styles?: 
     // Handler to increment
     const handleIncrement = (e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent navigating if this is inside a product card
-        dispatch(addToCart({ id: productId }));
-        dispatch(toggleCartSidebar('open'))
+        if (user) {
+            dispatch(addToCart({ id: productId, user_id: user.user_id }));
+            dispatch(toggleCartSidebar('open'))
+        } else {
+            // Handle the case when the user is not authenticated
+            alert("Please log in to add items to the cart.");
+        }
     };
 
     // Handler to decrement
@@ -24,10 +29,10 @@ export function AddToCart({ productId, styles }: { productId?: string, styles?: 
         e.stopPropagation();
         if (quantity > 1) {
             // Assuming your reducer handles updating specific quantities
-            dispatch(updateQuantity({ id: productId, quantity: quantity - 1 }));
+            dispatch(updateQuantity({ id: productId, quantity: quantity - 1, user_id: user.user_id }));
         } else {
             // If quantity is 1, removing it should remove from cart completely
-            dispatch(removeFromCart({ id: productId }));
+            dispatch(removeFromCart({ id: productId, user_id: user.user_id }));
         }
     };
 
@@ -46,7 +51,7 @@ export function AddToCart({ productId, styles }: { productId?: string, styles?: 
 
     // 2. STATE: Item IS in cart (Counter UI)
     return (
-        <div className={`flex items-center justify-between bg-brand-primary text-white rounded-lg shadow-md overflow-hidden ${styles === "small" ? "w-28 h-8" : "w-40 h-14"}`}>
+        <div className={`flex items-center justify-between bg-brand-primary text-white rounded-lg shadow-md overflow-hidden ${styles === "small" ? "w-28 h-8" : "w-40 h-12"}`}>
             {/* Decrease Button */}
             <button
                 onClick={handleDecrement}

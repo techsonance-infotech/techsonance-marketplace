@@ -1,10 +1,11 @@
-﻿import { useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleCartSidebar } from "../../features/CartSidebar";
 import { PRODUCT_LIST } from "../../utils/customer/constants";
 import { AddToCart } from "./AddToCart";
 
 export function CartSidebar() {
+  const focusRef = useRef(null);
   const { isCartOpen } = useSelector((state) => state.cartSidebar)
   const { items } = useSelector((state) => state.cart)
   const cartItems = PRODUCT_LIST.filter(product => items.some(item => item.id === product.id)).map(product => {
@@ -13,9 +14,25 @@ export function CartSidebar() {
   }
   );
   const dispatch = useDispatch();
+  useEffect(() => {
+    if (focusRef.current && isCartOpen) {
+
+      document.addEventListener('mousedown', function handleEscape(event) {
+        console.log(event, 'mouse')
+        dispatch(toggleCartSidebar('close'));
+
+      });
+  
+    }
+    return () => {
+      document.removeEventListener('mousedown', function handleEscape(event) {
+        console.log(event, 'mouse')
+      });
+    }
+  }, [isCartOpen]);
   return (
     <>
-      {isCartOpen && <aside className="absolute z-10 h-[100dvh] w-112 bg-white right-0 top-0 shadow-lg p-4">
+      {isCartOpen && <aside ref={focusRef} tabIndex={-1} className="absolute z-10 h-[100dvh] w-112 bg-white right-0 top-0 shadow-lg p-4">
         <h1 className="text-lg font-bold">Your Cart</h1>
         <button onClick={() => dispatch(toggleCartSidebar('close'))} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl">
           &times;

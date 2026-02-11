@@ -5,7 +5,7 @@ export type isSidebarType = {
 const initialState: isSidebarType = {
     isSidebarOpen: false,
 };
-const sidebarReducer = createSlice({
+const sidebarSlice = createSlice({
     name: "sidebar",
     initialState,
     reducers: {
@@ -14,5 +14,5 @@ const sidebarReducer = createSlice({
         }
     }
 });
-export const { toggleSidebar } = sidebarReducer.actions;
-export default sidebarReducer.reducer;
+export const { toggleSidebar } = sidebarSlice.actions;
+export const sidebarReducer = sidebarSlice.reducer;

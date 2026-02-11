@@ -1,10 +1,10 @@
 ﻿import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '../features/auth/authSlice';
 import { adminThemeReducer } from '../features/theme/adminThemeSlice';
-import sidebarReducer from "../features/sidebar"
-import menuReducer from "../features/menuBar"
 import { CartReducer } from '../features/Cart';
 import { cartSidebarReducer } from '../features/CartSidebar';
+import { authReducer } from '../features/auth/authSlice';
+import { menuReducer } from '../features/menuBar';
+import { sidebarReducer } from '../features/sidebar';
 
 
 
@@ -17,12 +17,11 @@ export const store = configureStore({
         cart: CartReducer,
         cartSidebar: cartSidebarReducer,
 
-        
+
     },
 });
 store.subscribe(() => {
     localStorage.setItem('cart', JSON.stringify(store.getState().cart.items));
-    localStorage.setItem('total', JSON.stringify(store.getState().cart.total));
 })
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
