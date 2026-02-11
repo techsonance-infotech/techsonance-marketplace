@@ -78,7 +78,7 @@ export function Product() {
                       key={i}
                       name='star'
                       fill='yellow' 
-                      className={i < product.rating ? 'text-yellow-500' : 'text-gray-800'}
+                      className={i < product?.rating ? 'text-yellow-500' : 'text-gray-800'}
                     />
                   ))}
                 </span>

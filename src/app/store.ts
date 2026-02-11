@@ -5,6 +5,7 @@ import { cartSidebarReducer } from '../features/CartSidebar';
 import { authReducer } from '../features/auth/authSlice';
 import { menuReducer } from '../features/menuBar';
 import { sidebarReducer } from '../features/sidebar';
+import { localStorageMiddleware } from '../features/UserSlice';
 
 
 
@@ -19,7 +20,12 @@ export const store = configureStore({
 
 
     },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(localStorageMiddleware),
+
 });
+store.subscribe(() => {
+    localStorage.setItem('user', JSON.stringify(store.getState().auth.user));
+})
 store.subscribe(() => {
     localStorage.setItem('cart', JSON.stringify(store.getState().cart.items));
 })

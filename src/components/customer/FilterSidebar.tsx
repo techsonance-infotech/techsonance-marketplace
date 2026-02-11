@@ -1,19 +1,19 @@
-﻿import { SlidersHorizontal, ChevronUp, ChevronRight, ChevronDown } from 'lucide-react'
+﻿import { SlidersHorizontal, ChevronUp, ChevronRight, X, ChevronDown } from 'lucide-react'
 import { type PRODUCT_LIST_TYPE } from '../../utils/customer/constants'
 import { useEffect, useState } from 'react'
-import { is } from 'date-fns/locale'
 
 export function FilterSidebar({ PRODUCT_LIST, filterProduct }: {
   PRODUCT_LIST: PRODUCT_LIST_TYPE[],
   filterProduct: React.Dispatch<React.SetStateAction<PRODUCT_LIST_TYPE[]>>
 }) {
-  const [products, setProducts] = useState<PRODUCT_LIST_TYPE[]>(PRODUCT_LIST)
-  const [categoryFilter] = useState<string[]>([...new Set(PRODUCT_LIST.map(pro => pro.category))])
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [isPriceOpen, setIsPriceOpen] = useState(true);
   const [isColorsOpen, setIsColorsOpen] = useState(true);
   const [isCategoryOpen, setIsCategoryOpen] = useState(true);
-  // Example colors based on image
+  const [isOpen, setIsOpen] = useState(false); // Mobile drawer state
+  const [categoryFilter] = useState<string[]>([...new Set(PRODUCT_LIST.map(pro => pro.category))])
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(50000); // Default high ceiling
   const colors = [
     { name: 'Navy', class: 'bg-blue-600' },
     { name: 'Black', class: 'bg-gray-900' },
@@ -23,105 +23,126 @@ export function FilterSidebar({ PRODUCT_LIST, filterProduct }: {
     { name: 'Blue', class: 'bg-blue-400' }
   ];
 
-  const handleCategoryFilter = (category: string) => {
-    if (!selectedCategories.includes(category)) {
-      setSelectedCategories(prev => [...prev, category])
-    } else {
-      setSelectedCategories(prev => prev.filter(cat => cat !== category))
-    }
-  }
-
   useEffect(() => {
-    if (selectedCategories.length === 0) {
-      filterProduct(products)
-    } else {
-      filterProduct(products.filter(pro => selectedCategories.includes(pro.category)))
-    }
-  }, [selectedCategories, products, filterProduct])
-  return (
-    <aside className='w-72 bg-white border-r border-gray-200 p-6 flex flex-col gap-8 hidden lg:block h-full'>
-      {/* Header */}
+    let filtered = selectedCategories.length === 0
+      ? PRODUCT_LIST
+      : PRODUCT_LIST.filter(pro => selectedCategories.includes(pro.category));
+    filtered = filtered.filter(pro => pro.price >= minPrice && pro.price <= maxPrice);
+
+    filterProduct(filtered);
+  }, [selectedCategories, minPrice, maxPrice, filterProduct]);
+  // Sidebar Content (Extracted to avoid repetition)
+  const SidebarContent = () => (
+    <div className="flex flex-col gap-8">
       <div className='flex items-center justify-between pb-4 border-b border-gray-100'>
         <h1 className='text-lg font-bold text-gray-800'>Filter</h1>
-        <SlidersHorizontal size={20} className="text-gray-500" />
+        <button onClick={() => setIsOpen(false)} className="lg:hidden">
+          <X size={20} />
+        </button>
+        <SlidersHorizontal size={20} className="hidden lg:block text-gray-500" />
       </div>
 
-      {/* Price Section */}
-      <section className='my-4'>
-        <div className='flex items-center justify-between mb-6' onClick={() => setIsPriceOpen(!isPriceOpen)}>
-          <h2 className='text-md font-semibold text-gray-700'>Price</h2>
+
+      <section className='border-b border-gray-50 pb-6'>
+        <div className='flex items-center justify-between mb-6 cursor-pointer group' onClick={() => setIsPriceOpen(!isPriceOpen)}>
+          <h2 className='text-sm font-bold text-gray-700 uppercase tracking-tighter'>Price</h2>
           {isPriceOpen ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
         </div>
 
-        {/* Mock Range Slider */}
         {isPriceOpen && (
-          <>
-
-            <div className="relative h-1 w-full bg-blue-100 rounded-full mb-6">
-              <div className="absolute h-full w-2/3 bg-blue-500 left-4 rounded-full"></div>
-              <div className="absolute top-1/2 -translate-y-1/2 left-4 w-4 h-4 bg-blue-500 border-2 border-white rounded-full shadow-md cursor-pointer"></div>
-              <div className="absolute top-1/2 -translate-y-1/2 left-[70%] w-4 h-4 bg-blue-500 border-2 border-white rounded-full shadow-md cursor-pointer"></div>
+          <div className="space-y-6">
+            {/* Visual Slider Mockup (Syncs with Max Price) */}
+            <div className="relative h-1.5 w-full bg-blue-50 rounded-full">
+              <div
+                className="absolute h-full bg-blue-500 rounded-full"
+                style={{ width: `${Math.min((maxPrice / 50000) * 100, 100)}%` }}
+              ></div>
+              <div className="absolute top-1/2 -translate-y-1/2 left-0 w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-sm"></div>
+              <div
+                className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-sm transition-all"
+                style={{ left: `calc(${Math.min((maxPrice / 50000) * 100, 100)}% - 8px)` }}
+              ></div>
             </div>
-
 
             <div className='flex items-center gap-3'>
-              <div className="flex-1 border rounded-md p-1 px-2 text-xs text-gray-500 flex items-center">
-                ₹<input type="text" defaultValue="1000" className="w-full outline-none ml-1 bg-transparent" />
+              <div className="flex-1 flex flex-col gap-1">
+                <span className="text-[10px] text-gray-400 font-bold uppercase">Min</span>
+                <div className="border border-gray-200 rounded-md p-2 text-sm text-gray-700 flex items-center focus-within:border-blue-400">
+                  <span className="text-gray-400 mr-1">₹</span>
+                  <input
+                    type="number"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(Number(e.target.value))}
+                    className="w-full outline-none bg-transparent"
+                  />
+                </div>
               </div>
-              <div className="flex-1 border rounded-md p-1 px-2 text-xs text-gray-500 flex items-center">
-                ₹<input type="text" defaultValue="10000" className="w-full outline-none ml-1 bg-transparent" />
+              <div className="flex-1 flex flex-col gap-1">
+                <span className="text-[10px] text-gray-400 font-bold uppercase">Max</span>
+                <div className="border border-gray-200 rounded-md p-2 text-sm text-gray-700 flex items-center focus-within:border-blue-400">
+                  <span className="text-gray-400 mr-1">₹</span>
+                  <input
+                    type="number"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(Number(e.target.value))}
+                    className="w-full outline-none bg-transparent"
+                  />
+                </div>
               </div>
             </div>
-          </>
-
-        )}
-      </section>
-
-      {/* Colors Section */}
-      <section className='my-4'>
-        <div className='flex items-center justify-between mb-4' onClick={() => setIsColorsOpen(!isColorsOpen)}>
-          <h2 className='text-md font-semibold text-gray-700'>Colors</h2>
-          {isColorsOpen ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
-        </div>
-        {isColorsOpen && (
-          <div className='grid grid-cols-3 gap-y-4 gap-x-2'>
-            {colors.map((color) => (
-              <div key={color.name} className="flex flex-col items-center gap-2 cursor-pointer group">
-                <div className={`w-6 h-6 rounded-md ${color.class} shadow-sm group-hover:ring-2 ring-blue-200 transition-all`}></div>
-                <span className="text-[10px] text-gray-400 uppercase tracking-tighter">{color.name}</span>
-              </div>
-            ))}
           </div>
         )}
-
       </section>
 
-      {/* Category Section */}
-      <section className='my-4'>
-        <div className='flex items-center justify-between mb-4' onClick={() => setIsCategoryOpen(!isCategoryOpen)}>
+      <section>
+        <div className='flex items-center justify-between mb-4'>
           <h2 className='text-md font-semibold text-gray-700'>Category</h2>
-          {isCategoryOpen ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+          <ChevronUp size={18} />
         </div>
-        {isCategoryOpen && (
-          <div className='flex flex-col gap-3'>
-            {categoryFilter.map((category, idx) => (
-              <div
-                key={idx}
-                onClick={() => handleCategoryFilter(category)}
-                className="flex items-center justify-between group cursor-pointer"
-              >
-                <label
-                  className={`text-sm cursor-pointer transition-colors ${selectedCategories.includes(category) ? 'text-blue-600 font-medium' : 'text-gray-500'}`}
-                >
-                  {category}
-                </label>
-                <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 transition-colors" />
-              </div>
-            ))}
-          </div>
-
-        )}
+        <div className='flex flex-col gap-3'>
+          {categoryFilter.map((cat) => (
+            <div
+              key={cat}
+              onClick={() => setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
+              className="flex items-center justify-between cursor-pointer group"
+            >
+              <span className={`text-sm ${selectedCategories.includes(cat) ? 'text-blue-600 font-bold' : 'text-gray-500'}`}>{cat}</span>
+              <ChevronRight size={14} className="text-gray-300" />
+            </div>
+          ))}
+        </div>
       </section>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+
+      <button
+        onClick={() => setIsOpen(true)}
+        className="lg:hidden fixed bottom-6 right-6 z-50 bg-black text-white p-4 rounded-full shadow-xl flex items-center gap-2"
+      >
+        <SlidersHorizontal size={20} />
+        <span className="font-semibold text-sm">Filters</span>
+      </button>
+
+
+      <aside className='hidden lg:block w-72 bg-white border-r border-gray-200 p-6 h-screen sticky top-0'>
+        <SidebarContent />
+      </aside>
+
+
+      <div className={`fixed inset-0 z-[60] lg:hidden transition-visibility duration-300 ${isOpen ? 'visible' : 'invisible'}`}>
+
+        <div
+          className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
+          onClick={() => setIsOpen(false)}
+        />
+        {/* Drawer Panel */}
+        <aside className={`absolute left-0 top-0 h-full w-80 bg-white p-6 shadow-2xl transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <SidebarContent />
+        </aside>
+      </div>
+    </>
   )
 }

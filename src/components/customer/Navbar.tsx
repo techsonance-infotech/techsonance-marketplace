@@ -15,7 +15,7 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
     const { isCartOpen } = useSelector((state) => state.cartSidebar)
       const { items } = useSelector((state) => state.cart)
     
-    const { isMenuOpen } = useSelector((state: any) => state.menu)
+    const {user}= useSelector((state:any)=>state.auth)
     const dispatch = useDispatch();
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const wishlistCount = 0;
@@ -64,7 +64,7 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
                         <p className=" absolute -top-3 left-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center">{items.length > 0 && items.length}</p>
                             <img src={cartImgDark} alt="" className="h-6 w-6 " />
                         </button>
-                        <Link to={'/user_profile'}>
+                        <Link to={'/customerProfile/'+(user?.user_id || '')} className=" ">
                             <img src={userIcon} alt="" className="h-6 w-6 " />
                         </Link>
                     </div>}

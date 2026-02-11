@@ -1,52 +1,24 @@
 ﻿import { createSlice } from '@reduxjs/toolkit';
-export const UserRole = {
-    Admin: 'admin',
-    Vendor: 'vendor',
-    Customer: 'customer'
-} as const;
-
-// This creates a type from the object values
-export type UserRole = typeof UserRole[keyof typeof UserRole];
-type Permission = 'read' | 'create' | 'delete' | 'update';
-interface RoleDefinition {
-    can: Permission[];
-}
-export const role: Record<UserRole, RoleDefinition> = {
-    [UserRole.Admin]: {
-        can: ['read', 'create', 'delete', 'update']
-    },
-    [UserRole.Vendor]: {
-        can: ['read', 'create', 'update']
-    },
-    [UserRole.Customer]: {
-        can: ['read']
-    }
-}
+import type { RoleDefinition, UserProfile, UserRole } from '../../utils/Types';
+import { getUserFromLocalStorage, MockUser } from '../UserSlice';
+import { get } from 'react-hook-form';
 
 
-export interface User {
-    user_id: String;
-    company_id: String;
-    user_role_type: UserRole;
-    name: String;
-    email: String;
-    phone: String;
-    user_status: "Active" | " Inactive" | " Banned"
-}
+
 
 export interface AuthType {
     isAuthenticated: boolean;
-    user: User | null;
+    user: UserProfile | null;
     loading: boolean;
     error: string | null;
     token: string | null;
     role: Record<UserRole, RoleDefinition>;
 }
-
+    
 const AUTH_TOKEN = 'authToken';
 const initialState = {
     isAuthenticated: !!localStorage.getItem(AUTH_TOKEN),
-    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
+    user:getUserFromLocalStorage(), 
     loading: false,
     error: null,
     token: localStorage.getItem(AUTH_TOKEN) || null,
@@ -72,6 +44,8 @@ const authSlice = createSlice({
         logOut(state) {
             state.isAuthenticated = false;
             state.user = null;
+            localStorage.removeItem(AUTH_TOKEN);    
+            localStorage.setItem(AUTH_TOKEN, '');
             state.token = null;
             localStorage.setItem(AUTH_TOKEN, '');
         }
