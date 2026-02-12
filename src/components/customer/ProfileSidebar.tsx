@@ -2,7 +2,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
 import type { RootState } from '../../app/store';
-import { DoorClosedIcon, Handbag, Heart, LocateIcon, LogOut, MapPin, User } from 'lucide-react';
 import { DynamicIcon } from 'lucide-react/dynamic';
 import { logOut } from '../../features/auth/authSlice';
 const ProfileSidebarLink = [
@@ -63,7 +62,7 @@ export function ProfileSidebar() {
                     <li key={link.name}>
                         <button
                             onClick={() => onClickHandler(link.path)}
-                            className={`lg:w-64  flex gap-4 items-center  text-left px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors ${path === `/customerProfile/${user?.user_id}${link.path}` ? 'bg-blue-100' : ''}`}
+                            className={`lg:w-64  flex gap-4 items-center  text-left px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors ${path === `/customerProfile/${user?.user_id}${link.path}` ? 'bg-blue-100' : link.path === `/logout` ? ' text-red-500' : ''}`}
                         >
                             <DynamicIcon name={link.icon} />
                             {link.name}

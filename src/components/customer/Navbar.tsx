@@ -2,23 +2,22 @@
 import { useMediaQuery } from 'react-responsive'
 import { BRAND_LOGO, cartImgDark, heartDark, heartLight, searchImgDark, searchImgLight, userIcon } from "../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { Bell,  Menu } from "lucide-react";
-import { closeMenu, openMenu } from "../../features/menuBar";
+import { Bell, Heart, ShoppingCart } from "lucide-react";
+
 import { NAV_LINKS } from "../../utils/customer/constants";
 import { toggleCartSidebar } from "../../features/CartSidebar";
- 
+
 
 
 export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: { styles?: string, logoUrl?: string, menuLinks?: { [key: string]: string }[] }) {
-    const heartImg = true ? heartDark : heartLight
+
     const searchImg = false ? searchImgLight : searchImgDark;
-    const { isCartOpen } = useSelector((state) => state.cartSidebar)
-      const { items } = useSelector((state) => state.cart)
-    
-    const {user}= useSelector((state:any)=>state.auth)
+    const { items } = useSelector((state) => state.cart)
+    const { wishItems } = useSelector((state: any) => state.wishlist)
+    const { user } = useSelector((state: any) => state.auth)
     const dispatch = useDispatch();
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
-    const wishlistCount = 0;
+    const wishlistCount = wishItems.length;
     const path = useLocation().pathname;
     if (path.startsWith('/admin') || path.startsWith('/vendor')) {
         return <Outlet />
@@ -42,7 +41,7 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
                     const key = Object.keys(item)[0];
                     const value = Object.values(item)[0];
                     return (
-                        <li key={key} className={`${path === value ? ' hover:text-white bg-[#04b0ffc1] ' : ''} py-1 px-3 rounded-full cursor-pointer`} >
+                        <li key={key} className={`text-lg  ${path === value ? ' hover:text-white bg-[#04b0ffc1] ' : ''} py-1 px-3 rounded-full cursor-pointer`} >
                             <Link to={`${value}`}>{key}</Link>
                         </li>
                     )
@@ -56,15 +55,15 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
                 </div>
                 {path === '/customerRegister' || path === '/customerLogin' ? null :
                     <div className="  flex gap-4 items-center ">
-                        <Link to={'/wishlist'} className="relative  ">
-                            {wishlistCount > 0 ? <span className=" absolute top-0 left-3 text-[12px] bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center" >{wishlistCount}</span> : null}
-                            <img src={heartImg} alt="" className="h-6 w-6" />
+                        <Link to={'/customerProfile/' + (user?.user_id || '') + '/wishlist'} className="relative  ">
+                            {wishlistCount > 0 ? <span className="  absolute -top-2 -right-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center" >{wishlistCount}</span> : null}
+                            <Heart size={32} color={wishlistCount > 0 ? "pink" : "black"} fill={wishlistCount > 0 ? "pink" : "none"} />
                         </Link>
-                        <button   onClick={() => dispatch(toggleCartSidebar('open'))}  className=" relative" >
-                        <p className=" absolute -top-3 left-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center">{items.length > 0 && items.length}</p>
-                            <img src={cartImgDark} alt="" className="h-6 w-6 " />
+                        <button onClick={() => dispatch(toggleCartSidebar('open'))} className=" relative" >
+                            {items.length > 0 && <p className=" absolute -top-2 -right-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center">{items.length}</p>}
+                            <ShoppingCart size={32} />
                         </button>
-                        <Link to={'/customerProfile/'+(user?.user_id || '')} className=" ">
+                        <Link to={'/customerProfile/' + (user?.user_id || '')} className=" ">
                             <img src={userIcon} alt="" className="h-6 w-6 " />
                         </Link>
                     </div>}

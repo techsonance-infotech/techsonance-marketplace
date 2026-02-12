@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 import { store } from './store'
 import { BrowserRouter, Route, Routes } from "react-router";
 import { ProtectedRoute } from '../components/common/ProtectedRoute.tsx'
- 
+
 import { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home } from '../utils/constants';
 import NotFound from './not-found.tsx'
 import AdminLayout from './pages/admin/AdminLayout.tsx'
@@ -19,6 +19,11 @@ import { UserLayout } from './pages/shop/customerProfile/UserLayout.tsx'
 import { UserProfile } from './pages/shop/customerProfile/index.tsx'
 import { Addresses } from './pages/shop/customerProfile/Addresses.tsx'
 import { UserRole } from '../utils/Types.ts'
+import { WishList } from './pages/shop/customerProfile/Wishlist.tsx'
+import { Checkout } from '../components/customer/Payment/Checkout.tsx'
+import OrderSuccess from '../components/customer/Payment/OrderSuccess.tsx'
+import { OrderFailed } from '../components/customer/Payment/OrderFailed.tsx'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
@@ -30,8 +35,14 @@ createRoot(document.getElementById('root')!).render(
             <Route path='shopping' element={<Shopping />} />
             <Route path='shopping/:id' element={<Product />} />
             <Route path='customerProfile/:userId' element={<UserLayout />} >
-              <Route index  element={<UserProfile />} />
+              <Route index element={<UserProfile />} />
               <Route path='addresses' element={<Addresses />} />
+              <Route path='wishlist' element={<WishList />} />
+              <Route path='checkout' >
+                <Route index element={<Checkout />} />
+                <Route path='orderSuccess' element={<OrderSuccess />} />
+                <Route path='orderFailed' element={<OrderFailed />} />
+              </Route>
             </Route>
           </Route>
           <Route path='auth'>
