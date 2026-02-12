@@ -11,8 +11,10 @@ const localStorageMiddleware = store => next => action => {
     const result = next(action);
     if (action.type.startsWith('cart/')) {
         const cartState = store.getState().cart;
-        localStorage.setItem('cart', JSON.stringify(cartState));
-        console.log('LocalStorage updated:', action.type, cartState);
+        if (Array.isArray(cartState.items)) {
+            localStorage.setItem('cart', JSON.stringify(cartState));
+            console.log('LocalStorage updated:', action.type, cartState);
+        }
     }
     if (action.type.startsWith('auth/')) {
         const authState = store.getState().auth;

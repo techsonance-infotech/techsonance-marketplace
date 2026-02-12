@@ -9,19 +9,26 @@ interface CartItem {
 const loadCartFromLocalStorage = () => {
     try {
         const serializedCart = localStorage.getItem('cart');
- 
+        
         if (serializedCart  ) {
-            return { items: JSON.parse(serializedCart) };
+            const parsedCart = JSON.parse(serializedCart);
+            if (parsedCart && Array.isArray(parsedCart.items)) {
+                return parsedCart;
+            } else {
+                console.warn("Invalid cart data in localStorage, resetting to initial state.");
+                return { items: [] };
+            }
         }
     } catch (e) {
         console.error("Could not load cart from localStorage", e);
     }
+    return { items: [] };
 }
 const initialState: {
     items: CartItem[];
     
 } = {
-    items: loadCartFromLocalStorage()?.items || [],
+    items:  loadCartFromLocalStorage()  ? loadCartFromLocalStorage().items : [],
  
 }
 const CartSlice = createSlice({
@@ -29,30 +36,29 @@ const CartSlice = createSlice({
     initialState,
     reducers: {
         addToCart: (state, action) => {
-            const existingItem = state.items.find(item => item.id === action.payload.id);
+            const existingItem =Array.isArray(state.items) ? state.items.find(item => item.id === action.payload.id) : undefined;
             if (existingItem ) {
                 existingItem.quantity += 1;
                 console.log(existingItem.userId)
             }
             else {
+               
                 state.items.push({ ...action.payload, quantity: 1 });
             }
             console.log('Current state:', state);
-            localStorage.setItem('cart', JSON.stringify(state.items));
 
         },
         removeFromCart: (state, action) => {
-            const existingItem = state.items.find(item => item.id === action.payload.id);
+            const existingItem = Array.isArray(state.items) ? state.items.find(item => item.id === action.payload.id) : undefined;
             if (existingItem ) {
 
                 state.items = state.items.filter(item => item.id !== action.payload.id);
             }
             console.log('Current state:', state);
-            localStorage.setItem('cart', JSON.stringify(state.items));
         },  
 
         updateQuantity: (state, action) => {
-            const existingItem = state.items.find(item => item.id === action.payload.id);
+            const existingItem = Array.isArray(state.items) ? state.items.find(item => item.id === action.payload.id) : undefined;
             if (existingItem) {
                 existingItem.quantity = action.payload.quantity;
 

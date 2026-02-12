@@ -29,10 +29,10 @@ export function AddToCart({ productId, styles }: { productId?: string, styles?: 
     const handleDecrement = ( ) => {
     
         if (quantity > 1) {
-            dispatch(updateQuantity({ id: productId, quantity: quantity - 1, user_id: user.user_id }));
+            dispatch(updateQuantity({ id: productId, quantity: quantity - 1, user_id: user?.user_id }));
         } else {
 
-            dispatch(removeFromCart({ id: productId, user_id: user.user_id }));
+            dispatch(removeFromCart({ id: productId, user_id: user?.user_id }));
             
         }
     };
