@@ -4,13 +4,17 @@ import { toggleCartSidebar } from "../../features/CartSidebar";
 import { PRODUCT_LIST } from "../../utils/customer/constants";
 import { AddToCart } from "./AddToCart";
 import type { RootState } from "../../app/store";
+import { X } from "lucide-react";
+import BuyBtn from "./BuyBtn";
+import { Link } from "react-router";
 
 export function CartSidebar() {
   const focusRef = useRef(null);
   const { isCartOpen } = useSelector((state: RootState) => state.cartSidebar)
+  const { user } = useSelector((state: RootState) => state.auth)
   const { items } = useSelector((state: RootState) => state.cart)
-  const cartItems =  Array.isArray(PRODUCT_LIST) && Array.isArray(items) ?PRODUCT_LIST.filter(product =>   items.some(item => item.id === product.id) ).map(product => {
-    const item =items.find(item => item.id === product.id)  
+  const cartItems = Array.isArray(PRODUCT_LIST) && Array.isArray(items) ? PRODUCT_LIST.filter(product => items.some(item => item.id === product.id)).map(product => {
+    const item = items.find(item => item.id === product.id)
     return { ...product, quantity: item?.quantity || 0 };
   }) : [];
 
@@ -32,8 +36,8 @@ export function CartSidebar() {
     <>
       {isCartOpen && <aside ref={focusRef} tabIndex={-1} className="absolute z-30 h-[100dvh] w-112 bg-white right-0 top-0 shadow-lg p-4">
         <h1 className="text-lg font-bold">Your Cart</h1>
-        <button onClick={() => dispatch(toggleCartSidebar('close'))} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl">
-          &times;
+        <button onClick={() => dispatch(toggleCartSidebar('close'))} className="absolute top-3 right-2 text-gray-500 hover:text-red-700 text-2xl hover:bg-red-300 rounded-full p-1">
+          <X />
         </button>
         {cartItems.length === 0 ? (
           <p className="mt-4 text-gray-500">Your cart is empty.</p>
@@ -56,13 +60,14 @@ export function CartSidebar() {
 
                   <p className="text-gray-500">${item.price}</p>
                   <AddToCart productId={item.id} styles="small" />
-                </span>
-              </li>
+                </span> </li>
             ))}
           </ul>
         )}
-      </aside>}
-    </>
-
+        <br className="w-full h-[2px] bg-gray-300 my-4" />
+<Link className=" flex justify-center py-2 px-6 border-2 border-gray-300 rounded-xl" to={'/viewCart'}> <button > View Cart </button> </Link>
+ <BuyBtn styles="w-full my-4 rounded-xl" />
+  </aside >
+   } </>
   )
 }

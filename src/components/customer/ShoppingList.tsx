@@ -79,7 +79,7 @@ export function ShoppingList({
                                         <AddToCart productId={product.id} styles="w-full" />
                                     </div>
                                     <div className="">
-                                        <BuyBtn productId={product.id} styles="flex-1" />
+                                        <BuyBtn productId={product.id}     />
                                     </div>
                                 </div>
                             </div>

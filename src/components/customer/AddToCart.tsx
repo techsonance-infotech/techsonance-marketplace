@@ -41,7 +41,7 @@ export function AddToCart({ productId, styles }: { productId?: string, styles?: 
         return (
             <button
                 onClick={handleIncrement}
-                className="flex items-center gap-2 bg-brand-primary text-white px-6 py-2.5 rounded-lg hover:bg-brand-primary-dark transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+                className={`flex items-center gap-2 bg-brand-primary ${styles !== "small" ? styles:''} text-white px-6 py-2.5 rounded-lg hover:bg-brand-primary-dark transition-all duration-200 shadow-md hover:shadow-lg active:scale-95`}
             >
                 <ShoppingCart size={18} />
                 <span className="font-medium">Add to Cart</span>
@@ -51,7 +51,7 @@ export function AddToCart({ productId, styles }: { productId?: string, styles?: 
 
     // 2. STATE: Item IS in cart (Counter UI)
     return (
-        <div className={`flex items-center justify-between bg-brand-primary text-white rounded-lg shadow-md overflow-hidden ${styles === "small" ? "w-28 h-8" : "w-40 h-12"}`}>
+        <div className={`flex items-center justify-between bg-brand-primary text-white rounded-lg shadow-md overflow-hidden ${styles === "small" ? "w-28 h-8" : "w-40 h-12"} ${styles !== "small" ? styles:''} `}>
             {/* Decrease Button */}
             <button
                 onClick={() => handleDecrement()}

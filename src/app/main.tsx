@@ -6,12 +6,14 @@ import { Provider } from 'react-redux'
 import { store } from './store'
 import { BrowserRouter, Route, Routes } from "react-router";
 import { ProtectedRoute } from '../components/common/ProtectedRoute.tsx'
-import { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home, WishList, Checkout, OrderSuccess, OrderFailed, Shopping, Product, Addresses, UserProfile, UserRole, } from '../utils/constants';
+import { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home, WishList, Checkout,  Shopping, Product, Addresses, UserProfile, UserRole, } from '../utils/constants';
 import { AdminLayout } from './pages/admin/AdminLayout.tsx'
 import { VendorLayout } from './pages/vendor/VendorLayout.tsx'
 import { VendorSettingLayout } from './pages/vendor/settings/VendorSettingLayout.tsx'
 import { ShopLayout } from './pages/shop/ShopLayout.tsx'
 import { UserLayout } from './pages/shop/customerProfile/UserLayout.tsx'
+import { Unauthorized } from './pages/shop/customerProfile/Unauthorized.tsx'
+import { OrderStatus } from './pages/shop/customerProfile/Payment/OrderStatus.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -24,14 +26,15 @@ createRoot(document.getElementById('root')!).render(
             <Route index element={<Home />} />
             <Route path='shopping' element={<Shopping />} />
             <Route path='shopping/:id' element={<Product />} />
+            <Route path='*' element={<Unauthorized />} />
             <Route path='customerProfile/:userId' element={<UserLayout />} >
               <Route index element={<UserProfile />} />
               <Route path='addresses' element={<Addresses />} />
               <Route path='wishlist' element={< WishList />} />
-              <Route path='checkout' >
+              <Route path='checkout/:id' >
                 <Route index element={<Checkout />} />
-                <Route path='orderSuccess' element={<OrderSuccess />} />
-                <Route path='orderFailed' element={<OrderFailed />} />
+                <Route path='orderStatus' element={<OrderStatus />} />
+           
               </Route>
             </Route>
           </Route>

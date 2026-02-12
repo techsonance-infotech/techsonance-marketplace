@@ -63,6 +63,7 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
                             {items.length > 0 && <p className=" absolute -top-2 -right-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center">{items.length}</p>}
                             <ShoppingCart size={32} />
                         </button>
+
                         <Link to={'/customerProfile/' + (user?.user_id || '')} className=" ">
                             <img src={userIcon} alt="" className="h-6 w-6 " />
                         </Link>

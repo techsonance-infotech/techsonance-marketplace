@@ -38,7 +38,6 @@ export function Home() {
                     {Array.isArray(features) && features.map((feature, idx) => (
                         <div key={idx} className="flex flex-col items-center gap-4 p-2" >
                             <span className="bg-linear-to-t from-brand-primary to-brand-secondary p-3 rounded-full ">
-
                                 <DynamicIcon name={feature.icon.toLowerCase()} className="h-8 w-8 text-primary" />
                             </span>
                             <p className="font-bold text-lg text-band-primary-foreground">{feature.title}</p>
