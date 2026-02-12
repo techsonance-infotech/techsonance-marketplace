@@ -76,8 +76,17 @@ import { Footer } from '../components/customer/Footer'
 import { Home } from '../app/pages/shop/index.tsx'
 
 
-export { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, Navbar, Footer, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home };
+import { Shopping } from '../app/pages/shop/Shopping.tsx'
+import { Product } from '../app/pages/shop/Product.tsx'
 
+import { UserProfile } from '../app/pages/shop/customerProfile/index.tsx'
+import { Addresses } from '../app/pages/shop/customerProfile/Addresses.tsx'
+import { WishList } from '../app/pages/shop/customerProfile/Wishlist.tsx'
+import { Checkout } from '../app/pages/shop/customerProfile/Payment/Checkout.tsx'
+import{ OrderSuccess} from '../app/pages/shop/customerProfile/Payment/OrderSuccess.tsx'
+import { OrderFailed } from '../app/pages/shop/customerProfile/Payment/OrderFailed.tsx'
+import { UserRole } from "./Types.ts"
+export { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, Navbar, Footer, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home , Shopping, Product,  UserProfile, Addresses,  WishList, Checkout, OrderSuccess, OrderFailed , UserRole };
 
 
 

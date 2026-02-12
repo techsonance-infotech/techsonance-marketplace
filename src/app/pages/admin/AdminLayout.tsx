@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 
 
 
-export default function AdminLayout() {
+export   function AdminLayout() {
     const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
     return (
         <>

@@ -1,28 +1,18 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-
+import NotFound from './not-found.tsx'
 import { Provider } from 'react-redux'
 import { store } from './store'
 import { BrowserRouter, Route, Routes } from "react-router";
 import { ProtectedRoute } from '../components/common/ProtectedRoute.tsx'
-
-import { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home } from '../utils/constants';
-import NotFound from './not-found.tsx'
-import AdminLayout from './pages/admin/AdminLayout.tsx'
+import { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home, WishList, Checkout, OrderSuccess, OrderFailed, Shopping, Product, Addresses, UserProfile, UserRole, } from '../utils/constants';
+import { AdminLayout } from './pages/admin/AdminLayout.tsx'
 import { VendorLayout } from './pages/vendor/VendorLayout.tsx'
 import { VendorSettingLayout } from './pages/vendor/settings/VendorSettingLayout.tsx'
 import { ShopLayout } from './pages/shop/ShopLayout.tsx'
-import { Shopping } from './pages/shop/Shopping.tsx'
-import { Product } from './pages/shop/Product.tsx'
 import { UserLayout } from './pages/shop/customerProfile/UserLayout.tsx'
-import { UserProfile } from './pages/shop/customerProfile/index.tsx'
-import { Addresses } from './pages/shop/customerProfile/Addresses.tsx'
-import { UserRole } from '../utils/Types.ts'
-import { WishList } from './pages/shop/customerProfile/Wishlist.tsx'
-import { Checkout } from '../components/customer/Payment/Checkout.tsx'
-import OrderSuccess from '../components/customer/Payment/OrderSuccess.tsx'
-import { OrderFailed } from '../components/customer/Payment/OrderFailed.tsx'
+
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -37,7 +27,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path='customerProfile/:userId' element={<UserLayout />} >
               <Route index element={<UserProfile />} />
               <Route path='addresses' element={<Addresses />} />
-              <Route path='wishlist' element={<WishList />} />
+              <Route path='wishlist' element={< WishList />} />
               <Route path='checkout' >
                 <Route index element={<Checkout />} />
                 <Route path='orderSuccess' element={<OrderSuccess />} />
