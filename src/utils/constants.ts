@@ -83,9 +83,14 @@ import { UserProfile } from '../app/pages/shop/customerProfile/index.tsx'
 import { Addresses } from '../app/pages/shop/customerProfile/Addresses.tsx'
 import { WishList } from '../app/pages/shop/customerProfile/Wishlist.tsx'
 import { Checkout } from '../app/pages/shop/customerProfile/Payment/Checkout.tsx'
- 
+ import { OrderStatus } from '../app/pages/shop/customerProfile/Payment/OrderStatus.tsx'
+import { Contact } from '../app/pages/shop/Contact.tsx'
+import { AboutAs } from '../app/pages/shop/AboutAs.tsx'
+import { CartList } from '../app/pages/shop/customerProfile/CartList.tsx'
+
+
 import { UserRole } from "./Types.ts"
-export { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, Navbar, Footer, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home , Shopping, Product,  UserProfile, Addresses,  WishList, Checkout  , UserRole };
+export { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, Navbar, Footer, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home , Shopping, Product,  UserProfile, Addresses,  WishList, Checkout  , OrderStatus, Contact, AboutAs, CartList, UserRole };
 
 
 
