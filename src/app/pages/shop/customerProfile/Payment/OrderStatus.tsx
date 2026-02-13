@@ -46,15 +46,7 @@ interface OrderFailedStatusTypes {
     possibleReasons?: string[];
 }
 
-interface OrderStatusProps {
-    
-    status: "success" | "failed";
-    orderSuccess: OrderSuccessStatusTypes;
-    orderFailed: OrderFailedStatusTypes;
-    onRetryPayment?: () => void;
-    onChangePaymentMethod?: () => void;
-}
-const mockOrderStatus: OrderSuccessStatusTypes = {
+const mockSuccessStatus: OrderSuccessStatusTypes = {
     orderId: "#345-9204268-1845104",
     orderDate: "Jan 1",
     estimatedDelivery: "Jan 4",
@@ -98,20 +90,18 @@ const mockFailedStatus: OrderFailedStatusTypes = {
         "Technical issues with the payment gateway."
     ]
 }
-export function OrderStatus({
-    status,
-    orderSuccess = mockOrderStatus,
-    orderFailed = mockFailedStatus,
-    onRetryPayment,
-    onChangePaymentMethod
-}: OrderStatusProps) {
+export function OrderStatus() {
     const [copied, setCopied] = useState(false);
-
+    const status = "success"; // Change to "failed" to test failed state
+    const orderSuccess = mockSuccessStatus;
+    const orderFailed = mockFailedStatus;
     const copyOrderId = () => {
         navigator.clipboard.writeText(orderSuccess.orderId || "");
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
+    const onRetryPayment = () => { }
+    const onChangePaymentMethod = () => { }
 
     const orderStatuses = [
         { label: "Order Placed", date: orderSuccess.orderDate, active: true },

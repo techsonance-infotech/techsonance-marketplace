@@ -3,7 +3,7 @@ import { HOME_HERO_DESC, HOME_HERO_TITLE } from "../../../utils/constants"
 import { useDispatch } from "react-redux";
 import { DynamicIcon } from 'lucide-react/dynamic';
 import { Button } from "../../../components/ui/button";
-import { BEST_SELLING_PRODUCTS, CATEGORY_LIST, FEEDBACK_LIST, HOME_BRAND_FEATURES } from "../../../utils/customer/constants";
+import { BEST_SELLING_PRODUCTS, CATEGORY_LIST, FEEDBACK_LIST, HOME_BRAND_FEATURES, PRODUCT_LIST } from "../../../utils/customer/constants";
 import { useState } from "react";
 import { CategoryList } from "../../../components/customer/CategoryList";
 import { BestSelling } from "../../../components/customer/BestSelling";
@@ -54,7 +54,7 @@ export function Home() {
 
                 <section className="xl:pt-5 pb-2 xl:px-32   lg:px-8 md:px-4 sm:px-2 py-1">
                     <h2 className="text-2xl text-center font-bold mt-8 mb-4">Popular products</h2>
-                    <ProductList products={CATEGORY_LIST} />
+                    <ProductList products={PRODUCT_LIST} />
                 </section>
                     <CustomerFeedback FEEDBACK_LIST={FEEDBACK_LIST} />
             </main>

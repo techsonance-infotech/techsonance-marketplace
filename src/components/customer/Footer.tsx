@@ -16,18 +16,18 @@ export function Footer({ styles }: { styles?: string }) {
     //
     return (
         <>
-            <footer className={`flex flex-col bg-footer      xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-4 ${styles}`}>
+            <footer className={`flex flex-col bg-footer      xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-4 px-2 ${styles}`}>
                 <span className="w-full flex justify-center items-start   xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-1   ">
 
 
                     {/* <img src={BRAND_LOGO} alt="brand logo" className="h-10  " /> */}
                     {
                         path === '/customerRegister' || path === '/customerLogin' ? null : <>
-                            <div className="w-full  space-x-4 flex justify-between  md:text-[12px] lg:text-[.8rem] font-medium">
+                            <div className="w-full  space-x-4 flex sm:flex-row flex-col justify-between  md:text-[12px] lg:text-[.8rem] font-medium">
                                 {
                                     FOOTER_CONTENT.map((section, index) => (
                                         <ul key={index} className="flex flex-col gap-2">
-                                            <li className="font-bold text-lg ">{section.header}</li>
+                                            <li className="font-bold text-lg  text-balance">{section.header}</li>
 
                                             {
                                                 section.links.map((link, linkIndex) => (
@@ -54,7 +54,7 @@ export function Footer({ styles }: { styles?: string }) {
                      
                 </span>
                 <span className="h-[1px] w-[85%] my-2  bg-black/30 mx-auto " ></span>
-                <span className=" font-light  text-center mb-6">
+                <span className=" font-light  text-center mb-6 text-balance">
                     {FOOTER_BOTTOM_TEXT}
                 </span>
             </footer>

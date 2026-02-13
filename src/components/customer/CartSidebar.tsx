@@ -44,12 +44,12 @@ export function CartSidebar() {
         ) : (
           <ul className="mt-4 space-y-2">
             {cartItems.map((item) => (
-              <li key={item.id} className="flex justify-between items-center border-b pb-2">
+              <li key={item.id} className="flex justify-between items-center  my-4">
                 <div>
                   <span className="flex gap-3">
-                    <img className="  aspect-square w-18 h-18 object-cover" src={item.imgUrl} alt="" />
+                    <img className="  aspect-square w-18 h-18 object-cover rounded-lg" src={item.imgUrl} alt="" />
                     <span>
-                      <p className="font-medium text-md mb-1">{item.title}</p>
+                      <p className="font-medium text-md mb-1 text-balance">{item.title}</p>
                       <p className="text-gray-500">Quantity: {item.quantity}</p>
                     </span>
                   </span>
@@ -58,16 +58,16 @@ export function CartSidebar() {
 
                 <span className="flex flex-col justify-between items-end gap-2">
 
-                  <p className="text-gray-500">${item.price}</p>
+                  <p className="text-gray-500"> ₹{item.price}</p>
                   <AddToCart productId={item.id} styles="small" />
                 </span> </li>
             ))}
           </ul>
         )}
         <br className="w-full h-[2px] bg-gray-300 my-4" />
-<Link className=" flex justify-center py-2 px-6 border-2 border-gray-300 rounded-xl" to={'/viewCart'}> <button > View Cart </button> </Link>
- <BuyBtn styles="w-full my-4 rounded-xl" />
-  </aside >
-   } </>
+        <Link className=" flex justify-center py-2 px-6 border-2 border-gray-300 rounded-xl" to={`/customerProfile/${user?.user_id}/cart`}> <button > View Cart </button> </Link>
+        <BuyBtn styles="w-full my-4 rounded-xl" />
+      </aside >
+      } </>
   )
 }
