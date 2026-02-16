@@ -49,7 +49,7 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
     };
 
     return (
-        <motion.div whileHover={{scale:1.1}} className={`${containerBase} ${heightClass} ${styles} `}>
+        <motion.div whileHover={{scale:1.1}} className={`${containerBase} ${heightClass} ${styles}  `}>
             <AnimatePresence mode="wait">
                 {quantity === 0 ? (
                     <motion.button
@@ -60,7 +60,7 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
                         onClick={handleIncrement}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.95 }}
-                        className="flex h-full w-full items-center justify-center gap-2 px-6 whitespace-nowrap"
+                        className="flex h-full w-full items-center justify-center gap-2  px-6 whitespace-nowrap"
                     >
                         <ShoppingCart size={isSmall ? 18 : 22} />
         

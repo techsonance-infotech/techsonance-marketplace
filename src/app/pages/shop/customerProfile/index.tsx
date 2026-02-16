@@ -35,7 +35,7 @@ const containerVariants = {
     visible: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.15 // Delays each section
+            staggerChildren: 0.15   
         }
     }
 };
@@ -65,6 +65,8 @@ export function UserProfile() {
         >
           
             <motion.section
+                initial="hidden"
+                animate="visible"
                 variants={itemVariants}
                 className="flex flex-col md:flex-row justify-between items-center p-8 bg-white border border-gray-200 rounded-2xl shadow-sm gap-6"
             >
@@ -136,7 +138,7 @@ export function UserProfile() {
                 <h1 className="font-bold text-2xl text-gray-900 mb-6">Account Management</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    {/* Address Card */}
+                 
                     <ManagementCard
                         icon={<MapPin size={28} className="text-blue-600" />}
                         color="bg-blue-50"
@@ -157,7 +159,6 @@ export function UserProfile() {
                         </div>
                     </ManagementCard>
 
-                    {/* Security Card */}
                     <ManagementCard
                         icon={<Lock size={28} className="text-green-600" />}
                         color="bg-green-50"
@@ -165,7 +166,7 @@ export function UserProfile() {
                         description="Manage your login credentials and security settings to keep your account safe."
                     />
 
-                    {/* Notifications Card */}
+                  
                     <ManagementCard
                         icon={<Bell size={28} className="text-yellow-600" />}
                         color="bg-yellow-50"

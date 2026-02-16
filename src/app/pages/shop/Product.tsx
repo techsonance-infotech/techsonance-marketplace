@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { DynamicIcon } from 'lucide-react/dynamic';
 import { Star } from 'lucide-react';
 
-import {   PRODUCT_LIST, type PRODUCT_LIST_TYPE } from '../../../utils/customer/constants';
+import { PRODUCT_LIST, type PRODUCT_LIST_TYPE } from '../../../utils/customer/constants';
 import WishListBtn from '../../../components/customer/WishListBtn';
 import { AddToCart } from '../../../components/customer/AddToCart';
 import BuyBtn from '../../../components/customer/BuyBtn';
@@ -45,7 +45,7 @@ export function Product() {
     <main className='xl:pt-10 pb-8 xl:px-32 lg:px-8 md:px-4 px-2 py-1 overflow-x-hidden'>
       <section className="flex flex-col lg:flex-row justify-evenly gap-12">
         <div className='flex flex-col-reverse lg:flex-row gap-4 w-full lg:w-1/2'>
-          
+
           <div className='flex lg:flex-col gap-4     overflow-x-auto lg:overflow-visible hide-scrollbar'>
             {product.specificationsImgUrl?.map((img, idx) => (
               <motion.img
@@ -61,7 +61,7 @@ export function Product() {
                 `}
               />
             ))}
-       
+
             <motion.img
               src={product.imgUrl}
               onClick={() => setActiveImage(product.imgUrl)}
@@ -70,12 +70,12 @@ export function Product() {
             />
           </div>
 
-         
+
           <div className='relative w-full aspect-square bg-gray-50 rounded-3xl overflow-hidden   '>
             <WishListBtn styles="absolute lg:top-0 lg:right-4 right-8 z-20" iconSize={32} />
             <AnimatePresence mode="wait">
               <motion.img
-                key={activeImage}  
+                key={activeImage}
                 initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
@@ -88,14 +88,14 @@ export function Product() {
           </div>
         </div>
 
-     
+
         <motion.div
           variants={containerStagger}
           initial="hidden"
           animate="visible"
           className='flex flex-col gap-6 w-full lg:w-1/2'
         >
-          
+
           <motion.div variants={fadeInUp} className="flex items-center gap-2">
             <span className='flex bg-yellow-50 px-2 py-1 rounded-md border border-yellow-100'>
               {Array.from({ length: 5 }, (_, i) => (
@@ -110,7 +110,7 @@ export function Product() {
             <span className="text-sm text-gray-500 font-medium">(124 Reviews)</span>
           </motion.div>
 
-         
+
           <motion.div variants={fadeInUp}>
             <h1 className='text-3xl lg:text-4xl font-black text-gray-900 mb-2'>{product.title}</h1>
             <p className='text-lg text-gray-500 font-medium leading-relaxed'>{product.description}</p>
@@ -133,13 +133,14 @@ export function Product() {
             <p className='text-xs text-gray-500 mt-1 font-medium uppercase tracking-wide'>Inclusive of all taxes</p>
           </motion.div>
 
-          
+
           <motion.div variants={fadeInUp} className='flex gap-4 h-12'>
-            <AddToCart productId={product.id} styles="flex-1 text-lg" />
-            <BuyBtn productId={product.id} styles="flex-1 text-lg" />
+            <AddToCart productId={product.id} styles="flex-1 text-xl
+            " />
+            <BuyBtn productId={product.id} styles="flex-1  " />
           </motion.div>
 
-          
+
           <motion.div variants={fadeInUp} className='mt-4'>
             <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Available Offers</h3>
             <div className='flex gap-4 overflow-x-auto pb-4 hide-scrollbar'>
@@ -162,9 +163,9 @@ export function Product() {
         </motion.div>
       </section>
 
-    
+
       <section className='flex flex-col lg:flex-row gap-12 mt-20'>
-     
+
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -182,7 +183,7 @@ export function Product() {
           </div>
         </motion.div>
 
-  
+
         <motion.div
           initial={{ opacity: 0, x: 30 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -207,8 +208,25 @@ export function Product() {
           </div>
         </motion.div>
       </section>
+      <section>
+        <h2 className='text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2 mt-20'>
+          Product Specs</h2>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          {product.specificationsImgUrl?.map((img, idx) => (
+            <motion.img
+              key={idx}
+              src={img}
+              alt={`Specification ${idx + 1}`}
+              className='w-full  object-cover   border border-gray-200'
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+            />
+          ))}
+        </div>
+      </section>
 
- 
       <section className='mt-20'>
         <h2 className='text-2xl font-bold text-gray-900 mb-8'>Customer Reviews</h2>
         {product.reviews && product.reviews.length > 0 ? (
@@ -245,10 +263,10 @@ export function Product() {
           </div>
         )}
       </section>
- 
+
       <section className='mt-20'>
         <h2 className='text-2xl font-bold text-gray-900 mb-8'>You might also like</h2>
-        <ProductList products={PRODUCT_LIST}  />
+        <ProductList products={PRODUCT_LIST} />
       </section>
     </main>
   );

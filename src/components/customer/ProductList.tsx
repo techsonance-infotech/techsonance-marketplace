@@ -70,7 +70,7 @@ export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST
                 </button>
             </div>
 
-            {/* Carousel Viewport */}
+            
             <div className="overflow-hidden w-full px-4 py-4">
                 <motion.div
                     ref={scope}
@@ -104,7 +104,6 @@ export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST
     );
 }
 
-// Extracted Sub-Component for cleanliness
 function ProductCard({ product, isMobile }: { product: PRODUCT_LIST_TYPE, isMobile: boolean }) {
     return (
         <div className="flex flex-col h-full bg-white border border-gray-200 rounded-2xl p-4 transition-all hover:shadow-lg hover:border-blue-200 group">
@@ -119,7 +118,7 @@ function ProductCard({ product, isMobile }: { product: PRODUCT_LIST_TYPE, isMobi
             </div>
 
             {/* Content Area */}
-            <div className="flex flex-col flex-grow justify-between">
+            <div className="flex flex-col grow justify-between">
                 <div>
                     <h3 className="font-semibold text-gray-900 line-clamp-1 mb-1" title={product.title}>
                         {product.title}
@@ -134,10 +133,10 @@ function ProductCard({ product, isMobile }: { product: PRODUCT_LIST_TYPE, isMobi
                     </div>
                 </div>
 
-                {/* Actions */}
-                <div className={`flex gap-2 ${isMobile ? 'flex-col' : 'flex-row'}`}>
-                    <AddToCart productId={product.id} styles="flex-1" />
-                    <BuyBtn productId={product.id} styles="flex-1" />
+            
+                <div className={`flex  items-center  justify-between gap-4  w-full`}>
+                    <AddToCart productId={product.id} styles="w-full"  />
+                    <BuyBtn productId={product.id} styles="w-full" />
                 </div>
             </div>
         </div>
