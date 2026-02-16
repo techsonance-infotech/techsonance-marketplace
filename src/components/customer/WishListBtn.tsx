@@ -2,6 +2,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { addToWishlist, removeFromWishlist } from '../../features/Wishlist';
 import { useMediaQuery } from 'react-responsive'
+import { AnimatePresence, motion } from 'motion/react';
 export default function WishListBtn({productId,styles}: {productId?: string, styles?: string}) {
   const dispatch = useDispatch();   
   const {wishItems}=useSelector((state:any)=>state.wishlist)
@@ -19,9 +20,38 @@ export default function WishListBtn({productId,styles}: {productId?: string, sty
   }
   return (
     <>
-    <button onClick={handleAddToWishlist} className={` text-primary lg:px-2 px-1  lg:py-2 py-1 rounded-full  transition-colors duration-300 flex items-center gap-2 mt-4 ${styles} ${isAlreadyInWishlist ? 'bg-pink-100 text-pink-500' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>
-        <Heart size={iconSize} color={isAlreadyInWishlist ? "pink" : "black"} fill={isAlreadyInWishlist ? "pink" : "none"} />
-    </button>
+   <motion.button
+      onClick={handleAddToWishlist}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+      className={`
+        rounded-full transition-colors duration-300 flex items-center justify-center mt-4
+        lg:px-2 px-1 lg:py-2 py-1
+        ${styles} 
+        ${isAlreadyInWishlist 
+          ? 'bg-pink-100 text-pink-500' 
+          : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+        }
+      `}
+      aria-label={isAlreadyInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={isAlreadyInWishlist ? "active" : "inactive"}
+          initial={{ scale: 0.7, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.7, opacity: 0 }}
+          transition={{ duration: 0.15 }}
+        >
+          <Heart 
+            size={iconSize} 
+            color={isAlreadyInWishlist ? "#ec4899" : "currentColor"} 
+            fill={isAlreadyInWishlist ? "#ec4899" : "none"} 
+          />
+        </motion.div>
+      </AnimatePresence>
+    </motion.button>
     </>
   )
 }

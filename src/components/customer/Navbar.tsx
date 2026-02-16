@@ -6,6 +6,7 @@ import { Bell, Heart, ShoppingCart } from "lucide-react";
 
 import { NAV_LINKS } from "../../utils/customer/constants";
 import { toggleCartSidebar } from "../../features/CartSidebar";
+import { motion } from "motion/react";
 
 
 
@@ -56,11 +57,16 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
                 {path === '/customerRegister' || path === '/customerLogin' ? null :
                     <div className="  flex gap-4 items-center ">
                         <Link to={'/customerProfile/' + (user?.user_id || '') + '/wishlist'} className="relative  ">
-                            {wishlistCount > 0 ? <span className="  absolute -top-2 -right-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center" >{wishlistCount}</span> : null}
+                            {wishlistCount > 0 ? <motion.span  
+                             key={wishlistCount}
+                            initial={{ scale: 1.2, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }} className="  absolute -top-2 -right-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center" >{wishlistCount}</motion.span> : null}
                             <Heart size={32} color={wishlistCount > 0 ? "pink" : "black"} fill={wishlistCount > 0 ? "pink" : "none"} />
                         </Link>
                         <button onClick={() => dispatch(toggleCartSidebar('open'))} className=" relative" >
-                            {items.length > 0 && <p className=" absolute -top-2 -right-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center">{items.length}</p>}
+                            {items.length > 0 && <motion.span  key={items.length}
+                            initial={{ scale: 1.2, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }} className=" absolute -top-2 -right-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center">{items.length}</motion.span>}
                             <ShoppingCart size={32} />
                         </button>
 
