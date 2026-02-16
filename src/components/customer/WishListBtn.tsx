@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToWishlist, removeFromWishlist } from '../../features/Wishlist';
 import { useMediaQuery } from 'react-responsive'
 import { AnimatePresence, motion } from 'motion/react';
-export default function WishListBtn({productId,styles}: {productId?: string, styles?: string}) {
+export default function WishListBtn({productId,styles,iconSize}: {productId?: string, styles?: string,iconSize?: number}) {
   const dispatch = useDispatch();   
   const {wishItems}=useSelector((state:any)=>state.wishlist)
   const isAlreadyInWishlist = wishItems.some((item: any) => item.productId === productId);
   const isMobile =useMediaQuery({ query: '(max-width: 768px)' });
-  const iconSize = isMobile ? 18 : 32;
+  const iconSizeValue = iconSize || (isMobile ? 28 : 32);
   const handleAddToWishlist = () => {
     if (isAlreadyInWishlist) {
      dispatch(removeFromWishlist(productId));
@@ -45,7 +45,7 @@ export default function WishListBtn({productId,styles}: {productId?: string, sty
           transition={{ duration: 0.15 }}
         >
           <Heart 
-            size={iconSize} 
+            size={iconSizeValue} 
             color={isAlreadyInWishlist ? "#ec4899" : "currentColor"} 
             fill={isAlreadyInWishlist ? "#ec4899" : "none"} 
           />

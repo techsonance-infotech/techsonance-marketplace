@@ -1,69 +1,145 @@
-﻿import { ChevronLeft, ChevronRight, CloudCog } from "lucide-react";
+﻿import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, useAnimate, } from "framer-motion";
+import { useMediaQuery } from "react-responsive";
 import type { PRODUCT_LIST_TYPE } from "../../utils/customer/constants";
-import { useState } from "react";
 import { AddToCart } from "./AddToCart";
 import BuyBtn from "./BuyBtn";
 import WishListBtn from "./WishListBtn";
-import { useMediaQuery } from "react-responsive";
 
-export function ProductList({ products, styles }: { products?: PRODUCT_LIST_TYPE[], styles?: string }) {
+export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST_TYPE[], styles?: string }) {
+    const isMobile = useMediaQuery({ maxWidth: 768 });
+    const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
+    const [scope, animate] = useAnimate()
 
-    const isMobile = useMediaQuery({ maxWidth: 768 },);
-    const [count, setCount] = useState(isMobile ? 2 : 4);
+    const itemsPerPage = isMobile ? 1 : isTablet ? 2 : 4;
+
+    const [currentIndex, setCurrentIndex] = useState(0);
 
 
-    console.log("isMobile", isMobile);
 
+    const maxIndex = Math.max(0, products.length - itemsPerPage);
+    const canScrollPrev = currentIndex > 0;
+    const canScrollNext = currentIndex < maxIndex;
 
-    const [firstIndex, setFirstIndex] = useState(0);
-    const [lastIndex, setLastIndex] = useState(count - 1);
-    const handlePrev = () => {
-        if (firstIndex > 0) {
-            setFirstIndex(firstIndex - 1);
-            setLastIndex(lastIndex - 1);
-            console.log("prev", firstIndex - 1, lastIndex - 1);
-        }
+    const scrollTo = (index: number) => {
+        let newIndex = index;
+        if (index < 0) newIndex = 0;
+        if (index > maxIndex) newIndex = maxIndex;
+
+        setCurrentIndex(newIndex);
     };
-    const handleNext = () => {
-        if (lastIndex < (products ? products.length - 1 : 0)) {
-            setFirstIndex(firstIndex + 1);
-            setLastIndex(lastIndex + 1);
-            console.log("next", firstIndex + 1, lastIndex + 1);
-        }
-    };
+
+    // Update animation whenever index changes
+    useEffect(() => {
+
+        animate(scope.current, {
+            x: `-${currentIndex * (100 / itemsPerPage)}%`,
+            transition: { type: "spring", stiffness: 300, damping: 30 }
+        })
+    }, [currentIndex, itemsPerPage, scope]);
+
+    if (!products || products.length === 0) return null;
 
     return (
-        <>
-            <section className={`w-full mx-auto ${styles} my-6`}>
-                <div className="flex items-center justify-between gap-2">
-                    {!isMobile && <button className="h-10 w-10 bg-primary border-2 flex items-center  border-gray-200 rounded-full  p-2 ">
-                        <ChevronLeft onClick={() => handlePrev()} className={`${firstIndex > 0 ? '' : 'text-gray-300'}`} />
-                    </button>}
-                    <ul className={`w-full grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 mx-auto lg:px-1 px-4  gap-4 justify-between   ${styles} items-center`}>
+        <section className={`w-full mx-auto relative group ${styles} my-8`}>
 
-                        {products && products.slice(firstIndex, lastIndex + 1).map((product, idx) => (
-                            <li key={idx} className={" flex flex-col text-lg text-gray-700 hover:text-gray-900 cursor-pointer border-2  border-gray-200 rounded-lg p-2   lg:p-4 justify-between  relative " + (isMobile ? "   " : "w-64 h-136")} >
-                                <div className="my-2 flex flex-col gap-2">
 
-                                    <WishListBtn productId={product.id} styles={isMobile ? "absolute top-2 right-4" : "absolute top-8 right-8"} />
-                                    <img className={"lg:w-64 lg:h-80 lg:aspect-auto aspect-8/16  h-44 object-cover rounded-lg "} src={product.imgUrl} alt={product.title.trim()} />
-                                    <p className="line-clamp-2 lg:text-xl text-sm">{product.title}</p>
-                                    <p className='lg:text-2xl text-lg font-bold text-gray-900' >₹{product.price} {product.discount > 0 && <span className='text-sm line-through text-gray-500 ml-2' >₹{Math.floor(product.price / (1 - product.discount))}</span>} {product.discount > 0 && <span className='text-sm text-green-500 ml-2' >{Math.round(product.discount * 100)}% off</span>}</p>
-                                </div>
+            <div className="flex items-center justify-end gap-2 mb-4 px-4">
+                <button
+                    disabled={!canScrollPrev}
+                    onClick={() => scrollTo(currentIndex - 1)}
+                    className={`h-10 w-10 rounded-full flex items-center justify-center border transition-all
+                        ${canScrollPrev
+                            ? 'bg-white border-gray-300 hover:bg-gray-100 hover:border-gray-400 text-gray-700 shadow-sm'
+                            : 'bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed'
+                        }`}
+                >
+                    <ChevronLeft size={20} />
+                </button>
+                <button
+                    disabled={!canScrollNext}
+                    onClick={() => scrollTo(currentIndex + 1)}
+                    className={`h-10 w-10 rounded-full flex items-center justify-center border transition-all
+                        ${canScrollNext
+                            ? 'bg-white border-gray-300 hover:bg-gray-100 hover:border-gray-400 text-gray-700 shadow-sm'
+                            : 'bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed'
+                        }`}
+                >
+                    <ChevronRight size={20} />
+                </button>
+            </div>
 
-                                <span className="flex flex-wrap  justify-between lg:gap-4 gap-1 items-center ">
-                                    <AddToCart productId={product.id} styles={`${isMobile ? "w-full" : ""}`} />
-                                    <BuyBtn productId={product.id} styles={`${isMobile ? "w-full" : ""}`} />
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
-                    {!isMobile && <button className="h-10 w-10 bg-primary border-2   flex items-center        border-gray-200 focus:border-gray-300 rounded-full  p-2 ">
-                        <ChevronRight onClick={() => handleNext()} className={` ${lastIndex < (products ? products.length - 1 : 0) ? '' : 'text-gray-300   '}`} />
-                    </button>}
+            {/* Carousel Viewport */}
+            <div className="overflow-hidden w-full px-4 py-4">
+                <motion.div
+                    ref={scope}
+                    className="flex gap-4"
+
+                    drag="x"
+                    dragConstraints={{
+                        right: 0,
+                        left: -((products.length - itemsPerPage) * (isMobile ? 300 : 280)) // Approximate width for drag limits
+                    }}
+                    style={{
+                        width: `${(products.length / itemsPerPage) * 100}%`,
+                        cursor: "grab"
+                    }}
+                    whileTap={{ cursor: "grabbing" }}
+                >
+                    {products.map((product) => (
+                        <motion.div
+                            key={product.id}
+                            className="relative flex-shrink-0"
+                            style={{
+                                width: `calc(${100 / products.length}% - 16px)`, // 16px accounts for gap
+                            }}
+                        >
+                            <ProductCard product={product} isMobile={isMobile} />
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </div>
+        </section>
+    );
+}
+
+// Extracted Sub-Component for cleanliness
+function ProductCard({ product, isMobile }: { product: PRODUCT_LIST_TYPE, isMobile: boolean }) {
+    return (
+        <div className="flex flex-col h-full bg-white border border-gray-200 rounded-2xl p-4 transition-all hover:shadow-lg hover:border-blue-200 group">
+            {/* Image Area */}
+            <div className="relative mb-4 overflow-hidden rounded-xl bg-gray-50">
+                <WishListBtn productId={product.id} styles="absolute top-3 right-5 z-10 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-sm" />
+                <img
+                    className="w-full aspect-[4/5] object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    src={product.imgUrl}
+                    alt={product.title}
+                />
+            </div>
+
+            {/* Content Area */}
+            <div className="flex flex-col flex-grow justify-between">
+                <div>
+                    <h3 className="font-semibold text-gray-900 line-clamp-1 mb-1" title={product.title}>
+                        {product.title}
+                    </h3>
+                    <div className="flex items-baseline gap-2 mb-4">
+                        <span className="text-xl font-bold text-gray-900">₹{product.price}</span>
+                        {product.discount > 0 && (
+                            <span className="text-xs text-green-600 font-bold bg-green-50 px-2 py-1 rounded-md">
+                                {Math.round(product.discount)}% OFF
+                            </span>
+                        )}
+                    </div>
                 </div>
 
-            </section>
-        </>
-    )
+                {/* Actions */}
+                <div className={`flex gap-2 ${isMobile ? 'flex-col' : 'flex-row'}`}>
+                    <AddToCart productId={product.id} styles="flex-1" />
+                    <BuyBtn productId={product.id} styles="flex-1" />
+                </div>
+            </div>
+        </div>
+    );
 }

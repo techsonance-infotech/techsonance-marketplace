@@ -42,15 +42,11 @@ export function Product() {
   };
 
   return (
-    <main className='xl:pt-10 pb-8 xl:px-32 lg:px-8 md:px-4 sm:px-2 py-1 overflow-x-hidden'>
-
-     
+    <main className='xl:pt-10 pb-8 xl:px-32 lg:px-8 md:px-4 px-2 py-1 overflow-x-hidden'>
       <section className="flex flex-col lg:flex-row justify-evenly gap-12">
-
- 
         <div className='flex flex-col-reverse lg:flex-row gap-4 w-full lg:w-1/2'>
           
-          <div className='flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible hide-scrollbar'>
+          <div className='flex lg:flex-col gap-4     overflow-x-auto lg:overflow-visible hide-scrollbar'>
             {product.specificationsImgUrl?.map((img, idx) => (
               <motion.img
                 key={idx}
@@ -70,13 +66,13 @@ export function Product() {
               src={product.imgUrl}
               onClick={() => setActiveImage(product.imgUrl)}
               whileHover={{ scale: 1.05 }}
-              className={`aspect-square w-20 h-20 object-cover rounded-xl cursor-pointer border-2 ${activeImage === product.imgUrl ? 'border-blue-500' : 'border-transparent'}`}
+              className={`aspect-square  w-20 h-20 object-cover rounded-xl cursor-pointer border-2 ${activeImage === product.imgUrl ? 'border-blue-500' : 'border-transparent'}`}
             />
           </div>
 
          
-          <div className='relative w-full aspect-square bg-gray-50 rounded-3xl overflow-hidden'>
-            <WishListBtn styles="absolute top-4 right-4 z-20" />
+          <div className='relative w-full aspect-square bg-gray-50 rounded-3xl overflow-hidden   '>
+            <WishListBtn styles="absolute lg:top-0 lg:right-4 right-8 z-20" iconSize={32} />
             <AnimatePresence mode="wait">
               <motion.img
                 key={activeImage}  
@@ -86,7 +82,7 @@ export function Product() {
                 transition={{ duration: 0.3 }}
                 src={activeImage || product.imgUrl}
                 alt={product.title}
-                className='w-full h-full object-cover'
+                className='w-full h-full object-cover '
               />
             </AnimatePresence>
           </div>
