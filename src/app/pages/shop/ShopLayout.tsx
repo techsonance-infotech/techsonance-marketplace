@@ -1,8 +1,8 @@
 ﻿import { Navigate, Outlet, useParams } from "react-router";
-import { useLayoutEffect } from "react";
+ 
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../store";
-import { Spinner } from "../../../components/ui/spinner";
+ 
 import { Footer, Navbar } from "../../../utils/constants";
 import { CartSidebar } from "../../../components/customer/CartSidebar";
 

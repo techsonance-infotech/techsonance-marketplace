@@ -1,11 +1,35 @@
 ﻿import { useSelector } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 import type { RootState } from "../../../store";
 import { PRODUCT_LIST } from "../../../../utils/customer/constants";
 import { AddToCart } from "../../../../components/customer/AddToCart";
 import BuyBtn from "../../../../components/customer/BuyBtn";
+import { useEffect, useState } from "react";
+
+
+const PriceTicker = ({ value }: { value: number }) => {
+    const [displayValue, setDisplayValue] = useState(value);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => setDisplayValue(value), 50);
+        return () => clearTimeout(timeout);
+    }, [value]);
+
+    return (
+        <motion.span
+            key={displayValue}
+            initial={{ y: 15, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="inline-block"
+        >
+            ₹{displayValue.toLocaleString()}
+        </motion.span>
+    );
+};
 
 export function CartList() {
     const { items } = useSelector((state: RootState) => state.cart);
+
     const cartItemsWithDetails = items.map(item => {
         const product = PRODUCT_LIST.find(p => p.id === item.id);
         return {
@@ -15,83 +39,98 @@ export function CartList() {
             imgUrl: product?.imgUrl || ''
         }
     });
+
     const totalPrice = cartItemsWithDetails.reduce((total, item) => total + item.price * item.quantity, 0);
+
     return (
-        <div>
-            <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
-            <p className="mb-4">Confirm your items before checking out</p>
+        <div className="max-w-6xl mx-auto p-4 lg:p-8">
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+            >
+                <h1 className="text-3xl font-bold mb-2">Your Cart</h1>
+                <p className="mb-8 text-gray-500">Confirm your items before checking out</p>
+            </motion.div>
+
             {cartItemsWithDetails.length === 0 ? (
-                <p>Your cart is empty.</p>
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center py-20 border-2 border-dashed rounded-2xl"
+                >
+                    <p className="text-xl text-gray-400">Your cart is empty.</p>
+                </motion.div>
             ) : (
-                <section className="flex flex-col md:flex-row gap-8">
+                <section className="flex flex-col lg:grid lg:grid-cols-3 gap-8 items-start">
 
-
-                    <div>
-                        {cartItemsWithDetails.map(item => (
-                            <div key={item.id} className="flex justify-between items-center gap-4   border-2  border-gray-300 px-4 py-2 rounded-lg mb-4">
-                                <span className="flex gap-4">
-
-
-                                    <img src={item.imgUrl} alt={item.name} className="w-18 h-18 object-cover rounded" />
-                                    <div>
-                                        <h3 className="font-bold text-balance">{item.name}</h3>
-                                        <p>Price: ₹{item.price}</p>
-                                        <p>Quantity: {item.quantity}</p>
+                    {/* Item List */}
+                    <div className="lg:col-span-2 w-full">
+                        <AnimatePresence mode="popLayout">
+                            {cartItemsWithDetails.map(item => (
+                                <motion.div
+                                    layout
+                                    key={item.id}
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, x: -50 }}
+                                    className="flex justify-between items-center gap-4 border border-gray-200 px-6 py-4 rounded-2xl mb-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                                >
+                                    <div className="flex gap-4 items-center">
+                                        <img src={item.imgUrl} alt={item.name} className="w-20 h-20 object-cover rounded-xl shadow-inner" />
+                                        <div>
+                                            <h3 className="font-bold text-lg text-gray-800">{item.name}</h3>
+                                            <p className="text-brand-primary font-semibold">₹{item.price.toLocaleString()}</p>
+                                        </div>
                                     </div>
-                                </span>
-                                <AddToCart productId={item.id} styles="w-60 small" />
+                                    <div className="flex flex-col items-end gap-2">
+                                        <AddToCart productId={item.id} styles="small w-fit" />
+                                        <p className="text-xs text-gray-400">Subtotal: ₹{(item.price * item.quantity).toLocaleString()}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Order Summary Sticky Sidebar */}
+                    <motion.div
+                        layout
+                        className="lg:col-span-1 w-full sticky top-8 border border-gray-200 py-6 px-6 rounded-2xl bg-gray-50/50 shadow-sm"
+                    >
+                        <h2 className="text-xl font-bold mb-1">Order Summary</h2>
+                        <p className="text-xs text-gray-400 mb-6">Shipping & discounts applied at next step</p>
+
+                        <div className="space-y-4">
+                            <div className="flex justify-between text-gray-600">
+                                <span>Total Items</span>
+                                <span>{items.length}</span>
                             </div>
-                        ))}
 
-                    </div>
-                    <div className="border-2 border-gray-300 py-4 px-6 rounded-xl">
-                        <h2 className="text-xl font-bold">Order Summary</h2>
-                        <p className="">Shipping & discounts will be applied at checkout</p>
-                        <div className="flex justify-between mt-4">
-
-                            <table className="w-full">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="">
-                                    <tr className="font-bold text-lg"><td>TOTAL MRP ({cartItemsWithDetails.length} Items )</td><td>₹{totalPrice}</td> </tr>
-                                    {
-                                        cartItemsWithDetails.map(item => (
-                                            <tr key={item.id} className="border-b border-gray-300 text-gray-700">
-                                                <td className="py-2 pl-2 text-left text-sm text-balance">{item.name} x {item.quantity}</td>
-                                                <td className="py-2 text-right">₹{item.price * item.quantity}</td>
-
+                            <div className="border-t border-gray-200 pt-4">
+                                <table className="w-full text-sm">
+                                    <tbody>
+                                        {cartItemsWithDetails.map(item => (
+                                            <tr key={item.id} className="text-gray-500">
+                                                <td className="py-1 line-clamp-1 w-32">{item.name}</td>
+                                                <td className="py-1 text-right">₹{(item.price * item.quantity).toLocaleString()}</td>
                                             </tr>
-                                        ))
-                                    }
-                                    <tr className="font-bold text-lg border-b border-gray-300">
-                                        <td className="py-2">Discount</td>
-                                        <td className="py-2 text-right">₹0</td>
-                                    </tr>
-                                    <tr className="font-bold text-lg border-b border-gray-300">
-                                        <td className="py-2">Shipping</td>
-                                        <td className="py-2 text-right">₹0</td>
-                                    </tr>
-                                    <tr className="font-bold text-lg  ">
-                                        <td className="py-2">Subtotal</td>
-                                        <td className="py-2 text-right">₹{totalPrice}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
 
-
-
-
+                            <div className="border-t-2 border-dashed border-gray-200 pt-4 mt-4">
+                                <div className="flex justify-between items-center font-bold text-xl text-gray-900">
+                                    <span>Subtotal</span>
+                                    <PriceTicker value={totalPrice} />
+                                </div>
+                            </div>
                         </div>
-                        <BuyBtn styles="mt-4 w-full" />
-                    </div>
+
+                        <BuyBtn styles="mt-8 w-full py-4 text-lg rounded-xl shadow-lg  " />
+                    </motion.div>
 
                 </section>
             )}
-
         </div>
-    )
+    );
 }

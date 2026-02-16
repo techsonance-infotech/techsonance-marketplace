@@ -1,262 +1,236 @@
-﻿import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../../store";
-import { Pen, Trash2 } from "lucide-react";
-import { DynamicIcon } from "lucide-react/dynamic";
+﻿import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import type { UserProfile } from "../../../../utils/Types";
-import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Pen, Trash2, X, Home, Briefcase, MapPin, CheckCircle2 } from "lucide-react";
 import { createAddress, deleteAddress, updateAddress, setDefaultAddress } from "../../../../features/auth/authSlice";
+import type { RootState } from "../../../store";
+import type { UserProfile } from "../../../../utils/Types";
 
-const addressTypes = ['home', 'work', 'other'];
+// --- 1. Reusable Form Input Component ---
+const FormInput = ({ label, register, name, required = false, ...rest }: any) => (
+    <div className="flex flex-col gap-1">
+        <label className="text-sm font-semibold text-gray-600">
+            {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <input
+            {...register(name, { required })}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+            {...rest}
+        />
+    </div>
+);
 
-const AddressForm = ({ user, addressId, operation, formToggle }: {
+// --- 2. The Animated Modal Form ---
+const AddressModal = ({ user, addressId, operation, onClose }: {
     user: UserProfile,
     addressId?: string,
     operation: 'edit' | 'add',
-    formToggle: React.Dispatch<React.SetStateAction<boolean>>
+    onClose: () => void
 }) => {
-    const existingAddress = user.addresses.find(addr => addr.address_id.toString() === addressId);
     const dispatch = useDispatch();
+    const existingAddress = user.addresses.find(addr => addr.address_id.toString() === addressId);
 
-    const { register, reset, handleSubmit } = useForm({
-        defaultValues: existingAddress && operation === 'edit' ? {
-            address_id: existingAddress.address_id,
-            address_for: existingAddress.address_for,
-            address_line1: existingAddress.address_line1,
-            city: existingAddress.city,
-            state: existingAddress.state,
-            country: existingAddress.country,
-            phone: existingAddress.phone,
-            postal_code: existingAddress.postal_code,
-            is_default: existingAddress.is_default
-        } : {
+    const { register, handleSubmit, reset } = useForm({
+        defaultValues: operation === 'edit' && existingAddress ? existingAddress : {
             address_for: 'home',
-            address_line1: '',
-            city: '',
-            state: '',
-            country: '',
-            phone: '',
-            postal_code: '',
             is_default: false
         }
     });
 
-    useEffect(() => {
-        if (operation === 'edit' && existingAddress) {
-            reset(existingAddress);
-        } else if (operation === 'add') {
-            reset({
-                address_for: 'home',
-                address_line1: '',
-                city: '',
-                state: '',
-                country: '',
-                phone: '',
-                postal_code: '',
-                is_default: false
-            });
-        }
-    }, [addressId, operation, existingAddress, reset]);
-
-    const onSubmitHandler = (data: any) => {
-        console.log('Form submitted:', { operation, data });
-
+    const onSubmit = (data: any) => {
         if (operation === 'edit') {
-            const updatedAddress = {
-                ...data,
-                address_id: existingAddress?.address_id, // Keep existing ID
-            };
-            console.log('Dispatching updateAddress:', updatedAddress);
-            dispatch(updateAddress(updatedAddress));
+            dispatch(updateAddress({ ...data, address_id: existingAddress?.address_id }));
         } else {
-            const newAddress = {
-                ...data,
-                address_id: Date.now(), // Generate new ID
-            };
-            console.log('Dispatching createAddress:', newAddress);
-            dispatch(createAddress(newAddress));
+            dispatch(createAddress({ ...data, address_id: Date.now() }));
         }
-
-        formToggle(false);
+        onClose();
     };
 
     return (
-        <section className="absolute z-20 bg-primary p-6 rounded-lg shadow-lg w-full transition-transform duration-300 ease-in-out">
-            <header className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">
-                    {operation === 'edit' ? 'Edit Address' : 'Add New Address'}
-                </h1>
-                <button onClick={() => formToggle(false)} className="bg-red-100 p-1 rounded-full text-gray-600 hover:text-gray-900">
-                    <DynamicIcon name="x" className="text-red-500" size={24} />
-                </button>
-            </header>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={onClose}
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            />
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden z-10"
+            >
+                <div className="flex justify-between items-center p-6 border-b border-gray-100">
+                    <h2 className="text-xl font-bold text-gray-800">
+                        {operation === 'edit' ? 'Edit Address' : 'Add New Address'}
+                    </h2>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <X size={20} />
+                    </button>
+                </div>
 
-            <form onSubmit={handleSubmit(onSubmitHandler)}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label className="block text-lg font-medium text-gray-700 mb-1">Address Type</label>
-                        <select {...register('address_for')} className="mt-1 block w-full border-gray-300 rounded-md border-2 py-3 px-6 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Select Address Type</option>
-                            {addressTypes.map((type) => (
-                                <option key={type} value={type}>
-                                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                                </option>
-                            ))}
-                        </select>
+                <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-1">
+                            <label className="text-sm font-semibold text-gray-600">Address Type</label>
+                            <select {...register('address_for')} className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="home">Home</option>
+                                <option value="work">Work</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <FormInput label="Phone" name="phone" register={register} required />
+                        <FormInput label="Address Line 1" name="address_line1" register={register} required />
+                        <FormInput label="City" name="city" register={register} required />
+                        <FormInput label="State" name="state" register={register} required />
+                        <FormInput label="Postal Code" name="postal_code" register={register} required />
+                        <FormInput label="Country" name="country" register={register} required />
                     </div>
-                    <div>
-                        <label className="block text-lg font-medium text-gray-700 mb-1">Address Line 1</label>
-                        <input type="text" {...register('address_line1')} className="mt-1 block w-full border-gray-300 rounded-md border-2 focus:ring-blue-500 focus:border-blue-500 py-2 px-6" />
+                    
+                    <div className="flex items-center gap-2 mt-2">
+                        <input type="checkbox" {...register('is_default')} id="is_default" className="w-4 h-4 text-blue-600 rounded" />
+                        <label htmlFor="is_default" className="text-gray-700">Set as default address</label>
                     </div>
-                    <div>
-                        <label className="block text-lg font-medium text-gray-700 mb-1">City</label>
-                        <input type="text" {...register('city')} className="mt-1 block w-full border-gray-300 rounded-md border-2 focus:ring-blue-500 focus:border-blue-500 py-2 px-6" />
+
+                    <div className="pt-4 flex gap-3 justify-end">
+                        <button type="button" onClick={onClose} className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg">Cancel</button>
+                        <button type="submit" className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg transition-all">Save Address</button>
                     </div>
-                    <div>
-                        <label className="block text-lg font-medium text-gray-700 mb-1">State</label>
-                        <input type="text" {...register('state')} className="mt-1 block w-full border-gray-300 rounded-md border-2 focus:ring-blue-500 focus:border-blue-500 py-2 px-6" />
-                    </div>
-                    <div>
-                        <label className="block text-lg font-medium text-gray-700 mb-1">Country</label>
-                        <input type="text" {...register('country')} className="mt-1 block w-full border-gray-300 rounded-md border-2 focus:ring-blue-500 focus:border-blue-500 py-2 px-6" />
-                    </div>
-                    <div>
-                        <label className="block text-lg font-medium text-gray-700 mb-1">Postal Code</label>
-                        <input type="text" {...register('postal_code')} className="mt-1 block w-full border-gray-300 rounded-md border-2 focus:ring-blue-500 focus:border-blue-500 py-2 px-6" />
-                    </div>
-                    <div>
-                        <label className="block text-lg font-medium text-gray-700 mb-1">Phone</label>
-                        <input type="text" {...register('phone')} className="mt-1 block w-full border-gray-300 rounded-md border-2 focus:ring-blue-500 focus:border-blue-500 py-2 px-6" />
-                    </div>
-                    <div className="flex items-center mt-4">
-                        <input type="checkbox" {...register('is_default')} className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                        <label className="ml-2 block text-lg text-gray-700">Set as default address</label>
-                    </div>
-                </div>
-                <div className="mt-6 flex gap-4">
-                    <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Save Changes
-                    </button>
-                    <button type="button" onClick={() => reset()} className="px-6 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-100">
-                        Reset
-                    </button>
-                </div>
-            </form>
-        </section>
+                </form>
+            </motion.div>
+        </div>
     );
 };
 
+// --- 3. Individual Address Card ---
+const AddressCard = ({ address, onEdit, onDelete, onSetDefault }: any) => {
+    const Icon = address.address_for === 'work' ? Briefcase : address.address_for === 'home' ? Home : MapPin;
+
+    return (
+        <motion.div
+            layout // Magic prop for smooth reordering
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            whileHover={{ y: -2 }}
+            className={`relative p-6 rounded-2xl border-2 transition-colors bg-white ${
+                address.is_default ? 'border-blue-500 bg-blue-50/30' : 'border-gray-100 hover:border-blue-200'
+            }`}
+        >
+            {address.is_default && (
+                <div className="absolute top-4 right-4 flex items-center gap-1 text-blue-600 text-xs font-bold bg-blue-100 px-2 py-1 rounded-full">
+                    <CheckCircle2 size={12} /> DEFAULT
+                </div>
+            )}
+
+            <div className="flex items-start gap-4 mb-4">
+                <div className={`p-3 rounded-xl ${address.is_default ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
+                    <Icon size={24} />
+                </div>
+                <div>
+                    <h3 className="font-bold text-gray-900 capitalize text-lg">{address.address_for}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed mt-1">
+                        {address.address_line1}<br />
+                        {address.city}, {address.state} {address.postal_code}<br />
+                        {address.country}
+                    </p>
+                    <p className="text-gray-500 text-sm mt-2 font-medium">{address.phone}</p>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-4 border-t border-gray-100 mt-2">
+                <button onClick={() => onEdit(address.address_id)} className="flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">
+                    <Pen size={14} /> Edit
+                </button>
+                <button onClick={() => onDelete(address.address_id)} className="flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-red-600 transition-colors">
+                    <Trash2 size={14} /> Delete
+                </button>
+                {!address.is_default && (
+                    <button onClick={() => onSetDefault(address.address_id)} className="ml-auto text-xs font-bold text-blue-600 hover:underline">
+                        SET AS DEFAULT
+                    </button>
+                )}
+            </div>
+        </motion.div>
+    );
+};
+
+// --- 4. Main Component ---
 export function Addresses() {
     const { user } = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch();
-    const [formVisible, setFormVisible] = useState(false);
-    const [formOperation, setFormOperation] = useState<'edit' | 'add'>('add');
-    const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+    const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
 
-    const handleDelete = (addressId: number) => {
-        console.log('Delete button clicked for address_id:', addressId);
-        dispatch(deleteAddress(addressId)); // Pass just the ID number
+    const openAdd = () => {
+        setModalMode('add');
+        setSelectedId(undefined);
+        setModalOpen(true);
     };
 
-    const handleSetDefault = (addressId: number) => {
-        console.log('Set default button clicked for address_id:', addressId);
-        dispatch(setDefaultAddress(addressId));
+    const openEdit = (id: number) => {
+        setModalMode('edit');
+        setSelectedId(id.toString());
+        setModalOpen(true);
     };
 
     return (
-        <section className="mb-[36vh] relative w-full">
-            {user && formVisible && (
-                <AddressForm
-                    user={user}
-                    addressId={selectedAddressId || undefined}
-                    operation={formOperation}
-                    formToggle={setFormVisible}
-                />
-            )}
-
-            <header className="flex items-center justify-between w-full mb-6">
-                <h1 className="font-bold text-2xl text-gray-900">My Addresses</h1>
-                <button
-                    className="px-6 py-2 border-2 text-primary bg-primary-foreground border-gray-800 rounded-lg cursor-pointer hover:border-gray-400 font-medium"
-                    onClick={() => {
-                        console.log('Add new address button clicked');
-                        setFormOperation('add');
-                        setSelectedAddressId(null);
-                        setFormVisible(true);
-                    }}
-                >
-                    + Add New Address
-                </button>
-            </header>
-
-            {user?.addresses.length ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                    {user.addresses.map((address) => (
-                        <div
-                            key={address.address_id}
-                            className={`w-full border-2 rounded-lg px-4 pt-6 pb-4 text-gray-600 ${address.is_default ? 'border-blue-300 relative' : 'border-gray-200'
-                                }`}
-                        >
-                            {address.is_default && (
-                                <span className="absolute top-0 right-0 bg-blue-500 border border-blue-500 text-white text-xs px-2 py-1 rounded-bl-md rounded-tr-md">
-                                    Default
-                                </span>
-                            )}
-
-                            <div className="w-full flex gap-8 justify-start items-start">
-                                <div className={`h-12 w-12 ${address.is_default ? 'bg-blue-300' : 'bg-gray-300'} rounded-3xl flex justify-center items-center`}>
-                                    <DynamicIcon
-                                        name={`${address.address_for === 'home' ? 'house' : 'hotel'}`}
-                                        size={32}
-                                        className={`${address.is_default ? 'text-blue-500' : 'text-gray-500'}`}
-                                    />
-                                </div>
-                                <div>
-                                    <h1 className="text-lg font-bold text-primary-foreground">
-                                        {address.address_for.charAt(0).toUpperCase() + address.address_for.slice(1)} Address
-                                    </h1>
-                                    <p className="text-lg font-medium">{address.address_line1}</p>
-                                    <p className="text-lg font-medium">{address.city}, {address.state} {address.postal_code}</p>
-                                    <p className="text-lg font-medium">{address.country}</p>
-                                    <p className="text-lg font-medium text-primary-foreground">Phone: {address.phone}</p>
-                                </div>
-                            </div>
-
-                            <div className="flex mt-4 items-end justify-start gap-12">
-                                <button
-                                    className="py-2 font-bold text-blue-500 cursor-pointer rounded-lg flex items-center gap-2"
-                                    onClick={() => {
-                                        console.log('Edit button clicked for address_id:', address.address_id);
-                                        setSelectedAddressId(address.address_id.toString());
-                                        setFormOperation('edit');
-                                        setFormVisible(true);
-                                    }}
-                                >
-                                    <Pen />
-                                    Edit
-                                </button>
-                                <button
-                                    className="font-bold py-2 text-red-500 cursor-pointer flex items-center gap-2"
-                                    onClick={() => handleDelete(address.address_id)}
-                                >
-                                    <Trash2 />
-                                    Delete
-                                </button>
-                                {!address.is_default && (
-                                    <button
-                                        className="py-2 cursor-pointer rounded-lg flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-blue-600"
-                                        onClick={() => handleSetDefault(address.address_id)}
-                                    >
-                                        SET AS DEFAULT
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    ))}
+        <section className="w-full max-w-5xl mx-auto mb-20">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">My Addresses</h1>
+                    <p className="text-gray-500 mt-1">Manage your shipping and billing locations</p>
                 </div>
-            ) : (
-                <p>No addresses found.</p>
-            )}
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={openAdd}
+                    className="px-5 py-2.5 bg-gray-900 text-white font-medium rounded-lg shadow-lg hover:bg-gray-800 transition-all flex items-center gap-2"
+                >
+                    + Add New
+                </motion.button>
+            </div>
+
+      
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <AnimatePresence mode="popLayout">
+                    {user?.addresses.length ? (
+                        user.addresses.map((address) => (
+                            <AddressCard
+                                key={address.address_id}
+                                address={address}
+                                onEdit={openEdit}
+                                onDelete={(id: number) => dispatch(deleteAddress(id))}
+                                onSetDefault={(id: number) => dispatch(setDefaultAddress(id))}
+                            />
+                        ))
+                    ) : (
+                        <motion.div 
+                            initial={{ opacity: 0 }} 
+                            animate={{ opacity: 1 }} 
+                            className="col-span-full py-12 text-center border-2 border-dashed border-gray-200 rounded-2xl"
+                        >
+                            <p className="text-gray-400">No addresses saved yet.</p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* Modal */}
+            <AnimatePresence>
+                {isModalOpen && user && (
+                    <AddressModal
+                        user={user}
+                        addressId={selectedId}
+                        operation={modalMode}
+                        onClose={() => setModalOpen(false)}
+                    />
+                )}
+            </AnimatePresence>
         </section>
     );
 }

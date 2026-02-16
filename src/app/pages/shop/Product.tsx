@@ -1,203 +1,259 @@
-﻿import React from 'react'
-import { useParams } from 'react-router'
-import { CATEGORY_LIST, PRODUCT_LIST, type PRODUCT_LIST_TYPE } from '../../../utils/customer/constants'
-import WishListBtn from '../../../components/customer/WishListBtn'
-import { AddToCart } from '../../../components/customer/AddToCart'
-import BuyBtn from '../../../components/customer/BuyBtn'
-import { DynamicIcon } from 'lucide-react/dynamic'
-import { ProductList } from '../../../components/customer/ProductList'
-const productS = PRODUCT_LIST
+﻿import { useState } from 'react';
+import { useParams } from 'react-router';
+import { motion, AnimatePresence } from 'framer-motion';
+import { DynamicIcon } from 'lucide-react/dynamic';
+import { Star } from 'lucide-react';
+
+import {   PRODUCT_LIST, type PRODUCT_LIST_TYPE } from '../../../utils/customer/constants';
+import WishListBtn from '../../../components/customer/WishListBtn';
+import { AddToCart } from '../../../components/customer/AddToCart';
+import BuyBtn from '../../../components/customer/BuyBtn';
+import { ProductList } from '../../../components/customer/ProductList';
+
+const productS = PRODUCT_LIST;
+
 const brandOffer = [
-  {
-    id: '1',
-    title: '1 year warranty',
-    description: 'Get 1 year warranty on this product',
-    icon: 'shopping-bag'
-  },
-  {
-    id: '2',
-    title: 'Free delivery',
-    description: 'Get free delivery on this product',
-    icon: 'truck'
-  },
-  {
-    id: '3',
-    title: '7 days return',
-    description: 'Get 7 days return on this product',
-    icon: 'undo-2'
-  },
-  {
-    id: '4',
-    title: 'Cash on delivery',
-    description: 'Get cash on delivery on this product',
-    icon: 'banknote'
-  },
-  {
-    id: '5',
-    title: 'GST Billing',
-    description: 'Get GST Bill on this product',
-    icon: 'file-spreadsheet'
-  }
-]
+  { id: '1', title: '1 year warranty', icon: 'shopping-bag' },
+  { id: '2', title: 'Free delivery', icon: 'truck' },
+  { id: '3', title: '7 days return', icon: 'undo-2' },
+  { id: '4', title: 'Cash on delivery', icon: 'banknote' },
+  { id: '5', title: 'GST Billing', icon: 'file-spreadsheet' }
+];
+
 export function Product() {
-  const { id } = useParams()
-  const product: PRODUCT_LIST_TYPE | undefined = productS.find(pro => pro.id === id)
+  const { id } = useParams();
+  const product: PRODUCT_LIST_TYPE | undefined = productS.find(pro => pro.id === id);
+
+  // State to handle the interactive image gallery
+  const [activeImage, setActiveImage] = useState(product?.imgUrl);
+
   if (!product) {
-    return (
-      <>
-
-        <h1 className='text-2xl font-bold text-gray-900'>Product not found</h1>
-      </>
-    )
+    return <h1 className='text-2xl font-bold text-gray-900 p-8'>Product not found</h1>;
   }
+
+  // Animation Variants
+  const containerStagger = {
+    visible: { transition: { staggerChildren: 0.1 } }
+  };
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } }
+  };
+
   return (
-    <>
-      <main className='  xl:pt-10 pb-8 xl:px-32   lg:px-8 md:px-4 sm:px-2 py-1'>
-        <section className="flex justify-evenly gap-8">
-          <span className='flex gap-4 w-full'>
-            <div className=''>
-              {
-                product.specificationsImgUrl &&
-                product.specificationsImgUrl.map((img, idx) => (
-                  <img key={idx} src={img} alt={`${product.title} specifications ${idx + 1}`} className="aspect-square w-40 h-40 object-cover mb-4 rounded-2xl" />
-                ))
-              }
-            </div>
-            <div className='  relative  w-full ' >
-              <WishListBtn styles=" absolute top-0 right-4 " />
-              <img src={product.imgUrl} alt={product.title} className='aspect-square w-full object-cover rounded-2xl' />
-            </div>
-          </span>
+    <main className='xl:pt-10 pb-8 xl:px-32 lg:px-8 md:px-4 sm:px-2 py-1 overflow-x-hidden'>
 
-          <div className='flex flex-col gap-4 w-full' >
-            <p>
-              {product.rating && (
-                <span className='flex my-2'>
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <DynamicIcon
-                      key={i}
-                      name='star'
-                      fill='yellow' 
-                      className={i < product?.rating ? 'text-yellow-500' : 'text-gray-800'}
-                    />
-                  ))}
-                </span>
-              )}
-            </p>
-            <h1 className='text-2xl font-bold text-gray-900' >{product.title}</h1>
-            <p className='text-lg text-gray-700 font-semibold' >{product.description}</p>
-            <p className='text-2xl font-bold text-gray-900' >₹{product.price} {product.discount > 0 && <span className='text-sm line-through text-gray-500 ml-2' >₹{Math.floor(product.price / (1 - product.discount))}</span>} {product.discount > 0 && <span className='text-sm text-green-500 ml-2' >{Math.round(product.discount * 100)}% off</span>}</p>
-            <p className='text-gray-600'>MRP (Inclusive of all taxes)</p>
-            <span className='flex  gap-8'>
-              <AddToCart productId={product.id} />
-              <BuyBtn productId={product.id} />
-            </span>
-            <div className='flex gap-4 mt-8   w-full justify-between items-center  '>
-              {
-                brandOffer.map(offer => (
-                  <div key={offer.id} className='flex flex-col items-center gap-4 '>
-                    <DynamicIcon name={offer.icon} strokeWidth={2}
-                      size={32} />
+     
+      <section className="flex flex-col lg:flex-row justify-evenly gap-12">
 
-                    <h3 className='text-lg font-medium text-balance text-gray-900'>{offer.title}</h3>
-                  </div>
-                ))
-              }
-            </div>
-
-          </div>
-        </section>
-        <section className='flex items-start  mt-12' >
-          <div className='w-[50%] pr-8' >
-            <h2 className='text-2xl font-bold text-gray-900 mt-8 mb-4' >Description</h2>
-            {product.description.split('\n').map((line, idx) => (
-              <p key={idx} className='text-gray-700 mb-2' >{line}</p>
+ 
+        <div className='flex flex-col-reverse lg:flex-row gap-4 w-full lg:w-1/2'>
+          
+          <div className='flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible hide-scrollbar'>
+            {product.specificationsImgUrl?.map((img, idx) => (
+              <motion.img
+                key={idx}
+                src={img}
+                onClick={() => setActiveImage(img)}
+                whileHover={{ scale: 1.05, borderColor: "#3b82f6" }}
+                whileTap={{ scale: 0.95 }}
+                alt={`Thumbnail ${idx + 1}`}
+                className={`
+                  aspect-square w-20 h-20 object-cover rounded-xl cursor-pointer border-2 transition-all
+                  ${activeImage === img ? 'border-blue-500 ring-2 ring-blue-100' : 'border-transparent'}
+                `}
+              />
             ))}
+       
+            <motion.img
+              src={product.imgUrl}
+              onClick={() => setActiveImage(product.imgUrl)}
+              whileHover={{ scale: 1.05 }}
+              className={`aspect-square w-20 h-20 object-cover rounded-xl cursor-pointer border-2 ${activeImage === product.imgUrl ? 'border-blue-500' : 'border-transparent'}`}
+            />
           </div>
-          <div className='w-[50%] pl-8 '>
-            <h1 className='font-bold text-2xl mb-6'>
-              Product Information
-            </h1>
-            <div className='bg-gray-100 rounded-lg p-4'>
 
-              <table >
-                <tbody>
-                  {
-                    product.productDetails?.specifications &&
-                    Object.entries(product.productDetails.specifications).map(([key, value]) => (
-                      <tr key={key} className='flex justify-between  ' >
-                        <td className='py-2 w-full pl-4 pr-8 font-bold text-gray-900'>{key}</td>
-                        <td className='  w-full py-2 pl-8 pr-4 text-gray-700'>{value}</td>
-                      </tr>
-                    ))
-                  }
-                </tbody>
-              </table>
+         
+          <div className='relative w-full aspect-square bg-gray-50 rounded-3xl overflow-hidden'>
+            <WishListBtn styles="absolute top-4 right-4 z-20" />
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={activeImage}  
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                src={activeImage || product.imgUrl}
+                alt={product.title}
+                className='w-full h-full object-cover'
+              />
+            </AnimatePresence>
+          </div>
+        </div>
+
+     
+        <motion.div
+          variants={containerStagger}
+          initial="hidden"
+          animate="visible"
+          className='flex flex-col gap-6 w-full lg:w-1/2'
+        >
+          
+          <motion.div variants={fadeInUp} className="flex items-center gap-2">
+            <span className='flex bg-yellow-50 px-2 py-1 rounded-md border border-yellow-100'>
+              {Array.from({ length: 5 }, (_, i) => (
+                <Star
+                  key={i}
+                  size={16}
+                  fill={i < (product.rating || 0) ? "#eab308" : "none"}
+                  className={i < (product.rating || 0) ? 'text-yellow-500' : 'text-gray-300'}
+                />
+              ))}
+            </span>
+            <span className="text-sm text-gray-500 font-medium">(124 Reviews)</span>
+          </motion.div>
+
+         
+          <motion.div variants={fadeInUp}>
+            <h1 className='text-3xl lg:text-4xl font-black text-gray-900 mb-2'>{product.title}</h1>
+            <p className='text-lg text-gray-500 font-medium leading-relaxed'>{product.description}</p>
+          </motion.div>
+
+          <motion.div variants={fadeInUp} className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+            <div className="flex items-end gap-3">
+              <span className='text-4xl font-black text-gray-900'>₹{product.price.toLocaleString()}</span>
+              {product.discount > 0 && (
+                <>
+                  <span className='text-lg line-through text-gray-400 mb-1'>
+                    ₹{Math.floor(product.price / (1 - product.discount / 100)).toLocaleString()}
+                  </span>
+                  <span className='text-lg font-bold text-green-600 mb-1'>
+                    {Math.round(product.discount)}% OFF
+                  </span>
+                </>
+              )}
             </div>
+            <p className='text-xs text-gray-500 mt-1 font-medium uppercase tracking-wide'>Inclusive of all taxes</p>
+          </motion.div>
 
-          </div>
-        </section>
-        <section className='flex justify-between flex-wrap gap-8 mt-12' >
-          {
-            product.specificationsImgUrl &&
-            product.specificationsImgUrl.map((img, idx) => (
-              <img key={idx} src={img} alt={`${product.title} specifications ${idx + 1}`} className="  h-auto object-cover mb-4 rounded-2xl" />
-            ))
-          }
-        </section>
-        <section className='my-8'>
-          <h1 className='font-bold text-2xl'>
-            Related Products
-          </h1>
-          <ProductList products={CATEGORY_LIST} />
-        </section>
-        <section className='my-8'>
-          <span>
-            <h1 className='font-bold text-2xl'>
-              All reviews
-            </h1>
+          
+          <motion.div variants={fadeInUp} className='flex gap-4 h-12'>
+            <AddToCart productId={product.id} styles="flex-1 text-lg" />
+            <BuyBtn productId={product.id} styles="flex-1 text-lg" />
+          </motion.div>
 
-          </span>
-          {product.reviews && product.reviews.length > 0 ? (
-            <div className='mt-4 grid grid-cols-2 gap-4'>
-              {product.reviews.map((review, idx) => (
-                <div key={idx} className=' border-2 border-gray-300 py-4   px-4 rounded-lg mb-4'>
-                  <div className='flex items-center gap-4 mb-2'>
-
-                    <div>
-                      <span className='flex my-2'>
-
-
-                        {Array.from({ length: review.rating }, (_, i) => (
-                          <DynamicIcon
-                            key={i}
-                            name='star'
-                            fill='yellow'
-                            className={i < review.rating ? 'text-yellow-500' : 'text-gray-800'}
-                          />
-                        ))}
-                      </span>
-                      <h3 className='text-lg font-medium text-gray-900'>{review.userName}</h3>
-                      <p className='text-sm text-gray-500'>{new Date(review.date).toLocaleDateString()}</p>
-                    </div>
+          
+          <motion.div variants={fadeInUp} className='mt-4'>
+            <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Available Offers</h3>
+            <div className='flex gap-4 overflow-x-auto pb-4 hide-scrollbar'>
+              {brandOffer.map((offer, idx) => (
+                <motion.div
+                  key={offer.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className='flex flex-col items-center justify-center gap-2 min-w-[100px] p-3 border border-gray-200 rounded-xl bg-white text-center'
+                >
+                  <div className="p-2 bg-brand-primary/10 rounded-full text-brand-primary">
+                    <DynamicIcon name={offer.icon} size={20} />
                   </div>
-                  <p className='text-gray-700'>{review.comment}</p>
-                  <p className='mt-4'>
-                    {review.date && (
-                      <span className='text-sm text-gray-500'>
-                        Reviewed on {new Date(review.date).toLocaleDateString()}
-                      </span>
-                    )}
-                  </p>
-                </div>
+                  <span className='text-xs font-semibold text-gray-700 leading-tight'>{offer.title}</span>
+                </motion.div>
               ))}
             </div>
-          ) : (
-            <p className='text-gray-700 mt-4'>No reviews yet.</p>
-          )}
+          </motion.div>
+        </motion.div>
+      </section>
 
-        </section>
-      </main>
-    </>
-  )
+    
+      <section className='flex flex-col lg:flex-row gap-12 mt-20'>
+     
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          className='lg:w-1/2'
+        >
+          <h2 className='text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2'>
+            <span className="w-1 h-8 bg-brand-primary rounded-full"></span>
+            Product Description
+          </h2>
+          <div className="prose prose-gray max-w-none text-gray-600 space-y-3">
+            {product.description.split('\n').map((line, idx) => (
+              <p key={idx}>{line}</p>
+            ))}
+          </div>
+        </motion.div>
+
+  
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          className='lg:w-1/2'
+        >
+          <h2 className='text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2'>
+            <span className="w-1 h-8 bg-brand-primary rounded-full"></span>
+            Specifications
+          </h2>
+          <div className='bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm'>
+            <table className="w-full text-sm text-left">
+              <tbody>
+                {product.productDetails?.specifications && Object.entries(product.productDetails.specifications).map(([key, value], idx) => (
+                  <tr key={key} className={`border-b border-gray-100 last:border-0 ${idx % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'}`}>
+                    <td className='py-3 px-6 font-semibold text-gray-900 w-1/3'>{key}</td>
+                    <td className='py-3 px-6 text-gray-600'>{value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+      </section>
+
+ 
+      <section className='mt-20'>
+        <h2 className='text-2xl font-bold text-gray-900 mb-8'>Customer Reviews</h2>
+        {product.reviews && product.reviews.length > 0 ? (
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            {product.reviews.map((review, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className='p-6 border border-gray-200 rounded-2xl bg-white hover:shadow-md transition-shadow'
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className='font-bold text-gray-900'>{review.userName}</h3>
+                    <div className='flex items-center gap-1 mt-1'>
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <Star key={i} size={12} fill={i < review.rating ? "#eab308" : "#e5e7eb"} className={i < review.rating ? "text-yellow-500" : "text-gray-200"} />
+                      ))}
+                    </div>
+                  </div>
+                  <span className='text-xs text-gray-400 font-medium'>
+                    {new Date(review.date).toLocaleDateString()}
+                  </span>
+                </div>
+                <p className='text-gray-600 leading-relaxed text-sm'>"{review.comment}"</p>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-12 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+            <p className='text-gray-500'>No reviews yet. Be the first to review!</p>
+          </div>
+        )}
+      </section>
+ 
+      <section className='mt-20'>
+        <h2 className='text-2xl font-bold text-gray-900 mb-8'>You might also like</h2>
+        <ProductList products={PRODUCT_LIST}  />
+      </section>
+    </main>
+  );
 }

@@ -43,7 +43,7 @@ export function FilterSidebar({ PRODUCT_LIST, filterProduct }: {
       </div>
 
 
-      <section className='border-b border-gray-50 pb-6'>
+      <section className='border-b border-gray-50 pb-0'>
         <div className='flex items-center justify-between mb-6 cursor-pointer group' onClick={() => setIsPriceOpen(!isPriceOpen)}>
           <h2 className='text-sm font-bold text-gray-700 uppercase tracking-tighter'>Price</h2>
           {isPriceOpen ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}

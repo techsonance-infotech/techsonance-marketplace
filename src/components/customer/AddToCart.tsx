@@ -21,6 +21,7 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
     const quantity = cartItem ? cartItem.quantity : 0;
     
     const isSmall = styles?.includes("small");
+
     const containerBase = `flex items-center justify-center bg-brand-primary text-white rounded-lg shadow-md overflow-hidden transition-all duration-200`;
     const heightClass = isSmall ? "h-8" : "h-11";
 
@@ -48,7 +49,7 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
     };
 
     return (
-        <div className={`${containerBase} ${heightClass} ${styles}`}>
+        <motion.div whileHover={{scale:1.1}} className={`${containerBase} ${heightClass} ${styles} `}>
             <AnimatePresence mode="wait">
                 {quantity === 0 ? (
                     <motion.button
@@ -99,6 +100,6 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </motion.div>
     );
 }

@@ -1,6 +1,6 @@
-﻿import React from 'react'
-import type { FeedbackType } from '../../utils/customer/constants';
+﻿import { motion } from 'framer-motion';
 import { Quote } from 'lucide-react';
+import type { FeedbackType } from '../../utils/customer/constants';
 
 export function CustomerFeedback({
     FEEDBACK_LIST, styles
@@ -8,22 +8,98 @@ export function CustomerFeedback({
     FEEDBACK_LIST: FeedbackType[];
     styles?: string;
 }) {
+    // Container variants to stagger the child cards
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.2, // Delay between each card's entry
+            },
+        },
+    };
+
+    // Individual card variants
+    const cardVariants = {
+        hidden: { 
+            opacity: 0, 
+            y: 40,
+            scale: 0.95 
+        },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            scale: 1,
+            transition: { 
+                type: "spring", 
+                stiffness: 80, 
+                damping: 15 
+            }
+        },
+    };
+
     return (
-        <>
-            <section className='border-0  mb-3 relative xl:pt-1 pb-8 xl:px-32   lg:px-8 md:px-4 sm:px-2 py-1'>
-                <h2 className="text-2xl text-center font-bold mt-8 mb-6 border-0  ">Customer Feedback</h2>
-                <img src={''} alt="" className='  w-full h-full object-cover bg-white border-0 mb-6 absolute z-[-10] top-0 left-0' />
-                <div className=' flex flex-wrap justify-center gap-8 p-4 rounded-lg'>
-                    {FEEDBACK_LIST.map((feedback, index) => (
-                        <div key={index} className={`feedback-item bg-card text-card-foreground  border-2 p-8 rounded-3xl w-102 ${styles}`}>
-                            <Quote className='rotate-180 mb-6' fill='black' />
-                            <p className="feedback-comment">{feedback.feedback
-                            }</p>
-                            <p className="feedback-name">- {feedback.customerName}</p>
+        <section className='overflow-hidden mb-12 relative xl:pt-1 pb-8 xl:px-32 lg:px-8 md:px-4 sm:px-2 py-1'>
+            <motion.h2 
+                initial={{ opacity: 0, y: -20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-3xl text-center font-bold mt-12 mb-10"
+            >
+                Customer Feedback
+            </motion.h2>
+
+            {/* Background Decorative Element */}
+            <div className='absolute inset-0 z-[-1] opacity-5 pointer-events-none flex justify-center items-center'>
+                 <Quote size={400} className="rotate-180 text-gray-400" />
+            </div>
+
+            <motion.div 
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                className='flex flex-wrap justify-center gap-8 p-4'
+            >
+                {FEEDBACK_LIST.map((feedback, index) => (
+                    <motion.div 
+                        key={index} 
+                        variants={cardVariants}
+                        whileHover={{ 
+                            y: -10, 
+                            boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" 
+                        }}
+                        className={`
+                            group bg-white text-card-foreground border-2 border-gray-100 
+                            p-10 rounded-3xl w-full md:w-[28rem] relative transition-colors 
+                            hover:border-brand-primary/20 ${styles}
+                        `}
+                    >
+                        <motion.div
+                            whileHover={{ rotate: 0 }}
+                            initial={{ rotate: 180 }}
+                            transition={{ type: "spring", stiffness: 300 }}
+                        >
+                            <Quote 
+                                className='mb-6 text-brand-primary' 
+                                fill='currentColor' 
+                                size={32}
+                            />
+                        </motion.div>
+
+                        <p className="text-lg italic text-gray-700 leading-relaxed mb-6">
+                            "{feedback.feedback}"
+                        </p>
+                        
+                        <div className="flex items-center gap-2">
+                            <span className="h-[2px] w-4 bg-brand-primary"></span>
+                            <p className="font-bold text-gray-900 uppercase tracking-wider text-sm">
+                                {feedback.customerName}
+                            </p>
                         </div>
-                    ))}
-                </div>
-            </section>
-        </>
-    )
+                    </motion.div>
+                ))}
+            </motion.div>
+        </section>
+    );
 }

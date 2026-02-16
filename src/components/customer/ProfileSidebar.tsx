@@ -1,75 +1,128 @@
-﻿import React from 'react'
+﻿
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
+import { motion, AnimatePresence } from 'framer-motion';
+import { DynamicIcon } from 'lucide-react/dynamic'; 
 import type { RootState } from '../../app/store';
-import { DynamicIcon } from 'lucide-react/dynamic';
 import { logOut } from '../../features/auth/authSlice';
+
+// Simulating your config file import
 const ProfileSidebarLink = [
-    {
-        name: 'Profile Overview',
-        path: '/customerProfile',
-        icon: 'user',
+    { name: 'Profile Overview', path: '/customerProfile', icon: 'user' },
+    { name: 'My Orders', path: '/orders', icon: 'shopping-bag' }, // 'handbag' isn't in Lucide, usually 'shopping-bag'
+    { name: 'Wishlist', path: '/wishlist', icon: 'heart' },
+    { name: 'Addresses', path: '/addresses', icon: 'map-pin' },
+    { name: 'Logout', path: '/logout', icon: 'log-out', isDanger: true }
+];
 
-    },
-    {
-        name: 'My Orders',
-        path: '/orders',
-        icon: 'handbag',
-    },
-    {
-        name: 'Wishlist',
-        path: '/wishlist',
-        icon: 'heart',
-    },
-    {
-
-        name: 'Addresses',
-        path: '/addresses',
-        icon: 'map-pin',
-    },
-    {
-        name: 'Logout',
-        path: '/logout',
-        icon: 'log-out',
-    }
-
-]
 export function ProfileSidebar() {
     const { user } = useSelector((state: RootState) => state.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const path = useLocation().pathname;
-    const onClickHandler = (path: string) => {
-        if (path === '/logout') {
-            dispatch(logOut())
-            console.log('Logging out...');
-        } else if (path === '/customerProfile') {
-            navigate(`/customerProfile/${user?.user_id}`, { replace: true });
+    const currentPath = useLocation().pathname;
+
+    const handleNavigation = (linkPath: string) => {
+        if (linkPath === '/logout') {
+            dispatch(logOut());
+            navigate('/'); 
+        } else if (linkPath === '/customerProfile') {
+            navigate(`/customerProfile/${user?.user_id}`);
         } else {
-            navigate(`/customerProfile/${user?.user_id}${path}`);
-
+            navigate(`/customerProfile/${user?.user_id}${linkPath}`);
         }
-    }
-    return (
-        <aside>
-            <div className="flex flex-col items-start gap-4 mb-8 border-l-8 rounded-l-sm px-4 py-2  ">
-                <h1 className="text-2xl text-start align-middle font-bold  text-gray-900">Hello {user && user.name}</h1>
-                <p className="text-gray-500 text-sm leading-relaxed">{user?.email}</p>
-            </div>
+    };
 
-            <ul className="space-y-2">
-                {ProfileSidebarLink.map((link) => (
-                    <li key={link.name}>
-                        <button
-                            onClick={() => onClickHandler(link.path)}
-                            className={`lg:w-64  flex gap-4 items-center  text-left px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors ${path === `/customerProfile/${user?.user_id}${link.path}` ? 'bg-blue-100' : link.path === `/logout` ? ' text-red-500' : ''}`}
+    return (
+        <aside className="w-full lg:w-72 flex-shrink-0">
+             {/* User Header Card */}
+             <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-8 p-6  border-l-4    flex items-center gap-4"
+            >
+                {/* <div className="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center text-brand-primary font-bold text-xl">
+                    {user?.name?.charAt(0) || 'U'}
+                </div> */}
+                <div className="overflow-hidden">
+                    <h1 className="text-lg font-bold text-gray-900 truncate">
+                        {user?.name || 'User'}
+                    </h1>
+                    <p className="text-gray-500 text-xs truncate max-w-[150px]">
+                        {user?.email}
+                    </p>
+                </div>
+            </motion.div>
+
+            {/* Navigation List */}
+            <motion.ul 
+                className="space-y-1"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                    visible: { transition: { staggerChildren: 0.05 } }
+                }}
+            >
+                {ProfileSidebarLink.map((link) => {
+                    // Logic to determine active state
+                    const targetPath = link.path === '/customerProfile' 
+                        ? `/customerProfile/${user?.user_id}` 
+                        : `/customerProfile/${user?.user_id}${link.path}`;
+                    
+                    const isActive = currentPath === targetPath || (link.path !== '/customerProfile' && currentPath.startsWith(targetPath));
+                    const isDanger = link.path === '/logout';
+
+                    return (
+                        <motion.li 
+                            key={link.name}
+                            variants={{
+                                hidden: { opacity: 0, x: -10 },
+                                visible: { opacity: 1, x: 0 }
+                            }}
                         >
-                            <DynamicIcon name={link.icon} />
-                            {link.name}
-                        </button>
-                    </li>
-                ))}
-            </ul>
+                            <button
+                                onClick={() => handleNavigation(link.path)}
+                                className={`
+                                    relative w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-sm font-medium transition-colors group
+                                    ${isDanger 
+                                        ? 'text-red-500 hover:bg-red-50' 
+                                        : isActive 
+                                            ? 'text-brand-primary' 
+                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                    }
+                                `}
+                            >
+                                {/* The Magic Floating Background Pill */}
+                                {isActive && !isDanger && (
+                                    <motion.div
+                                        layoutId="sidebar-active-pill"
+                                        className="absolute inset-0 bg-blue-50 border border-blue-100 rounded-xl"
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                    />
+                                )}
+
+                                {/* Icon & Text - z-index ensures they sit ON TOP of the pill */}
+                                <span className="relative z-10 flex items-center justify-center w-5 h-5">
+                                    <DynamicIcon name={link.icon} size={20} />
+                                </span>
+                                <span className="relative z-10 font-semibold">
+                                    {link.name}
+                                </span>
+                                
+                                {/* Hover Chevron (Micro-interaction) */}
+                                {!isActive && !isDanger && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, x: -5 }}
+                                        whileHover={{ opacity: 1, x: 0 }}
+                                        className="absolute right-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <DynamicIcon name="chevron-right" size={16} />
+                                    </motion.div>
+                                )}
+                            </button>
+                        </motion.li>
+                    );
+                })}
+            </motion.ul>
         </aside>
-    )
+    );
 }

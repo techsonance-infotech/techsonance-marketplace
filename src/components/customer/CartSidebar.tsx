@@ -1,73 +1,120 @@
-﻿import { useEffect, useRef } from "react";
+﻿import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleCartSidebar } from "../../features/CartSidebar";
 import { PRODUCT_LIST } from "../../utils/customer/constants";
 import { AddToCart } from "./AddToCart";
 import type { RootState } from "../../app/store";
-import { X } from "lucide-react";
+import { X, ShoppingBag } from "lucide-react";
 import BuyBtn from "./BuyBtn";
 import { Link } from "react-router";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function CartSidebar() {
-  const focusRef = useRef(null);
-  const { isCartOpen } = useSelector((state: RootState) => state.cartSidebar)
-  const { user } = useSelector((state: RootState) => state.auth)
-  const { items } = useSelector((state: RootState) => state.cart)
-  const cartItems = Array.isArray(PRODUCT_LIST) && Array.isArray(items) ? PRODUCT_LIST.filter(product => items.some(item => item.id === product.id)).map(product => {
-    const item = items.find(item => item.id === product.id)
-    return { ...product, quantity: item?.quantity || 0 };
-  }) : [];
-
+  const { isCartOpen } = useSelector((state: RootState) => state.cartSidebar);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { items } = useSelector((state: RootState) => state.cart);
   const dispatch = useDispatch();
-  useEffect(() => {
-    if (focusRef.current && isCartOpen) {
-      focusRef.current.addEventListener('mouseleave', function handleEscape(event) {
-        dispatch(toggleCartSidebar('close'));
-      });
 
-    }
-    return () => {
-      if (focusRef.current) {
-        focusRef.current.removeEventListener('mouseleave', function handleEscape(event) { });
-      }
-    }
-  }, [isCartOpen]);
+  const cartItems = Array.isArray(PRODUCT_LIST) && Array.isArray(items) 
+    ? PRODUCT_LIST.filter(product => items.some(item => item.id === product.id)).map(product => {
+        const item = items.find(item => item.id === product.id);
+        return { ...product, quantity: item?.quantity || 0 };
+      }) 
+    : [];
+
+  const closeSidebar = () => dispatch(toggleCartSidebar('close'));
+
   return (
-    <>
-      {isCartOpen && <aside ref={focusRef} tabIndex={-1} className="absolute z-30 h-[100dvh] w-112 bg-white right-0 top-0 shadow-lg p-4">
-        <h1 className="text-lg font-bold">Your Cart</h1>
-        <button onClick={() => dispatch(toggleCartSidebar('close'))} className="absolute top-3 right-2 text-gray-500 hover:text-red-700 text-2xl hover:bg-red-300 rounded-full p-1">
-          <X />
-        </button>
-        {cartItems.length === 0 ? (
-          <p className="mt-4 text-gray-500">Your cart is empty.</p>
-        ) : (
-          <ul className="mt-4 space-y-2">
-            {cartItems.map((item) => (
-              <li key={item.id} className="flex justify-between items-center  my-4">
-                <div>
-                  <span className="flex gap-3">
-                    <img className="  aspect-square w-18 h-18 object-cover rounded-lg" src={item.imgUrl} alt="" />
-                    <span>
-                      <p className="font-medium text-md mb-1 text-balance">{item.title}</p>
-                      <p className="text-gray-500">Quantity: {item.quantity}</p>
-                    </span>
-                  </span>
+    <AnimatePresence>
+      {isCartOpen && (
+        <>
+          {/* 1. Blurred Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeSidebar}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
+          />
 
+          {/* 2. Side Drawer */}
+          <motion.aside
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            onMouseLeave={closeSidebar} // Replaces the useEffect event listener logic
+            className="fixed right-0 top-0 z-[70] h-[100dvh] w-full max-w-md bg-white shadow-2xl flex flex-col"
+          >
+            {/* Header */}
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <ShoppingBag size={20} className="text-brand-primary" />
+                <h1 className="text-xl font-bold text-gray-800">Your Cart</h1>
+              </div>
+              <button 
+                onClick={closeSidebar}
+                className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {cartItems.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-4">
+                  <ShoppingBag size={48} strokeWidth={1} />
+                  <p>Your cart is empty.</p>
                 </div>
+              ) : (
+                <ul className="space-y-6">
+                  <AnimatePresence mode="popLayout">
+                    {cartItems.map((item) => (
+                      <motion.li 
+                        layout
+                        key={item.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        className="flex justify-between items-center gap-4"
+                      >
+                        <div className="flex gap-4 items-center">
+                          <img 
+                            className="aspect-square w-16 h-16 object-cover rounded-xl border border-gray-100" 
+                            src={item.imgUrl} 
+                            alt={item.title} 
+                          />
+                          <div>
+                            <p className="font-semibold text-gray-800 text-sm line-clamp-1">{item.title}</p>
+                            <p className="text-brand-primary font-bold text-sm">₹{item.price}</p>
+                          </div>
+                        </div>
 
-                <span className="flex flex-col justify-between items-end gap-2">
+                        <div className="flex flex-col items-end gap-1">
+                           <AddToCart productId={item.id} styles="small " />
+                        </div>
+                      </motion.li>
+                    ))}
+                  </AnimatePresence>
+                </ul>
+              )}
+            </div>
 
-                  <p className="text-gray-500"> ₹{item.price}</p>
-                  <AddToCart productId={item.id} styles="small" />
-                </span> </li>
-            ))}
-          </ul>
-        )}
-        <br className="w-full h-[2px] bg-gray-300 my-4" />
-        <Link className=" flex justify-center py-2 px-6 border-2 border-gray-300 rounded-xl" to={`/customerProfile/${user?.user_id}/cart`}> <button > View Cart </button> </Link>
-        <BuyBtn styles="w-full my-4 rounded-xl" />
-      </aside >
-      } </>
-  )
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-100 bg-gray-50/50 space-y-3">
+              <Link 
+                onClick={closeSidebar}
+                className="flex justify-center py-3 px-6 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors shadow-sm" 
+                to={`/customerProfile/${user?.user_id}/cart`}
+              > 
+                View Full Cart
+              </Link>
+              <BuyBtn styles="w-full py-4 rounded-xl shadow-lg" />
+            </div>
+          </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
+  );
 }

@@ -36,7 +36,7 @@ export function Home() {
                     </h1>
                     <p className="lg:text-5xl md:text-4xl text-2xl px-2  font-bold text-balance m-auto lg:w-[60vw] sm:w-[70vw] text-center mb-16">{HOME_HERO_DESC}</p>
                     <Link to="/shopping" className="m-auto  ">
-                        <motion.button className="m-auto block  bg-linear-to-t from-brand-primary to-brand-secondary text-primary font-bold px-4 py-2 rounded-lg">Shop Now</motion.button>
+                        <motion.button className="m-auto block  bg-linear-to-t from-brand-primary to-brand-secondary text-primary font-bold px-4 py-2 rounded-lg cursor-pointer ">Shop Now</motion.button>
                     </Link>
                 </section>
                 <section className="flex justify-between gap-16 mt-14  flex-wrap bg-primary xl:pt-10 pb-8 xl:px-32   lg:px-8 md:px-4 sm:px-2 py-1">
