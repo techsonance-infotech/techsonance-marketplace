@@ -29,7 +29,7 @@ const PriceTicker = ({ value }: { value: number }) => {
 
 export function CartList() {
     const { items } = useSelector((state: RootState) => state.cart);
-
+    
     const cartItemsWithDetails = items.map(item => {
         const product = PRODUCT_LIST.find(p => p.id === item.id);
         return {
@@ -43,7 +43,7 @@ export function CartList() {
     const totalPrice = cartItemsWithDetails.reduce((total, item) => total + item.price * item.quantity, 0);
 
     return (
-        <div className="max-w-6xl mx-auto p-4 lg:p-8">
+        <div className="max-w-6xl mx-auto  lg:p-8">
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -73,12 +73,12 @@ export function CartList() {
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, x: -50 }}
-                                    className="flex justify-between items-center gap-4 border border-gray-200 px-6 py-4 rounded-2xl mb-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                                    className="flex justify-between items-center lg:gap-4 border border-gray-200 lg:px-6 px-2 lg:py-4 pt-1 rounded-2xl lg:mb-4 bg-white shadow-sm hover:shadow-md transition-shadow"
                                 >
-                                    <div className="flex gap-4 items-center">
-                                        <img src={item.imgUrl} alt={item.name} className="w-20 h-20 object-cover rounded-xl shadow-inner" />
+                                    <div className="flex lg:gap-4 items-center">
+                                        <img src={item.imgUrl} alt={item.name} className="w-20 h-20 object-cover aspect-square rounded-xl mr-2   " />
                                         <div>
-                                            <h3 className="font-bold text-lg text-gray-800">{item.name}</h3>
+                                            <h3 className="lg:font-bold lg:text-lg text-sm text-gray-800">{item.name}</h3>
                                             <p className="text-brand-primary font-semibold">₹{item.price.toLocaleString()}</p>
                                         </div>
                                     </div>
@@ -94,10 +94,10 @@ export function CartList() {
                     {/* Order Summary Sticky Sidebar */}
                     <motion.div
                         layout
-                        className="lg:col-span-1 w-full sticky top-8 border border-gray-200 py-6 px-6 rounded-2xl bg-gray-50/50 shadow-sm"
+                        className="lg:col-span-1 w-full sticky lg:top-8 top-2 border border-gray-200 lg:py-6 py-2 lg:px-6 px-2 rounded-2xl bg-gray-50/50 shadow-sm"
                     >
                         <h2 className="text-xl font-bold mb-1">Order Summary</h2>
-                        <p className="text-xs text-gray-400 mb-6">Shipping & discounts applied at next step</p>
+                        <p className="text-xs text-gray-400 lg:mb-6">Shipping & discounts applied at next step</p>
 
                         <div className="space-y-4">
                             <div className="flex justify-between text-gray-600">
@@ -118,7 +118,7 @@ export function CartList() {
                                 </table>
                             </div>
 
-                            <div className="border-t-2 border-dashed border-gray-200 pt-4 mt-4">
+                            <div className="border-t-2 border-dashed border-gray-200 lg:pt-4 pt-2 mt-4">
                                 <div className="flex justify-between items-center font-bold text-xl text-gray-900">
                                     <span>Subtotal</span>
                                     <PriceTicker value={totalPrice} />
@@ -126,7 +126,7 @@ export function CartList() {
                             </div>
                         </div>
 
-                        <BuyBtn styles="mt-8 w-full py-4 text-lg rounded-xl shadow-lg  " />
+                        <BuyBtn styles="lg:mt-8 mt-4  w-full lg:py-4  text-lg rounded-xl shadow-lg  " />
                     </motion.div>
 
                 </section>

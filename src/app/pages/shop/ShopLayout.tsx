@@ -1,16 +1,18 @@
 ﻿import { Navigate, Outlet, useParams } from "react-router";
- 
+
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../store";
- 
+
 import { Footer, Navbar } from "../../../utils/constants";
 import { CartSidebar } from "../../../components/customer/CartSidebar";
+import { TabNavBar } from "../../../components/customer/TabNavBar";
+import { useMediaQuery } from "react-responsive";
 
 
 export function ShopLayout() {
   // const isLoading = useSelector(selectVendorLoading);
   // const isError = useSelector(selectVendorError);
-
+  const isMobile = useMediaQuery({ maxWidth: 767 })
   // if (isLoading) {
   //   return <Spinner />
   // }
@@ -23,6 +25,7 @@ export function ShopLayout() {
       <Navbar styles="bg-navbar  " />
       <CartSidebar />
       <Outlet />
+      {isMobile && <TabNavBar />}
       <Footer styles="bg-footer-foreground text-primary" />
     </>
   )

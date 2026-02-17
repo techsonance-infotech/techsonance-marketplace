@@ -24,6 +24,7 @@
 // Supporting Interfaces based on your schema
 export interface Address {
   address_id: number;
+  name?: string;  
   address_for: 'home' | 'work' | 'other';
   address_line1: string;
   city: string;
@@ -54,6 +55,9 @@ export interface Wishlist {
 export interface UserOrder {
   order_id: number;
   order_status: 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled';
+  delivered_at?: string; 
+  shippingTo: Address | string;
+  products?: { product_id: string; quantity: number } [];  
   total_amount: number;
   address_id: number;
   created_at: string;

@@ -41,9 +41,11 @@ const AddressModal = ({ user, addressId, operation, onClose }: {
     const onSubmit = (data: any) => {
         if (operation === 'edit') {
             dispatch(updateAddress({ ...data, address_id: existingAddress?.address_id }));
+
         } else {
             dispatch(createAddress({ ...data, address_id: Date.now() }));
         }
+      
         onClose();
     };
 

@@ -21,7 +21,7 @@ export function Checkout() {
   };
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-8">
+    <section className="max-w-6xl mx-auto px-4 py-8 min-h-[60vh]">
       <h1 className="text-2xl font-bold text-center mb-8">
         secure Checkout with Us
       </h1>

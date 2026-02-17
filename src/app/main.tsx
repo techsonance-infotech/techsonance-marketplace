@@ -13,6 +13,7 @@ import { VendorSettingLayout } from './pages/vendor/settings/VendorSettingLayout
 import { ShopLayout } from './pages/shop/ShopLayout.tsx'
 import { UserLayout } from './pages/shop/customerProfile/UserLayout.tsx'
 import { Unauthorized } from './pages/shop/customerProfile/Unauthorized.tsx'
+import { CustomersOrders } from './pages/shop/customerProfile/CustomersOrders.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -32,7 +33,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path='addresses' element={<Addresses />} />
               <Route path='wishlist' element={< WishList />} />
               <Route path='cart' element={< CartList />} />
-              
+              <Route path='orders' element={<CustomersOrders />} />
               <Route path='checkout/:id' >
                 <Route index element={<Checkout />} />
                 <Route path='orderStatus' element={<OrderStatus />} />

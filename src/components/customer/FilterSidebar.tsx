@@ -99,7 +99,7 @@ export function FilterSidebar({ PRODUCT_LIST, filterProduct }: {
           <h2 className='text-md font-semibold text-gray-700'>Category</h2>
           <ChevronUp size={18} />
         </div>
-        <div className='flex flex-col gap-3'>
+        <div className='flex flex-col gap-3  overflow-y-scroll h-full'>
           {categoryFilter.map((cat) => (
             <div
               key={cat}
@@ -120,7 +120,7 @@ export function FilterSidebar({ PRODUCT_LIST, filterProduct }: {
 
       <button
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 z-50 bg-black text-white p-4 rounded-full shadow-xl flex items-center gap-2"
+        className="lg:hidden fixed bottom-20 right-6 z-50 bg-black text-white p-4 rounded-full shadow-xl flex items-center gap-2"
       >
         <SlidersHorizontal size={20} />
         <span className="font-semibold text-sm">Filters</span>

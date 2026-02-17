@@ -44,13 +44,13 @@ export function CartSidebar() {
     };
   }, [isCartOpen]);
 
-  // useEffect(() => {
-  //   if (isCartOpen ) {
-  //     setTimeout(() => {
-  //       closeSidebar();
-  //     }, 2500)
-  //   }
-  // }, [isCartOpen])
+  useEffect(() => {
+    if (isCartOpen && isMobile) {
+      setTimeout(() => {
+        closeSidebar();
+      }, 1500)
+    }
+  }, [isCartOpen])
 
   if (isMobile) {
     return (
@@ -63,7 +63,7 @@ export function CartSidebar() {
               exit={{ opacity: 0, translateY: -30 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               key={cartItems.length}
-              className="fixed     z-[60]  w-full      flex  items-center justify-center gap-6  "
+              className="fixed z-70  w-full      flex  items-center justify-center gap-6  "
             >
 
               {

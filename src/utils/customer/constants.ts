@@ -1,4 +1,5 @@
-﻿
+﻿import { iconNames } from "lucide-react/dynamic";
+
 //Cusomter Home hero title and description
 export const HOME_HERO_TITLE = "Welcome to Sound Sphere - Your Ultimate Music Marketplace";
 export const HOME_HERO_DESC = "Discover, buy, and sell music products with ease. Join our vibrant community of music lovers and elevate your sound experience today!";
@@ -19,6 +20,18 @@ export interface FooterSectionType {
 }
 // Navigation Links
 export const NAV_LINKS: NavLinkType[] = [{ Home: '/' }, { Shop: '/shopping' }, { About: '/about' }, { Contact: '/contact' }]
+export interface tabLinkType {
+    [key: string]: string;
+}
+export const TAB_LINKS: tabLinkType[] = [
+    { title: 'Home', url: '/',iconNames:'house' },
+    { title: 'Shop', url: '/shopping',iconNames:'shopping-bag' },
+    { title: 'Cart', url: '/cart',iconNames:'shopping-cart' },
+    
+    { title: 'Profile', url: '/customerProfile',iconNames:'user' },
+    {title:'Menu', url:'', iconNames:'menu'}
+ 
+]
 export const FOOTER_CONTENT: FooterSectionType[] = [
     {
         header: 'Need Help?',
@@ -197,7 +210,7 @@ export const PRODUCT_LIST: PRODUCT_LIST_TYPE[] = [
         satisfaction: "4.8/5"
     },
     {
-        id: "hpx-cloud-stinger-2-core-ps",
+        id: "hpx-cloud-ps",
         title: "HyperX Cloud Stinger 2 Core Gaming Headset PS White",
         price: 3790,
         discount: 18, // Estimated based on typical MRP vs price

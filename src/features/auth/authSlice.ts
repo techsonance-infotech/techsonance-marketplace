@@ -51,13 +51,22 @@ export const MockUser: UserProfile = {
     "orders": [
         {
             "order_id": 9001,
+            "products": [
+                { "product_id": "sp-003", "quantity": 1 },
+            ],
+            "shippingTo": "Alex Rivier ",
             "order_status": "Delivered",
+            "delivered_at": "2026-01-25T12:00:00Z",
             "total_amount": 19999.00,
             "address_id": 2045,
             "created_at": "2026-01-20T09:15:00Z"
         },
         {
             "order_id": 9552,
+            "products": [
+                { "product_id": "mc-004", "quantity": 1 }
+            ],
+            "shippingTo": "Alex Rivier ",
             "order_status": "Pending",
             "total_amount": 8490.00,
             "address_id": 2045,

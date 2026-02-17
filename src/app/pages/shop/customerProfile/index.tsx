@@ -4,7 +4,7 @@ import { Handbag, Mail, Phone, Timer, MapPin, Lock, Bell } from "lucide-react";
 import type { RootState } from "../../../store";
 import { useEffect, useState } from "react";
 
- 
+
 const Counter = ({ value }: { value: number }) => {
     const [count, setCount] = useState(0);
 
@@ -13,7 +13,7 @@ const Counter = ({ value }: { value: number }) => {
         const end = value;
         if (start === end) return;
 
-       
+
         const duration = 1000;
         const incrementTime = Math.abs(Math.floor(duration / end));
 
@@ -29,13 +29,13 @@ const Counter = ({ value }: { value: number }) => {
     return <span>{count}</span>;
 };
 
- 
+
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.15   
+            staggerChildren: 0.15
         }
     }
 };
@@ -58,19 +58,19 @@ export function UserProfile() {
 
     return (
         <motion.section
-            className="w-full max-w-5xl mx-auto pb-20"
+            className="w-full   mx-auto lg:px-4 lg:py-8 px-2 py-4"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
-          
+
             <motion.section
                 initial="hidden"
                 animate="visible"
                 variants={itemVariants}
-                className="flex flex-col md:flex-row justify-between items-center p-8 bg-white border border-gray-200 rounded-2xl shadow-sm gap-6"
+                className="flex flex-col md:flex-row justify-between items-center lg:p-8 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm lg:gap-6 gap-2"
             >
-                <div className="flex flex-col md:flex-row items-center gap-8 w-full">
+                <div className="flex flex-col md:flex-row items-center gap-8   w-full">
                     <motion.div
                         whileHover={{ scale: 1.05 }}
                         className="relative"
@@ -108,7 +108,7 @@ export function UserProfile() {
                 </motion.button>
             </motion.section>
 
- 
+
             <div className="mt-8 flex flex-col md:flex-row gap-6">
                 {[
                     { label: "TOTAL ORDERS", value: user.orders.length, icon: Handbag, color: "bg-brand-primary", text: "text-brand-primary" },
@@ -118,11 +118,11 @@ export function UserProfile() {
                         key={idx}
                         variants={itemVariants}
                         whileHover={{ y: -5, boxShadow: "0 10px 30px -10px rgba(0,0,0,0.1)" }}
-                        className="flex-1 flex justify-between items-center p-6 bg-white border border-gray-200 rounded-2xl shadow-sm transition-all"
+                        className="flex-1 flex justify-between items-center lg:p-6 px-3 py-3 bg-white border border-gray-200 rounded-2xl shadow-sm transition-all"
                     >
                         <div>
                             <h2 className="font-bold text-sm text-gray-400 mb-1 tracking-wider">{stat.label}</h2>
-                            <p className="text-4xl font-extrabold text-gray-800">
+                            <p className="lg:text-4xl text-3xl font-extrabold text-gray-800">
                                 <Counter value={stat.value} />
                             </p>
                         </div>
@@ -133,12 +133,12 @@ export function UserProfile() {
                 ))}
             </div>
 
-        
+
             <motion.section variants={itemVariants} className="my-8">
-                <h1 className="font-bold text-2xl text-gray-900 mb-6">Account Management</h1>
+                <h1 className="font-bold lg:text-2xl text-xl text-gray-900 mb-6">Account Management</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                 
+
                     <ManagementCard
                         icon={<MapPin size={28} className="text-blue-600" />}
                         color="bg-blue-50"
@@ -166,7 +166,7 @@ export function UserProfile() {
                         description="Manage your login credentials and security settings to keep your account safe."
                     />
 
-                  
+
                     <ManagementCard
                         icon={<Bell size={28} className="text-yellow-600" />}
                         color="bg-yellow-50"
@@ -184,19 +184,19 @@ export function UserProfile() {
     );
 }
 
- 
+
 const ManagementCard = ({ icon, color, title, description, children }: any) => (
     <motion.div
         variants={itemVariants}
         whileHover={{ scale: 1.02, backgroundColor: "#fafafa" }}
-        className="flex flex-col p-6 border border-gray-200 rounded-2xl bg-white shadow-sm cursor-pointer transition-colors"
+        className="flex flex-col lg:p-6 p-3 border border-gray-200 rounded-2xl bg-white shadow-sm cursor-pointer transition-colors"
     >
         <div className="flex items-start gap-6">
             <div className={`w-14 h-14 ${color} rounded-2xl flex justify-center items-center flex-shrink-0`}>
                 {icon}
             </div>
             <div>
-                <h2 className="font-bold text-xl mb-2 text-gray-900">{title}</h2>
+                <h2 className="font-bold lg:text-xl text-lg mb-2 text-gray-900">{title}</h2>
                 <p className="text-gray-500 text-sm leading-relaxed">{description}</p>
             </div>
         </div>
