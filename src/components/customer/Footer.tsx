@@ -1,64 +1,103 @@
 ﻿import { Link, Outlet, useLocation } from "react-router";
-
+import { motion } from "framer-motion";
 import { FOOTER_BOTTOM_TEXT, FOOTER_CONTENT } from "../../utils/customer/constants";
 import { DynamicIcon } from "lucide-react/dynamic";
 
-
-
-
 export function Footer({ styles }: { styles?: string }) {
-
     const path = useLocation().pathname;
 
+    // Skip footer for admin/vendor routes
     if (path.startsWith('/admin') || path.startsWith('/vendor')) {
-        return <Outlet />
+        return <Outlet />;
     }
-    //
+
+    // Hide main footer content for Auth pages
+    const isAuthPage = path === '/customerRegister' || path === '/customerLogin';
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.2
+            }
+        }
+    };
+
+    const columnVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { type: "spring", stiffness: 50 }
+        }
+    };
+
     return (
-        <>
-            <footer className={`flex flex-col bg-footer      xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-4 px-2 ${styles}`}>
-                <span className="w-full flex justify-center items-start   xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-1   ">
+        <footer className={`bg-footer xl:px-32 lg:px-8 md:px-4 sm:px-2 py-8 px-4 ${styles}`}>
+            {!isAuthPage && (
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    className="w-full flex flex-col sm:flex-row justify-between gap-8 mb-12"
+                >
+                    {FOOTER_CONTENT.map((section, index) => (
+                        <motion.ul
+                            key={index}
+                            variants={columnVariants}
+                            className="flex flex-col gap-4 min-w-[150px]"
+                        >
+                            <li className="font-bold text-lg text-primary mb-2">
+                                {section.header}
+                            </li>
 
+                            {section.links.map((link, linkIndex) => (
+                                <motion.li
+                                    key={linkIndex}
+                                    whileHover={{ x: 5 }}
+                                    className="text-sm text-primary hover:text-brand-primary transition-colors"
+                                >
+                                    <Link
+                                        to={link.url}
+                                        className="flex items-center gap-2 group"
+                                    >
+                                        {link.icon && (
+                                                <DynamicIcon
+                                                    name={link.icon}
+                                                    className={link.styles}
+                                                    size={28}
+                                                />
+                                          
+                                        )}
+                                        {link.category !== 'social' && <span className="w-64 text-balance" >{link.title}</span>}
+                                    </Link>
+                                </motion.li>
+                            ))}
+                        </motion.ul>
+                    ))}
+                </motion.div>
+            )}
 
-                    {/* <img src={BRAND_LOGO} alt="brand logo" className="h-10  " /> */}
-                    {
-                        path === '/customerRegister' || path === '/customerLogin' ? null : <>
-                            <div className="w-full  space-x-4 flex sm:flex-row flex-col justify-between  md:text-[12px] lg:text-[.8rem] font-medium">
-                                {
-                                    FOOTER_CONTENT.map((section, index) => (
-                                        <ul key={index} className="flex flex-col gap-2">
-                                            <li className="font-bold text-lg  text-balance">{section.header}</li>
+            <div className="flex flex-col items-center">
+                <motion.span
+                    initial={{ width: 0 }}
+                    whileInView={{ width: "100%" }}
+                    viewport={{ once: true }}
+                    className="h-[1px] bg-black/10 mb-6"
+                />
 
-                                            {
-                                                section.links.map((link, linkIndex) => (
-                                                    <li key={linkIndex} className={`text-sm  hover:text-gray-400 transition-colors duration-300 w-64 `}>
-                                                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
-                                                            {link.icon && <DynamicIcon name={link.icon} className={link.styles} size={32} />
-                                                            }
-
-                                                            {link.category === 'social' ? null : link.title}
-                                                        </a>
-                                                    </li>
-                                                ))
-                                            }
-
-                                        </ul>
-
-                                    )
-                                    )
-
-                                }
-                            </div>
-
-                        </>}
-                     
-                </span>
-                <span className="h-[1px] w-[85%] my-2  bg-black/30 mx-auto " ></span>
-                <span className=" font-light  text-center mb-6 text-balance">
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    className="font-light text-center text-gray-100 text-sm max-w-2xl leading-relaxed"
+                >
                     {FOOTER_BOTTOM_TEXT}
-                </span>
-            </footer>
-
-        </>
-    )
+                </motion.p>
+            </div>
+        </footer>
+    );
 }

@@ -8,15 +8,17 @@ const cartSidebarSlice = createSlice({
     initialState,
     reducers: {
         toggleCartSidebar: (state, action) => {
-            if (action.payload === "close") {
-                state.isCartOpen = false;
-                return;
-            }else if (action.payload === "open") {
-                state.isCartOpen = true;
-                return;
+            switch (action.payload) {
+                case 'open':
+                    state.isCartOpen = true;
+                    break;
+                case 'close':
+                    state.isCartOpen = false;
+                    break;
+                default:
+                    state.isCartOpen = !state.isCartOpen;
             }
-            state.isCartOpen = !state.isCartOpen;
-        }
+        },
     },
 });
 

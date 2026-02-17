@@ -9,8 +9,8 @@ interface CartItem {
 const loadCartFromLocalStorage = () => {
     try {
         const serializedCart = localStorage.getItem('cart');
-        
-        if (serializedCart  ) {
+
+        if (serializedCart) {
             const parsedCart = JSON.parse(serializedCart);
             if (parsedCart && Array.isArray(parsedCart.items)) {
                 return parsedCart;
@@ -26,23 +26,22 @@ const loadCartFromLocalStorage = () => {
 }
 const initialState: {
     items: CartItem[];
-    
+
 } = {
-    items:  loadCartFromLocalStorage()  ? loadCartFromLocalStorage().items : [],
- 
+    items: loadCartFromLocalStorage() ? loadCartFromLocalStorage().items : [],
+
 }
 const CartSlice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
         addToCart: (state, action) => {
-            const existingItem =Array.isArray(state.items) ? state.items.find(item => item.id === action.payload.id) : undefined;
-            if (existingItem ) {
+            const existingItem = Array.isArray(state.items) ? state.items.find(item => item.id === action.payload.id) : undefined;
+            if (existingItem) {
                 existingItem.quantity += 1;
-                console.log(existingItem.userId)
             }
             else {
-               
+
                 state.items.push({ ...action.payload, quantity: 1 });
             }
             console.log('Current state:', state);
@@ -50,12 +49,12 @@ const CartSlice = createSlice({
         },
         removeFromCart: (state, action) => {
             const existingItem = Array.isArray(state.items) ? state.items.find(item => item.id === action.payload.id) : undefined;
-            if (existingItem ) {
+            if (existingItem) {
 
                 state.items = state.items.filter(item => item.id !== action.payload.id);
             }
             console.log('Current state:', state);
-        },  
+        },
 
         updateQuantity: (state, action) => {
             const existingItem = Array.isArray(state.items) ? state.items.find(item => item.id === action.payload.id) : undefined;
@@ -72,4 +71,3 @@ const CartSlice = createSlice({
 });
 export const { addToCart, removeFromCart, updateQuantity, clearCart } = CartSlice.actions;
 export const CartReducer = CartSlice.reducer;
- 

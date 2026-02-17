@@ -4,10 +4,10 @@ import type { RootState } from "../../app/store";
 import { addToCart, removeFromCart, updateQuantity } from "../../features/Cart";
 import { toggleCartSidebar } from "../../features/CartSidebar";
 import { useLocation } from "react-router";
-import { motion, AnimatePresence } from "framer-motion"; // Note: standard import is framer-motion
+import { motion, AnimatePresence } from "framer-motion";  
 
 interface AddToCartProps {
-    productId: string; // Made required for safety
+    productId: string; 
     styles?: string;
 }
 
@@ -24,7 +24,19 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
 
     const containerBase = `flex items-center justify-center bg-brand-primary text-white rounded-lg shadow-md overflow-hidden transition-all duration-200`;
     const heightClass = isSmall ? "h-8" : "h-11";
-
+    const debounceFunction = ({func, delay=300}: {func: () => void, delay: number}) => {
+        let timeoutId:any;  
+        return () => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            timeoutId = setTimeout(() => {
+                func();
+            }, delay);
+        };
+    }
+    
+    
     const handleIncrement = () => {
         if (!user) {
           
@@ -36,13 +48,14 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
         
         // Only open sidebar if we aren't already on the cart page
         if (!path.includes("cart")) {
-            dispatch(toggleCartSidebar('open'));
+            debounceFunction({ func: () => dispatch(toggleCartSidebar('open')), delay: 300 })();
         }
     };
 
     const handleDecrement = () => {
         if (quantity > 1) {
             dispatch(updateQuantity({ id: productId, quantity: quantity - 1, user_id: user?.user_id }));
+ 
         } else {
             dispatch(removeFromCart({ id: productId, user_id: user?.user_id }));
         }
@@ -60,6 +73,7 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
                         onClick={handleIncrement}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
                         className="flex h-full w-full items-center justify-center gap-2  px-6 whitespace-nowrap"
                     >
                         <ShoppingCart size={isSmall ? 18 : 22} />

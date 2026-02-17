@@ -127,7 +127,7 @@ export function FilterSidebar({ PRODUCT_LIST, filterProduct }: {
       </button>
 
 
-      <aside className='hidden lg:block w-72 bg-white border-r border-gray-200 p-6 h-screen sticky top-0'>
+      <aside className='hidden lg:block lg:w-72 w-[60%] bg-white border-r border-gray-200 p-6 h-screen sticky top-0'>
         <SidebarContent />
       </aside>
 
@@ -139,7 +139,7 @@ export function FilterSidebar({ PRODUCT_LIST, filterProduct }: {
           onClick={() => setIsOpen(false)}
         />
         {/* Drawer Panel */}
-        <aside className={`absolute left-0 top-0 h-full w-80 bg-white p-6 shadow-2xl transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <aside className={`absolute left-0 top-0 h-full lg:w-72 w-[60%] bg-white p-6 shadow-2xl transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           <SidebarContent />
         </aside>
       </div>

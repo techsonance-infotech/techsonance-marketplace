@@ -47,7 +47,7 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
                     <li key={label} className="relative py-1 px-4">
                         <Link 
                             to={href} 
-                            className={`relative z-10 transition-colors duration-300 ${
+                            className={`relative z-10 transition-colors duration-300 font-bold ${
                                 isActive ? 'text-white' : 'text-gray-600 hover:text-gray-900'
                             }`}
                         >
@@ -73,23 +73,23 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
                     </button>
                 </div>
                 {path === '/customerRegister' || path === '/customerLogin' ? null :
-                    <div className="  flex gap-4 items-center ">
+                    <div className="  flex gap-6 items-center ">
                         <Link to={'/customerProfile/' + (user?.user_id || '') + '/wishlist'} className="relative  ">
                             {wishlistCount > 0 ? <motion.span  
                              key={wishlistCount}
                             initial={{ scale: 1.2, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }} className="  absolute -top-2 -right-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center" >{wishlistCount}</motion.span> : null}
-                            <Heart size={32} color={wishlistCount > 0 ? "pink" : "black"} fill={wishlistCount > 0 ? "pink" : "none"} />
+                            <Heart size={38} color={wishlistCount > 0 ? "pink" : "black"} fill={wishlistCount > 0 ? "pink" : "none"} />
                         </Link>
                         <button onClick={() => dispatch(toggleCartSidebar('open'))} className=" relative" >
                             {items.length > 0 && <motion.span  key={items.length}
                             initial={{ scale: 1.2, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }} className=" absolute -top-2 -right-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center">{items.length}</motion.span>}
-                            <ShoppingCart size={32} />
+                            <ShoppingCart size={38} />
                         </button>
 
                         <Link to={'/customerProfile/' + (user?.user_id || '')} className=" ">
-                            <img src={userIcon} alt="" className="h-6 w-6 " />
+                            <img src={userIcon} alt="" className="h-8 w-8 rounded-full" />
                         </Link>
                     </div>}
             </span>

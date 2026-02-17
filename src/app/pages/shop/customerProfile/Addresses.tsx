@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+﻿import {   useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
@@ -120,7 +120,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSetDefault }: any) => {
             }`}
         >
             {address.is_default && (
-                <div className="absolute top-4 right-4 flex items-center gap-1 text-blue-600 text-xs font-bold bg-blue-100 px-2 py-1 rounded-full">
+                <div className="absolute top-4 right-4 flex items-center gap-1 text-blue-600 text-xs font-bold bg-blue-100 px-2 py-1 rounded-lg">
                     <CheckCircle2 size={12} /> DEFAULT
                 </div>
             )}
@@ -220,7 +220,7 @@ export function Addresses() {
                 </AnimatePresence>
             </div>
 
-            {/* Modal */}
+ 
             <AnimatePresence>
                 {isModalOpen && user && (
                     <AddressModal

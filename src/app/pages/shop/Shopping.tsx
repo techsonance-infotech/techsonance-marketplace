@@ -1,6 +1,4 @@
-﻿
-import { CartSidebar } from "../../../components/customer/CartSidebar";
-import { ShoppingList } from "../../../components/customer/ShoppingList";
+﻿import { ShoppingList } from "../../../components/customer/ShoppingList";
 import { PRODUCT_LIST } from "../../../utils/customer/constants";
 
 export function Shopping() {

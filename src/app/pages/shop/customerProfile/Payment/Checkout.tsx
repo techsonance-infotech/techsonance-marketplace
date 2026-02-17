@@ -1,8 +1,9 @@
 ﻿import { MapPin, CreditCard, Wallet as WalletIcon } from "lucide-react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../../store";
-
 import { useState } from "react";
+import { motion } from "motion/react";
+import { Link } from "react-router";
 
 export function Checkout() {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -11,7 +12,7 @@ export function Checkout() {
   const [couponCode, setCouponCode] = useState<string>('');
   const [upiId, setUpiId] = useState<string>('');
   const [upiValid, setUpiValid] = useState<boolean>(false);
-  // Mock order data - replace with actual data from your cart/order state
+
   const orderData = {
     subtotal: 1999,
     discount: 300,
@@ -45,6 +46,13 @@ export function Checkout() {
               ))
               }
             </div>
+            <Link to={`/customerProfile/${user?.user_id}/addresses`}>
+              <motion.button
+                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                whileHover={{ scale: 1.05 }}>
+                Update Address
+              </motion.button>
+            </Link>
           </div>
 
 

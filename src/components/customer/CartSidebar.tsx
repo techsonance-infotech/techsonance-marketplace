@@ -10,11 +10,14 @@ import { Link } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMediaQuery } from "react-responsive";
 
+
+
 export function CartSidebar() {
   const { isCartOpen } = useSelector((state: RootState) => state.cartSidebar);
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const { user } = useSelector((state: RootState) => state.auth);
   const { items } = useSelector((state: RootState) => state.cart);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
 
   const cartItems = Array.isArray(PRODUCT_LIST) && Array.isArray(items)
@@ -26,12 +29,28 @@ export function CartSidebar() {
 
   const closeSidebar = () => dispatch(toggleCartSidebar('close'));
   useEffect(() => {
-    setTimeout(() => {
-      if (isCartOpen) {
+    if (!sidebarRef.current) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!sidebarRef.current?.contains(e.target as Node)) {
         closeSidebar();
       }
-    }, 1000)
-  }, [isCartOpen])
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mouseleave', handleClickOutside);
+    };
+  }, [isCartOpen]);
+
+  // useEffect(() => {
+  //   if (isCartOpen ) {
+  //     setTimeout(() => {
+  //       closeSidebar();
+  //     }, 2500)
+  //   }
+  // }, [isCartOpen])
 
   if (isMobile) {
     return (
@@ -71,17 +90,9 @@ export function CartSidebar() {
 
       {isCartOpen && (
         <>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeSidebar}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
-          />
-
-
           <motion.aside
+            ref={sidebarRef}
+            onClick={closeSidebar}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
