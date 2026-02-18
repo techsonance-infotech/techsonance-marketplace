@@ -14,6 +14,8 @@ import { ShopLayout } from './pages/shop/ShopLayout.tsx'
 import { UserLayout } from './pages/shop/customerProfile/UserLayout.tsx'
 import { Unauthorized } from './pages/shop/customerProfile/Unauthorized.tsx'
 import { CustomersOrders } from './pages/shop/customerProfile/CustomersOrders.tsx'
+import PasswordForm from './pages/shop/customerProfile/PasswordForm.tsx'
+import { ProfileForm } from './pages/shop/customerProfile/ProfileForm.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -34,6 +36,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path='wishlist' element={< WishList />} />
               <Route path='cart' element={< CartList />} />
               <Route path='orders' element={<CustomersOrders />} />
+              <Route path='editProfile' element={<ProfileForm />} />
+              <Route path='changePassword' element={<PasswordForm />} />
               <Route path='checkout/:id' >
                 <Route index element={<Checkout />} />
                 <Route path='orderStatus' element={<OrderStatus />} />

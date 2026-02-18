@@ -1,4 +1,4 @@
-﻿import {   useState } from "react";
+﻿import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,26 +45,26 @@ const AddressModal = ({ user, addressId, operation, onClose }: {
         } else {
             dispatch(createAddress({ ...data, address_id: Date.now() }));
         }
-      
+
         onClose();
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center  px-4">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={onClose}
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                className="absolute inset-0  bg-black/40 backdrop-blur-sm"
             />
             <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden z-10"
+                className="relative bg-white w-full max-w-2xl  rounded-2xl shadow-2xl overflow-hidden z-10"
             >
-                <div className="flex justify-between items-center p-6 border-b border-gray-100">
+                <div className="flex justify-between items-center py-3 px-6 border-b border-gray-100">
                     <h2 className="text-xl font-bold text-gray-800">
                         {operation === 'edit' ? 'Edit Address' : 'Add New Address'}
                     </h2>
@@ -73,7 +73,7 @@ const AddressModal = ({ user, addressId, operation, onClose }: {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                <form onSubmit={handleSubmit(onSubmit)} className="lg:p-6 p-3 space-y-4 max-h-[70dvh] overflow-y-auto">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1">
                             <label className="text-sm font-semibold text-gray-600">Address Type</label>
@@ -90,7 +90,7 @@ const AddressModal = ({ user, addressId, operation, onClose }: {
                         <FormInput label="Postal Code" name="postal_code" register={register} required />
                         <FormInput label="Country" name="country" register={register} required />
                     </div>
-                    
+
                     <div className="flex items-center gap-2 mt-2">
                         <input type="checkbox" {...register('is_default')} id="is_default" className="w-4 h-4 text-blue-600 rounded" />
                         <label htmlFor="is_default" className="text-gray-700">Set as default address</label>
@@ -117,9 +117,8 @@ const AddressCard = ({ address, onEdit, onDelete, onSetDefault }: any) => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             whileHover={{ y: -2 }}
-            className={`relative p-6 rounded-2xl border-2 transition-colors bg-white ${
-                address.is_default ? 'border-blue-500 bg-blue-50/30' : 'border-gray-100 hover:border-blue-200'
-            }`}
+            className={`relative  p-6 rounded-2xl border-2 transition-colors bg-white ${address.is_default ? 'border-blue-500 bg-blue-50/30' : 'border-gray-100 hover:border-blue-200'
+                }`}
         >
             {address.is_default && (
                 <div className="absolute top-4 right-4 flex items-center gap-1 text-blue-600 text-xs font-bold bg-blue-100 px-2 py-1 rounded-lg">
@@ -180,9 +179,9 @@ export function Addresses() {
     };
 
     return (
-        <section className="w-full max-w-5xl mx-auto mb-20">
+        <section className="w-full  mt-2 mx-auto mb-20">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">My Addresses</h1>
                     <p className="text-gray-500 mt-1">Manage your shipping and billing locations</p>
@@ -197,7 +196,7 @@ export function Addresses() {
                 </motion.button>
             </div>
 
-      
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <AnimatePresence mode="popLayout">
                     {user?.addresses.length ? (
@@ -211,9 +210,9 @@ export function Addresses() {
                             />
                         ))
                     ) : (
-                        <motion.div 
-                            initial={{ opacity: 0 }} 
-                            animate={{ opacity: 1 }} 
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
                             className="col-span-full py-12 text-center border-2 border-dashed border-gray-200 rounded-2xl"
                         >
                             <p className="text-gray-400">No addresses saved yet.</p>
@@ -222,7 +221,7 @@ export function Addresses() {
                 </AnimatePresence>
             </div>
 
- 
+
             <AnimatePresence>
                 {isModalOpen && user && (
                     <AddressModal

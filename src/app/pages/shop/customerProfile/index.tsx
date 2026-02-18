@@ -2,7 +2,10 @@
 import { motion } from "framer-motion";
 import { Handbag, Mail, Phone, Timer, MapPin, Lock, Bell } from "lucide-react";
 import type { RootState } from "../../../store";
-import { useEffect, useState } from "react";
+import { Activity, useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
+import { ProfileSidebar } from "../../../../components/customer/ProfileSidebar";
+import { Link } from "react-router";
 
 
 const Counter = ({ value }: { value: number }) => {
@@ -51,26 +54,29 @@ const itemVariants = {
 
 export function UserProfile() {
     const { user } = useSelector((state: RootState) => state.auth);
-
+    const isMobileOrTablet = useMediaQuery({ minWidth: 320, maxWidth: 1024 });
     if (!user) return null;
 
     const activeOrders = user.orders.filter(order => order.order_status === 'Pending').length;
 
     return (
         <motion.section
-            className="w-full   mx-auto lg:px-4 lg:py-8 px-2 py-4"
+            className="w-full   mx-auto lg:px-4 py-0 px-2 py-4"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
+            <Activity mode={isMobileOrTablet ? "visible" : "hidden"}>
+                <ProfileSidebar />
+            </Activity>
 
             <motion.section
                 initial="hidden"
                 animate="visible"
                 variants={itemVariants}
-                className="flex flex-col md:flex-row justify-between items-center lg:p-8 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm lg:gap-6 gap-2"
+                className="mt-6 flex  flex-col lg:flex-row justify-between items-center lg:p-8 px-4 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm lg:gap-6 gap-2 "
             >
-                <div className="flex flex-col md:flex-row items-center gap-8   w-full">
+                <div className="flex  lg:flex-row flex-col items-center   gap-8   w-full">
                     <motion.div
                         whileHover={{ scale: 1.05 }}
                         className="relative"
@@ -78,41 +84,42 @@ export function UserProfile() {
                         <img
                             src={user.profileImgUrl || "https://i.pinimg.com/originals/74/a3/b6/74a3b6a8856b004dfff824ae9668fe9b.jpg"}
                             alt={user.name || "User"}
-                            className="rounded-full w-32 h-32 object-cover border-4 border-gray-50 shadow-md"
+                            className="rounded-full lg:w-32 lg:h-32 w-24 h-24 object-cover border-4 border-gray-50 shadow-md"
                         />
-                        <span className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></span>
+                        <span className="absolute bottom-2  right-2 lg:w-5 lg:h-5 w-2 h-2 bg-green-500 border-2 border-white rounded-full"></span>
                     </motion.div>
 
-                    <div className="flex flex-col gap-2 text-center md:text-left">
-                        <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1>
-                        <div className="flex flex-wrap justify-center md:justify-start gap-4 text-gray-500 text-sm">
-                            <span className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full border border-gray-100">
+                    <div className="flex flex-col   gap-2 lg:text-center text-start md:text-left">
+                        <h1 className="lg:text-3xl text-xl text-start font-bold text-gray-900">{user.name}</h1>
+                        <div className="flex flex-wrap lg:justify-center  md:justify-start lg:gap-4 text-gray-500 text-sm">
+                            <span className="flex items-center gap-2 lg:px-3 py-1 lg:bg-gray-50 rounded-full lg:border border-gray-100">
                                 <Mail size={14} /> {user.email}
                             </span>
-                            <span className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full border border-gray-100">
+                            <span className="flex items-center gap-2 lg:px-3 py-1 lg:bg-gray-50 rounded-full lg:border   border-gray-100">
                                 <Phone size={14} /> {user.phone}
                             </span>
                         </div>
-                        <p className="text-gray-400 text-xs mt-2 font-medium">
+                        <p className="text-gray-400 text-xs lg:mt-2 text-left font-medium">
                             Member since: {new Date(user.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
                     </div>
                 </div>
-
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-6 py-2.5 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors whitespace-nowrap"
-                >
-                    Edit Profile
-                </motion.button>
+                <Link to={`/customerProfile/${user?.user_id}/editProfile`}>
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="lg:px-6 px-3 lg:py-2.5 py-1 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors whitespace-nowrap"
+                    >
+                        Edit Profile
+                    </motion.button>
+                </Link>
             </motion.section>
 
 
             <div className="mt-8 flex flex-col md:flex-row gap-6">
                 {[
                     { label: "TOTAL ORDERS", value: user.orders.length, icon: Handbag, color: "bg-brand-primary", text: "text-brand-primary" },
-                    { label: "ACTIVE ORDERS", value: activeOrders, icon: Timer, color: "bg-yellow-500", text: "text-yellow-500" }
+                    { label: "ACTIVE ORDERS", value: activeOrders, icon: Timer, color: "bg-yellow", text: "text-yellow-500" }
                 ].map((stat, idx) => (
                     <motion.div
                         key={idx}
@@ -122,12 +129,12 @@ export function UserProfile() {
                     >
                         <div>
                             <h2 className="font-bold text-sm text-gray-400 mb-1 tracking-wider">{stat.label}</h2>
-                            <p className="lg:text-4xl text-3xl font-extrabold text-gray-800">
+                            <p className="lg:text-4xl text-2xl font-extrabold text-gray-800">
                                 <Counter value={stat.value} />
                             </p>
                         </div>
                         <div className={`flex items-center justify-center ${stat.color}/10 p-4 rounded-full h-16 w-16`}>
-                            <stat.icon className={`${stat.text} w-8 h-8`} />
+                            <stat.icon className={`${stat.text} lg:w-8 lg:h-8 h-6 w-6 `} />
                         </div>
                     </motion.div>
                 ))}
@@ -145,18 +152,24 @@ export function UserProfile() {
                         title="Saved Addresses"
                         description="Manage your saved addresses for faster checkout and delivery."
                     >
-                        <div className="mt-4 pt-4 border-t border-gray-100">
-                            <p className="text-xs font-bold text-gray-400 uppercase mb-2">Default Address</p>
-                            {user.addresses.filter(a => a.is_default).length > 0 ? (
-                                user.addresses.filter(a => a.is_default).map(address => (
-                                    <p key={address.address_id} className="text-sm text-gray-600 line-clamp-1">
-                                        {address.address_line1}, {address.city}...
-                                    </p>
-                                ))
-                            ) : (
-                                <p className="text-sm text-gray-400 italic">No default address set</p>
-                            )}
-                        </div>
+                        <Link to={`/customerProfile/${user?.user_id}/addresses`}>
+                            <div className="mt-4 pt-4 border-t border-gray-100">
+                                <p className="text-xs font-bold text-gray-400 uppercase mb-2">Default Address</p>
+
+
+                                {user.addresses.filter(a => a.is_default).length > 0 ? (
+                                    user.addresses.filter(a => a.is_default).map(address => (
+                                        <p key={address.address_id} className="text-sm text-gray-600 line-clamp-1">
+                                            {address.address_line1}, {address.city}...
+                                        </p>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-gray-400 italic">No default address set</p>
+                                )}
+
+
+                            </div>
+                        </Link>
                     </ManagementCard>
 
                     <ManagementCard
@@ -180,7 +193,7 @@ export function UserProfile() {
                     </ManagementCard>
                 </div>
             </motion.section>
-        </motion.section>
+        </motion.section >
     );
 }
 

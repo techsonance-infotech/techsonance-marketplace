@@ -79,12 +79,11 @@ export function ShoppingList({
 
                                                 <Link to={`/shopping/${product.id}`} className="block overflow-hidden rounded-lg">
                                                     <img
-                                                        className="w-full object-cover lg:aspect-square  rounded-lg mb-4 transform hover:scale-105 transition-transform duration-300"
-                                                        src={product.imgUrl}
+                                                        className="w-full object-cover lg:aspect-9/14 aspect-9/15 rounded-lg mb-4 transform hover:scale-105 transition-transform duration-300"
+                                                        src={product.imgUrl ? product.imgUrl : "https://placehold.net/10.png"}
                                                         alt={product.title.trim()}
                                                     />
                                                 </Link>
-
                                                 <h3 className="font-semibold text-sm lg:line-clamp-1 line-clamp-2 leading-4 mb-1">{product.title}</h3>
                                                 <p className="text-sm  text-gray-500 lg:line-clamp-2 line-clamp-2 leading-5 overflow-hidden mb-4 h-10">
                                                     {product.description}

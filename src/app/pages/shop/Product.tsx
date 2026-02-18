@@ -134,15 +134,15 @@ export function Product() {
           </motion.div>
 
 
-          <motion.div variants={fadeInUp} className='flex gap-4 h-12'>
-            <AddToCart productId={product.id} styles="flex-1 text-xl
+          <motion.div variants={fadeInUp} className='flex gap-4  items-center'>
+            <AddToCart productId={product.id} styles=" text-xl 
             " />
-            <BuyBtn productId={product.id} styles="flex-1  " />
+            <BuyBtn productId={product.id} styles="scale-[0.95]" />
           </motion.div>
 
 
           <motion.div variants={fadeInUp} className='mt-4'>
-            <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Available Offers</h3>
+            {/* <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">We Offer</h3> */}
             <div className='flex gap-4 overflow-x-auto pb-4 hide-scrollbar'>
               {brandOffer.map((offer, idx) => (
                 <motion.div
@@ -150,7 +150,7 @@ export function Product() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: idx * 0.1 }}
-                  className='flex flex-col items-center justify-center gap-2 min-w-[100px] p-3 border border-gray-200 rounded-xl bg-white text-center'
+                  className='flex flex-col items-center justify-center gap-2 min-w-[100px] p-3 b  text-center'
                 >
                   <div className="p-2 bg-brand-primary/10 rounded-full text-brand-primary">
                     <DynamicIcon name={offer.icon} size={20} />

@@ -12,7 +12,7 @@ export function UserLayout() {
     return (
         <>
             <main className={`  xl:pt-10 pb-8   xl:px-32   lg:px-8 md:px-4 px-2 pt-1    min-h-[80dvh] ${isMobile ? ' flex flex-col' : 'flex'}`}>
-                <ProfileSidebar />
+                {!isMobile && <ProfileSidebar />}
                 <Outlet />
              {isMobile && <TabNavBar />}
             </main>

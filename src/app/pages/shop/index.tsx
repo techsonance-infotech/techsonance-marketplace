@@ -2,7 +2,7 @@
 import { HOME_HERO_DESC, HOME_HERO_TITLE } from "../../../utils/constants"
 import { useDispatch } from "react-redux";
 import { DynamicIcon } from 'lucide-react/dynamic';
-import {motion} from "motion/react";
+import { motion } from "motion/react";
 import { BEST_SELLING_PRODUCTS, CATEGORY_LIST, FEEDBACK_LIST, HOME_BRAND_FEATURES, PRODUCT_LIST } from "../../../utils/customer/constants";
 import { useState } from "react";
 import { CategoryList } from "../../../components/customer/CategoryList";
@@ -31,10 +31,10 @@ export function Home() {
                 <section className="xl:px-32 xl:py-2 lg:px-8 md:px-4 sm:px-2 py-1">
 
 
-                    <h1 className="pt-16 px-2 lg:text-2xl md:text-xl text-lg font-bold text-balance m-auto lg:w-[30vw] sm:w-[50vw] text-center mb-6">
+                    <h1 className="pt-16 px-2 lg:text-2xl md:text-xl text-lg font-bold text-balance m-auto lg:w-[30vw] sm:w-[50vw] text-center mb-6 text-primary ">
                         {HOME_HERO_TITLE}
                     </h1>
-                    <p className="lg:text-5xl md:text-4xl text-2xl px-2  font-bold text-balance m-auto lg:w-[60vw] sm:w-[70vw] text-center mb-16">{HOME_HERO_DESC}</p>
+                    <p className="lg:text-5xl md:text-4xl text-2xl px-2  font-bold text-balance m-auto lg:w-[60vw] sm:w-[70vw] text-center mb-16  text-primary">{HOME_HERO_DESC}</p>
                     <Link to="/shopping" className="m-auto  ">
                         <motion.button className="m-auto block  bg-linear-to-t from-brand-primary to-brand-secondary text-primary font-bold px-4 py-2 rounded-lg cursor-pointer ">Shop Now</motion.button>
                     </Link>

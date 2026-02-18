@@ -6,25 +6,22 @@ import type { UserOrder } from "../../../../utils/Types";
 import { Link } from "react-router";
 import { PRODUCT_LIST, type PRODUCT_LIST_TYPE } from "../../../../utils/customer/constants";
 import { useMediaQuery } from "react-responsive";
-import { is } from "date-fns/locale";
 type ordersStatusType = 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled';
 const OrderCard = ({ order, isMobile }: { order: UserOrder, isMobile: boolean }) => {
-  const productId = order.products[0].product_id;
-  const quantity = order.products[0].quantity;
+  const productId: string| undefined = order.products[0].product_id;
+  const quantity: number = order.products[0].quantity;
 
-  const productDetails: PRODUCT_LIST_TYPE = PRODUCT_LIST.find(p => p.id === productId)
-  console.log('Found product details for productId:', productId, 'details:', productDetails);
-  console.log(Array.isArray(productDetails), 'productDetails is an array')
-  const product = Array.isArray(productDetails) ? productDetails[0] : productDetails;
+  const productDetails: PRODUCT_LIST_TYPE | undefined = PRODUCT_LIST.find(p => p.id === productId)
+  const product: PRODUCT_LIST_TYPE | undefined = Array.isArray(productDetails) ? productDetails[0] : productDetails;
   console.log('productDetails', productDetails, 'order,', order)
   if (isMobile) {
     return (
       <>
         <motion.div className="w-full flex border-2 border-gray-300 rounded-xl gap-4 py-1">
-          <img src={product?.imgUrl} alt={product?.title} className="h-24 w-24 object-cover rounded " />
+          <img src={product?.imgUrl ? product.imgUrl : "https://placehold.net/10.png"} alt={product?.title} className="ml-1 rounded-lg h-24 w-24 object-cover   " />
           <div className="flex flex-col justify-start items-start gap-2  ">
-            <p className="text-blue-600">{product?.title}</p>
-            {product?.status === 'Delivered' ? <p className="text-green-600">Delivered</p> : <p className="text-orange-600">Pending</p>}
+            <p className="text-blue-600 line-clamp-1">{product?.title}</p>
+            {order.order_status === 'Delivered' ? <p className="text-green-600">Delivered</p> : <p className="text-orange-600">Pending</p>}
             <p>ordered on {new Date(order.created_at).toLocaleDateString()}</p>
           </div>
 
@@ -64,9 +61,9 @@ const OrderCard = ({ order, isMobile }: { order: UserOrder, isMobile: boolean })
         Order will Deliver soon
       </motion.div>}
       <div className="flex justify-start items-start gap-4">
-        <img src={product?.imgUrl} alt={product?.title} className="w-24 h-24 object-cover rounded" />
+        <img src={product?.imgUrl ? product.imgUrl : "https://placehold.net/10.png"} alt={product?.title} className=" w-24 h-24 object-cover rounded" />
         <div>
-          <p className="text-blue-600">{product?.title}</p>
+          <p className="text-blue-600 line-clamp-1">{product?.title}</p>
           <p className="text-gray-600">Quantity: {quantity}</p>
         </div>
         <div className="flex justify-end items-end ml-auto gap-4">
@@ -116,7 +113,16 @@ export function CustomersOrders() {
             return (
               <motion.button
                 key={status}
-                className={"relative lg:px-6 lg:py-2 px-4 font-medium transition-colors focus:outline-none border-b-4" + (isActive ? " text-black bg-black/5" : " text-gray-500 border-b-gray-200 hover:text-gray-700")}
+                animate={{
+                  color: isActive ? "#1D4ED8" : "#6B7280",
+                  borderColor: isActive ? "#1D4ED8" : "transparent",
+                }}
+                transition={{
+                  duration: 0.3,
+                  color: { type: 'spring', ease: 'easeInOut', duration: 0.3 },
+                  background: { type: 'spring', ease: 'easeInOut', duration: 0.5 }
+                }}
+                className={"relative lg:px-6 lg:py-2 px-4 font-medium transition-colors focus:outline-none border-b-4"}
 
                 onClick={() => setOrderStatus(status as ordersStatusType)}
               >
@@ -125,18 +131,6 @@ export function CustomersOrders() {
                   className="relative z-10" >
                   {status === 'Pending' ? 'Active' : status === 'Shipped' ? 'Shipped' : status === 'Delivered' ? 'Delivered' : 'Cancelled'}
                 </motion.p>
-
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabUnderline"
-                    className="absolute bottom-[-2px] left-0 right-0 h-1 bg-black  "
-                    transition={{
-                      type: 'spring',
-                      bounce: 0.2,
-                      duration: 0.4
-                    }}
-                  />
-                )}
               </motion.button>
             );
           })}
