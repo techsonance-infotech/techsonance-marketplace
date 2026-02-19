@@ -47,7 +47,7 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
         dispatch(addToCart({ id: productId, user_id: user.user_id }));
 
         // Only open sidebar if we aren't already on the cart page
-        if (!path.includes("cart")) {
+        if (!path.includes("cart") && !path.includes("wishlist")) {
             debounceFunction({ func: () => dispatch(toggleCartSidebar('open')), delay: 300 })();
         }
     };

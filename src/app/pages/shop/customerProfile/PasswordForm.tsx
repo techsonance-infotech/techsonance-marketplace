@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router";
 import type { RootState } from "../../../store";
 import { useSelector } from "react-redux";
+import { ChevronLeftCircle } from "lucide-react";
 
 
 export default function PasswordForm() {
@@ -25,7 +26,8 @@ export default function PasswordForm() {
     }
     return (
         <>
-            <form className="max-w-md lg:ml-10 pt-1 px-3 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <ChevronLeftCircle className="my-4 block lg:hidden" size={36} onClick={() => navigate(-1)} />
+            <form className="max-w-md lg:ml-10 pt-1 lg:px-3 px-1 space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <label htmlFor="current_password" className="block text-sm font-medium text-gray-700">
                         Current Password

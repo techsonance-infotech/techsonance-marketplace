@@ -1,16 +1,16 @@
 ﻿import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { Handbag, Mail, Phone, Timer, MapPin, Lock, Bell } from "lucide-react";
+import { Handbag, Mail, Phone, Timer, MapPin, Lock, Bell, ChevronLeftCircle } from "lucide-react";
 import type { RootState } from "../../../store";
 import { Activity, useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { ProfileSidebar } from "../../../../components/customer/ProfileSidebar";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 
 const Counter = ({ value }: { value: number }) => {
     const [count, setCount] = useState(0);
-
+    const navigate = useNavigate()
     useEffect(() => {
         let start = 0;
         const end = value;
@@ -66,7 +66,7 @@ export function UserProfile() {
             initial="hidden"
             animate="visible"
         >
-
+            <ChevronLeftCircle className="mb-4 block lg:hidden" size={36} onClick={() => navigate(-1)} />
 
             <motion.section
                 initial="hidden"

@@ -11,8 +11,6 @@ import { ProductSkeleton } from "../common/ProductSkeleton";
 import { motion, MotionConfig } from "motion/react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
-import { toggleCartSidebar } from "../../features/CartSidebar";
-
 
 export function ShoppingList({
     products, styles
@@ -40,7 +38,7 @@ export function ShoppingList({
             }
         )
     }
- 
+ const productsToShow = productsState.slice(firstIndex, lastIndex + 1)
     return (
         <>
             <MotionConfig transition={{ duration: 0.4, ease: "easeInOut" }}>
@@ -56,7 +54,7 @@ export function ShoppingList({
                                 ))
                             ) :
                                 (
-                                    productsState && productsState.slice(firstIndex, lastIndex + 1).map((product, idx) => (
+                                   productsToShow.map((product, idx) => (
                                         <li className="flex flex-col justify-between text-lg text-gray-700 hover:text-gray-900 cursor-pointer border-2 border-gray-200 rounded-lg p-4 relative  transition-shadow hover:shadow-md "
                                         >
 
@@ -64,7 +62,7 @@ export function ShoppingList({
                                                 <WishListBtn productId={product.id} styles="absolute top-2 right-6 z-10" />
 
                                                 <Link to={`/shopping/${product.id}`} className="block overflow-hidden rounded-lg">
-                                                    <img
+                                                    <img loading="lazy"
                                                         className="w-full object-cover lg:aspect-9/14 aspect-9/12 rounded-lg mb-4 transform hover:scale-105 transition-transform duration-300"
                                                         src={product.imgUrl ? product.imgUrl : "https://placehold.net/10.png"}
                                                         alt={product.title.trim()}

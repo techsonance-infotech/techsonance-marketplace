@@ -3,9 +3,10 @@ import type { RootState } from "../../../store";
 import { motion } from "motion/react";
 import { useState } from "react";
 import type { UserOrder } from "../../../../utils/Types";
-import { Link } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 import { PRODUCT_LIST, type PRODUCT_LIST_TYPE } from "../../../../utils/customer/constants";
 import { useMediaQuery } from "react-responsive";
+import { ChevronLeftCircle } from "lucide-react";
 type ordersStatusType = 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled';
 const OrderCard = ({ order, isMobile }: { order: UserOrder, isMobile: boolean }) => {
   const productId: string | undefined = order.products[0].product_id;
@@ -93,6 +94,7 @@ const OrdersList = ({ orders, status, isMobile }: { orders: UserOrder[], status:
 }
 export function CustomersOrders() {
   const { user } = useSelector((state: RootState) => state.auth);
+  const navigate = useNavigate()
   const isMobile = useMediaQuery({ maxWidth: 640 });
   const [orderStatus, setOrderStatus] = useState<ordersStatusType>('Pending');
   const orders: UserOrder[] = user?.orders || [];
@@ -103,7 +105,8 @@ export function CustomersOrders() {
   return (
     <>
 
-      <section className=" w-full  px-4 py-8 min-h-[60vh]">
+      <ChevronLeftCircle className="my-4 block lg:hidden" size={36} onClick={() => navigate(-1)} />
+      <section className=" w-full  lg:px-4 px-2   min-h-[60vh]">
         <h1 className="w-full mb-6 font-bold">My Orders
         </h1>
 

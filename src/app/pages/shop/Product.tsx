@@ -24,14 +24,14 @@ export function Product() {
   const { id } = useParams();
   const product: PRODUCT_LIST_TYPE | undefined = productS.find(pro => pro.id === id);
 
-  // State to handle the interactive image gallery
+   
   const [activeImage, setActiveImage] = useState(product?.imgUrl);
 
   if (!product) {
     return <h1 className='text-2xl font-bold text-gray-900 p-8'>Product not found</h1>;
   }
 
-  // Animation Variants
+ 
   const containerStagger = {
     visible: { transition: { staggerChildren: 0.1 } }
   };
@@ -135,7 +135,7 @@ export function Product() {
 
 
           <motion.div variants={fadeInUp} className='flex gap-4  items-center'>
-            <AddToCart productId={product.id} styles=" text-xl 
+            <AddToCart productId={product.id} styles=" text-xl w-32 lg:w-40
             " />
             <BuyBtn productId={product.id} styles="scale-[0.95]" />
           </motion.div>

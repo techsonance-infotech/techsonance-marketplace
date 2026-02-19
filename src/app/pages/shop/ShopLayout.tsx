@@ -1,4 +1,4 @@
-﻿import { Navigate, Outlet, useParams } from "react-router";
+﻿import {   Outlet  } from "react-router";
 
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../store";
@@ -31,6 +31,7 @@ export function ShopLayout() {
       <Activity mode={isMobile ? "visible" : "hidden"}>
         <TabNavBar />
       </Activity>
+ 
       <Footer styles="bg-footer-foreground text-primary" />
     </>
   )

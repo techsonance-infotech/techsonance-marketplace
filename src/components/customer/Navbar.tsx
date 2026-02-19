@@ -20,8 +20,8 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const wishlistCount = wishItems.length;
     const path = useLocation().pathname;
-    if (path.startsWith('/admin') || path.startsWith('/vendor')) {
-        return <Outlet />
+    if (path.startsWith('/admin') || path.startsWith('/vendor') || path.includes('checkout') || path.includes('cart') || path.includes('wishlist')||path.includes('orders') || path.includes('changePassword')|| path.includes('address') || path.includes('customerProfile')) {
+        return <></>
     }
     if (isTabletOrMobile) {
         return (

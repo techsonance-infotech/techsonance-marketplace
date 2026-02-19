@@ -16,11 +16,13 @@ import { Unauthorized } from './pages/shop/customerProfile/Unauthorized.tsx'
 import { CustomersOrders } from './pages/shop/customerProfile/CustomersOrders.tsx'
 import PasswordForm from './pages/shop/customerProfile/PasswordForm.tsx'
 import { ProfileForm } from './pages/shop/customerProfile/ProfileForm.tsx'
+import ScrollToTop from '../components/common/ScrollToTop.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
+      <ScrollToTop />
         <Routes>
           <Route path='/404' element={<NotFound />} />
           <Route path='/' element={<ShopLayout />} >
@@ -84,6 +86,7 @@ createRoot(document.getElementById('root')!).render(
             </Route>
           </Route>
         </Routes>
+ 
       </BrowserRouter>
     </Provider>
   </StrictMode>,

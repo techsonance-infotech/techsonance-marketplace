@@ -1,4 +1,4 @@
-﻿import { Outlet } from "react-router";
+﻿import { Outlet  } from "react-router";
 
 import { ADMIN_NAV_LINKS } from "../../../utils/constants";
 import { Sidebar } from "../../../components/common/Sidebar";
@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 
 
 
-export   function AdminLayout() {
+export function AdminLayout() {
     const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
     return (
         <>

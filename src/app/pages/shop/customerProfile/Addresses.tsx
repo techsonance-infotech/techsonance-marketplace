@@ -2,10 +2,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
-import { Pen, Trash2, X, Home, Briefcase, MapPin, CheckCircle2 } from "lucide-react";
+import { Pen, Trash2, X, Home, Briefcase, MapPin, CheckCircle2, ChevronLeftCircle } from "lucide-react";
 import { createAddress, deleteAddress, updateAddress, setDefaultAddress } from "../../../../features/auth/authSlice";
 import type { RootState } from "../../../store";
 import type { UserProfile } from "../../../../utils/Types";
+import { useNavigate } from "react-router";
 
 // --- 1. Reusable Form Input Component ---
 const FormInput = ({ label, register, name, required = false, ...rest }: any) => (
@@ -51,6 +52,7 @@ const AddressModal = ({ user, addressId, operation, onClose }: {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center  px-4">
+
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -165,7 +167,7 @@ export function Addresses() {
     const [isModalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
     const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
-
+    const navigate = useNavigate()
     const openAdd = () => {
         setModalMode('add');
         setSelectedId(undefined);
@@ -180,7 +182,7 @@ export function Addresses() {
 
     return (
         <section className="w-full  mt-2 mx-auto mb-20">
-            {/* Header */}
+            <ChevronLeftCircle className="mb-4 block lg:hidden" size={36} onClick={() => navigate(-1)} />
             <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">My Addresses</h1>
