@@ -40,19 +40,7 @@ export function ShoppingList({
             }
         )
     }
-    useEffect(() => {
-        if (!sectionRef.current) return;
-        document.addEventListener("mousemove", (e) => {
-            if (sectionRef.current?.contains(e.target as Node)) {
-                if (isCartOpen) {
-                    setTimeout(() => {
-                        dispatch(toggleCartSidebar('close'));
-                    }, 2500);
-                }
-            }
-        })
-
-    }, [isCartOpen]);
+ 
     return (
         <>
             <MotionConfig transition={{ duration: 0.4, ease: "easeInOut" }}>

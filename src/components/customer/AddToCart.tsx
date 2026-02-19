@@ -4,10 +4,10 @@ import type { RootState } from "../../app/store";
 import { addToCart, removeFromCart, updateQuantity } from "../../features/Cart";
 import { toggleCartSidebar } from "../../features/CartSidebar";
 import { useLocation } from "react-router";
-import { motion, AnimatePresence } from "framer-motion";  
+import { motion, AnimatePresence } from "framer-motion";
 
 interface AddToCartProps {
-    productId: string; 
+    productId: string;
     styles?: string;
 }
 
@@ -19,13 +19,13 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
 
     const cartItem = items?.find(item => item.id === productId);
     const quantity = cartItem ? cartItem.quantity : 0;
-    
+
     const isSmall = styles?.includes("small");
 
     const containerBase = `flex items-center justify-center bg-brand-primary text-white rounded-lg shadow-md overflow-hidden transition-all duration-200`;
     const heightClass = isSmall ? "h-6" : "h-11";
-    const debounceFunction = ({func, delay=300}: {func: () => void, delay: number}) => {
-        let timeoutId:any;  
+    const debounceFunction = ({ func, delay = 300 }: { func: () => void, delay: number }) => {
+        let timeoutId: any;
         return () => {
             if (timeoutId) {
                 clearTimeout(timeoutId);
@@ -35,17 +35,17 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
             }, delay);
         };
     }
-    
-    
+
+
     const handleIncrement = () => {
         if (!user) {
-          
+
             alert("Please log in to add items to the cart.");
             return;
         }
 
         dispatch(addToCart({ id: productId, user_id: user.user_id }));
-        
+
         // Only open sidebar if we aren't already on the cart page
         if (!path.includes("cart")) {
             debounceFunction({ func: () => dispatch(toggleCartSidebar('open')), delay: 300 })();
@@ -55,14 +55,14 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
     const handleDecrement = () => {
         if (quantity > 1) {
             dispatch(updateQuantity({ id: productId, quantity: quantity - 1, user_id: user?.user_id }));
- 
+
         } else {
             dispatch(removeFromCart({ id: productId, user_id: user?.user_id }));
         }
     };
 
     return (
-        <motion.div whileHover={{scale:1.1}} className={`${containerBase} ${heightClass} ${styles}  `}>
+        <motion.div whileHover={{ scale: 1.1 }} className={`${containerBase} ${heightClass} ${styles}  `}>
             <AnimatePresence mode="wait">
                 {quantity === 0 ? (
                     <motion.button
@@ -74,10 +74,10 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.95 }}
                         transition={{ duration: 0.15 }}
-                        className="flex h-full w-full items-center justify-center gap-2  px-6 whitespace-nowrap"
+                        className="flex h-full w-full items-center justify-center gap-2  whitespace-nowrap"
                     >
                         <ShoppingCart size={isSmall ? 18 : 22} />
-        
+
                     </motion.button>
                 ) : (
                     <motion.div
@@ -85,12 +85,12 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
                         initial={{ opacity: 0, y: 5 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -5 }}
-                        className="flex h-full w-full items-center justify-between"
+                        className="flex  h-full w-full items-center justify-evenly "
                     >
                         <motion.button
                             whileTap={{ scale: 0.8 }}
                             onClick={handleDecrement}
-                            className="h-full px-3 hover:bg-black/10 transition-colors"
+                            className="h-full   flex items-center justify-center flex-1 hover:bg-black/10 transition-colors"
                         >
                             <Minus size={16} />
                         </motion.button>
@@ -99,7 +99,7 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
                             key={quantity}
                             initial={{ scale: 1.2, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="font-bold text-sm min-w-[20px] text-center"
+                            className="font-bold   flex-1 text-xs  text-center"
                         >
                             {quantity}
                         </motion.span>
@@ -107,7 +107,7 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
                         <motion.button
                             whileTap={{ scale: 0.8 }}
                             onClick={handleIncrement}
-                            className="h-full px-3 hover:bg-black/10 transition-colors"
+                            className="h-full flex items-center justify-center flex-1 hover:bg-black/10 transition-colors"
                         >
                             <Plus size={16} />
                         </motion.button>

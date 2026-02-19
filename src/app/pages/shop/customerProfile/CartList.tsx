@@ -82,8 +82,8 @@ export function CartList() {
                                             <p className="text-brand-primary font-semibold lg:text-md text-sm">₹{item.price.toLocaleString()}</p>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-end gap-1">
-                                        <AddToCart productId={item.id} styles="small w-fit " />
+                                    <div className="flex flex-col items-start gap-1">
+                                        <AddToCart productId={item.id} styles="small lg:w-24 w-18" />
                                         <p className="text-xs text-gray-400">Subtotal: ₹{(item.price * item.quantity).toLocaleString()}</p>
                                     </div>
                                 </motion.div>
