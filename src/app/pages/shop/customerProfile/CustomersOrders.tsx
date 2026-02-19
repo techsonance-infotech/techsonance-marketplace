@@ -1,14 +1,14 @@
 ﻿import { useSelector } from "react-redux";
 import type { RootState } from "../../../store";
 import { motion } from "motion/react";
-import { use, useState } from "react";
+import { useState } from "react";
 import type { UserOrder } from "../../../../utils/Types";
 import { Link } from "react-router";
 import { PRODUCT_LIST, type PRODUCT_LIST_TYPE } from "../../../../utils/customer/constants";
 import { useMediaQuery } from "react-responsive";
 type ordersStatusType = 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled';
 const OrderCard = ({ order, isMobile }: { order: UserOrder, isMobile: boolean }) => {
-  const productId: string| undefined = order.products[0].product_id;
+  const productId: string | undefined = order.products[0].product_id;
   const quantity: number = order.products[0].quantity;
 
   const productDetails: PRODUCT_LIST_TYPE | undefined = PRODUCT_LIST.find(p => p.id === productId)

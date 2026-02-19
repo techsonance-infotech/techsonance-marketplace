@@ -5,7 +5,7 @@ import { PRODUCT_LIST } from "../../utils/customer/constants";
 import { AddToCart } from "./AddToCart";
 import type { RootState } from "../../app/store";
 import { X, ShoppingBag } from "lucide-react";
-import BuyBtn from "./BuyBtn";
+import {BuyBtn }from "./BuyBtn";
 import { Link } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMediaQuery } from "react-responsive";

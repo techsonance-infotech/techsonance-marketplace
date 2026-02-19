@@ -3,7 +3,7 @@ import type { RootState } from '../../app/store';
 import { useSelector } from 'react-redux';
 import { motion } from 'motion/react';
 
-export default function BuyBtn({ productId, styles }: { productId?: string, styles?: string }) {
+export   function BuyBtn({ productId, styles }: { productId?: string, styles?: string }) {
   const { user } = useSelector((state: RootState) => state.auth);
   return (
     <> <Link to={`/customerProfile/${user?.user_id}/checkout/${productId}`} className={`${styles}  `}>   

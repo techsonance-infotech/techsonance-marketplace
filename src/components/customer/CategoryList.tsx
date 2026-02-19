@@ -41,11 +41,11 @@ export function CategoryList({ categories, styles }: { categories?: CATEGORY_LIS
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
-                className={`px-4 flex lg:flex-nowrap flex-wrap lg:justify-between justify-evenly gap-6 ${styles}`}
+                className={`px-4 lg:flex lg:flex-nowrap grid grid-cols-2  lg:justify-between justify-evenly gap-6 ${styles}`}
             >
                 {categories && categories.slice(0, 4).map((category, idx) => (
                     <motion.li 
-                        key={category.id || idx} 
+                        key={ idx} 
                         variants={itemVariants}
                         className="group flex flex-col items-center cursor-pointer"
                     >

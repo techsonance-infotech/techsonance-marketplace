@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { RootState } from "../../../store";
 import { PRODUCT_LIST } from "../../../../utils/customer/constants";
 import { AddToCart } from "../../../../components/customer/AddToCart";
-import BuyBtn from "../../../../components/customer/BuyBtn";
+import { BuyBtn } from "../../../../components/customer/BuyBtn";
 import { useEffect, useState } from "react";
 
 
@@ -20,7 +20,7 @@ const PriceTicker = ({ value }: { value: number }) => {
             key={displayValue}
             initial={{ y: 15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="inline-block"
+            className="inline-block lg:text-xl text-lg text-primary-foreground"
         >
             ₹{displayValue.toLocaleString()}
         </motion.span>
@@ -29,7 +29,7 @@ const PriceTicker = ({ value }: { value: number }) => {
 
 export function CartList() {
     const { items } = useSelector((state: RootState) => state.cart);
-    
+
     const cartItemsWithDetails = items.map(item => {
         const product = PRODUCT_LIST.find(p => p.id === item.id);
         return {
@@ -43,7 +43,7 @@ export function CartList() {
     const totalPrice = cartItemsWithDetails.reduce((total, item) => total + item.price * item.quantity, 0);
 
     return (
-        <div className="max-w-6xl mx-auto  lg:p-8">
+        <div className=" mx-auto  lg:p-8">
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -73,17 +73,17 @@ export function CartList() {
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, x: -50 }}
-                                    className="flex justify-between items-center lg:gap-4 border border-gray-200 lg:px-6 px-2 lg:py-4 pt-1 rounded-2xl lg:mb-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                                    className="flex justify-between items-start lg:gap-4 gap-2 border border-gray-200 lg:px-6 p-2 lg:py-4 mb-3  rounded-2xl lg:mb-4 bg-white shadow-sm hover:shadow-md transition-shadow h-full"
                                 >
-                                    <div className="flex lg:gap-4 items-center">
-                                        <img src={item.imgUrl} alt={item.name} className="w-20 h-20 object-cover aspect-square rounded-xl mr-2   " />
-                                        <div>
-                                            <h3 className="lg:font-bold lg:text-lg text-sm text-gray-800">{item.name}</h3>
-                                            <p className="text-brand-primary font-semibold">₹{item.price.toLocaleString()}</p>
+                                    <div className="flex lg:gap-4 items-start    gap-2">
+                                        <img src={item.imgUrl} alt={item.name} className="lg:w-20 lg:h-20 w-16 h-16 object-cover aspect-square rounded-xl   " />
+                                        <div className="flex flex-col justify-between lg:full h-16  ">
+                                            <h3 className="lg:font-bold lg:text-lg text-xs lg:line-clamp-3 line-clamp-2 lg:leading-5">{item.name}</h3>
+                                            <p className="text-brand-primary font-semibold lg:text-md text-sm">₹{item.price.toLocaleString()}</p>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-end gap-2">
-                                        <AddToCart productId={item.id} styles="small w-fit" />
+                                    <div className="flex flex-col items-end gap-1">
+                                        <AddToCart productId={item.id} styles="small w-fit " />
                                         <p className="text-xs text-gray-400">Subtotal: ₹{(item.price * item.quantity).toLocaleString()}</p>
                                     </div>
                                 </motion.div>
@@ -91,12 +91,12 @@ export function CartList() {
                         </AnimatePresence>
                     </div>
 
-                    {/* Order Summary Sticky Sidebar */}
+
                     <motion.div
                         layout
                         className="lg:col-span-1 w-full sticky lg:top-8 top-2 border border-gray-200 lg:py-6 py-2 lg:px-6 px-2 rounded-2xl bg-gray-50/50 shadow-sm"
                     >
-                        <h2 className="text-xl font-bold mb-1">Order Summary</h2>
+                        <h2 className="lg:text-xl text-lg font-bold mb-1">Order Summary</h2>
                         <p className="text-xs text-gray-400 lg:mb-6">Shipping & discounts applied at next step</p>
 
                         <div className="space-y-4">
@@ -119,14 +119,14 @@ export function CartList() {
                             </div>
 
                             <div className="border-t-2 border-dashed border-gray-200 lg:pt-4 pt-2 mt-4">
-                                <div className="flex justify-between items-center font-bold text-xl text-gray-900">
-                                    <span>Subtotal</span>
+                                <div className="flex justify-between items-center font-bold text-xl text-primary-foreground">
+                                    <span className="lg:text-xl text-lg text-primary-foreground ">Subtotal</span>
                                     <PriceTicker value={totalPrice} />
                                 </div>
                             </div>
                         </div>
 
-                        <BuyBtn styles="lg:mt-8 mt-4  w-full lg:py-4  text-lg rounded-xl shadow-lg  " />
+                        <BuyBtn styles="lg:mt-8 mt-4  w-full lg:py-4  text-lg rounded-xl shadow-lg  text-primary bg-primary-foreground " />
                     </motion.div>
 
                 </section>

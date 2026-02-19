@@ -11,8 +11,9 @@ import { Activity } from "react";
 
 
 export function ShopLayout() {
-  // const isLoading = useSelector(selectVendorLoading);
-  // const isError = useSelector(selectVendorError);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
+  // const { userId } = useParams();
   const isMobile = useMediaQuery({ maxWidth: 767 })
 
   // if (isLoading) {

@@ -4,8 +4,8 @@ import { motion, useAnimate, } from "framer-motion";
 import { useMediaQuery } from "react-responsive";
 import type { PRODUCT_LIST_TYPE } from "../../utils/customer/constants";
 import { AddToCart } from "./AddToCart";
-import BuyBtn from "./BuyBtn";
-import WishListBtn from "./WishListBtn";
+import {BuyBtn }from "./BuyBtn";
+import {WishListBtn} from "./WishListBtn";
 import { Link } from "react-router";
 
 export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST_TYPE[], styles?: string }) {
@@ -78,7 +78,7 @@ export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST
                             key={product.id}
                             className="relative "
                             style={{
-                                width: `calc(${50 / products.length}% - 16px)`, // 16px accounts for gap
+                                width: `calc(${isMobile ? 55 : 100 / products.length}% - 16px)`, // 16px accounts for gap
                             }}
                         >
                             <ProductCard product={product} isMobile={isMobile} />

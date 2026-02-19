@@ -7,12 +7,13 @@ import { Bell, Heart, ShoppingCart } from "lucide-react";
 import { NAV_LINKS } from "../../utils/customer/constants";
 import { toggleCartSidebar } from "../../features/CartSidebar";
 import { motion } from "motion/react";
+import type { RootState } from "../../app/store";
 
 
 
 export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: { styles?: string, logoUrl?: string, menuLinks?: { [key: string]: string }[] }) {
     const searchImg = false ? searchImgLight : searchImgDark;
-    const { items } = useSelector((state) => state.cart)
+    const { items } = useSelector((state:RootState) => state.cart)
     const { wishItems } = useSelector((state: any) => state.wishlist)
     const { user } = useSelector((state: any) => state.auth)
     const dispatch = useDispatch();

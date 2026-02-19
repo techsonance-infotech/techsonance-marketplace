@@ -23,7 +23,7 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
     const isSmall = styles?.includes("small");
 
     const containerBase = `flex items-center justify-center bg-brand-primary text-white rounded-lg shadow-md overflow-hidden transition-all duration-200`;
-    const heightClass = isSmall ? "h-8" : "h-11";
+    const heightClass = isSmall ? "h-6" : "h-11";
     const debounceFunction = ({func, delay=300}: {func: () => void, delay: number}) => {
         let timeoutId:any;  
         return () => {

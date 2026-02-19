@@ -1,17 +1,15 @@
-﻿
-import { useDispatch, useSelector } from 'react-redux';
-import { Outlet, useLocation, useNavigate } from 'react-router';
-import { AnimatePresence, motion } from 'framer-motion';
+﻿import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router';
+import {   motion } from 'framer-motion';
 import { DynamicIcon } from 'lucide-react/dynamic';
 import type { RootState } from '../../app/store';
 import { logOut } from '../../features/auth/authSlice';
 import { useMediaQuery } from 'react-responsive';
 
-
-// Simulating your config file import
 const ProfileSidebarLink = [
     { name: 'Profile Overview', path: '/customerProfile', icon: 'user' },
     { name: 'My Orders', path: '/orders', icon: 'shopping-bag' },
+    { name: "My Cart", path: '/cart', icon: 'shopping-cart' },
     { name: 'Wishlist', path: '/wishlist', icon: 'heart' },
     { name: 'Change Password', path: '/changePassword', icon: 'lock' },
     { name: 'Customer Support', path: '/support', icon: 'headphones' },
@@ -48,14 +46,12 @@ export function ProfileSidebar() {
 
             >
                 {mobileLinks.map((link) => {
-                    // Logic to determine active state
                     const targetPath = link.path === '/customerProfile'
                         ? `/customerProfile/${user?.user_id}`
                         : `/customerProfile/${user?.user_id}${link.path}`;
 
                     const isActive = currentPath === targetPath || (link.path !== '/customerProfile' && currentPath.startsWith(targetPath));
                     const isDanger = link.path === '/logout';
-
                     return (
 
                         <motion.li
@@ -84,9 +80,6 @@ export function ProfileSidebar() {
                                 <span className="relative text-start z-10 font-semibold">
                                     {link.name}
                                 </span>
-
-
-                               
                             </button>
                         </motion.li>
                     );

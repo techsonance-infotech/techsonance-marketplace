@@ -5,9 +5,9 @@ import { DynamicIcon } from 'lucide-react/dynamic';
 import { Star } from 'lucide-react';
 
 import { PRODUCT_LIST, type PRODUCT_LIST_TYPE } from '../../../utils/customer/constants';
-import WishListBtn from '../../../components/customer/WishListBtn';
+import {WishListBtn} from '../../../components/customer/WishListBtn';
 import { AddToCart } from '../../../components/customer/AddToCart';
-import BuyBtn from '../../../components/customer/BuyBtn';
+import {BuyBtn }from '../../../components/customer/BuyBtn';
 import { ProductList } from '../../../components/customer/ProductList';
 
 const productS = PRODUCT_LIST;

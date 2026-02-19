@@ -66,15 +66,13 @@ export function UserProfile() {
             initial="hidden"
             animate="visible"
         >
-            <Activity mode={isMobileOrTablet ? "visible" : "hidden"}>
-                <ProfileSidebar />
-            </Activity>
+
 
             <motion.section
                 initial="hidden"
                 animate="visible"
                 variants={itemVariants}
-                className="mt-6 flex  flex-col lg:flex-row justify-between items-center lg:p-8 px-4 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm lg:gap-6 gap-2 "
+                className="mb-6 flex  flex-col lg:flex-row justify-between items-center lg:p-8 px-4 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm lg:gap-6 gap-2 "
             >
                 <div className="flex  lg:flex-row flex-col items-center   gap-8   w-full">
                     <motion.div
@@ -114,6 +112,9 @@ export function UserProfile() {
                     </motion.button>
                 </Link>
             </motion.section>
+            <Activity mode={isMobileOrTablet ? "visible" : "hidden"}>
+                <ProfileSidebar />
+            </Activity>
 
 
             <div className="mt-8 flex flex-col md:flex-row gap-6">

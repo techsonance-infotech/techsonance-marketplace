@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToWishlist, removeFromWishlist } from '../../features/Wishlist';
 import { useMediaQuery } from 'react-responsive'
 import { AnimatePresence, motion } from 'motion/react';
-export default function WishListBtn({productId,styles,iconSize}: {productId?: string, styles?: string,iconSize?: number}) {
+export function WishListBtn({productId,styles,iconSize}: {productId?: string, styles?: string,iconSize?: number}) {
   const dispatch = useDispatch();   
   const {wishItems}=useSelector((state:any)=>state.wishlist)
   const isAlreadyInWishlist = wishItems.some((item: any) => item.productId === productId);

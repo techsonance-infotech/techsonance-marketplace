@@ -1,8 +1,8 @@
 ﻿import { useEffect, useRef, useState } from "react";
 import type { PRODUCT_LIST_TYPE } from "../../utils/customer/constants";
 import { AddToCart } from "./AddToCart";
-import BuyBtn from "./BuyBtn";
-import WishListBtn from "./WishListBtn";
+import {BuyBtn} from "./BuyBtn";
+import {WishListBtn} from "./WishListBtn";
 import { Pagination } from "../common/Pagination";
 import { Link } from "react-router";
 import { FilterSidebar } from "./FilterSidebar";
