@@ -1,4 +1,4 @@
-﻿import { iconNames } from "lucide-react/dynamic";
+﻿
 
 //Cusomter Home hero title and description
 export const HOME_HERO_TITLE = "Welcome to Sound Sphere - Your Ultimate Music Marketplace";
@@ -24,13 +24,13 @@ export interface tabLinkType {
     [key: string]: string;
 }
 export const TAB_LINKS: tabLinkType[] = [
-    { title: 'Home', url: '/',iconNames:'house' },
-    { title: 'Shop', url: '/shopping',iconNames:'shopping-bag' },
-    { title: 'Cart', url: '/cart',iconNames:'shopping-cart' },
-    
-    { title: 'Profile', url: '/customerProfile',iconNames:'user' },
-    {title:'Menu', url:'', iconNames:'menu'}
- 
+    { title: 'Home', url: '/', iconNames: 'house' },
+    { title: 'Shop', url: '/shopping', iconNames: 'shopping-bag' },
+    { title: 'Cart', url: '/cart', iconNames: 'shopping-cart' },
+
+    { title: 'Profile', url: '/customerProfile', iconNames: 'user' },
+    { title: 'Menu', url: '', iconNames: 'menu' }
+
 ]
 export const FOOTER_CONTENT: FooterSectionType[] = [
     {
@@ -68,9 +68,9 @@ export const FOOTER_CONTENT: FooterSectionType[] = [
         links: [
             { title: 'Email', url: 'mailto:support@soundsphere.com', icon: 'email', category: 'contact' },
             { title: 'Eklingpura Chouraha, Ahmedabad Main Road F(NH 8- Near Mahadev Hotel) Udaipur, India- 313002', url: 'https://www.google.com/maps/place/Sound+Sphere/@37.7749,-122.4194,15z/data=!4m5!3m4!1s0x0:0x0!8m2!3d37.7749!4d-122.4194', icon: 'location', styles: 'text-sm', category: 'contact' },
-            { title: 'Facebook', url: 'https://www.facebook.com/soundsphere', icon: 'facebook', styles: ' bg-blue-500 text-white rounded p-1', category: 'social' },
-            { title: 'Twitter', url: 'https://www.twitter.com/soundsphere', icon: 'twitter', styles: 'bg-blue-400 text-white rounded p-1', category: 'social' },
-            { title: 'Instagram', url: 'https://www.instagram.com/soundsphere', icon: 'instagram', styles: 'bg-pink-500 text-white rounded p-1', category: 'social' },
+            // { title: 'Facebook', url: 'https://www.facebook.com/soundsphere', icon: 'facebook', styles: ' bg-blue-500 text-white rounded p-1', category: 'social' },
+
+            // { title: 'Instagram', url: 'https://www.instagram.com/soundsphere', icon: 'instagram', styles: 'bg-pink-500 text-white rounded p-1', category: 'social' },
         ]
     }
 
@@ -308,7 +308,7 @@ export const PRODUCT_LIST: PRODUCT_LIST_TYPE[] = [
         price: 9999,
         discount: 10,
         category: "Speakers",
-        imgUrl: "https://images.unsplash.com/photo-1629821665671-54238e83344b?auto=format&fit=crop&w=300&q=80",
+        imgUrl: "https://placehold.net/10.png",
         description: "Bold sound for every adventure. The beat goes on with the JBL Flip 6 2-way speaker system.",
         satisfaction: "4.8/5"
     },
@@ -378,7 +378,7 @@ export const PRODUCT_LIST: PRODUCT_LIST_TYPE[] = [
         price: 29900,
         discount: 18,
         category: "Headphones",
-        imgUrl: "https://images.unsplash.com/photo-1545127398-14699f8e4901?auto=format&fit=crop&w=300&q=80",
+        imgUrl: "https://placehold.net/10.png",
         description: "Iconic quiet, comfort, and sound. The perfect balance of quiet, comfort, and sound.",
         satisfaction: "4.7/5"
     },

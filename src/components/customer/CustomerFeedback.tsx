@@ -59,7 +59,7 @@ export function CustomerFeedback({
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
-                className="lg:grid  lg:grid-cols-3 md:grid-cols-2 flex  lg:justify-center lg:gap-8 gap-4 lg:p-4 p-2"
+                className="lg:grid  lg:grid-cols-3 md:grid-cols-2 flex  lg:justify-center lg:gap-8 gap-4 lg:p-4 p-2 snap-mandatory lg:overflow-visible overflow-x-auto"
             >
                 {FEEDBACK_LIST.map((feedback, index) => (
                     <motion.div

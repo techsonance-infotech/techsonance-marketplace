@@ -6,22 +6,17 @@ import type { PRODUCT_LIST_TYPE } from "../../utils/customer/constants";
 import { AddToCart } from "./AddToCart";
 import BuyBtn from "./BuyBtn";
 import WishListBtn from "./WishListBtn";
+import { Link } from "react-router";
 
 export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST_TYPE[], styles?: string }) {
     const isMobile = useMediaQuery({ maxWidth: 768 });
     const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
     const [scope, animate] = useAnimate()
-
-    const itemsPerPage = isMobile ? 1 : isTablet ? 2 : 4;
-
+    const itemsPerPage = isMobile ? 1 : isTablet ? 2 : 4
     const [currentIndex, setCurrentIndex] = useState(0);
-
-
-
     const maxIndex = Math.max(0, products.length - itemsPerPage);
     const canScrollPrev = currentIndex > 0;
     const canScrollNext = currentIndex < maxIndex;
-
     const scrollTo = (index: number) => {
         let newIndex = index;
         if (index < 0) newIndex = 0;
@@ -29,22 +24,16 @@ export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST
 
         setCurrentIndex(newIndex);
     };
-
     // Update animation whenever index changes
     useEffect(() => {
-
         animate(scope.current, {
             x: `-${currentIndex * (100 / itemsPerPage)}%`,
             transition: { type: "spring", stiffness: 300, damping: 30 }
         })
     }, [currentIndex, itemsPerPage, scope]);
-
     if (!products || products.length === 0) return null;
-
     return (
         <section className={`w-full mx-auto relative group ${styles} my-8`}>
-
-
             <div className="flex items-center justify-end gap-2 mb-4 px-4">
                 <button
                     disabled={!canScrollPrev}
@@ -69,13 +58,10 @@ export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST
                     <ChevronRight size={20} />
                 </button>
             </div>
-
-            
-            <div className="overflow-hidden w-full px-4 py-4">
-                <motion.div
+            <div className="overflow-hidden w-full px-4 py-2">
+                <motion.ul
                     ref={scope}
                     className="flex gap-4"
-
                     drag="x"
                     dragConstraints={{
                         right: 0,
@@ -90,15 +76,15 @@ export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST
                     {products.map((product) => (
                         <motion.div
                             key={product.id}
-                            className="relative flex-shrink-0"
+                            className="relative "
                             style={{
-                                width: `calc(${100 / products.length}% - 16px)`, // 16px accounts for gap
+                                width: `calc(${50 / products.length}% - 16px)`, // 16px accounts for gap
                             }}
                         >
                             <ProductCard product={product} isMobile={isMobile} />
                         </motion.div>
                     ))}
-                </motion.div>
+                </motion.ul>
             </div>
         </section>
     );
@@ -106,39 +92,52 @@ export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST
 
 function ProductCard({ product, isMobile }: { product: PRODUCT_LIST_TYPE, isMobile: boolean }) {
     return (
-        <div className="flex flex-col h-full bg-white border border-gray-200 rounded-2xl p-4 transition-all hover:shadow-lg hover:border-blue-200 group">
-            {/* Image Area */}
-            <div className="relative mb-4 overflow-hidden rounded-xl bg-gray-50">
-                <WishListBtn productId={product.id} styles="absolute top-3 right-5 z-10 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-sm" />
-                <img
-                    className="w-full aspect-[4/5] object-cover transform group-hover:scale-105 transition-transform duration-500"
-                    src={product.imgUrl}
-                    alt={product.title}
-                />
+        <li className="flex flex-col justify-between text-lg text-gray-700 hover:text-gray-900 cursor-pointer border-2 border-gray-200 rounded-lg p-4 relative  transition-shadow hover:shadow-md"
+        >
+      
+            <div className="flex flex-col h-full">
+                <WishListBtn productId={product.id} styles="absolute top-2 right-6 z-10" />
+
+                <Link to={`/shopping/${product.id}`} className="block overflow-hidden rounded-lg">
+                    <img
+                        className="w-full object-cover lg:aspect-9/14 aspect-9/12 rounded-lg mb-4 transform hover:scale-105 transition-transform duration-300"
+                        src={product.imgUrl ? product.imgUrl : "https://placehold.net/10.png"}
+                        alt={product.title.trim()}
+                    />
+                </Link>
+                <h3 className="font-semibold text-sm lg:line-clamp-1 line-clamp-2 leading-4 mb-1">{product.title}</h3>
+                <p className="lg:text-sm text-xs  text-gray-500 lg:line-clamp-2 line-clamp-2 leading-5 overflow-hidden mb-4 h-10">
+                    {product.description}
+                </p>
             </div>
 
-            {/* Content Area */}
-            <div className="flex flex-col grow justify-between">
-                <div>
-                    <h3 className="font-semibold text-gray-900 line-clamp-1 mb-1" title={product.title}>
-                        {product.title}
-                    </h3>
-                    <div className="flex items-baseline gap-2 mb-4">
-                        <span className="text-xl font-bold text-gray-900">₹{product.price}</span>
-                        {product.discount > 0 && (
-                            <span className="text-xs text-green-600 font-bold bg-green-50 px-2 py-1 rounded-md">
-                                {Math.round(product.discount)}% OFF
-                            </span>
-                        )}
+
+            <div className="mt-auto">
+                <div className="flex items-baseline gap-2   flex-wrap">
+                    <span className="font-bold  text-gray-900 lg:text-xl text-sm">₹{product.price}</span>
+                    {product.discount > 0 && (
+                        <>
+                            <div className="flex gap-2  ">
+
+                                <span className="text-xs line-through text-gray-400">
+                                    ₹{Math.floor(product.price / (1 - product.discount / 100))}
+                                </span>
+                                <span className="text-xs font-bold text-green-500">
+                                    {Math.round(product.discount)}% off
+                                </span>
+                            </div>
+                        </>
+                    )}
+                </div>
+                {
+                    !isMobile &&
+                    <div className={`flex gap-2 mt-2   justify-between items-center`}>
+                        <AddToCart productId={product.id} styles="w-full " />
+                        <BuyBtn productId={product.id} styles=" scale-[.9]" />
+
                     </div>
-                </div>
-
-            
-                <div className={`flex  items-center  justify-between gap-4  w-full`}>
-                    <AddToCart productId={product.id} styles="w-full"  />
-                    <BuyBtn productId={product.id} styles="w-full" />
-                </div>
+                }
             </div>
-        </div>
+        </li>
     );
 }
