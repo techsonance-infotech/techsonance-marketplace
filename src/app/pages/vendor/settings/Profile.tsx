@@ -1,12 +1,6 @@
-﻿import { useSelector } from "react-redux";
-import { Sidebar } from "../../../../components/common/Sidebar";
-import Navbar from "../../../../components/vendor/Navbar";
-import {   VENDOR_SETTINGS_LINKS } from "../../../../utils/constants";
-import { InnerSideBar } from "../../../../components/common/InnerSideBar";
-import { useState } from "react";
+﻿ import { useState } from "react";
 
 export function Profile() {
-  const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
   const [bandImg, setBandImg] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     storeName: '',

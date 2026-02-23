@@ -1,9 +1,4 @@
 ﻿import React, { useEffect, useRef, useState } from 'react'
-
-
-import { VENDOR_NAV_LINKS, VENDOR_SETTINGS_LINKS } from '../../../../utils/constants'
-
-import { InnerSideBar } from '../../../../components/common/InnerSideBar'
 import { useSelector } from 'react-redux'
 import { useForm } from 'react-hook-form'
 

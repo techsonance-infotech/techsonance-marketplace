@@ -1,7 +1,7 @@
 ﻿import { useState } from "react";
-import { Sidebar } from "../../../components/common/Sidebar";
-import { searchImgDark, VENDOR_NAV_LINKS } from "../../../utils/constants";
-import { useSelector } from "react-redux";
+ 
+import { searchImgDark } from "../../../utils/constants";
+ 
 import Navbar from "../../../components/vendor/Navbar";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Calendar } from "../../../components/ui/calendar";

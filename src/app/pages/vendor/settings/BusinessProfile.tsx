@@ -1,12 +1,7 @@
 ﻿import { useSelector } from "react-redux";
-import Navbar from "../../../../components/vendor/Navbar";
-
-import { VENDOR_NAV_LINKS, VENDOR_SETTINGS_LINKS } from "../../../../utils/constants";
-import { InnerSideBar } from "../../../../components/common/InnerSideBar";
-import { useForm } from "react-hook-form"; import { Sidebar } from "../../../../components/common/Sidebar";
-/**
-* Interface representing a Vendor's Business Profile.
-*/
+ 
+import { useForm } from "react-hook-form"; 
+ 
 interface BusinessProfile {
     id: number;
     full_name: string;         // The personal name of the account holder

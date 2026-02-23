@@ -4,8 +4,8 @@ import { motion, useAnimate, } from "framer-motion";
 import { useMediaQuery } from "react-responsive";
 import type { PRODUCT_LIST_TYPE } from "../../utils/customer/constants";
 import { AddToCart } from "./AddToCart";
-import {BuyBtn }from "./BuyBtn";
-import {WishListBtn} from "./WishListBtn";
+import { BuyBtn } from "./BuyBtn";
+import { WishListBtn } from "./WishListBtn";
 import { Link } from "react-router";
 
 export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST_TYPE[], styles?: string }) {
@@ -30,6 +30,9 @@ export function ProductList({ products = [], styles }: { products?: PRODUCT_LIST
             x: `-${currentIndex * (100 / itemsPerPage)}%`,
             transition: { type: "spring", stiffness: 300, damping: 30 }
         })
+        return () => {
+            animate(scope.current, { x: 0 })
+        }
     }, [currentIndex, itemsPerPage, scope]);
     if (!products || products.length === 0) return null;
     return (
@@ -94,7 +97,7 @@ function ProductCard({ product, isMobile }: { product: PRODUCT_LIST_TYPE, isMobi
     return (
         <li className="flex flex-col justify-between text-lg text-gray-700 hover:text-gray-900 cursor-pointer border-2 border-gray-200 rounded-lg p-4 relative  transition-shadow hover:shadow-md"
         >
-      
+
             <div className="flex flex-col h-full">
                 <WishListBtn productId={product.id} styles="absolute top-2 right-6 z-10" />
 

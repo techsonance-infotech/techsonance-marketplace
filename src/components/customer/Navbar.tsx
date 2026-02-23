@@ -1,4 +1,4 @@
-﻿import { Link, Outlet, useLocation } from "react-router";
+﻿import { Link, useLocation } from "react-router";
 import { useMediaQuery } from 'react-responsive'
 import { BRAND_LOGO, searchImgDark, searchImgLight, userIcon } from "../../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
@@ -59,7 +59,7 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
                             <motion.div 
                                 layoutId="nav-pill"
                                 transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
-                                className="absolute inset-0 bg-[#04b0ffc1] rounded-full z-0"
+                                className="absolute   inset-0 bg-[#04b0ffc1] rounded-full z-0"
                             />
                         )}
                     </li>

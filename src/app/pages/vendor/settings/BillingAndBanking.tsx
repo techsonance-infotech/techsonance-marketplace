@@ -1,7 +1,4 @@
-﻿
-import { VENDOR_SETTINGS_LINKS } from '../../../../utils/constants'
-import { InnerSideBar } from '../../../../components/common/InnerSideBar'
-import { useSelector } from 'react-redux';
+﻿import { useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { Dot, Edit, Landmark } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -28,12 +25,10 @@ const invoiceSettings: InvoiceSettings = { gstin: "24ABCDE1234F1Z5", pan: "ABCDE
 const bankAccounts: BankAccount[] = [{ bankName: "HDFC Bank", accountNumber: "XXXX-XXXX-8821", ifsc: "HDFC0001234", primary: true }];
 
 export function BillingAndBanking() {
-    const { isSidebarOpen } = useSelector((state: any) => state.sidebar);
     const { register, getValues, setValue, watch, handleSubmit } = useForm({
         defaultValues: invoiceSettings
     })
     const [signatureUrl, setSignatureUrl] = useState<string | undefined>();
-    console.log(watch('signatureUrl'))
         ;
     useEffect(() => {
         if (signatureUrl && signatureUrl.length > 0) {

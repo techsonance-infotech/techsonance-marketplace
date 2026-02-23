@@ -1,8 +1,5 @@
 ﻿import { useSelector } from "react-redux";
-import { InnerSideBar } from "../../../../components/common/InnerSideBar";
-import { VENDOR_NAV_LINKS, VENDOR_SETTINGS_LINKS } from "../../../../utils/constants";
-import { Sidebar } from "../../../../components/common/Sidebar";
-import Navbar from "../../../../components/vendor/Navbar";
+
 import { useForm } from "react-hook-form";
 import { ToggleLeft, ToggleRight } from "lucide-react";
 import { useState } from "react";
