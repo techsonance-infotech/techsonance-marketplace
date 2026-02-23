@@ -55,7 +55,7 @@ export function ShoppingList({
                             ) :
                                 (
                                    productsToShow.map((product, idx) => (
-                                        <li className="flex flex-col justify-between text-lg text-gray-700 hover:text-gray-900 cursor-pointer border-2 border-gray-200 rounded-lg p-4 relative  transition-shadow hover:shadow-md "
+                                        <li key={idx} className="flex flex-col justify-between text-lg text-gray-700 hover:text-gray-900 cursor-pointer border-2 border-gray-200 rounded-lg p-4 relative  transition-shadow hover:shadow-md "
                                         >
 
                                             <div className="flex flex-col h-full">

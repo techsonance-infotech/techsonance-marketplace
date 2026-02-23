@@ -1,11 +1,7 @@
-﻿import { useSelector } from "react-redux";
-import { Navbar } from "../../../components/admin/Navbar";
-import { Sidebar } from "../../../components/common/Sidebar";
+﻿import { Navbar } from "../../../components/admin/Navbar";
 import "./index.css"
 import { DashboardChart } from "../../../components/admin/DashboardChart";
 import { Outlet } from "react-router";
-import { ADMIN_NAV_LINKS } from "../../../utils/constants";
-
 const data = {
   totalVendors: 120,
   vendorGrowth: 15,
