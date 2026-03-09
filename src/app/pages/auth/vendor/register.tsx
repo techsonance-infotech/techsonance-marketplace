@@ -3,25 +3,28 @@ import { Link, Outlet, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { passwordValidationSchema } from "../../../../utils/validation";
-import { VENDOR_AUTH_URL } from "../../../../utils/constants";
+import { COUNTRY_CODES, VENDOR_AUTH_URL } from "../../../../utils/constants";
 
 interface FormData {
     business_name: string;
     business_number: string;
     business_owner_full_name: string;
     category: string;
-    country?: string; // Optional if not in the form
+    country_code?: string;
     vendor_admin_email: string;
     vendor_admin_full_name: string;
     password: string;
     confirm_password: string;
 }
 
+const inputClass = "rounded-xl border border-gray-300 py-2.5 px-4 w-full text-sm text-gray-800 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all";
+const labelClass = "text-sm font-medium text-gray-700";
+const errorClass = "text-red-500 text-xs mt-0.5";
+
 export function VendorRegister() {
     const navigate = useNavigate();
     const [globalError, setGlobalError] = useState<string | null>(null);
 
-    // Initialize React Hook Form
     const {
         register,
         handleSubmit,
@@ -35,6 +38,7 @@ export function VendorRegister() {
             business_owner_full_name: "",
             category: "",
             vendor_admin_email: "",
+            country_code: "",
             vendor_admin_full_name: "",
             password: "",
             confirm_password: "",
@@ -45,7 +49,7 @@ export function VendorRegister() {
         setGlobalError(null);
         try {
             const response = await axios.post(`${VENDOR_AUTH_URL}/register-vendor`, {
-                user_role: 'vendor',
+                user_role: "vendor",
                 business_name: data.business_name,
                 business_number: data.business_number,
                 business_owner_full_name: data.business_owner_full_name,
@@ -53,17 +57,17 @@ export function VendorRegister() {
                 vendor_admin_email: data.vendor_admin_email,
                 vendor_admin_full_name: data.vendor_admin_full_name,
                 password: data.password,
+                country_code: data.country_code,
             }, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json'
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json",
                 }
             });
 
             if (response.status === 200) {
-                console.log('Registration successful');
-                reset(); // Clear form on success
-                navigate(`/vendorLogin`);
+                reset();
+                navigate("/vendorLogin");
             }
         } catch (error: unknown) {
             console.error(error);
@@ -73,167 +77,233 @@ export function VendorRegister() {
 
     return (
         <>
-            <main className="py-20 m-auto max-w-4xl px-6 font-[inter] mb-2 flex flex-col items-center ">
-                <div className="w-full">
-                    <h1 className="font-bold text-2xl mb-2">
-                        Business Registration
-                    </h1>
-                    <p className="mb-6 text-balance">Setup the organization profile, assign a domain, and create the admin account.</p>
+            <main className="py-20 m-auto max-w-4xl px-6 font-[inter] mb-2 flex flex-col items-center">
+                <div className="w-full mb-6">
+                    <h1 className="font-bold text-2xl mb-1">Business Registration</h1>
+                    <p className="text-sm text-gray-500 text-balance">
+                        Setup the organization profile, assign a domain, and create the admin account.
+                    </p>
                 </div>
 
-                {/* React Hook Form handles the e.preventDefault() under the hood */}
-                <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-6 ">
-                    <section className="border p-6 rounded-2xl mb-6 w-full">
-                        <h1 className="font-bold text-xl text-left mb-2">
-                            Organization Details
-                        </h1>
-                        <span className="flex gap-8 flex-col">
-                            <span className="flex lg:flex-row lg:flex-nowrap justify-between gap-6 w-full">
-                                <div className="flex flex-col gap-2 w-full">
-                                    <label htmlFor="business_name">
-                                        Vendor / Business Name <span className="text-red-600">*</span>
+                <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-6">
+
+                    {/* Organization Details */}
+                    <section className="border border-gray-200 p-6 rounded-2xl w-full shadow-sm">
+                        <h2 className="font-bold text-xl mb-6">Organization Details</h2>
+
+                        <div className="flex flex-col gap-6">
+                            <div className="flex lg:flex-row flex-col gap-6 w-full">
+                                {/* Business Name */}
+                                <div className="flex flex-col gap-1.5 w-full">
+                                    <label htmlFor="business_name" className={labelClass}>
+                                        Vendor / Business Name <span className="text-red-500">*</span>
                                     </label>
                                     <input
+                                        id="business_name"
                                         type="text"
-                                        className="rounded-xl border-2 border-gray-800 focus:ring-blue-500 focus:border-blue-500 block w-full px-2.5 py-1.5"
+                                        className={inputClass}
                                         placeholder="Enter your business name"
                                         {...register("business_name", { required: "Business name is required" })}
                                     />
-                                    {errors.business_name && <p className="text-red-600 text-sm">{errors.business_name.message}</p>}
+                                    {errors.business_name && <p className={errorClass}>{errors.business_name.message}</p>}
                                 </div>
 
-                                <div className="flex flex-col gap-2 w-full">
-                                    <label htmlFor="category" className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
-                                        Business Category <span className="text-red-600">*</span>
+                                {/* Business Category */}
+                                <div className="flex flex-col gap-1.5 w-full">
+                                    <label htmlFor="category" className={labelClass}>
+                                        Business Category <span className="text-red-500">*</span>
                                     </label>
                                     <select
-                                        className="border-2 py-[.5rem] px-4 rounded-xl"
+                                        id="category"
+                                        className={inputClass}
                                         {...register("category", { required: "Please select a business category" })}
                                     >
-                                        <option value="">Select Business Category</option>
+                                        <option value="" disabled>Select Business Category</option>
                                         <option value="retail">Retail</option>
-                                        <option value="diy_hardware">DIY and hardware</option>
-                                        <option value="fashion">Fashion and apparel</option>
-                                        <option value="food_and_beverages">Food and beverages</option>
-                                        <option value="health_and_wellness">Health and wellness</option>
+                                        <option value="diy_hardware">DIY and Hardware</option>
+                                        <option value="fashion">Fashion and Apparel</option>
+                                        <option value="food_and_beverages">Food and Beverages</option>
+                                        <option value="health_and_wellness">Health and Wellness</option>
                                         <option value="automotive">Automotive</option>
-                                        <option value="sports_and_outdoors">Sports and outdoors</option>
+                                        <option value="sports_and_outdoors">Sports and Outdoors</option>
                                         <option value="furniture">Furniture</option>
                                         <option value="technology">Technology</option>
-                                        <option value="beauty_and_personal_care">Beauty and personal care</option>
-                                        <option value="hospitality">Toys and hobbies</option>
+                                        <option value="beauty_and_personal_care">Beauty and Personal Care</option>
+                                        <option value="hospitality">Toys and Hobbies</option>
                                         <option value="other">Other</option>
                                     </select>
-                                    {errors.category && <p className="text-red-600 text-sm">{errors.category.message}</p>}
+                                    {errors.category && <p className={errorClass}>{errors.category.message}</p>}
                                 </div>
-                            </span>
+                            </div>
 
-                            <span className="flex lg:flex-row lg:flex-nowrap justify-between gap-6">
-                                <div className="flex flex-col gap-2 w-full ">
-                                    <label htmlFor="business_owner_full_name">Business Owner Full Name <span className="text-red-600">*</span></label>
+                            <div className="flex lg:flex-row flex-col gap-6 w-full">
+                                {/* Owner Name */}
+                                <div className="flex flex-col gap-1.5 w-full">
+                                    <label htmlFor="business_owner_full_name" className={labelClass}>
+                                        Business Owner Full Name <span className="text-red-500">*</span>
+                                    </label>
                                     <input
+                                        id="business_owner_full_name"
                                         type="text"
-                                        className="rounded-xl border-2 border-gray-800 py-2 px-4"
+                                        className={inputClass}
                                         placeholder="Enter business owner full name"
                                         {...register("business_owner_full_name", { required: "Owner name is required" })}
                                     />
-                                    {errors.business_owner_full_name && <p className="text-red-600 text-sm">{errors.business_owner_full_name.message}</p>}
+                                    {errors.business_owner_full_name && <p className={errorClass}>{errors.business_owner_full_name.message}</p>}
                                 </div>
-                                <div className="flex flex-col gap-2 w-full ">
-                                    <label htmlFor="business_number">Business Number <span className="text-red-600">*</span></label>
-                                    <input
-                                        type="text"
-                                        className="rounded-xl border-2 border-gray-800 py-2 px-4"
-                                        placeholder="Enter business owner contact number"
-                                        {...register("business_number", { required: "Business number is required" })}
-                                    />
-                                    {errors.business_number && <p className="text-red-600 text-sm">{errors.business_number.message}</p>}
+
+                                {/* Business Number */}
+                                <div className="flex flex-col gap-1.5 w-full">
+                                    <label htmlFor="business_number" className={labelClass}>
+                                        Business Number <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all bg-white">
+                                        <select
+                                            id="country_code"
+                                            className="appearance-none bg-gray-50 border-r border-gray-300 pl-3 pr-3 py-2.5 text-sm text-gray-700 font-medium focus:outline-none cursor-pointer"
+                                            {...register("country_code", { required: "Country code is required" })}
+                                        >
+                                            <option value="" disabled>Code</option>
+                                            {COUNTRY_CODES.map((country) => (
+                                                <option key={country.value} value={country.value}>
+                                                    {country.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <input
+                                            type="tel"
+                                            id="business_number"
+                                            className="flex-1 py-2.5 px-4 text-sm text-gray-800 placeholder-gray-400 bg-white focus:outline-none"
+                                            placeholder="123-456-7890"
+                                            {...register("business_number", {
+                                                required: "Business number is required",
+                                                pattern: {
+                                                    value: /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/,
+                                                    message: "Please use the format 123-456-7890",
+                                                }
+                                            })}
+                                        />
+                                    </div>
+                                    {(errors.country_code || errors.business_number) && (
+                                        <p className={errorClass}>
+                                            {errors.country_code?.message || errors.business_number?.message}
+                                        </p>
+                                    )}
                                 </div>
-                            </span>
-                        </span>
+                            </div>
+                        </div>
                     </section>
 
-                    <section className="border p-6 rounded-2xl mb-6 w-full">
-                        <h1 className="font-bold text-xl text-left mb-2">
-                            Business Admin Account
-                        </h1>
-                        <p className="mb-6 text-balance">
+                    {/* Business Admin Account */}
+                    <section className="border border-gray-200 p-6 rounded-2xl w-full shadow-sm">
+                        <h2 className="font-bold text-xl mb-1">Business Admin Account</h2>
+                        <p className="text-sm text-gray-500 mb-6 text-balance">
                             These credentials will be used for the first login to the Vendor Dashboard.
                         </p>
 
-                        <div className="flex flex-col gap-2 w-full mb-3 ">
-                            <label htmlFor="vendor_admin_full_name">Vendor Admin Full Name <span className="text-red-600">*</span></label>
-                            <input
-                                type="text"
-                                className="rounded-xl border-2 border-gray-800 py-2 px-4"
-                                placeholder="Please enter admin full name"
-                                {...register("vendor_admin_full_name", { required: "Admin full name is required" })}
-                            />
-                            {errors.vendor_admin_full_name && <p className="text-red-600 text-sm">{errors.vendor_admin_full_name.message}</p>}
-                        </div>
-
-                        <div className="flex flex-col gap-2 w-full mb-4">
-                            <label htmlFor="vendor_admin_email">Vendor Admin Email <span className="text-red-600">*</span></label>
-                            <input
-                                type="email"
-                                className="rounded-xl border-2 border-gray-800 py-2 px-4"
-                                placeholder="admin@vendor.com"
-                                {...register("vendor_admin_email", { 
-                                    required: "Admin email is required",
-                                    pattern: {
-                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                        message: "Invalid email address"
-                                    }
-                                })}
-                            />
-                            {errors.vendor_admin_email && <p className="text-red-600 text-sm">{errors.vendor_admin_email.message}</p>}
-                        </div>
-
-                        <div className="flex flex-row gap-6 w-full ">
-                            <div className="flex flex-col gap-2 w-full">
-                                <label htmlFor="password">Password <span className="text-red-600">*</span></label>
+                        <div className="flex flex-col gap-6">
+                            {/* Admin Full Name */}
+                            <div className="flex flex-col gap-1.5 w-full">
+                                <label htmlFor="vendor_admin_full_name" className={labelClass}>
+                                    Vendor Admin Full Name <span className="text-red-500">*</span>
+                                </label>
                                 <input
-                                    type="password"
-                                    className="rounded-xl border-2 border-gray-800 py-2 px-4"
-                                    placeholder="Please enter password"
-                                    {...register("password", { 
-                                        required: "Password is required",
-                                        validate: (val) => passwordValidationSchema.safeParse(val).success || "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
-                                    })}
+                                    id="vendor_admin_full_name"
+                                    type="text"
+                                    className={inputClass}
+                                    placeholder="Enter admin full name"
+                                    {...register("vendor_admin_full_name", { required: "Admin full name is required" })}
                                 />
-                                {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
+                                {errors.vendor_admin_full_name && <p className={errorClass}>{errors.vendor_admin_full_name.message}</p>}
                             </div>
-                            <div className="flex flex-col gap-2 w-full">
-                                <label htmlFor="confirm_password">Confirm Password<span className="text-red-600">*</span></label>
+
+                            {/* Admin Email */}
+                            <div className="flex flex-col gap-1.5 w-full">
+                                <label htmlFor="vendor_admin_email" className={labelClass}>
+                                    Vendor Admin Email <span className="text-red-500">*</span>
+                                </label>
                                 <input
-                                    type="password"
-                                    className="rounded-xl border-2 border-gray-800 py-2 px-4"
-                                    placeholder="Please reenter password"
-                                    {...register("confirm_password", { 
-                                        required: "Confirm password is required",
-                                        validate: (val) => val === watch("password") || "Passwords do not match" 
+                                    id="vendor_admin_email"
+                                    type="email"
+                                    className={inputClass}
+                                    placeholder="admin@vendor.com"
+                                    {...register("vendor_admin_email", {
+                                        required: "Admin email is required",
+                                        pattern: {
+                                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                            message: "Invalid email address",
+                                        }
                                     })}
                                 />
-                                {errors.confirm_password && <p className="text-red-600 text-sm">{errors.confirm_password.message}</p>}
+                                {errors.vendor_admin_email && <p className={errorClass}>{errors.vendor_admin_email.message}</p>}
+                            </div>
+
+                            {/* Password + Confirm */}
+                            <div className="flex lg:flex-row flex-col gap-6 w-full">
+                                <div className="flex flex-col gap-1.5 w-full">
+                                    <label htmlFor="password" className={labelClass}>
+                                        Password <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        className={inputClass}
+                                        placeholder="Enter password"
+                                        {...register("password", {
+                                            required: "Password is required",
+                                            validate: (val) =>
+                                                passwordValidationSchema.safeParse(val).success ||
+                                                "Must be 8+ chars with uppercase, lowercase, number & special character",
+                                        })}
+                                    />
+                                    {errors.password && <p className={errorClass}>{errors.password.message}</p>}
+                                </div>
+
+                                <div className="flex flex-col gap-1.5 w-full">
+                                    <label htmlFor="confirm_password" className={labelClass}>
+                                        Confirm Password <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        id="confirm_password"
+                                        type="password"
+                                        className={inputClass}
+                                        placeholder="Re-enter password"
+                                        {...register("confirm_password", {
+                                            required: "Please confirm your password",
+                                            validate: (val) => val === watch("password") || "Passwords do not match",
+                                        })}
+                                    />
+                                    {errors.confirm_password && <p className={errorClass}>{errors.confirm_password.message}</p>}
+                                </div>
                             </div>
                         </div>
                     </section>
 
-                    {globalError && <p className="text-red-600 text-center font-bold">{globalError}</p>}
+                    {globalError && (
+                        <p className="text-red-600 text-center text-sm font-medium">{globalError}</p>
+                    )}
 
-                    <span className="flex gap-6 justify-end mb-4 ">
-                        <button type="button" onClick={() => reset()} className="bg-gray-200 text-center text-black py-2 px-6 rounded-xl mb-4 border-2 border-black/30">Cancel</button>
-                        <button 
-                            type="submit" 
+                    {/* Actions */}
+                    <div className="flex gap-4 justify-end mb-4">
+                        <button
+                            type="button"
+                            onClick={() => reset()}
+                            className="py-2 px-6 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
                             disabled={isSubmitting}
-                            className="bg-blue-500 text-center text-white font-bold py-2 px-6 rounded-xl mb-4 disabled:opacity-50"
+                            className="py-2 px-6 rounded-xl bg-blue-500 text-white text-sm font-bold hover:bg-blue-600 disabled:opacity-50 transition-all"
                         >
                             {isSubmitting ? "Creating..." : "Create Business Account"}
                         </button>
-                    </span>
+                    </div>
 
-                    <p className="text-center">Already have an account?
-                        <Link className="text-blue-500 underline ml-1" to={`/vendorLogin`}>Log in</Link>
+                    <p className="text-center text-sm text-gray-600 mb-4">
+                        Already have an account?{" "}
+                        <Link className="text-blue-500 underline" to="/vendorLogin">Log in</Link>
                     </p>
                 </form>
             </main>

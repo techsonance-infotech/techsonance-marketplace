@@ -92,7 +92,20 @@ import { CartList } from '../app/pages/shop/customerProfile/CartList.tsx'
 import { UserRole } from "./Types.ts"
 export { Login, VendorLogin, VendorRegister, CustomerRegister, CustomerLogin, Navbar, Footer, DashBoard, VendorManagement, VendorForm, ApproveVendor, SupportTickets, AuditLog, Dashboard, Orders, Inventory, Products, ProductForm, ProductUpdateForm, Finances, Marketing, CustomerCare, Profile, Locations, BillingAndBanking, BusinessProfile, Security, Home , Shopping, Product,  UserProfile, Addresses,  WishList, Checkout  , OrderStatus, Contact, AboutAs, CartList, UserRole };
 
-
+export const COUNTRY_CODES = [
+    { value: "+1",   label: "🇺🇸 +1"   }, // United States / Canada
+    { value: "+44",  label: "🇬🇧 +44"  }, // United Kingdom
+    { value: "+91",  label: "🇮🇳 +91"  }, // India
+    { value: "+61",  label: "🇦🇺 +61"  }, // Australia
+    { value: "+33",  label: "🇫🇷 +33"  }, // France
+    { value: "+49",  label: "🇩🇪 +49"  }, // Germany
+    { value: "+81",  label: "🇯🇵 +81"  }, // Japan
+    { value: "+86",  label: "🇨🇳 +86"  }, // China
+    { value: "+55",  label: "🇧🇷 +55"  }, // Brazil
+    { value: "+52",  label: "🇲🇽 +52"  }, // Mexico
+    { value: "+27",  label: "🇿🇦 +27"  }, // South Africa
+    { value: "+971", label: "🇦🇪 +971" }, // United Arab Emirates
+];
 
 export interface NavLinkType {
     [key: string]: string;
