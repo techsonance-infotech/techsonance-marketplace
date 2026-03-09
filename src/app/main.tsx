@@ -22,7 +22,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-      <ScrollToTop />
+        <ScrollToTop />
         <Routes>
           <Route path='/404' element={<NotFound />} />
           <Route path='/' element={<ShopLayout />} >
@@ -48,9 +48,9 @@ createRoot(document.getElementById('root')!).render(
           </Route>
           <Route path='auth'>
             <Route path="*" element={<NotFound />} />
-            <Route path="adminLogin" element={<ProtectedRoute allowedRoles={[UserRole.Admin]}><Login /></ProtectedRoute>} />
-            <Route path="vendorLogin" element={<ProtectedRoute allowedRoles={[UserRole.Vendor]}><VendorLogin /></ProtectedRoute>} />
-            <Route path="vendorRegister" element={<ProtectedRoute allowedRoles={[UserRole.Vendor]}><VendorRegister /></ProtectedRoute>} />
+            <Route path="adminLogin" element={<Login />} />
+            <Route path="vendorLogin" element={<VendorLogin />} />
+            <Route path="vendorRegister" element={<VendorRegister />} />
             <Route path="customerRegister" element={<CustomerRegister />} />
             <Route path="customerLogin" element={<CustomerLogin />} />
           </Route>
@@ -86,7 +86,7 @@ createRoot(document.getElementById('root')!).render(
             </Route>
           </Route>
         </Routes>
- 
+
       </BrowserRouter>
     </Provider>
   </StrictMode>,

@@ -1,114 +1,115 @@
 ﻿import { useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router";
-import { set } from "zod";
-import { passwordValidationSchema } from "../../../../utils/validation";
+import { useForm } from "react-hook-form";
 import axios from "axios";
-import { VENDOR_BASE_URL } from "../../../../utils/constants";
+import { passwordValidationSchema } from "../../../../utils/validation";
+import { VENDOR_AUTH_URL } from "../../../../utils/constants";
+
 interface FormData {
-    business_name: string | null,
-    business_number: string | null,
-    business_owner_full_name: string | null,
-    category: string | null,
-    vendor_admin_email: string | null,
-    vendor_admin_full_name: string | null,
-    password: string | null,
-    password_confirm: string | null,
+    business_name: string;
+    business_number: string;
+    business_owner_full_name: string;
+    category: string;
+    country?: string; // Optional if not in the form
+    vendor_admin_email: string;
+    vendor_admin_full_name: string;
+    password: string;
+    confirm_password: string;
 }
 
 export function VendorRegister() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState<FormData>({
-        business_name: null,
-        business_number: null,
-        business_owner_full_name: null,
-        category: null,
-        vendor_admin_email: null,
-        vendor_admin_full_name: null,
-        password: null,
-        password_confirm: null,
-    })
-    const [error, setError] = useState<string | null>(null);
-    const [passwordMatchError, setPasswordMatchError] = useState<string | null>(null);
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value }: { name: string; value: string } = e.target;
-        if (!name) return;
-        if (value === null) return;
-        if (name == 'category' && formData.category != null) {
-            setError(null);
-        }
-        if (name == 'password') {
-            passwordValidationSchema.safeParse(value).success ? setPasswordMatchError(null) : setPasswordMatchError("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character");
-        }
-        if (name == 'confirm_password') {
-            console.log(value)
-            if (formData.password !== value || formData.password == null) {
-                setPasswordMatchError("Passwords do not match");
-                return;
-            }
-            setPasswordMatchError(null);
-        }
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-    }
-    const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        formData.category == null || formData.category === '' ? setError("Please select a business category") : setError(null);
-        formData.password == null || formData.password_confirm == null ? setPasswordMatchError("Passwords must be filled") : setPasswordMatchError(null);
-        try {
-        // axios.post(`${VENDOR_BASE_URL}/api/vendor/register`, {
-        //     user_role: 'vendor',
-        //     business_name: formData.business_name,
-        //     business_number: formData.business_number,
-        //     business_owner_full_name: formData.business_owner_full_name,
-        //     category: formData.category,
-        //     vendor_admin_email: formData.vendor_admin_email,
-        //     vendor_admin_full_name: formData.vendor_admin_full_name,
-        //     password: formData.password,
-        // }).then((response) => {
-        //     console.log(response.data);
-        //     if (response.status === 200) {
-                console.log('Registration successful');
-                navigate(`/vendorLogin`);
-        //     }
-        // })
+    const [globalError, setGlobalError] = useState<string | null>(null);
 
-            } catch (error: unknown) {
-            console.log(error)
-            throw new Error("Registration failed");
+    // Initialize React Hook Form
+    const {
+        register,
+        handleSubmit,
+        watch,
+        reset,
+        formState: { errors, isSubmitting },
+    } = useForm<FormData>({
+        defaultValues: {
+            business_name: "",
+            business_number: "",
+            business_owner_full_name: "",
+            category: "",
+            vendor_admin_email: "",
+            vendor_admin_full_name: "",
+            password: "",
+            confirm_password: "",
         }
-        console.log(formData)
-    }
+    });
+
+    const onSubmit = async (data: FormData) => {
+        setGlobalError(null);
+        try {
+            const response = await axios.post(`${VENDOR_AUTH_URL}/register-vendor`, {
+                user_role: 'vendor',
+                business_name: data.business_name,
+                business_number: data.business_number,
+                business_owner_full_name: data.business_owner_full_name,
+                category: data.category,
+                vendor_admin_email: data.vendor_admin_email,
+                vendor_admin_full_name: data.vendor_admin_full_name,
+                password: data.password,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.status === 200) {
+                console.log('Registration successful');
+                reset(); // Clear form on success
+                navigate(`/vendorLogin`);
+            }
+        } catch (error: unknown) {
+            console.error(error);
+            setGlobalError("Registration failed. Please try again.");
+        }
+    };
 
     return (
         <>
             <main className="py-20 m-auto max-w-4xl px-6 font-[inter] mb-2 flex flex-col items-center ">
                 <div className="w-full">
-                    <h1 className=" font-bold  text-2xl  mb-2 ">
+                    <h1 className="font-bold text-2xl mb-2">
                         Business Registration
                     </h1>
-                    <p className="mb-6 text-balance ">Setup the organization profile, assign a domain, and create the admin account.</p>
+                    <p className="mb-6 text-balance">Setup the organization profile, assign a domain, and create the admin account.</p>
                 </div>
-                <form onSubmit={(e) => submitHandler(e)} className="w-full  flex flex-col gap-6 ">
-                    <section className="border p-6 rounded-2xl mb-6 w-full  ">
+
+                {/* React Hook Form handles the e.preventDefault() under the hood */}
+                <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-6 ">
+                    <section className="border p-6 rounded-2xl mb-6 w-full">
                         <h1 className="font-bold text-xl text-left mb-2">
                             Organization Details
                         </h1>
-                        <span className="flex gap-8 flex-col  ">
-
+                        <span className="flex gap-8 flex-col">
                             <span className="flex lg:flex-row lg:flex-nowrap justify-between gap-6 w-full">
-                                <div className="flex flex-col gap-2 w-full  ">
-                                    <label htmlFor="business_name" >
+                                <div className="flex flex-col gap-2 w-full">
+                                    <label htmlFor="business_name">
                                         Vendor / Business Name <span className="text-red-600">*</span>
                                     </label>
-                                    <input type="text" name="business_name" className="border-2 py-2 px-4 rounded-xl" placeholder="Enter your business name" onChange={(e) => handleChange(e)} />
+                                    <input
+                                        type="text"
+                                        className="rounded-xl border-2 border-gray-800 focus:ring-blue-500 focus:border-blue-500 block w-full px-2.5 py-1.5"
+                                        placeholder="Enter your business name"
+                                        {...register("business_name", { required: "Business name is required" })}
+                                    />
+                                    {errors.business_name && <p className="text-red-600 text-sm">{errors.business_name.message}</p>}
                                 </div>
-                                <div className="flex flex-col gap-2 w-full  ">
-                                    <label htmlFor="category" className="block mb-1 text-sm font-medium text-gray-900 dark:text-white" >
+
+                                <div className="flex flex-col gap-2 w-full">
+                                    <label htmlFor="category" className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
                                         Business Category <span className="text-red-600">*</span>
                                     </label>
-                                    <select name="category" id="" className="border-2 py-[.6rem] px-4 rounded-xl  " onChange={(e) => handleChange(e)} >
+                                    <select
+                                        className="border-2 py-[.5rem] px-4 rounded-xl"
+                                        {...register("category", { required: "Please select a business category" })}
+                                    >
                                         <option value="">Select Business Category</option>
                                         <option value="retail">Retail</option>
                                         <option value="diy_hardware">DIY and hardware</option>
@@ -123,73 +124,120 @@ export function VendorRegister() {
                                         <option value="hospitality">Toys and hobbies</option>
                                         <option value="other">Other</option>
                                     </select>
-                                    {error && <p className="text-red-600 text-sm">{error}</p>}
+                                    {errors.category && <p className="text-red-600 text-sm">{errors.category.message}</p>}
                                 </div>
                             </span>
 
                             <span className="flex lg:flex-row lg:flex-nowrap justify-between gap-6">
-
                                 <div className="flex flex-col gap-2 w-full ">
-                                    <label htmlFor="business_owner_full_name" >Business Owner Full Name <span className="text-red-600">*</span></label>
-                                    <input type="text" name="business_owner_full_name" className="border-2 py-2 px-4 rounded-xl" placeholder="Enter  business owner full name" onChange={(e) => handleChange(e)} />
+                                    <label htmlFor="business_owner_full_name">Business Owner Full Name <span className="text-red-600">*</span></label>
+                                    <input
+                                        type="text"
+                                        className="rounded-xl border-2 border-gray-800 py-2 px-4"
+                                        placeholder="Enter business owner full name"
+                                        {...register("business_owner_full_name", { required: "Owner name is required" })}
+                                    />
+                                    {errors.business_owner_full_name && <p className="text-red-600 text-sm">{errors.business_owner_full_name.message}</p>}
                                 </div>
                                 <div className="flex flex-col gap-2 w-full ">
-                                    <label htmlFor="business_number" >Business Number <span className="text-red-600">*</span></label    >
-                                    <input type="text" name="business_number" className="border-2 py-2 px-4 rounded-xl" placeholder="Enter business owner contact number" onChange={(e) => handleChange(e)} />
+                                    <label htmlFor="business_number">Business Number <span className="text-red-600">*</span></label>
+                                    <input
+                                        type="text"
+                                        className="rounded-xl border-2 border-gray-800 py-2 px-4"
+                                        placeholder="Enter business owner contact number"
+                                        {...register("business_number", { required: "Business number is required" })}
+                                    />
+                                    {errors.business_number && <p className="text-red-600 text-sm">{errors.business_number.message}</p>}
                                 </div>
                             </span>
-
                         </span>
-
                     </section>
-                    <section className="border p-6 rounded-2xl mb-6 w-full ">
+
+                    <section className="border p-6 rounded-2xl mb-6 w-full">
                         <h1 className="font-bold text-xl text-left mb-2">
                             Business Admin Account
                         </h1>
-                        <p className="mb-6 text-balance  ">
+                        <p className="mb-6 text-balance">
                             These credentials will be used for the first login to the Vendor Dashboard.
                         </p>
 
-
                         <div className="flex flex-col gap-2 w-full mb-3 ">
-
                             <label htmlFor="vendor_admin_full_name">Vendor Admin Full Name <span className="text-red-600">*</span></label>
-                            <input type="text" name="vendor_admin_full_name" className="border-2 py-2 px-4 rounded-xl" placeholder="Please enter admin full name" onChange={(e) => handleChange(e)} />
+                            <input
+                                type="text"
+                                className="rounded-xl border-2 border-gray-800 py-2 px-4"
+                                placeholder="Please enter admin full name"
+                                {...register("vendor_admin_full_name", { required: "Admin full name is required" })}
+                            />
+                            {errors.vendor_admin_full_name && <p className="text-red-600 text-sm">{errors.vendor_admin_full_name.message}</p>}
                         </div>
-                        <div className="flex flex-col gap-2 w-full  mb-4">
 
+                        <div className="flex flex-col gap-2 w-full mb-4">
                             <label htmlFor="vendor_admin_email">Vendor Admin Email <span className="text-red-600">*</span></label>
-                            <input type="text" name="vendor_admin_email" className="border-2 py-2 px-4 rounded-xl" placeholder="admin@vendor.com" onChange={(e) => handleChange(e)} />
+                            <input
+                                type="email"
+                                className="rounded-xl border-2 border-gray-800 py-2 px-4"
+                                placeholder="admin@vendor.com"
+                                {...register("vendor_admin_email", { 
+                                    required: "Admin email is required",
+                                    pattern: {
+                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                        message: "Invalid email address"
+                                    }
+                                })}
+                            />
+                            {errors.vendor_admin_email && <p className="text-red-600 text-sm">{errors.vendor_admin_email.message}</p>}
                         </div>
+
                         <div className="flex flex-row gap-6 w-full ">
-
-                            <div className="flex flex-col gap-2 w-full ">
-
-                                <label htmlFor="password">password <span className="text-red-600">*</span></label>
-                                <input type="password" name="password" id="" className="border-2 py-2 px-4 rounded-xl" placeholder="Please enter password" onChange={(e) => handleChange(e)} />
-                                {passwordMatchError && <p className="text-red-600 text-sm">{passwordMatchError}</p>}
-
+                            <div className="flex flex-col gap-2 w-full">
+                                <label htmlFor="password">Password <span className="text-red-600">*</span></label>
+                                <input
+                                    type="password"
+                                    className="rounded-xl border-2 border-gray-800 py-2 px-4"
+                                    placeholder="Please enter password"
+                                    {...register("password", { 
+                                        required: "Password is required",
+                                        validate: (val) => passwordValidationSchema.safeParse(val).success || "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
+                                    })}
+                                />
+                                {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
                             </div>
-                            <div className="flex flex-col gap-2 w-full ">
-                                <label htmlFor="confirm password">Confirm Password<span className="text-red-600">*</span></label>
-                                <input type="password" name="confirm_password" id="" className="border-2 py-2 px-4 rounded-xl" placeholder="Please reenter  password" onChange={(e) => handleChange(e)} />
+                            <div className="flex flex-col gap-2 w-full">
+                                <label htmlFor="confirm_password">Confirm Password<span className="text-red-600">*</span></label>
+                                <input
+                                    type="password"
+                                    className="rounded-xl border-2 border-gray-800 py-2 px-4"
+                                    placeholder="Please reenter password"
+                                    {...register("confirm_password", { 
+                                        required: "Confirm password is required",
+                                        validate: (val) => val === watch("password") || "Passwords do not match" 
+                                    })}
+                                />
+                                {errors.confirm_password && <p className="text-red-600 text-sm">{errors.confirm_password.message}</p>}
                             </div>
                         </div>
-
                     </section>
+
+                    {globalError && <p className="text-red-600 text-center font-bold">{globalError}</p>}
+
                     <span className="flex gap-6 justify-end mb-4 ">
-                        <button className="bg-gray-200 text-center  text-black  py-2 px-6 rounded-xl mb-4 border-2 border-black/30 ">Cancel</button>
-                        <button type="submit" className="bg-blue-500 text-center  text-white font-bold py-2 px-6 rounded-xl mb-4 "
-                        >Create Business Account
+                        <button type="button" onClick={() => reset()} className="bg-gray-200 text-center text-black py-2 px-6 rounded-xl mb-4 border-2 border-black/30">Cancel</button>
+                        <button 
+                            type="submit" 
+                            disabled={isSubmitting}
+                            className="bg-blue-500 text-center text-white font-bold py-2 px-6 rounded-xl mb-4 disabled:opacity-50"
+                        >
+                            {isSubmitting ? "Creating..." : "Create Business Account"}
                         </button>
                     </span>
-                    <p className="text-center" >Already have an account?
+
+                    <p className="text-center">Already have an account?
                         <Link className="text-blue-500 underline ml-1" to={`/vendorLogin`}>Log in</Link>
                     </p>
-
                 </form>
             </main>
             <Outlet />
         </>
-    )
+    );
 }
