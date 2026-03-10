@@ -24,7 +24,7 @@ const errorClass = "text-red-500 text-xs mt-0.5";
 export function VendorRegister() {
     const navigate = useNavigate();
     const [globalError, setGlobalError] = useState<string | null>(null);
-
+    
     const {
         register,
         handleSubmit,
@@ -64,11 +64,12 @@ export function VendorRegister() {
                     "Content-Type": "application/json",
                 }
             });
-
-            if (response.status === 200) {
+            console.log(response.data);
+            if (response.status === 201) {
                 reset();
-                navigate("/vendorLogin");
+                navigate("/auth/vendorLogin");
             }
+
         } catch (error: unknown) {
             console.error(error);
             setGlobalError("Registration failed. Please try again.");
@@ -178,7 +179,7 @@ export function VendorRegister() {
                                             {...register("business_number", {
                                                 required: "Business number is required",
                                                 pattern: {
-                                                    value: /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/,
+                                                    value: /^[0-9]/,
                                                     message: "Please use the format 123-456-7890",
                                                 }
                                             })}
@@ -303,7 +304,7 @@ export function VendorRegister() {
 
                     <p className="text-center text-sm text-gray-600 mb-4">
                         Already have an account?{" "}
-                        <Link className="text-blue-500 underline" to="/vendorLogin">Log in</Link>
+                        <Link className="text-blue-500 underline" to="/auth/vendorLogin">Log in</Link>
                     </p>
                 </form>
             </main>

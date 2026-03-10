@@ -65,7 +65,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="supportTickets" element={<SupportTickets />} />
             <Route path="auditLog" element={<AuditLog />} />
           </Route>
-          <Route path='vendor' element={<VendorLayout />}>
+          <Route path='vendor' element={<ProtectedRoute allowedRoles={[UserRole.Vendor]}><VendorLayout /></ProtectedRoute>} >
             <Route index element={<Dashboard />} />
             <Route path='products'   >
               <Route index element={<Products />} />
