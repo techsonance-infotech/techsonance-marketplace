@@ -172,7 +172,7 @@ export function ProfileSidebar() {
                                         whileHover={{ opacity: 1, x: 0 }}
                                         className="absolute right-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
-                                        <DynamicIcon name="chevron-right" size={16} />
+                                        <DynamicIcon name="chevron-right" size={16}  />
                                     </motion.div>
                                 )}
                             </button>

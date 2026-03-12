@@ -6,9 +6,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 type SidebarProps = {
     NAV_LINKS: NavLinkType[];
+    id?: string | number;
 }
 
-export function Sidebar({ NAV_LINKS }: SidebarProps) {
+export function Sidebar({ basePath = "", NAV_LINKS, id = 32 }: SidebarProps) {
     const { isSidebarOpen }: isSidebarType = useSelector((state: any) => state.sidebar);
     const dispatch = useDispatch()
     const path = usePathname();
@@ -24,7 +25,7 @@ export function Sidebar({ NAV_LINKS }: SidebarProps) {
                 {
                     NAV_LINKS.map((linkObj, index) => (
 
-                        <Link href={Object.values(linkObj)[0]} key={index} className={`flex gap-2 rounded-2xl items-center px-4 py-2 my-2 ${path === Object.values(linkObj)[0] ? "bg-gray-700" : ""} hover:bg-gray-700 transition ease-in-out ` + (isSidebarOpen ? "px-4" : "px-2")}>
+                        <Link href={Object.values(linkObj)[0] == null ? `${basePath}` : `${basePath}/${Object.values(linkObj)[0]}`} key={index} className={`flex gap-2 rounded-2xl items-center px-4 py-2 my-2 ${path === `${basePath}/${Object.values(linkObj)[0]}` ? "bg-gray-700" : ""} hover:bg-gray-700 transition ease-in-out ` + (isSidebarOpen ? "px-4" : "px-2")}>
                             <img src={Object.values(linkObj)[1]} alt={Object.keys(linkObj)[0]} className="w-6 h-6 " />
                             {
                                 isSidebarOpen && <span className="text-sm">{Object.keys(linkObj)[0]}</span>

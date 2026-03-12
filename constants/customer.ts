@@ -1,6 +1,4 @@
 import { IconName } from "lucide-react/dynamic";
-import type { NavLinkType, FooterSectionType, tabLinkType } from "./common";
-
 // ============================================================
 // CUSTOMER NAVIGATION
 // ============================================================
@@ -32,7 +30,7 @@ export const HOME_BRAND_FEATURES: { title: string; icon: IconName }[] = [
   { title: "Delivered with Care and on time", icon: "truck" },
   { title: "High Quality audio", icon: "audio-lines" },
 ];
-
+export const HOME_SECONDARY_IMG = "https://m.media-amazon.com/images/I/61KcQyhY6SL._SL1200_.jpg"
 // ============================================================
 // FOOTER
 // ============================================================
@@ -313,3 +311,130 @@ export const PRODUCT_LIST: PRODUCT_LIST_TYPE[] = [
   { id: "hd-024", title: "Logitech G733 LIGHTSPEED", price: 11995, discount: 15, category: "Gaming Audio", imgUrl: "https://images.unsplash.com/photo-1628236162359-21b790d56569?auto=format&fit=crop&w=300&q=80", description: "Wireless gaming headset with suspension headband and Blue VO!CE mic technology.", satisfaction: "4.6/5" },
   { id: "sp-025", title: "UE Wonderboom 3", price: 7995, discount: 5, category: "Speakers", imgUrl: "https://images.unsplash.com/photo-1614912803300-835694297316?auto=format&fit=crop&w=300&q=80", description: "Ultraportable Bluetooth speaker with a surprisingly bigger 360-degree sound that's crisp and bassy.", satisfaction: "4.7/5" },
 ];
+
+
+
+
+
+
+import { OrderFailedStatusTypes, OrderSuccessStatusTypes } from "@/utils/Types"
+
+
+//Cusomter Home hero title and description
+export const HOME_HERO_TITLE = "Welcome to Sound Sphere - Your Ultimate Music Marketplace";
+export const HOME_HERO_DESC = "Discover, buy, and sell music products with ease. Join our vibrant community of music lovers and elevate your sound experience today!";
+
+export interface NavLinkType {
+  [key: string]: string;
+}
+export interface FooterLinkType {
+  title: string;
+  url: string;
+  icon?: string;
+  styles?: string;
+  category?: string;
+}
+export interface FooterSectionType {
+  header: string;
+  links: FooterLinkType[];
+}
+// Navigation Links
+
+export interface tabLinkType {
+  [key: string]: string;
+}
+
+
+
+export const mockSuccessStatus: OrderSuccessStatusTypes = {
+  orderId: "#345-9204268-1845104",
+  orderDate: "Jan 1",
+  estimatedDelivery: "Jan 4",
+  shippingAddress: {
+    line1: "flat no 202, bblossom the presidency,",
+    line2: "vesu, near raguver spectrum building",
+    city: "SURAT",
+    state: "GUJARAT",
+    postalCode: "395007",
+    country: "India"
+  },
+  paymentMethod: {
+    type: "UPI",
+    details: "bankofindia@1313yap"
+  },
+  items: [
+    {
+      id: "1",
+      name: "Sound Sphere Bass Pro",
+      image: "/product-image.png",
+      color: "Midnight Black",
+      quantity: 1,
+      price: 1399
+    }
+  ],
+  subtotal: 1399,
+  discount: 300,
+  delivery: 0,
+  total: 1099,
+
+}
+
+export const mockFailedStatus: OrderFailedStatusTypes = {
+  errorCode: "PAYMENT_DECLINED",
+  transactionId: "TXN123456789",
+  attemptedAmount: 1099,
+  possibleReasons: [
+    "Insufficient funds in the account.",
+    "Incorrect card details entered.",
+    "Bank's fraud detection system flagged the transaction.",
+    "Technical issues with the payment gateway."
+  ]
+}
+
+export interface CATEGORY_LIST_TYPE {
+  title: string;
+  url: string;
+}
+
+export interface BestSellingProductType {
+  title: string;
+  url: string;
+  description: string;
+  satisfaction: string;
+}
+
+export interface FeedbackType {
+  customerName: string;
+  feedback: string;
+  rating: number;
+}
+
+export interface ReviewType {
+  id: string;
+  userName: string;
+  rating: number;
+  date: string;
+  comment: string;
+}
+
+export interface PRODUCT_LIST_TYPE {
+  id: string;
+  title: string;
+  price: number;
+  discount: number;
+  category: string;
+  imgUrl: string;
+  description: string;
+  satisfaction: string;
+  rating?: number;
+  reviewCount?: number;
+  productDetails?: {
+    brand: string;
+    model: string;
+    specifications: {
+      [key: string]: string;
+    };
+  };
+  specificationsImgUrl?: string[];
+  reviews?: ReviewType[];
+}

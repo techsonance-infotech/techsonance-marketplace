@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Edit } from "lucide-react";
 import { Pagination } from "@/components/common/Pagination";
-import { productData, searchImgDark } from "@/utils/constants";
+import { productData, searchImgDark } from "@/constants/constants";
 
 
 
@@ -60,37 +60,36 @@ export default function Products() {
                                 <th className="p-4 border-b   border-gray-400">ACTION</th>
                             </tr>
                         </thead>
-                        <tbody className="text-center">
+                        <tbody className="text-center w-full ">
                             {
                                 currentData.map((item, index) => (
-                                    <>
-                                        <tr key={index} className={`hover:bg-gray-100 ${item.id === currentData[pageSize - 1].id ? 'border-b-0' : 'border-b border-gray-400'} border-b border-gray-400   `}>
-                                            <td className={`p-4  `}> <input type="checkbox" className="w-4 h-4" /></td>
-                                            <td className={`p-4  `}> <img className="w-16 h-16" src={item.imageUrl} alt="product image" /> </td>
-                                            <td className={`p-4 w-56  `}>{item.productName}</td>
-                                            <td className={`p-4  `}>
-                                                {item.sku}
-                                            </td>
 
-                                            <td className={`p-4  `}>
-                                                <p className={`${item.stock >= 20 ? 'text-green-500  py-1 px-3 rounded-lg ' : 'text-red-500   py-1 px-3 rounded-lg  '}`}>{item.stock}</p>
-                                            </td>
-                                            <td className={`p-4  `}>₹ {item.price}</td>
-                                            <td className={`p-4  `}>
-                                                {
-                                                    item.status === "Active" ? <span className="bg-green-100 text-green-800 py-1 px-3 rounded-lg text-sm">Active</span> :
-                                                        item.status === "Inactive" ? <span className="bg-green-100 text-green-800 py-1 px-3 rounded-lg text-sm">In Active</span> :
-                                                            <></>
-                                                }
-                                            </td>
-                                            <td className={`p-4`}>
-                                                <Link href={`/vendor/products/productUpdateForm/${item.id}`}>
-                                                    <Edit />
-                                                </Link>
-                                            </td>
+                                    <tr key={index} className={`hover:bg-gray-100 ${item.id === currentData[pageSize - 1].id ? 'border-b-0' : 'border-b border-gray-400'} border-b border-gray-400   `}>
+                                        <td className={`p-4  `}> <input type="checkbox" className="w-4 h-4" /></td>
+                                        <td className={`p-4  `}> <img className="w-16 h-16" src={item.imageUrl} alt="product image" /> </td>
+                                        <td className={`p-4 w-56  `}>{item.productName}</td>
+                                        <td className={`p-4  `}>
+                                            {item.sku}
+                                        </td>
 
-                                        </tr>
-                                    </>
+                                        <td className={`p-4  `}>
+                                            <p className={`${item.stock >= 20 ? 'text-green-500  py-1 px-3 rounded-lg ' : 'text-red-500   py-1 px-3 rounded-lg  '}`}>{item.stock}</p>
+                                        </td>
+                                        <td className={`p-4  `}>₹ {item.price}</td>
+                                        <td className={`p-4  `}>
+                                            {
+                                                item.status === "Active" ? <span className="bg-green-100 text-green-800 py-1 px-3 rounded-lg text-sm">Active</span> :
+                                                    item.status === "Inactive" ? <span className="bg-green-100 text-green-800 py-1 px-3 rounded-lg text-sm">In Active</span> :
+                                                        <></>
+                                            }
+                                        </td>
+                                        <td className={`p-4`}>
+                                            <Link href={`/vendor/products/productUpdateForm/${item.id}`}>
+                                                <Edit />
+                                            </Link>
+                                        </td>
+
+                                    </tr>
                                 ))
                             }
                         </tbody >

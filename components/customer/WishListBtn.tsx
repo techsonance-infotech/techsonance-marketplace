@@ -35,8 +35,7 @@ export function WishListBtn({ productId, styles, iconSize }: { productId?: strin
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
-        className={`
-        rounded-full transition-colors duration-300 flex items-center justify-center mt-4
+        className={`rounded-full transition-colors duration-300 flex items-center justify-center mt-4
         lg:px-2 px-1 lg:py-2 py-1
         ${styles} 
         ${isAlreadyInWishlist

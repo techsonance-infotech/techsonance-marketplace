@@ -16,14 +16,14 @@ import {
 // ============================================================
 
 export const VENDOR_NAV_LINKS: NavLinkType[] = [
-  { Dashboard: "/vendor", icon: dashboard_icon },
-  { Products: "/vendor/products", icon: product_icon },
-  { Orders: "/vendor/orders", icon: order_icon },
-  { Inventory: "/vendor/inventory", icon: inventory_icon },
-  { Analytics: "/vendor/finances", icon: finance_icon },
-  { Marketing: "/vendor/marketing", icon: marketing_icon },
-  { "Customer Care": "/vendor/customerCare", icon: customer_care_icon },
-  { Settings: "/vendor/settings", icon: settings_icon },
+  { Dashboard: null, icon: dashboard_icon },
+  { Products: "products", icon: product_icon },
+  { Orders: "orders", icon: order_icon },
+  { Inventory: "inventory", icon: inventory_icon },
+  { Analytics: "finances", icon: finance_icon },
+  { Marketing: "marketing", icon: marketing_icon },
+  { "Customer Care": "customerCare", icon: customer_care_icon },
+  { Settings: "settings", icon: settings_icon },
 ];
 
 // ============================================================
@@ -34,21 +34,20 @@ export const VENDOR_SETTINGS_LINKS: Link[] = [
   {
     section: "general",
     list: [
-      { title: "Store Profile", path: "/vendor/settings", icon: "profile" },
-      { title: "Locations & Warehouses", path: "/vendor/settings/locations", icon: "locations" },
+      { title: "Store Profile", path: null, icon: "profile" },
+      { title: "Locations & Warehouses", path: "locations", icon: "locations" },
     ],
   },
   {
     section: "organization",
     list: [
-      { title: "Billing & Banking", path: "/vendor/settings/billing", icon: "billing" },
+      { title: "Billing & Banking", path: "billing", icon: "billing" },
     ],
   },
   {
     section: "account",
-    list: [
-      { title: "Business Profile", path: "/vendor/settings/businessProfile", icon: "businessProfile" },
-      { title: "Security & Password", path: "/vendor/settings/security", icon: "usersRoles" },
+    list: [{ title: "Business Profile", path: "businessProfile", icon: "businessProfile" },
+    { title: "Security & Password", path: "security", icon: "usersRoles" },
     ],
   },
 ];
@@ -242,7 +241,7 @@ export interface Warehouse {
   total_units: number;
   is_default: boolean;
   contactPerson?: string;  // Optional contact person
-    phone?: string;
+  phone?: string;
 }
 
 export const WAREHOUSE_DATA: Warehouse[] = [

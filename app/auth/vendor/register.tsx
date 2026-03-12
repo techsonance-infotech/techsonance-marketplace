@@ -3,7 +3,7 @@ import { Link, Outlet, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { passwordValidationSchema } from "../../../utils/validation";
-import { COUNTRY_CODES, VENDOR_AUTH_URL } from "../../../utils/constants";
+import { COUNTRY_CODES, VENDOR_AUTH_URL } from "../../../constants/constants";
 
 interface FormData {
     business_name: string;

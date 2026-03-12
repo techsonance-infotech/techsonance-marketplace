@@ -1,12 +1,13 @@
 'use client';
-
 import Navbar from "@/components/vendor/Navbar";
 import { Pagination } from "@/components/common/Pagination";
 import { VENDOR_DASHBOARD_STATS, VENDOR_ORDER_DATA } from "@/constants/vendor";
 import { useState } from "react";
 import Link from "next/link";
-
-export default function VendorDashboardPage() {
+import './index.css';
+import { useParams } from "next/navigation";
+export default function DashboardPage() {
+  
     const [count, setCount] = useState(1);
     const pageSize = 5;
     const totalPages = Math.ceil(VENDOR_ORDER_DATA.length / pageSize);

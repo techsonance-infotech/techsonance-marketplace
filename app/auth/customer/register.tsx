@@ -3,7 +3,7 @@ import { Link, Outlet, useNavigate } from "react-router";
 import { passwordValidationSchema } from "../../../utils/validation";
 import poster from "../../../../assets/customer form poster.png";
 import axios from "axios";
-import { CUSTOMER_BASE_URL } from "../../../utils/constants";
+import { CUSTOMER_BASE_URL } from "../../../constants/constants";
 import { useDispatch } from "react-redux";
 interface FormData {
     customer_name: string | null,

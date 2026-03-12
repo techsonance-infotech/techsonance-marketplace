@@ -5,7 +5,7 @@ import axios from "axios";
 import poster from "../../../../assets/vendor login poster.png";
 import { loginFailure, loginStart, loginSuccess } from "../../../features/auth/authSlice";
 import { passwordValidationSchema } from "../../../utils/validation";
-import { VENDOR_AUTH_URL } from "../../../utils/constants";
+import { VENDOR_AUTH_URL } from "../../../constants/constants";
 import { role, UserRole } from "../../../utils/Types";
 interface LoginFormData {
     email: string;

@@ -1,6 +1,5 @@
 'use client';
 import { motion } from "motion/react";
-import { arrow } from "@/constants/common";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 
@@ -29,7 +28,7 @@ export function Pagination({ setCount, count, totalPages, style, onPageChange }:
     };
 
     return (
-        <div className={`flex   flex-row justify-center items-center gap-6 my-8 ${style}`}>
+        <div className={`flex w-full  flex-row justify-end  items-center gap-6 my-8 ${style}`}>
             {/* Previous Button */}
             <motion.button
                 whileTap={count > 1 ? { scale: 0.95 } : {}}

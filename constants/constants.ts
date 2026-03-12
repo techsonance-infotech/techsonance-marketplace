@@ -36,7 +36,7 @@ const toggle_light = "/assets/toggle-light.png";
 const toggle_dark = "/assets/toggle-dark.png";
 const replacement_icon = "/assets/replacement icon.png";
 
-import { Product, UserRole } from "./Types"
+import { Product, UserRole } from "../utils/Types"
 
 export { UserRole };
 

@@ -3,7 +3,7 @@ import { Link, Outlet, useNavigate } from "react-router";
 import { passwordValidationSchema } from "../../../utils/validation";
 
 import axios from "axios";
-import { CUSTOMER_BASE_URL, CUSTOMER_LOGIN_POSTER } from "../../../utils/constants";
+import { CUSTOMER_BASE_URL, CUSTOMER_LOGIN_POSTER } from "../../../constants/constants";
 import { useDispatch } from "react-redux";
 import { loginFailure, loginStart, loginSuccess } from "../../../features/auth/authSlice";
 interface FormData {

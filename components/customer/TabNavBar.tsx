@@ -26,7 +26,7 @@ export function TabNavBar() {
     }), [user])
     return (
         <>
-            <motion.footer className="fixed bottom-0 w-full bg-white   border-t-gray-300   pb-0  flex justify-around items-center lg:hidden z-100 pt-1">
+            <motion.footer className="lg:hidden xl:hidden fixed bottom-0 w-full bg-white   border-t-gray-300   pb-0  flex justify-around items-center   z-100 pt-1">
                 {
                     navLinks.map((link, index) => {
                         const isActive: boolean = path === link.url;

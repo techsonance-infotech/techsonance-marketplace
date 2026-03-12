@@ -3,33 +3,12 @@ import { useSelector } from "react-redux";
 import { motion } from "motion/react";
 import { ShoppingBag, Mail, Phone, Timer, MapPin, Lock, Bell, ChevronLeftCircle } from "lucide-react";
 import type { RootState } from "@/Redux store/store";
-import { useEffect, useState } from "react";
-
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
+import { Counter } from "@/components/customer/Counter";
 
 
-const Counter = ({ value }: { value: number }) => {
-    const [count, setCount] = useState(0);
-    useEffect(() => {
-        let start = 0;
-        const end = value;
-        if (start === end) return;
-
-        const duration = 1000;
-        const incrementTime = Math.abs(Math.floor(duration / end));
-
-        const timer = setInterval(() => {
-            start += 1;
-            setCount(start);
-            if (start === end) clearInterval(timer);
-        }, incrementTime);
-
-        return () => clearInterval(timer);
-    }, [value]);
-
-    return <span>{count}</span>;
-};
 
 
 const containerVariants = {
@@ -53,6 +32,8 @@ const itemVariants = {
 
 export default function UserProfilePage() {
     const { user } = useSelector((state: RootState) => state.auth);
+    const {userId}=useParams()
+    console.log(user);
     const router = useRouter();
     if (!user) return null;
 
@@ -60,7 +41,7 @@ export default function UserProfilePage() {
 
     return (
         <motion.section
-            className="w-full mx-auto lg:px-4 py-0 px-2 py-4"
+            className="w-full mx-auto lg:px-4 py-0 px-2 mb-4"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -78,9 +59,11 @@ export default function UserProfilePage() {
                         whileHover={{ scale: 1.05 }}
                         className="relative"
                     >
-                        <img
+                        <Image
                             src={user.profileImgUrl || "https://i.pinimg.com/originals/74/a3/b6/74a3b6a8856b004dfff824ae9668fe9b.jpg"}
                             alt={user.name || "User"}
+                            width={128}
+                            height={128}
                             className="rounded-full lg:w-32 lg:h-32 w-24 h-24 object-cover border-4 border-gray-50 shadow-md"
                         />
                         <span className="absolute bottom-2 right-2 lg:w-5 lg:h-5 w-2 h-2 bg-green-500 border-2 border-white rounded-full"></span>
