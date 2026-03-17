@@ -10,7 +10,7 @@ export default function VendorSettingsLayout({ children }: { children: React.Rea
         <>
             <Navbar title="Global Settings" />
             <InnerSideBar
-                path={`/vendor/${vendorId}/settings`}
+                // path={`/vendor/${vendorId}/settings`}
                 links={VENDOR_SETTINGS_LINKS}
                 isOpen={'ml-50'}
                 isNotOpen={'ml-24'}

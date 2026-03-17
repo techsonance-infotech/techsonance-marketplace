@@ -5,6 +5,7 @@ import { toggleSidebar, type isSidebarType } from "@/Redux store/features/sideba
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 type SidebarProps = {
+    basePath?: string;
     NAV_LINKS: NavLinkType[];
     id?: string | number;
 }
