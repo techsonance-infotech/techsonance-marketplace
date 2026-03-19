@@ -248,6 +248,9 @@ export const CUSTOMER_BASE_URL = process.env.NEXT_PUBLIC_CUSTOMER_BASE_URL;
 export const ADMIN_BASE_URL = process.env.NEXT_PUBLIC_ADMIN_BASE_URL;
 export const VENDOR_AUTH_URL = process.env.NEXT_PUBLIC_VENDOR_AUTH_URL;
 export const CUSTOMER_AUTH_URL = process.env.NEXT_PUBLIC_CUSTOMER_BASE_URL;
+export const ADMIN_AUTH_URL = process.env.NEXT_PUBLIC_ADMIN_BASE_URL;
+export const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 //Cusomter Home hero title and description
 export const HOME_HERO_TITLE = "Welcome to Sound Sphere - Your Ultimate Music Marketplace";
 export const HOME_HERO_DESC = "Discover, buy, and sell music products with ease. Join our vibrant community of music lovers and elevate your sound experience today!";
