@@ -26,8 +26,8 @@ export default function VendorManagementPage() {
                 <header className="flex justify-between items-center my-6">
                     <h1 className="font-bold text-2xl">Manage Vendor domains, and platform access.</h1>
                     <span className="flex gap-4">
-                        <Link className="vendor_manage_link text-white font-medium bg-blue-600 hover:bg-blue-700" href="/admin/vendorManagement/vendorForm">+ Create Vendors</Link>
-                        <Link className="vendor_manage_link font-medium" href="/admin/vendorManagement/approveVendors">Approve Vendor <span className="bg-yellow-300 py-1 px-3 rounded-full">{vendorRequests}</span></Link>
+                        <Link className="vendor_manage_link text-white font-medium bg-blue-600 hover:bg-blue-700" href="vendorManagement/vendorForm">+ Create Vendors</Link>
+                        <Link className="vendor_manage_link font-medium" href="vendorManagement/approveVendors">Approve Vendor <span className="bg-yellow-300 py-1 px-3 rounded-full">{vendorRequests}</span></Link>
                     </span>
                 </header>
                 <div className={"border-2 justify-between rounded-lg flex border-gray-400 items-center px-4 py-2 gap-4 bg-white filter " + (theme === 'light' ? '' : 'invert')}>

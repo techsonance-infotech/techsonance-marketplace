@@ -14,7 +14,7 @@ interface LoginFormData {
 
 export default function VendorLoginPage() {
     const router = useRouter();
-    const { loading, error  } = useSelector((state: RootState) => state.auth); 
+    const { loading, error } = useSelector((state: RootState) => state.auth);
     const {
         reset,
         register,
@@ -23,7 +23,13 @@ export default function VendorLoginPage() {
     } = useForm<LoginFormData>({
         defaultValues: { email: "", password: "" }
     });
-
+    const storedData = typeof window !== 'undefined' ? localStorage.getItem("auth") : null;
+    const auth = storedData ? JSON.parse(storedData) : null;
+    if (auth && auth?.isAuthenticated && auth?.user?.user_role
+        === "vendor") {
+        console.log("Already logged in as vendor.");
+        router.replace('/vendor/dashboard');
+    }
     const onSubmit = async (data: LoginFormData) => {
         const result = await vendorLogin(data);
         if (result?.status) {

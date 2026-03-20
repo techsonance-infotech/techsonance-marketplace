@@ -1,9 +1,8 @@
 ﻿import { loginFailure, loginSuccess } from "@/Redux store/features/auth/authSlice";
 import axios from "axios";
 import { UserProfile, UserRole, VendorRegisterFormData } from "./Types";
-import { VENDOR_AUTH_URL } from "@/constants/constants";
+import { ADMIN_AUTH_URL, VENDOR_AUTH_URL } from "@/constants/constants";
 import { useDispatch } from "react-redux";
-
 
 export const vendorLogin = async (data: { email: string, password: string }) => {
     const dispatch = useDispatch();
@@ -11,7 +10,7 @@ export const vendorLogin = async (data: { email: string, password: string }) => 
         const response = await axios.post(`${VENDOR_AUTH_URL}/login-vendor`, {
             email: data.email,
             password: data.password
-        });
+        }, { withCredentials: true });
         if (response.status === 201) {
             const payload: { user: UserProfile, token: string, role: UserRole } = {
                 user: response.data.user,
@@ -44,6 +43,7 @@ export const vendorRegister = async (data: VendorRegisterFormData) => {
             hash_password: data.password,
             country_code: data.country_code,
         }, {
+            withCredentials: true,
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
@@ -58,3 +58,38 @@ export const vendorRegister = async (data: VendorRegisterFormData) => {
         return { status: false, message: "Registration failed. Please try again.", error };
     }
 }
+
+export const adminLogin = async (data: { admin_id: string, password: string }) => {
+
+    try {
+        // const response = await fetch(`${ADMIN_AUTH_URL}/login`, {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json"
+        //     },
+        //     body: JSON.stringify({
+        //         email: data.admin_id,
+        //         password: data.password
+        //     })
+        // });
+        const response = await axios.post(`${ADMIN_AUTH_URL}/login`, {
+            email: data.admin_id,
+            password: data.password
+        }, { withCredentials: true });
+        if (response.status !== 201) {
+            const errorMessage = response.data?.message || "Login failed";
+            console.log(errorMessage);
+            return { status: false, message: errorMessage };
+        }
+        const payload: { user: UserProfile, token: string, role: UserRole } = {
+            user: response.data.user,
+            token: response.data.token,
+            role: response.data.user_role as UserRole
+        };
+        return { status: true, message: "Login successful", data: payload };
+    } catch (err: any) {
+        const errorMessage = err.response?.data?.message || err.message || "Login failed";
+        console.log(errorMessage, err);
+        return { status: false, message: errorMessage };
+    }
+} 
