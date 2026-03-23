@@ -11,7 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
         <>
             <Sidebar NAV_LINKS={ADMIN_NAV_LINKS} basePath={`/admin/${adminId}`} id={adminId} />
-            <main className={`mr-6 ${isSidebarOpen ? 'ml-50' : 'ml-24'}`}>
+            <main className={`mr-6 mb-[5px] ${isSidebarOpen ? 'ml-50' : 'ml-24'}`}>
                 {children}
             </main>
         </>

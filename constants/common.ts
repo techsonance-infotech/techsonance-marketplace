@@ -81,16 +81,23 @@ export interface tabLinkType {
 // ============================================================
 
 export const categoryOptions: { value: string; label: string }[] = [
-    { value: "clothing", label: "Clothing" },
-    { value: "electronics", label: "Electronics" },
-    { value: "home_and_garden", label: "Home & Garden" },
-    { value: "health_and_beauty", label: "Health & Beauty" },
-    { value: "sports_and_outdoors", label: "Sports & Outdoors" },
-    { value: "toys_and_games", label: "Toys & Games" },
-    { value: "automotive", label: "Automotive" },
-    { value: "books_and_media", label: "Books & Media" },
-    { value: "food_and_beverage", label: "Food & Beverage" },
-    { value: "art_and_collectibles", label: "Art & Collectibles" }
+  { value: "clothing", label: "Clothing" },
+  { value: "electronics", label: "Electronics" },
+  { value: "home_and_garden", label: "Home & Garden" },
+  { value: "health_and_beauty", label: "Health & Beauty" },
+  { value: "sports_and_outdoors", label: "Sports & Outdoors" },
+  { value: "toys_and_games", label: "Toys & Games" },
+  { value: "automotive", label: "Automotive" },
+  { value: "books_and_media", label: "Books & Media" },
+  { value: "food_and_beverage", label: "Food & Beverage" },
+  { value: "art_and_collectibles", label: "Art & Collectibles" }
+];
+
+export const BusinessStructure: { value: string; label: string }[] = [
+  { value: "sole_proprietorship", label: "Sole Proprietorship" },
+  { value: "partnership", label: "Partnership" },
+  { value: "corporation", label: "Corporation" },
+  { value: "llc", label: "LLC" }
 ];
 // ============================================================
 // COUNTRY CODES

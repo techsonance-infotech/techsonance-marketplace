@@ -18,7 +18,7 @@ export default function RolesSection({ roles, onRefresh }: Props) {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    await createRole(name.trim().toUpperCase());
+    await createRole(name.trim());
     setName("");
     onRefresh();
   };

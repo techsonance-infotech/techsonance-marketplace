@@ -47,7 +47,7 @@ export default function AssignSection({ roles, permissions, onRefresh }: Props) 
 
     }
     getRolePermissions();
-  }, [onRefresh()]);
+  }, []);
   console.log("rolePerms", rolePerms);
   // const assignedIds = new Set(
   //   roles.find((r) => r.id === roleId)?.permissions?.map((p) => p.id) ?? []

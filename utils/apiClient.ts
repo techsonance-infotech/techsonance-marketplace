@@ -39,6 +39,8 @@ export const vendorRegister = async (data: VendorRegisterFormData) => {
             store_owner_first_name: data.store_owner_first_name,
             store_owner_last_name: data.store_owner_last_name,
             category: data.category,
+            company_domain:data.company_domain,
+            company_structure: data.company_structure,
             email: data.email,
             first_name: data.first_name,
             last_name: data.last_name,

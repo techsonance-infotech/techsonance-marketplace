@@ -147,20 +147,22 @@ export interface OrderFailedStatusTypes {
 }
 
 export interface VendorRegisterFormData {
-  store_name: string;
-  first_name: string;
-  last_name: string;
-  phone_number: string;
-  store_owner_first_name: string;
-  store_owner_last_name: string;
-  category: string;
-  country_code?: string;
-  email: string;
-  password: string;
-  confirm_password: string;
-  document?: [{
-    document_type: VendorDocumentType;
-    document: string;
+  store_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  phone_number: string | null;
+  store_owner_first_name: string | null;
+  store_owner_last_name: string | null;
+  company_domain: string | null;
+  company_structure: string | null;
+  category: string | null;
+  country_code?: string | null;
+  email: string | null;
+  password: string | null;
+  confirm_password: string | null;
+  documents?: [{
+    document_type: VendorDocumentType | null;
+    document: string | null;
   }];
 }
 
@@ -173,4 +175,51 @@ export enum VendorDocumentType {
   ContractAgreements = 'contract_agreements',
   VendorInformation = 'vendor_information',
   BusinessContinuityPlan = 'business_continuity_plan',
+}
+
+
+export interface Vendor {
+    id: string;
+    store_owner_first_name: string;
+    store_owner_last_name: string;
+    store_name: string;
+    store_description: string;
+    category: string;
+    vendor_status: string;
+    is_verified: boolean;
+    created_at: string;
+    updated_at: string;
+    company_id: string;
+    user_id: string;
+}
+
+export interface User {
+    id: string;
+    profile_picture_url: string | null;
+    first_name: string;
+    last_name: string;
+    email: string;
+    country_code: string;
+    phone_number: string;
+    user_status: string;
+    created_at: string;
+    updated_at: string;
+    company_id: string;
+    role_id: string;
+}
+
+export interface Company {
+    id: string;
+    company_name: string;
+    company_domain: string;
+    company_structure: string;
+    company_status: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface VendorApplication {
+    vendor: Vendor;
+    user: User;
+    company: Company;
 }
