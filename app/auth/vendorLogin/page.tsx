@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { passwordValidationSchema } from "@/utils/validation";
 import { vendorLogin } from "@/utils/apiClient";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/Redux store/store";
 
 interface LoginFormData {
@@ -23,6 +23,7 @@ export default function VendorLoginPage() {
     } = useForm<LoginFormData>({
         defaultValues: { email: "", password: "" }
     });
+    const dispatch = useDispatch();
     const storedData = typeof window !== 'undefined' ? localStorage.getItem("auth") : null;
     const auth = storedData ? JSON.parse(storedData) : null;
     if (auth && auth?.isAuthenticated && auth?.user?.user_role
@@ -31,10 +32,11 @@ export default function VendorLoginPage() {
         router.replace('/vendor/dashboard');
     }
     const onSubmit = async (data: LoginFormData) => {
-        const result = await vendorLogin(data);
+        const result = await vendorLogin(data,dispatch);
         if (result?.status) {
-            router.push('/vendor/dashboard');
             reset();
+            console.log(result.user);
+            router.push(`/vendor/${result.user.vendor_id ?? ''}`);
         } else {
             result?.status === false && console.log(result?.message);
         }
@@ -42,7 +44,7 @@ export default function VendorLoginPage() {
     };
 
     return (
-        <main className="flex font-[roboto] justify-center items-center border h-[100vh] gap-16">
+        <main className="flex font-[roboto] justify-center items-center   h-[100vh] gap-16">
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col border rounded-2xl px-9 h-[620px] w-[540px] justify-center">
                 <h1 className="font-bold lg:text-[2rem] md:text-[1.5rem]">Manage your Store</h1>
                 <p className="font-bold text-[1rem] text-slate-600 mb-8">Welcome back! Please enter your details.</p>
@@ -88,13 +90,13 @@ export default function VendorLoginPage() {
                 <button
                     type="submit"
                     disabled={isSubmitting || loading}
-                    className="bg-blue-500 text-center text-white font-bold py-2 rounded-xl mb-4 disabled:opacity-50"
+                    className="cursor-pointer bg-blue-500 text-center text-white font-bold py-2 rounded-xl mb-4 disabled:opacity-50"
                 >
                     {loading || isSubmitting ? "Logging in..." : "Log in to Dashboard"}
                 </button>
                 <p className="text-center text-balance text-slate-500">
                     Don&apos;t have a Business account?
-                    <Link href="/auth/vendorRegister" className="text-blue-500 underline ml-1">Create Business account</Link>
+                    <Link href="/auth/vendorRegister" className="cursor-pointer text-blue-500 underline ml-1">Create Business account</Link>
                 </p>
             </form>
         </main>

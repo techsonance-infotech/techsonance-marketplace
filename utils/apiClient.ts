@@ -5,8 +5,7 @@ import { ADMIN_AUTH_URL, BASE_API_URL, VENDOR_AUTH_URL } from "@/constants/const
 import { useDispatch } from "react-redux";
 import { authToken } from "./authToken";
 
-export const vendorLogin = async (data: { email: string, password: string }) => {
-    const dispatch = useDispatch();
+export const vendorLogin = async (data: { email: string, password: string }, dispatch: any) => {
     try {
         const response = await axios.post(`${VENDOR_AUTH_URL}/login-vendor`, {
             email: data.email,
@@ -20,7 +19,7 @@ export const vendorLogin = async (data: { email: string, password: string }) => 
                 role: response.data.user_role as UserRole
             };
             dispatch(loginSuccess(payload));
-            return { status: true, message: "Login successful" };
+            return { user: response.data.user, status: true, message: "Login successful" };
         }
     } catch (err: any) {
         const errorMessage = err.response?.data?.message || err.message || "Login failed";
@@ -39,7 +38,7 @@ export const vendorRegister = async (data: VendorRegisterFormData) => {
             store_owner_first_name: data.store_owner_first_name,
             store_owner_last_name: data.store_owner_last_name,
             category: data.category,
-            company_domain:data.company_domain,
+            company_domain: data.company_domain,
             company_structure: data.company_structure,
             email: data.email,
             first_name: data.first_name,

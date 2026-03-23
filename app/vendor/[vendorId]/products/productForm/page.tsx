@@ -2,6 +2,8 @@
 import { useFieldArray, useForm } from "react-hook-form";
 import { useState } from "react";
 import { Trash2, Plus, UploadCloud, RefreshCw, Package, Tag, Image, Building2, ChevronDown, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { VENDOR_BASE_URL } from "@/constants";
+import { useSelector } from "react-redux";
 
 type Feature = { title: string; description: string };
 type Option = { name: string; values: string };
@@ -61,7 +63,8 @@ export default function ProductForm() {
     const options = watch("options");
     const basePrice = watch("basePrice");
     const variants = watch("variants");
-
+    const { user } = useSelector((state: any) => state.auth);
+    
     const [productFiles, setProductFiles] = useState<File[]>([]);
     const [featureFiles, setFeatureFiles] = useState<File[]>([]);
     const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
@@ -137,10 +140,19 @@ export default function ProductForm() {
         };
 
         try {
-            // Uncomment to wire up to real API:
-            // await fetch('/api/products', { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' } });
-            console.log("Payload →", payload);
-            await new Promise((r) => setTimeout(r, 1200)); // Simulate network
+            const response = await fetch(`${VENDOR_BASE_URL}/products`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: {
+                    ...payload,
+                    vendor_id: ''
+                }
+            });
+            if (!response.ok) {
+                throw new Error("Failed to create product");
+            }
             setSubmitStatus("success");
             setTimeout(() => setSubmitStatus("idle"), 3000);
         } catch {

@@ -23,7 +23,7 @@ export default function Products() {
         <>
             <main>
                 <div className="flex gap-6 my-6 justify-end">
-                    <Link className="rounded-xl bg-black text-white px-4 py-2" href="/vendor/products/productForm">+ Add New Product</Link>
+                    <Link className="rounded-xl bg-black text-white px-4 py-2" href="products/productForm">+ Add New Product</Link>
                     <button className="rounded-xl bg-blue-500 text-white px-4 py-2"> Export CSV</button>
                 </div>
                 <div className={" mt-2 justify-between rounded-2xl flex border-gray-300    items-center  py-2 gap-4   bg-white  filter  "}>

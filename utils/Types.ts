@@ -1,17 +1,24 @@
 ﻿export interface UserProfile {
-  // Core User Data (from 'users' table)
-  user_id: number;
-  company_id: number;
-  user_role_id: number;
-  name: string;
+  company_id: string;
+  vendor_id: string | null;
+  user_id: string;
+  role: string;
   email: string;
   phone: string;
-  profileImgUrl: string;
-  user_status: 'active' | 'suspended' | 'pending';
-  created_at: string;
+  // profileImgUrl: string;
+  // user_status: 'active' | 'suspended' | 'pending';
+  first_name: string;
+  last_name: string;
+  country_code: string
+  phone_number: string
+  store_name: string
+  category: string
+  vendor_status: string
+  joined_at: Date;
+
 
   // Linked Addresses (from 'addresses' table)
-  addresses: Address[];
+  addresses: Address[] | null;
 
   // Active Shopping State
   cart: Cart | null;
@@ -23,7 +30,7 @@
 
 // Supporting Interfaces based on your schema
 export interface Address {
-  address_id: number;
+  address_id: string;
   name?: string;
   address_for: 'home' | 'work' | 'other';
   address_line1: string;
@@ -36,7 +43,7 @@ export interface Address {
 }
 
 export interface Cart {
-  cart_id: number;
+  cart_id: string;
   items: CartItem[];
   created_at: string;
 }
@@ -179,47 +186,47 @@ export enum VendorDocumentType {
 
 
 export interface Vendor {
-    id: string;
-    store_owner_first_name: string;
-    store_owner_last_name: string;
-    store_name: string;
-    store_description: string;
-    category: string;
-    vendor_status: string;
-    is_verified: boolean;
-    created_at: string;
-    updated_at: string;
-    company_id: string;
-    user_id: string;
+  id: string;
+  store_owner_first_name: string;
+  store_owner_last_name: string;
+  store_name: string;
+  store_description: string;
+  category: string;
+  vendor_status: string;
+  is_verified: boolean;
+  created_at: string;
+  updated_at: string;
+  company_id: string;
+  user_id: string;
 }
 
 export interface User {
-    id: string;
-    profile_picture_url: string | null;
-    first_name: string;
-    last_name: string;
-    email: string;
-    country_code: string;
-    phone_number: string;
-    user_status: string;
-    created_at: string;
-    updated_at: string;
-    company_id: string;
-    role_id: string;
+  id: string;
+  profile_picture_url: string | null;
+  first_name: string;
+  last_name: string;
+  email: string;
+  country_code: string;
+  phone_number: string;
+  user_status: string;
+  created_at: string;
+  updated_at: string;
+  company_id: string;
+  role_id: string;
 }
 
 export interface Company {
-    id: string;
-    company_name: string;
-    company_domain: string;
-    company_structure: string;
-    company_status: string;
-    created_at: string;
-    updated_at: string;
+  id: string;
+  company_name: string;
+  company_domain: string;
+  company_structure: string;
+  company_status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface VendorApplication {
-    vendor: Vendor;
-    user: User;
-    company: Company;
+  vendor: Vendor;
+  user: User;
+  company: Company;
 }

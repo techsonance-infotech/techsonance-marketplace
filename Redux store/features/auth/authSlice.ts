@@ -34,7 +34,7 @@ const AUTH_TOKEN = 'authToken';
 
 const initialState: AuthType = {
     isAuthenticated: isClient ? !!localStorage.getItem(AUTH_TOKEN) : false,
-    user: getUserFromLocalStorage() || MockUser, // Load user from localStorage or use mock data for development    
+    user: getUserFromLocalStorage(), // Load user from localStorage or use mock data for development    
     loading: false,
     error: null,
     token: isClient ? localStorage.getItem(AUTH_TOKEN) : null,
