@@ -22,7 +22,15 @@ const getVendorRequests = async () => {
             status: string;
         } = await response.json();
         console.log(resJson.data);
-        return resJson.data.length;
+        let count = 0;
+        if (resJson.data?.length !== undefined) {
+            for (const application of resJson.data) {
+                if (application.company.company_status === 'Pending') {
+                    count++;
+                }
+            }
+        }
+        return count;
     } catch (error) {
         console.error('Error fetching vendor applications:', error);
         return 0;

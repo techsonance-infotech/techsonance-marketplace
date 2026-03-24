@@ -4,17 +4,18 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { passwordValidationSchema } from "@/utils/validation";
-import { BusinessStructure, categoryOptions, COUNTRY_CODES } from "@/constants/common";
+import { BusinessStructure, categoryOptions, COUNTRIES, COUNTRY_CODES } from "@/constants/common";
 import { vendorRegister } from "@/utils/apiClient";
 import { VendorDocumentType, VendorRegisterFormData } from "@/utils/Types";
 import { DynamicIcon } from "lucide-react/dynamic";
 import { RegistrationSuccessModal } from "@/components/vendor/RegistrationSuccessModal";
+import FinancialCompliance from "@/components/vendor/FinancialCompliance";
 
 export default function VendorRegisterPage() {
     const router = useRouter();
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [globalError, setGlobalError] = useState<string | null>(null);
-    const [isLegalDocumentWantToUpload, setIsLegalDocumentWantToUpload] = useState(false);
+    const [countryCode, setCountryCode] = useState("");
     const {
         register,
         handleSubmit,
@@ -41,7 +42,8 @@ export default function VendorRegisterPage() {
         }
     });
 
-    const { fields: documentFields, append: appendDocument, remove: removeDocument } = useFieldArray({ control, name: "documents" });
+    const { fields: financialDocumentFields, append: financialAppendDocument, remove: financialRemoveDocument } = useFieldArray({ control, name: "documents" });
+    const { fields: legalDocumentFields, append: legalAppendDocument, remove: legalRemoveDocument } = useFieldArray({ control, name: "documents" });
     const onSubmit = async (data: VendorRegisterFormData) => {
         setGlobalError(null);
         console.log(data);
@@ -227,39 +229,43 @@ export default function VendorRegisterPage() {
                             </div>
                         </div>
                     </section>
-
+                    <section className="border border-gray-100 bg-white p-6 rounded-2xl w-full shadow-md shadow-gray-100/80 transition-all duration-300">
+                        <h2 className="font-bold text-xl mb-2">Legal & Financial Information</h2>
+                        <p className="text-sm text-gray-500 text-balance mb-4">Mandatory financial information is required for vendor registration.</p>
+                        <label htmlFor="country_code" className="input-label">
+                            Country <span className="text-red-500">*</span>
+                        </label>
+                        <select name="country_code" id="country_code" className="input-select w-full mt-2" onChange={(e) => setCountryCode(e.target.value)}>
+                            <option value="">Select Country</option>
+                            {COUNTRIES.map((country) => (
+                                <option key={country.country_code} value={country.country_code}>
+                                    {country.country_name}
+                                </option>
+                            ))}
+                        </select>
+                        <FinancialCompliance country_code={countryCode} />
+                    </section>
                     {globalError && <p className="text-red-600 text-center text-sm font-medium">{globalError}</p>}
                     {/* Legal Document Upload */}
                     <section className="border border-gray-100 bg-white p-6 rounded-2xl w-full shadow-md shadow-gray-100/80 transition-all duration-300">
                         {/* Toggle Row */}
-                        <label
-                            htmlFor="legal_document_toggle"
-                            className="flex items-center gap-3 cursor-pointer group w-fit"
-                        >
-                            <div className="relative">
-                                <input
-                                    id="legal_document_toggle"
-                                    type="checkbox"
-                                    className="sr-only peer"
-                                    checked={isLegalDocumentWantToUpload}
-                                    onChange={(e) => setIsLegalDocumentWantToUpload(e.target.checked)}
-                                />
-                                <div className="w-10 h-5 bg-gray-200 rounded-full peer-checked:bg-blue-500 transition-colors duration-200" />
-                                <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-5" />
-                            </div>
-                            <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors duration-150 select-none">
-                                Upload legal document now
-                            </span>
-                        </label>
 
+                        <h2 className="text-lg font-bold text-gray-800 mb-4">
+                            Legal & Financial Document Upload
+                        </h2>
+                        <p className="text-sm text-gray-500 mb-6  w-full">
+                            Uploading legal and financial documents required for verification and compliance. Please ensure all documents are clear and legible.
+                        </p>
                         {/* Document Upload Panel */}
-                        {isLegalDocumentWantToUpload && (
-                            <div className="mt-5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <div className="flex items-center justify-between">
+
+                        <div className="mt-5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 flex flex-wrap justify-between gap-2">
+                            {/* Legal Documents */}
+                            <div className="w-full pb-3 border-b-2 border-b-black/10">
+                                <div className="flex items-center justify-between  mb-2">
                                     <p className={`input-label mb-0`}>Legal Documents</p>
                                     <button
                                         type="button"
-                                        onClick={() => appendDocument({ document: undefined, document_type: undefined })}
+                                        onClick={() => legalAppendDocument({ document: undefined, document_type: undefined })}
                                         className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors duration-150"
                                     >
                                         <DynamicIcon name="plus" className="w-3.5 h-3.5" />
@@ -267,16 +273,15 @@ export default function VendorRegisterPage() {
                                     </button>
                                 </div>
 
-                                {documentFields.length === 0 && (
+                                {legalDocumentFields.length === 0 && (
                                     <div className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-gray-400">
                                         <DynamicIcon name="file-text" className="w-8 h-8 mb-2 opacity-40" />
                                         <p className="text-sm">No documents added yet</p>
                                         <p className="text-xs mt-0.5">Click "Add Document" to get started</p>
                                     </div>
                                 )}
-
                                 <div className="flex flex-col gap-3">
-                                    {documentFields.map((field, index) => (
+                                    {legalDocumentFields.map((field, index) => (
                                         <div
                                             key={field.id}
                                             className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl p-3 group hover:border-blue-200 hover:bg-blue-50/30 transition-all duration-150"
@@ -300,15 +305,15 @@ export default function VendorRegisterPage() {
                                                 {...register(`documents.${index}.document_type` as const, { required: "Please select a document type" })}
                                             >
                                                 <option value="" disabled>Select type</option>
-                                                {Object.values(VendorDocumentType).map((type) => (
-                                                    <option key={type} value={type}>{type}</option>
+                                                {VendorDocumentType.map((type) => (
+                                                    <option key={type.value} value={type.value}>{type.label}</option>
                                                 ))}
                                             </select>
 
                                             {/* Remove button */}
                                             <button
                                                 type="button"
-                                                onClick={() => removeDocument(index)}
+                                                onClick={() => legalRemoveDocument(index)}
                                                 className="shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-150"
                                                 title="Remove document"
                                             >
@@ -318,7 +323,77 @@ export default function VendorRegisterPage() {
                                     ))}
                                 </div>
                             </div>
-                        )}
+                            {/* Financial Documents */}
+                            <div className="w-full">
+                                <div className="flex items-center justify-between mb-2">
+                                    <p className={`input-label mb-0`}>Financial Documents</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => financialAppendDocument({ document: undefined, document_type: undefined })}
+                                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors duration-150"
+                                    >
+                                        <DynamicIcon name="plus" className="w-3.5 h-3.5" />
+                                        Add Document
+                                    </button>
+                                </div>
+
+                                {financialDocumentFields.length === 0 && (
+                                    <div className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-gray-400">
+                                        <DynamicIcon name="file-text" className="w-8 h-8 mb-2 opacity-40" />
+                                        <p className="text-sm">No documents added yet</p>
+                                        <p className="text-xs mt-0.5">Click "Add Document" to get started</p>
+                                    </div>
+                                )}
+                                <div className="flex flex-col gap-3">
+                                    {financialDocumentFields.map((field, index) => (
+                                        <div
+                                            key={field.id}
+                                            className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl p-3 group hover:border-blue-200 hover:bg-blue-50/30 transition-all duration-150"
+                                        >
+                                            {/* File number badge */}
+                                            <span className="shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors duration-150">
+                                                {index + 1}
+                                            </span>
+
+                                            {/* File input */}
+                                            <input
+                                                type="file"
+                                                className="block text-sm text-gray-500 file:mr-3 file:py-1 file:px-1 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-white file:text-gray-700 file:shadow-sm file:border-gray-200 hover:file:bg-gray-50 cursor-pointer flex-1 min-w-0"
+                                                {...register(`documents.${index}.document` as const, { required: "Please upload a document" })}
+                                            />
+
+                                            {/* Document type select */}
+                                            <select
+                                                id="document_type"
+                                                className="text-sm text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all duration-150 shrink-0"
+                                                {...register(`documents.${index}.document_type` as const, { required: "Please select a document type" })}
+                                            >
+                                                <option value="" disabled>Select type</option>
+                                                {countryCode ?
+                                                    COUNTRIES.find((c) => c.country_code === countryCode)?.fields.map((field) => (
+                                                        <option key={field.id} value={field.id}>{field.label}</option>
+                                                    ))
+                                                    :
+                                                    <option value="" disabled>No document types available or country not selected</option>
+
+                                                }
+                                            </select>
+
+                                            {/* Remove button */}
+                                            <button
+                                                type="button"
+                                                onClick={() => financialRemoveDocument(index)}
+                                                className="shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-150"
+                                                title="Remove document"
+                                            >
+                                                <DynamicIcon name="trash" className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
                     </section>
                     {/* Actions */}
                     <div className="flex gap-4 justify-end mb-4">

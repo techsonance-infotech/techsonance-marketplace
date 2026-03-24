@@ -3,7 +3,7 @@ import { Sidebar } from "@/components/common/Sidebar";
 import { VENDOR_NAV_LINKS } from "@/constants/vendor";
 import { useIsSidebarOpen } from "@/utils/sideBarCheck";
 import { useParams } from "next/navigation";
-
+import './index.css';
 export default function VendorLayout({ children }: { children: React.ReactNode }) {
     const { vendorId } = useParams();
     return (

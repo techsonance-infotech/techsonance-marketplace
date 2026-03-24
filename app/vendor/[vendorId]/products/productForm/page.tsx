@@ -1,14 +1,33 @@
 'use client';
 import { useFieldArray, useForm } from "react-hook-form";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Trash2, Plus, UploadCloud, RefreshCw, Package, Tag, Image, Building2, ChevronDown, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import { VENDOR_BASE_URL } from "@/constants";
 import { useSelector } from "react-redux";
-
+import { BASE_API_URL } from "@/constants/constants";
 type Feature = { title: string; description: string };
 type Option = { name: string; values: string };
 type Variant = { attributes: Record<string, string>; sku: string; price: number; stock: number };
-
+const organizationTaxationFields =
+    [
+        {
+            name: "status",
+            label: "Status",
+            options: [
+                { value: "active", label: "Active" },
+                { value: "inactive", label: "Inactive" },
+                { value: "draft", label: "Draft" },
+            ],
+        },
+        {
+            name: "taxProfile",
+            label: "Tax Profile",
+            options: [
+                { value: "standard", label: "GST Standard (18%)" },
+                { value: "reduced", label: "GST Reduced (5%)" },
+                { value: "zero", label: "Zero Rated (0%)" },
+            ],
+        },
+    ];
 type ProductFormValues = {
     productName: string;
     description: string;
@@ -58,17 +77,31 @@ export default function ProductForm() {
     const { fields: featureFields, append: appendFeature, remove: removeFeature } = useFieldArray({ control, name: "features" });
     const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({ control, name: "options" });
     const { fields: variantFields, remove: removeVariant } = useFieldArray({ control, name: "variants" });
-
+    const { user } = useSelector((state: any) => state.auth);
+    const [productFiles, setProductFiles] = useState<File[]>([]);
+    const [featureFiles, setFeatureFiles] = useState<File[]>([]);
+    const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
     const hasVariants = watch("hasVariants");
     const options = watch("options");
     const basePrice = watch("basePrice");
     const variants = watch("variants");
-    const { user } = useSelector((state: any) => state.auth);
-    
-    const [productFiles, setProductFiles] = useState<File[]>([]);
-    const [featureFiles, setFeatureFiles] = useState<File[]>([]);
-    const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+    const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([]);
+    const [categoriesLoading, setCategoriesLoading] = useState(true);  // ← add this
 
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch(`${BASE_API_URL}categories`);
+                const data = await response.json();
+                setCategoryOptions(data.map((cat: any) => ({ value: cat.id, label: cat.name })));
+            } catch (error) {
+                console.error('Failed to load categories', error);
+            } finally {
+                setCategoriesLoading(false);  // ← always set false
+            }
+        };
+        fetchCategories();
+    }, []);
     // --- Unified file handler ---
     const handleFileSelect = (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -121,6 +154,16 @@ export default function ProductForm() {
 
     // --- Submit ---
     const onSubmit = async (data: ProductFormValues) => {
+        // Guard checks FIRST, before building FormData
+        if (productFiles.length === 0 || featureFiles.length === 0) {
+            setSubmitStatus("error");
+            return;
+        }
+        if (!user || !user.vendor_id || !user.company_id) {
+            setSubmitStatus("error");
+            return;
+        }
+
         const totalStock = data.hasVariants
             ? data.variants.reduce((sum, v) => sum + Number(v.stock), 0)
             : Number(data.stocks);
@@ -130,42 +173,43 @@ export default function ProductForm() {
             description: data.description,
             features: data.features,
             category_id: data.category,
-            status: data.status,
+            status: data.status.toLowerCase(),
             tax_profile: data.taxProfile,
-            base_price: Number(data.basePrice),
-            discount_percent: Number(data.discountPercent),
+            base_price: String(data.basePrice),
+            discount_percent: String(data.discountPercent),
             stock_quantity: totalStock,
-            sku: data.hasVariants ? null : data.sku,
-            variants: data.hasVariants ? data.variants : [],
+            has_variants: data.hasVariants,
+            sku: data.hasVariants ? undefined : data.sku,
+            variants: data.hasVariants
+                ? data.variants.map(v => ({
+                    ...v,
+                    stock_quantity: v.stock,
+                    price: v.price,
+                }))
+                : [],
         };
 
+        const formData = new FormData();
+        productFiles.forEach((file) => formData.append('product', file));
+        featureFiles.forEach((file) => formData.append('product_spec', file));
+        formData.append('product_data', JSON.stringify(payload));
+        formData.append('vendor_id', user.vendor_id);
+        formData.append('company_id', user.company_id);
+        console.log(formData.getAll('product'));
+        console.log(formData.getAll('product_spec'));
+        console.log(formData.getAll('product_data'));
         try {
-            const response = await fetch(`${VENDOR_BASE_URL}/products`, {
+            const response = await fetch(`${BASE_API_URL}products`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: {
-                    ...payload,
-                    vendor_id: ''
-                }
+                body: formData,
             });
-            if (!response.ok) {
-                throw new Error("Failed to create product");
-            }
+            if (!response.status) throw new Error("Failed to create product");
             setSubmitStatus("success");
-            setTimeout(() => setSubmitStatus("idle"), 3000);
         } catch {
             setSubmitStatus("error");
-            setTimeout(() => setSubmitStatus("idle"), 3000);
         }
     };
 
-    const inputCls =
-        "w-full border border-slate-200 rounded-lg px-4 py-2.5 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-sm text-slate-800 placeholder:text-slate-400";
-    const labelCls = "block mb-1.5 text-sm font-semibold text-slate-700";
-    const sectionCls = "border border-slate-200 rounded-2xl bg-white mb-6 shadow-sm overflow-hidden";
-    const sectionHeaderCls = "flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/70";
 
     return (
         <main className="min-h-screen  py-8 ">
@@ -178,7 +222,7 @@ export default function ProductForm() {
                             <h1 className="text-2xl font-bold text-slate-900">Create New Product</h1>
                             <p className="text-sm text-slate-500 mt-0.5">Fill in the details below to list a new product.</p>
                         </div>
-                        <div className="flex items-center gap-3 flex-wrap">
+                        {/* <div className="flex items-center gap-3 flex-wrap">
                             {submitStatus === "success" && (
                                 <span className="flex items-center gap-1.5 text-sm text-emerald-600 font-medium">
                                     <CheckCircle2 size={16} /> Published!
@@ -195,35 +239,34 @@ export default function ProductForm() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex items-center gap-2 bg-indigo-600 text-white text-sm font-semibold py-2.5 px-6 rounded-xl hover:bg-indigo-700 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                                className="flex items-center gap-2 bg-blue-600 text-white text-sm font-semibold py-2.5 px-6 rounded-xl hover:bg-blue-700 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                                 {isSubmitting ? <><Loader2 size={15} className="animate-spin" /> Publishing…</> : "Publish Product"}
                             </button>
-                        </div>
+                        </div> */}
                     </header>
 
-                    {/* ── 1. GENERAL INFORMATION ── */}
-                    <div className={sectionCls}>
-                        <div className={sectionHeaderCls}>
+                    <div className={"section"}>
+                        <div className={"section_header"}>
                             <Package size={18} className="text-indigo-500" />
                             <h2 className="text-base font-semibold text-slate-800">General Information</h2>
                         </div>
                         <div className="p-6 space-y-5">
                             <div>
-                                <label className={labelCls}>Product Name <span className="text-red-400">*</span></label>
+                                <label className={"form_label"}>Product Name <span className="text-red-400">*</span></label>
                                 <input
                                     type="text"
-                                    className={inputCls}
+                                    className={'form_input'}
                                     placeholder="e.g. Classic Cotton T-Shirt"
                                     {...register("productName", { required: "Product name is required" })}
                                 />
                                 {errors.productName && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12} />{errors.productName.message}</p>}
                             </div>
                             <div>
-                                <label className={labelCls}>Description <span className="text-red-400">*</span></label>
+                                <label className={"form_label"}>Description <span className="text-red-400">*</span></label>
                                 <textarea
                                     rows={4}
-                                    className={inputCls}
+                                    className={"form_input"}
                                     placeholder="Describe your product…"
                                     {...register("description", { required: "Description is required" })}
                                 />
@@ -237,7 +280,7 @@ export default function ProductForm() {
                                     <button
                                         type="button"
                                         onClick={() => appendFeature({ title: "", description: "" })}
-                                        className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 border border-indigo-200 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition"
+                                        className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 border border-blue-200 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition"
                                     >
                                         <Plus size={14} /> Add Feature
                                     </button>
@@ -256,7 +299,7 @@ export default function ProductForm() {
                                                 <label className="block text-xs font-semibold text-slate-600 mb-1">Feature Title</label>
                                                 <input
                                                     type="text"
-                                                    className={inputCls}
+                                                    className={'form_input'}
                                                     placeholder="e.g. Waterproof"
                                                     {...register(`features.${index}.title`, { required: "Required" })}
                                                 />
@@ -265,7 +308,7 @@ export default function ProductForm() {
                                                 <label className="block text-xs font-semibold text-slate-600 mb-1">Details</label>
                                                 <textarea
                                                     rows={2}
-                                                    className={inputCls}
+                                                    className={"form_input"}
                                                     placeholder="Feature description…"
                                                     {...register(`features.${index}.description`, { required: "Required" })}
                                                 />
@@ -278,22 +321,22 @@ export default function ProductForm() {
                     </div>
 
                     {/* ── 2. PRICING, INVENTORY & VARIANTS ── */}
-                    <div className={sectionCls}>
-                        <div className={sectionHeaderCls}>
-                            <Tag size={18} className="text-indigo-500" />
+                    <div className={"section"}>
+                        <div className={"section_header"}>
+                            <Tag size={18} className="text-blue-500" />
                             <h2 className="text-base font-semibold text-slate-800">Pricing & Inventory</h2>
                         </div>
                         <div className="p-6">
                             <div className="flex flex-wrap gap-5 mb-6">
                                 <div className="flex-1 min-w-[180px]">
-                                    <label className={labelCls}>Base Price (₹) <span className="text-red-400">*</span></label>
+                                    <label className={'form_label'}>Base Price (₹) <span className="text-red-400">*</span></label>
                                     <div className="relative">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">₹</span>
                                         <input
                                             type="number"
                                             step="0.01"
                                             min={0}
-                                            className={`${inputCls} pl-7`}
+                                            className={`my-1 border-2 border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500  w-full bg-white focus:border-blue-500 outline-none transition text-sm text-slate-800 placeholder:text-slate-400 pl-7`}
                                             placeholder="0.00"
                                             {...register("basePrice", { required: "Required", min: { value: 0, message: "Must be ≥ 0" } })}
                                         />
@@ -301,12 +344,12 @@ export default function ProductForm() {
                                     {errors.basePrice && <p className="text-red-500 text-xs mt-1">{errors.basePrice.message}</p>}
                                 </div>
                                 <div className="flex-1 min-w-[180px]">
-                                    <label className={labelCls}>Discount (%)</label>
+                                    <label className={"form_label"}>Discount (%)</label>
                                     <input
                                         type="number"
                                         min={0}
                                         max={100}
-                                        className={inputCls}
+                                        className={"form_input"}
                                         placeholder="0"
                                         {...register("discountPercent", { min: 0, max: 100 })}
                                     />
@@ -314,12 +357,12 @@ export default function ProductForm() {
                                 {!hasVariants && (
                                     <>
                                         <div className="flex-1 min-w-[180px]">
-                                            <label className={labelCls}>Stock Quantity</label>
-                                            <input type="number" min={0} className={inputCls} placeholder="0" {...register("stocks", { min: 0 })} />
+                                            <label className={"form_label"}>Stock Quantity</label>
+                                            <input type="number" min={0} className={"form_input"} placeholder="0" {...register("stocks", { min: 0 })} />
                                         </div>
                                         <div className="flex-1 min-w-[180px]">
-                                            <label className={labelCls}>SKU</label>
-                                            <input type="text" className={inputCls} placeholder="e.g. SHIRT-001" {...register("sku")} />
+                                            <label className={"form_label"}>SKU</label>
+                                            <input type="text" className={"form_input"} placeholder="e.g. SHIRT-001" {...register("sku")} />
                                         </div>
                                     </>
                                 )}
@@ -330,24 +373,24 @@ export default function ProductForm() {
                                 <label className="flex items-center gap-3 cursor-pointer select-none w-fit group">
                                     <div className="relative">
                                         <input type="checkbox" className="sr-only peer" {...register("hasVariants")} />
-                                        <div className="w-11 h-6 bg-slate-200 peer-checked:bg-indigo-600 rounded-full transition-colors" />
+                                        <div className="w-11 h-6 bg-slate-200 peer-checked:bg-blue-600 rounded-full transition-colors" />
                                         <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5" />
                                     </div>
                                     <span className="text-sm font-semibold text-slate-700">This product has variants (size, color, etc.)</span>
                                 </label>
 
                                 {hasVariants && (
-                                    <div className="mt-6 bg-indigo-50/40 rounded-xl border border-indigo-100 p-5">
-                                        <h3 className="text-sm font-bold text-indigo-900 mb-4">Step 1 — Define Options</h3>
+                                    <div className="mt-6 bg-blue-50/40 rounded-xl border border-blue-100 p-5">
+                                        <h3 className="text-sm font-bold text-blue-900 mb-4">Step 1 — Define Options</h3>
                                         {optionFields.map((field, index) => (
                                             <div key={field.id} className="flex flex-wrap md:flex-nowrap gap-3 mb-3 items-end">
                                                 <div className="flex-1 min-w-[140px]">
                                                     <label className="block text-xs font-semibold text-slate-600 mb-1">Option Name</label>
-                                                    <input type="text" placeholder="e.g. Color" className={inputCls} {...register(`options.${index}.name`)} />
+                                                    <input type="text" placeholder="e.g. Color" className={'form_input'} {...register(`options.${index}.name`)} />
                                                 </div>
                                                 <div className="flex-[2] min-w-[220px]">
                                                     <label className="block text-xs font-semibold text-slate-600 mb-1">Values (comma-separated)</label>
-                                                    <input type="text" placeholder="e.g. Red, Blue, Green" className={inputCls} {...register(`options.${index}.values`)} />
+                                                    <input type="text" placeholder="e.g. Red, Blue, Green" className={"form_input"} {...register(`options.${index}.values`)} />
                                                 </div>
                                                 <button
                                                     type="button"
@@ -364,14 +407,14 @@ export default function ProductForm() {
                                             <button
                                                 type="button"
                                                 onClick={() => appendOption({ name: "", values: "" })}
-                                                className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:underline"
+                                                className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline"
                                             >
                                                 <Plus size={14} /> Add another option
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={generateVariantMatrix}
-                                                className="flex items-center gap-2 bg-indigo-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition shadow-sm"
+                                                className="flex items-center gap-2 bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-700 transition shadow-sm"
                                             >
                                                 <RefreshCw size={14} /> Generate Matrix
                                             </button>
@@ -407,7 +450,7 @@ export default function ProductForm() {
                                                                                     type="number"
                                                                                     step="0.01"
                                                                                     min={0}
-                                                                                    className="w-28 pl-6 pr-2 py-1.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+                                                                                    className="w-28 pl-6 pr-2 py-1.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                                                                                     {...register(`variants.${index}.price`)}
                                                                                 />
                                                                             </div>
@@ -416,14 +459,14 @@ export default function ProductForm() {
                                                                             <input
                                                                                 type="number"
                                                                                 min={0}
-                                                                                className="w-24 px-3 py-1.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+                                                                                className="w-24 px-3 py-1.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                                                                                 {...register(`variants.${index}.stock`)}
                                                                             />
                                                                         </td>
                                                                         <td className="px-4 py-2">
                                                                             <input
                                                                                 type="text"
-                                                                                className="w-36 px-3 py-1.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition font-mono"
+                                                                                className="w-36 px-3 py-1.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition font-mono"
                                                                                 {...register(`variants.${index}.sku`)}
                                                                             />
                                                                         </td>
@@ -440,7 +483,7 @@ export default function ProductForm() {
                                                                 );
                                                             })}
                                                         </tbody>
-                                                        {variants.length > 0 && (
+                                                        {/* {variants.length > 0 && (
                                                             <tfoot>
                                                                 <tr className="bg-slate-50 text-xs text-slate-500">
                                                                     <td className="px-4 py-2.5 font-semibold" colSpan={2}>Total Stock</td>
@@ -450,7 +493,7 @@ export default function ProductForm() {
                                                                     <td colSpan={2} />
                                                                 </tr>
                                                             </tfoot>
-                                                        )}
+                                                        )} */}
                                                     </table>
                                                 </div>
                                             </div>
@@ -462,8 +505,8 @@ export default function ProductForm() {
                     </div>
 
                     {/* ── 3. MEDIA ── */}
-                    <div className={sectionCls}>
-                        <div className={sectionHeaderCls}>
+                    <div className={"section"}>
+                        <div className={"section_header"}>
                             <Image size={18} className="text-indigo-500" />
                             <h2 className="text-base font-semibold text-slate-800">Media</h2>
                         </div>
@@ -476,7 +519,7 @@ export default function ProductForm() {
                             ).map(({ label, files, setFiles, fieldName }) => (
                                 <div key={fieldName} className="border border-slate-200 rounded-xl p-4 bg-slate-50">
                                     <h3 className="text-sm font-semibold text-slate-700 mb-3">{label}</h3>
-                                    <label className="flex flex-col items-center justify-center h-36 border-2 border-dashed border-indigo-300 bg-indigo-50/30 rounded-xl cursor-pointer hover:bg-indigo-50 transition group">
+                                    <label className="flex flex-col items-center justify-center h-36 border-2 border-dashed border-blue-300 bg-blue-50/30 rounded-xl cursor-pointer hover:bg-blue-50 transition group">
                                         <input
                                             type="file"
                                             multiple
@@ -484,8 +527,8 @@ export default function ProductForm() {
                                             className="hidden"
                                             onChange={(e) => handleFileSelect(e, files, setFiles as any, fieldName)}
                                         />
-                                        <UploadCloud size={32} className="text-indigo-400 group-hover:text-indigo-600 transition mb-2" />
-                                        <p className="text-xs font-semibold text-indigo-500 group-hover:text-indigo-700">Click to upload</p>
+                                        <UploadCloud size={32} className="text-blue-400 group-hover:text-blue-600 transition mb-2" />
+                                        <p className="text-xs font-semibold text-blue-500 group-hover:text-blue-700">Click to upload</p>
                                         <p className="text-xs text-slate-400 mt-0.5">PNG, JPG, MP4 up to 10MB</p>
                                     </label>
                                     {files.length > 0 && (
@@ -510,49 +553,42 @@ export default function ProductForm() {
                     </div>
 
                     {/* ── 4. ORGANIZATION & TAXATION ── */}
-                    <div className={sectionCls}>
-                        <div className={sectionHeaderCls}>
-                            <Building2 size={18} className="text-indigo-500" />
+                    <div className={"section"}>
+                        <div className={"section_header"}>
+                            <Building2 size={18} className="text-blue-500" />
                             <h2 className="text-base font-semibold text-slate-800">Organization & Taxation (GST)</h2>
                         </div>
                         <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {[
-                                {
-                                    name: "category" as const,
-                                    label: "Category",
-                                    options: [
-                                        { value: "electronic", label: "Electronics" },
-                                        { value: "fashion", label: "Fashion" },
-                                        { value: "home_appliance", label: "Home Appliances" },
-                                        { value: "books", label: "Books" },
-                                        { value: "sports", label: "Sports" },
-                                    ],
-                                },
-                                {
-                                    name: "status" as const,
-                                    label: "Status",
-                                    options: [
-                                        { value: "Active", label: "Active" },
-                                        { value: "Inactive", label: "Inactive" },
-                                        { value: "Draft", label: "Draft" },
-                                    ],
-                                },
-                                {
-                                    name: "taxProfile" as const,
-                                    label: "Tax Profile",
-                                    options: [
-                                        { value: "standard", label: "GST Standard (18%)" },
-                                        { value: "reduced", label: "GST Reduced (5%)" },
-                                        { value: "zero", label: "Zero Rated (0%)" },
-                                    ],
-                                },
-                            ].map(({ name, label, options: opts }) => (
+                            <div>
+                                <label className="form_label">Category <span className="text-red-400">*</span></label>
+                                <div className="relative">
+                                    <select
+                                        {...register("category", { required: "Required" })}
+                                        disabled={categoriesLoading}
+                                        className="form_input appearance-none pr-9 disabled:opacity-50"
+                                    >
+                                        <option value="">
+                                            {categoriesLoading ? "Loading categories…" : "Select Category"}
+                                        </option>
+                                        {categoryOptions.map((c) => (
+                                            <option key={c.value} value={c.value}>{c.label}</option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                                </div>
+                                {errors.category && (
+                                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                        <AlertCircle size={12} />{errors.category.message}
+                                    </p>
+                                )}
+                            </div>
+                            {organizationTaxationFields.map(({ name, label, options: opts }) => (
                                 <div key={name}>
-                                    <label className={labelCls}>{label} <span className="text-red-400">*</span></label>
+                                    <label className={'form_label'}>{label} <span className="text-red-400">*</span></label>
                                     <div className="relative">
                                         <select
                                             {...register(name, { required: "Required" })}
-                                            className={`${inputCls} appearance-none pr-9`}
+                                            className={`form_input appearance-none pr-9`}
                                         >
                                             <option value="">Select {label}</option>
                                             {opts.map((o) => (
@@ -575,7 +611,7 @@ export default function ProductForm() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex items-center gap-2 bg-indigo-600 text-white text-sm font-semibold py-2.5 px-8 rounded-xl hover:bg-indigo-700 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 bg-blue-600 text-white text-sm font-semibold py-2.5 px-8 rounded-xl hover:bg-blue-700 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             {isSubmitting ? <><Loader2 size={15} className="animate-spin" /> Publishing…</> : "Publish Product"}
                         </button>

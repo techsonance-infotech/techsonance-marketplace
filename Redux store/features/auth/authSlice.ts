@@ -1,14 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { RoleDefinition, UserProfile, UserRole } from '../../../utils/Types';
-import { MockUser } from '@/utils/customer/constants';
 
 const isClient = typeof window !== 'undefined';
-
-
+const AUTH_TOKEN = 'authToken';
+const USER_STORAGE_KEY = 'user';
 const getUserFromLocalStorage = () => {
     if (!isClient) return null;
     try {
-        const serializedUser = localStorage.getItem('user');
+        const serializedUser = localStorage.getItem(USER_STORAGE_KEY);
         if (serializedUser) {
             return JSON.parse(serializedUser);
         } else {
@@ -23,18 +22,17 @@ const getUserFromLocalStorage = () => {
 
 export interface AuthType {
     isAuthenticated: boolean;
-    user: UserProfile | null;
+    user: Partial<UserProfile> | null;
     loading: boolean;
     error: string | null;
     token: string | null;
     role: UserRole;
 }
 
-const AUTH_TOKEN = 'authToken';
 
 const initialState: AuthType = {
     isAuthenticated: isClient ? !!localStorage.getItem(AUTH_TOKEN) : false,
-    user: getUserFromLocalStorage(), // Load user from localStorage or use mock data for development    
+    user: getUserFromLocalStorage(), // Load user from localStorage if available
     loading: false,
     error: null,
     token: isClient ? localStorage.getItem(AUTH_TOKEN) : null,
@@ -53,7 +51,7 @@ const authSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
-        loginSuccess(state, action: { payload: { user: UserProfile, token: string, role: UserRole } }) {
+        loginSuccess(state, action: { payload: { user: any, token: string, role: UserRole } }) {
             state.isAuthenticated = true;
             state.user = action.payload.user;
             state.token = action.payload.token;
@@ -61,6 +59,7 @@ const authSlice = createSlice({
             state.loading = false;
             state.error = null;
             if (isClient) {
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(action.payload.user));
                 localStorage.setItem(AUTH_TOKEN, action.payload.token);
             }
         },
@@ -72,7 +71,7 @@ const authSlice = createSlice({
             state.error = null;
             if (isClient) {
                 localStorage.removeItem(AUTH_TOKEN);
-                localStorage.removeItem('user');
+                localStorage.removeItem(USER_STORAGE_KEY);
                 localStorage.removeItem('cart');
             }
         },

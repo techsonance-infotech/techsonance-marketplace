@@ -168,22 +168,52 @@ export interface VendorRegisterFormData {
   password: string | null;
   confirm_password: string | null;
   documents?: [{
-    document_type: VendorDocumentType | null;
+    document_type: string | null;
     document: string | null;
   }];
 }
 
-export enum VendorDocumentType {
-  BusinessRegistration = 'business_registration',
-  FinancialStatements = 'financial_statements',
-  InsuranceCoverage = 'insurance_coverage',
-  ComplianceCertifications = 'compliance_certifications',
-  SecurityDocumentation = 'security_documentation',
-  ContractAgreements = 'contract_agreements',
-  VendorInformation = 'vendor_information',
-  BusinessContinuityPlan = 'business_continuity_plan',
-}
 
+export const VendorDocumentType: { label: string; value: string }[] = [
+  {
+    label: 'Business Registration',
+    value: 'business_registration'
+  },
+  {
+    label: 'Financial Statements',
+    value: 'financial_statements'
+  },
+  {
+    label: 'Insurance Coverage',
+    value: 'insurance_coverage'
+  }
+  ,
+  {
+    label: 'Compliance Certifications',
+    value: 'compliance_certifications'
+  }
+  ,
+  {
+    label: 'Security Documentation',
+    value: 'security_documentation'
+  }
+  ,
+  {
+    label: 'Contract Agreements', 
+    value: 'contract_agreements'  
+  }
+  ,
+  {
+    label: 'Vendor Information',
+    value: 'vendor_information'
+  } 
+  ,
+  {
+    label: 'Business Continuity Plan',
+    value: 'business_continuity_plan'
+  }
+
+]
 
 export interface Vendor {
   id: string;
