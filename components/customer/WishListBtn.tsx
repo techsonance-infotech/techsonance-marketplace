@@ -13,13 +13,13 @@ export function WishListBtn({ productId, styles, iconSize }: { productId?: strin
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
   const iconSizeValue = iconSize || (isMobile ? 28 : 32);
   const router = useRouter();
-  
+
   const handleAddToWishlist = () => {
-    if (!user) {
+    if (!user.user_role || user.user_role.toLowerCase() !== 'customer') {
       router.push('/auth/customerLogin');
       return;
     }
-    
+
     if (isAlreadyInWishlist) {
       dispatch(removeFromWishlist(productId));
       console.log(`Removing product ${productId} from wishlist`);

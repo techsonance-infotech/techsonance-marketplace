@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import { useEffect, useState } from 'react';
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { useMediaQuery } from 'react-responsive'
@@ -23,15 +23,18 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const wishlistCount = wishItems.length;
     const path = usePathname();
-    const [isMounted, setIsMounted] = React.useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         setIsMounted(true);
     }, []);
+
+    const showUserContent = isMounted && user;
 
     if (path.startsWith('/admin') || path.startsWith('/vendor') || path.includes('checkout') || path.includes('cart') || path.includes('wishlist') || path.includes('orders') || path.includes('changePassword') || path.includes('address') || path.includes('customerProfile')) {
         return <></>
     }
+
     if (isTabletOrMobile) {
         return (
             <nav className="flex justify-between items-center  align-middle  px-4 py-2 h-16   ">
@@ -82,13 +85,16 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
                 </div>
                 {path === '/customerRegister' || path === '/customerLogin' || path.includes('/customerProfile') ? null :
                     <div className="  flex gap-6 items-center ">
-                        <Link href={'/customerProfile/' + (user?.user_id || '') + '/wishlist'} className="relative  ">
-                            {isMounted && wishlistCount > 0 ? <motion.span
-                                key={wishlistCount}
-                                initial={{ scale: 1.2, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }} className="  absolute -top-2 -right-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center" >{wishlistCount}</motion.span> : null}
-                            <Heart size={38} color={isMounted && wishlistCount > 0 ? "pink" : "black"} fill={isMounted && wishlistCount > 0 ? "pink" : "none"} />
-                        </Link>
+                        {showUserContent ?
+                            <Link href={'/customerProfile' + (`/${user?.user_id}`) + '/wishlist'} className="relative  ">
+                                {wishlistCount > 0 ? <motion.span
+                                    key={wishlistCount}
+                                    initial={{ scale: 1.2, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }} className="  absolute -top-2 -right-2 text-md bg-red-500 text-white rounded-full  w-6 h-6 flex items-center justify-center" >{wishlistCount}</motion.span> : null}
+                                <Heart size={38} color={isMounted && wishlistCount > 0 ? "pink" : "black"} fill={isMounted && wishlistCount > 0 ? "pink" : "none"} />
+                            </Link>
+                            : ''
+                        }
                         <button onClick={() => dispatch(toggleCartSidebar('open'))} className=" relative" >
                             {isMounted && items.length > 0 && <motion.span key={items.length}
                                 initial={{ scale: 1.2, opacity: 0 }}
@@ -96,7 +102,7 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
                             <ShoppingCart size={38} />
                         </button>
 
-                        <Link href={'/customerProfile/' + (user?.user_id || '')} className=" ">
+                        <Link href={'/customerProfile' + (user?.userId ? `/${user?.user_id}` : '')} className=" ">
                             <img src={userIcon} alt="" className="h-8 w-8 rounded-full" />
                         </Link>
                     </div>}

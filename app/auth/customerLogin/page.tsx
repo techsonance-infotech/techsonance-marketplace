@@ -53,9 +53,9 @@ export default function CustomerLoginPage() {
     };
 
     return (
-        <main className="flex justify-center items-center border h-[100vh]">
+        <main className="flex justify-center items-center  h-[100vh]">
             <img src={CUSTOMER_LOGIN_POSTER} alt="Login poster" className="lg:h-[380px] lg:w-[380px] md:h-[300px] md:w-[300px] rounded-l-[4rem] rounded-r-0" />
-            <form onSubmit={submitHandler} className="flex bg-white flex-col border rounded-xl px-12 py-8 justify-center w-[400px] h-[460px]">
+            <form onSubmit={submitHandler} className="flex bg-white flex-col  rounded-xl px-12 py-8 justify-center w-[400px] h-[460px]">
                 <h1 className="lg:text-[1.5rem] md:text-[1rem] text-center my-1">Welcome</h1>
                 <p className="text-[.7rem] text-slate-600 mb-6 text-center">Welcome back! Find great products.</p>
                 <div className="flex flex-col gap-4 mb-4">

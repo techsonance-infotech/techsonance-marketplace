@@ -11,6 +11,47 @@ import {
   settings_icon,
 } from "./common";
 
+
+export const VendorDocumentTypes: { label: string; value: string }[] = [
+  {
+    label: 'Business Registration',
+    value: 'business_registration'
+  },
+  {
+    label: 'Financial Statements',
+    value: 'financial_statements'
+  },
+  {
+    label: 'Insurance Coverage',
+    value: 'insurance_coverage'
+  }
+  ,
+  {
+    label: 'Compliance Certifications',
+    value: 'compliance_certifications'
+  }
+  ,
+  {
+    label: 'Security Documentation',
+    value: 'security_documentation'
+  }
+  ,
+  {
+    label: 'Contract Agreements',
+    value: 'contract_agreements'
+  }
+  ,
+  {
+    label: 'Vendor Information',
+    value: 'vendor_information'
+  }
+  ,
+  {
+    label: 'Business Continuity Plan',
+    value: 'business_continuity_plan'
+  }
+
+]
 // ============================================================
 // VENDOR NAVIGATION LINKS
 // ============================================================

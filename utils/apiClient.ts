@@ -2,7 +2,6 @@
 import axios from "axios";
 import { UserProfile, UserRole, VendorRegisterFormData } from "./Types";
 import { ADMIN_AUTH_URL, BASE_API_URL, VENDOR_AUTH_URL } from "@/constants/constants";
-import { useDispatch } from "react-redux";
 import { authToken } from "./authToken";
 
 export const vendorLogin = async (data: { email: string, password: string }, dispatch: any) => {
@@ -28,29 +27,17 @@ export const vendorLogin = async (data: { email: string, password: string }, dis
     }
 }
 export const vendorRegister = async (data: VendorRegisterFormData) => {
-
+    console.log("data",data);
     try {
         const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
-        const response = await axios.post(`${VENDOR_AUTH_URL}/register-vendor`, {
-            user_role: "vendor",
-            store_name: data.store_name,
-            phone_number: data.phone_number,
-            store_owner_first_name: data.store_owner_first_name,
-            store_owner_last_name: data.store_owner_last_name,
-            category: data.category,
-            company_domain: data.company_domain,
-            company_structure: data.company_structure,
-            email: data.email,
-            first_name: data.first_name,
-            last_name: data.last_name,
-            hash_password: data.password,
-            country_code: data.country_code,
-        }, {
-            withCredentials: true,
+        const response = await fetch(`${VENDOR_AUTH_URL}/register-vendor`, {
+            method: 'POST',
+            body: data as any,
         });
-        console.log(response.data);
+        const result = await response.json();
+        console.log(result);
         if (response.status === 201) {
-            return { status: true, message: "Registration successful", data: response.data };
+            return { status: true, message: "Registration successful", data: result };
         }
     } catch (error: unknown) {
         console.log('Registration failed. Please try again.', error);

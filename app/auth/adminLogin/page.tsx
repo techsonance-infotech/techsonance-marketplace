@@ -1,5 +1,5 @@
 'use client';
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { loginStart, loginSuccess, loginFailure } from "@/Redux store/features/auth/authSlice";
 import { adminLogin } from "@/utils/apiClient";
@@ -13,11 +13,13 @@ export default function AdminLoginPage() {
     const router = useRouter();
     const storedData = typeof window !== 'undefined' ? localStorage.getItem("auth") : null;
     const auth = storedData ? JSON.parse(storedData) : null;
-    if (auth && auth?.isAuthenticated && auth?.user?.user_role
-        === "admin") {
-        console.log("Already logged in as admin.");
-        router.push(`/admin/${auth.user.id}`);
-    }
+    useEffect(() => {
+        if (auth && auth?.isAuthenticated && auth?.user?.user_role
+            === "admin") {
+            console.log("Already logged in as admin.");
+            router.push(`/admin/${auth.user.id}`);
+        }
+    }, [auth, router]); 
     const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         dispatch(loginStart());
@@ -34,7 +36,7 @@ export default function AdminLoginPage() {
 
     return (
         <>
-            <main className="flex font-[inter] justify-center items-center border h-[100vh]">
+            <main className="flex font-[inter] justify-center items-center   h-[100vh]">
                 <form onSubmit={submitHandler} className="flex flex-col border rounded-2xl px-9 h-[580px] w-[540px] justify-center">
                     <p className="text-center font-bold text-[1.4rem] text-slate-600">Restricted Access</p>
                     <h1 className="font-bold text-[2rem] text-center mb-6">System Administration</h1>

@@ -130,8 +130,26 @@ export interface ShippingAddress {
 export interface PaymentMethod {
   type: string;
   details: string;
+}export interface BestSellingProductType {
+  title: string;
+  url: string;
+  description: string;
+  satisfaction: string;
+}
+export interface CATEGORY_LIST_TYPE {
+  title: string;
+  url: string;
 }
 
+export interface FeedbackType {
+  customerName: string;
+  feedback: string;
+  rating: number;
+}
+export interface CATEGORY_LIST_TYPE {
+  title: string;
+  url: string;
+}
 export interface OrderSuccessStatusTypes {
   orderId?: string;
   orderDate?: string;
@@ -153,8 +171,8 @@ export interface OrderFailedStatusTypes {
   possibleReasons?: string[];
 }
 
-export interface VendorRegisterFormData {
-  store_name: string | null;
+export interface VendorRegisterTypes {
+  company_name: string | null;
   first_name: string | null;
   last_name: string | null;
   phone_number: string | null;
@@ -167,53 +185,60 @@ export interface VendorRegisterFormData {
   email: string | null;
   password: string | null;
   confirm_password: string | null;
-  documents?: [{
-    document_type: string | null;
-    document: string | null;
-  }];
+}
+export interface VendorRegisterFormData {
+  vendor: VendorRegisterTypes;
+  documents: File[] | undefined
+
 }
 
+export interface CATEGORY_LIST_TYPE {
+  title: string;
+  url: string;
+}
 
-export const VendorDocumentType: { label: string; value: string }[] = [
-  {
-    label: 'Business Registration',
-    value: 'business_registration'
-  },
-  {
-    label: 'Financial Statements',
-    value: 'financial_statements'
-  },
-  {
-    label: 'Insurance Coverage',
-    value: 'insurance_coverage'
-  }
-  ,
-  {
-    label: 'Compliance Certifications',
-    value: 'compliance_certifications'
-  }
-  ,
-  {
-    label: 'Security Documentation',
-    value: 'security_documentation'
-  }
-  ,
-  {
-    label: 'Contract Agreements', 
-    value: 'contract_agreements'  
-  }
-  ,
-  {
-    label: 'Vendor Information',
-    value: 'vendor_information'
-  } 
-  ,
-  {
-    label: 'Business Continuity Plan',
-    value: 'business_continuity_plan'
-  }
+export interface BestSellingProductType {
+  title: string;
+  url: string;
+  description: string;
+  satisfaction: string;
+}
 
-]
+export interface FeedbackType {
+  customerName: string;
+  feedback: string;
+  rating: number;
+}
+
+export interface ReviewType {
+  id: string;
+  userName: string;
+  rating: number;
+  date: string;
+  comment: string;
+}
+
+export interface PRODUCT_LIST_TYPE {
+  id: string;
+  title: string;
+  price: number;
+  discount: number;
+  category: string;
+  imgUrl: string;
+  description: string;
+  satisfaction: string;
+  rating?: number;
+  reviewCount?: number;
+  productDetails?: {
+    brand: string;
+    model: string;
+    specifications: {
+      [key: string]: string;
+    };
+  };
+  specificationsImgUrl?: string[];
+  reviews?: ReviewType[];
+}
 
 export interface Vendor {
   id: string;
@@ -260,3 +285,42 @@ export interface VendorApplication {
   user: User;
   company: Company;
 }
+export interface NavLinkType {
+  [key: string]: string | null;
+}
+
+export interface FooterLinkType {
+  title: string;
+  url: string;
+  icon?: string;
+  styles?: string;
+  category?: string;
+}
+
+export interface FooterSectionType {
+  header: string;
+  links: FooterLinkType[];
+}
+
+export interface tabLinkType {
+  [key: string]: string | null;
+}
+
+export type FeatureType = { title: string; description: string };
+export type OptionType = { name: string; values: string };
+export type VariantType = { attributes: Record<string, string>; sku: string; price: number; stock: number };
+export type ProductFormValues = {
+  productName: string;
+  description: string;
+  features: FeatureType[];
+  basePrice: number;
+  discountPercent: number;
+  stocks: number;
+  sku: string;
+  has_variants: boolean;
+  productMedia: File[];
+  featureMedia: File[];
+  category: string;
+  status: string;
+  taxProfile: string;
+};

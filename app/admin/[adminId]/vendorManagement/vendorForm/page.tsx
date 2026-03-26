@@ -5,10 +5,11 @@ import { passwordValidationSchema } from "@/utils/validation";
 import Link from "next/link";
 import { BusinessStructure, categoryOptions, COUNTRY_CODES } from "@/constants/common";
 import { useRouter } from "next/navigation";
-import { VendorDocumentType, VendorRegisterFormData } from "@/utils/Types";
+import {  VendorRegisterFormData } from "@/utils/Types";
 import { useState } from "react";
 import { vendorRegister } from "@/utils/apiClient";
 import { DynamicIcon } from "lucide-react/dynamic";
+import { VendorDocumentTypes } from "@/constants";
 
 export default function VendorFormPage() {
     const { register, handleSubmit, watch, reset, control, formState: { errors, isSubmitting }, } = useForm<VendorRegisterFormData>({
@@ -283,7 +284,7 @@ export default function VendorFormPage() {
                                                 {...register(`documents.${index}.document_type` as const, { required: "Please select a document type" })}
                                             >
                                                 <option value="" disabled>Select type</option>
-                                                {Object.values(VendorDocumentType).map((type) => (
+                                                {Object.values(VendorDocumentTypes).map((type) => (
                                                     <option key={type} value={type}>{type}</option>
                                                 ))}
                                             </select>
