@@ -8,7 +8,7 @@ const getUserFromLocalStorage = () => {
     if (!isClient) return null;
     try {
         const serializedUser = localStorage.getItem(USER_STORAGE_KEY);
-        if (serializedUser) {
+        if (serializedUser !==undefined && serializedUser !== null) {
             return JSON.parse(serializedUser);
         } else {
             return null;
@@ -59,7 +59,7 @@ const authSlice = createSlice({
             state.loading = false;
             state.error = null;
             if (isClient) {
-                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(action.payload.user));
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(action.payload));
                 localStorage.setItem(AUTH_TOKEN, action.payload.token);
             }
         },

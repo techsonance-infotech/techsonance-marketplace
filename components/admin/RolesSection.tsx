@@ -49,14 +49,14 @@ export default function RolesSection({ roles, onRefresh }: Props) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g. MODERATOR"
-          className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-gray-500"
+          className="flex-1 border border-gray-300 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:border-gray-500"
         />
-        <button className="border border-gray-300 rounded px-3 py-1.5 text-sm hover:bg-gray-50">
+        <button className="border border-gray-300 rounded-xl px-4 py-1.5  text-sm hover:bg-gray-50">
           Add
         </button>
       </form>
 
-      <div className="divide-y border rounded">
+      <div className="divide-y border-2 border-gray-300 rounded-2xl">
         {roles.length === 0 && (
           <p className="text-xs text-gray-400 p-3">No roles yet.</p>
         )}
@@ -76,7 +76,7 @@ export default function RolesSection({ roles, onRefresh }: Props) {
                 {role.permissions!.map((p) => (
                   <span
                     key={p.id}
-                    className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 rounded px-2 py-0.5"
+                    className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 rounded-2xl px-2 py-0.5"
                   >
                     {p.permission_name}
                     <button

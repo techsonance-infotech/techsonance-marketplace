@@ -19,13 +19,14 @@ export default function AdminLoginPage() {
             console.log("Already logged in as admin.");
             router.push(`/admin/${auth.user.id}`);
         }
-    }, [auth, router]); 
+    }, [auth, router]);
     const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         dispatch(loginStart());
         const result: { status: boolean, message: string, data?: any } = await adminLogin({ admin_id: adminLoginID!, password: adminLoginPass! });
         dispatch(result.status ? loginSuccess(result.data) : loginFailure(result.message));
-        router.replace('/admin');
+        const userId = result.data?.user?.id;
+        router.replace(`/admin/${userId}`);
         if (!result.status) {
             setError(result.message);
         } else {

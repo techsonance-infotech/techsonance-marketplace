@@ -34,12 +34,12 @@ export default function AssignSection({ roles, permissions, onRefresh }: Props) 
           method: "GET",
           headers: { Authorization: `Bearer ${authToken()}` },
         });
-        if (response.status !== 201) {
+        if (response.status !== 200) {
           console.error('Error fetching role permissions:', response.message);
         }
         const data = await response.json();
         console.log("api response role permissions", data);
-        setRolePerms(data.role_permissions);
+        setRolePerms(data.data);
 
       } catch (error) {
         console.error("Error fetching role permissions:", error);
@@ -61,7 +61,7 @@ export default function AssignSection({ roles, permissions, onRefresh }: Props) 
         <select
           value={roleId}
           onChange={(e) => setRoleId(e.target.value)}
-          className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-gray-500"
+          className="flex-1 border border-gray-300 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:border-gray-500"
         >
           <option value="">Select role</option>
           {roles.map((r) => (
@@ -72,7 +72,7 @@ export default function AssignSection({ roles, permissions, onRefresh }: Props) 
         <select
           value={permId}
           onChange={(e) => setPermId(e.target.value)}
-          className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-gray-500"
+          className="flex-1 border border-gray-300 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:border-gray-500"
         >
           <option value="">Select permission</option>
           {permissions.map((p) => (
@@ -85,14 +85,14 @@ export default function AssignSection({ roles, permissions, onRefresh }: Props) 
         <button
           type="submit"
           disabled={!roleId || !permId}
-          className="border border-gray-300 rounded px-3 py-1.5 text-sm hover:bg-gray-50 disabled:opacity-40"
+          className="border border-gray-300 rounded-xl px-4 py-1.5  text-sm hover:bg-gray-50 disabled:opacity-40"
         >
           Assign
         </button>
       </form>
       <section>
         <h3 className="text-xs font-semibold text-gray-600 mt-4 mb-2">Current Assignments</h3>
-        <div className="divide-y border rounded">
+        <div className="divide-y border-2 border-gray-300 rounded-2xl">
           {rolePerms?.map((rp, idx) => (
             <div key={idx} className="px-3 py-2.5">
               <p className="text-sm font-mono text-gray-800">{rp.role}</p>
@@ -101,7 +101,7 @@ export default function AssignSection({ roles, permissions, onRefresh }: Props) 
                   rp.permissions?.map((permission, idx) => (
                     <span
                       key={idx}
-                      className={permission == undefined ? "hidden" : "inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 rounded px-2 py-0.5"}
+                      className={permission == undefined ? "hidden" : "inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 rounded-xl px-2 py-0.5"}
                     >
                       {permission == undefined ? '' : permission}
                     </span>

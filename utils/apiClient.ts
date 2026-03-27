@@ -27,7 +27,7 @@ export const vendorLogin = async (data: { email: string, password: string }, dis
     }
 }
 export const vendorRegister = async (data: VendorRegisterFormData) => {
-    console.log("data",data);
+    console.log("data", data);
     try {
         const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
         const response = await fetch(`${VENDOR_AUTH_URL}/register-vendor`, {
@@ -48,20 +48,30 @@ export const vendorRegister = async (data: VendorRegisterFormData) => {
 export const adminLogin = async (data: { admin_id: string, password: string }) => {
 
     try {
-        const response = await axios.post(`${ADMIN_AUTH_URL}/login`, {
-            email: data.admin_id,
-            password: data.password
-        }, { withCredentials: true });
-        if (response.status !== 201) {
-            const errorMessage = response.data?.message || "Login failed";
+        const response = await fetch(`${ADMIN_AUTH_URL}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: data.admin_id,
+                password: data.password
+            }),
+            credentials: 'include'
+        });
+        const result = await response.json();
+        console.log(result);
+        if (response.status !== 200) {
+            const errorMessage = result.message || "Login failed";
             console.log(errorMessage);
             return { status: false, message: errorMessage };
         }
         const payload: { user: UserProfile, token: string, role: UserRole } = {
-            user: response.data.user,
-            token: response.data.token,
-            role: response.data.user_role as UserRole
+            user: result.data,
+            token: result.data.token,
+            role: result.data.user_role as UserRole
         };
+        console.log(payload);
         return { status: true, message: "Login successful", data: payload };
     } catch (err: any) {
         const errorMessage = err.response?.data?.message || err.message || "Login failed";
@@ -72,7 +82,7 @@ export const adminLogin = async (data: { admin_id: string, password: string }) =
 
 
 export const fetchRoles = async () => {
-    const response = await fetch(`${BASE_API_URL}roles/all`, {
+    const response = await fetch(`${BASE_API_URL}roles`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${authToken()}`,
@@ -81,7 +91,7 @@ export const fetchRoles = async () => {
     if (!response.ok) {
         throw new Error('Failed to fetch roles');
     }
-    return response.json();
+    return await response.json();
 };
 export const fetchPermissions = async () => {
     const response = await fetch(`${BASE_API_URL}permissions`, {
@@ -93,7 +103,7 @@ export const fetchPermissions = async () => {
     if (!response.ok) {
         throw new Error('Failed to fetch permissions');
     }
-    return response.json();
+    return await response.json();
 };
 export const createRole = async (role: string) => {
     const response = await fetch(`${BASE_API_URL}roles/create`, {
@@ -108,7 +118,7 @@ export const createRole = async (role: string) => {
     if (!response.ok) {
         throw new Error('Failed to create role');
     }
-    return response.json();
+    return await response.json();
 };
 
 export const createPermission = async (permissionName: string) => {
@@ -123,5 +133,5 @@ export const createPermission = async (permissionName: string) => {
     if (!response.ok) {
         throw new Error('Failed to create permission');
     }
-    return response.json();
+    return await response.json();
 }

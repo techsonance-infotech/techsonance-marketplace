@@ -15,12 +15,13 @@ export default function RolesPage() {
 
     const refresh = async () => {
         const [r, p] = await Promise.all([fetchRoles(), fetchPermissions()]);
-        setRoles(r);
-        setPermissions(p.permissions);
+        setRoles(r.data);
+        setPermissions(p.data);
     };
 
     useEffect(() => { refresh(); }, []);
-
+console.log(roles);
+console.log(permissions);
     return (
         <div className="max-w-3xl mx-auto px-6 py-10 space-y-8">
             <h1 className="text-lg font-semibold text-gray-800">RBAC Management</h1>
