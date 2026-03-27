@@ -7,7 +7,8 @@ import { passwordValidationSchema } from "@/utils/validation";
 import axios from "axios";
 import { CUSTOMER_BASE_URL, CUSTOMER_REGISTRATION_POSTER } from "@/constants/common";
 import Image from "next/image";
-import { RegistrationFields } from "@/constants/dynamicFields";
+import { CUSTOMER_REGISTRATION_FIELDS } from "@/constants/dynamicFields";
+
 
 
 interface FormData {
@@ -78,7 +79,7 @@ export default function CustomerRegisterPage() {
                 <h1 className="lg:text-[1.5rem] md:text-[1rem] text-center">Create an account</h1>
                 <p className="text-[.7rem] text-slate-600 mb-4 text-center">Join to Find great products.</p>
                 <div className="flex flex-col gap-4 mb-4">
-                    {RegistrationFields.map((field, index) => (
+                    {CUSTOMER_REGISTRATION_FIELDS.map((field, index) => (
                         <div key={index} className="flex flex-col gap-1">
                             <label htmlFor={field.id} className="text-sm font-medium">{field.label}</label>
                             <input

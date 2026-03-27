@@ -1,4 +1,36 @@
-﻿export const RegistrationFields = [
+﻿import { BusinessStructure, categoryOptions, COUNTRY_CODES } from "./common";
+
+export const ORGANIZATION_DETAIL_FIELDS = [
+    { id: "company_name", label: "Company Name", placeholder: "Enter your company name", type: "text" },
+    { id: "store_owner_first_name", label: "First Name", placeholder: "Enter your first name", type: "text" },
+    { id: "store_owner_last_name", label: "Last Name", placeholder: "Enter your last name", type: "text" },
+    {
+        id: "phone_number", label: "Business Phone Number", groupField: [
+            { id: "country_code", type: "select", options: COUNTRY_CODES, styles: "rounded-r-none" },
+            { id: "phone_number", type: "tel", placeholder: "123-456-7890", styles: "rounded-l-none" },
+        ]
+    },
+    { id: "category", label: "Business Category", type: "select", options: categoryOptions },
+    { id: "company_structure", label: "Business Structure", type: "select", options: BusinessStructure },
+];
+
+export const BUSINESS_ADMIN_ACCOUNT_FIELDS = [
+    { id: "first_name", label: "Admin First Name", placeholder: "Enter your first name", type: "text" },
+    { id: "last_name", label: "Admin Last Name", placeholder: "Enter your last name", type: "text" },
+    { id: "email", label: "Admin Email", placeholder: "Enter your email", type: "email" },
+    { id: "password", label: "Password", placeholder: "Enter your password", type: "password" },
+    { id: "confirm_password", label: "Confirm Password", placeholder: "Confirm your password", type: "password" },
+];
+
+export enum RegistrationStages {
+    Organization = "organization",
+    Instance = "instance",
+    Compliance = "compliance",
+    AdminAccount = "admin_account",
+    Documents = "documents",
+}
+
+export const CUSTOMER_REGISTRATION_FIELDS = [
     { id: "first_name", label: "First name", type: "text", placeholder: "Enter your first name" },
     { id: "last_name", label: "Last name", type: "text", placeholder: "Enter your last name" },
     { id: "email", label: "Email", type: "text", placeholder: "Enter your email" },

@@ -10,36 +10,8 @@ import { RegistrationSuccessModal } from "@/components/vendor/RegistrationSucces
 import FinancialCompliance from "@/components/vendor/FinancialCompliance";
 import { DocUploadInput, DocUploadInputRef } from "@/components/vendor/DocUploadInput";
 import { VendorDocumentTypes } from "@/constants";
+import { ORGANIZATION_DETAIL_FIELDS } from "@/constants/dynamicFields";
 
-export const ORGANIZATION_DETAIL_FIELDS = [
-    { id: "company_name", label: "Company Name", placeholder: "Enter your company name", type: "text" },
-    { id: "store_owner_first_name", label: "First Name", placeholder: "Enter your first name", type: "text" },
-    { id: "store_owner_last_name", label: "Last Name", placeholder: "Enter your last name", type: "text" },
-    {
-        id: "phone_number", label: "Business Phone Number", groupField: [
-            { id: "country_code", type: "select", options: COUNTRY_CODES, styles: "rounded-r-none" },
-            { id: "phone_number", type: "tel", placeholder: "123-456-7890", styles: "rounded-l-none" },
-        ]
-    },
-    { id: "category", label: "Business Category", type: "select", options: categoryOptions },
-    { id: "company_structure", label: "Business Structure", type: "select", options: BusinessStructure },
-];
-
-export const BUSINESS_ADMIN_ACCOUNT_FIELDS = [
-    { id: "first_name", label: "Admin First Name", placeholder: "Enter your first name", type: "text" },
-    { id: "last_name", label: "Admin Last Name", placeholder: "Enter your last name", type: "text" },
-    { id: "email", label: "Admin Email", placeholder: "Enter your email", type: "email" },
-    { id: "password", label: "Password", placeholder: "Enter your password", type: "password" },
-    { id: "confirm_password", label: "Confirm Password", placeholder: "Confirm your password", type: "password" },
-];
-
-export enum RegistrationStages {
-    Organization = "organization",
-    Instance = "instance",
-    Compliance = "compliance",
-    AdminAccount = "admin_account",
-    Documents = "documents",
-}
 
 // Fields that belong to each step — used for per-step validation
 const STEP_FIELDS: Record<number, (keyof VendorRegisterFormData)[]> = {
@@ -158,15 +130,15 @@ export default function VendorRegisterPage() {
                     {formStep === 0 && (
                         <section className="border border-gray-100 bg-white p-6 rounded-2xl w-full shadow-md shadow-gray-100/80">
                             <h2 className="font-bold text-xl mb-6">Organization Details</h2>
-                            <div className="flex flex-col gap-6">
+                            <div className="grid grid-cols-2  gap-6">
                                 {ORGANIZATION_DETAIL_FIELDS.map((field) => (
-                                    <div key={field.id} className="flex flex-col gap-2 w-full">
+                                    <div key={field.id} className="col-span-2 flex flex-col gap-2 w-full">
                                         <label className="input-label">
                                             {field.label} <span className="text-red-500">*</span>
                                         </label>
 
                                         {field.groupField ? (
-                                            <div className="flex w-full">
+                                            <div className=" w-full">
                                                 {field.groupField.map((subField) => (
                                                     <span key={subField.id} className="w-full">
                                                         {subField.type === "select" ? (

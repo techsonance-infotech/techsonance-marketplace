@@ -76,10 +76,9 @@ export default function VendorManagementPage() {
                     </span>
                     <span className="flex gap-4">
                         <select className="vendor_filter" name="status" id="status">
-                            <option value="all">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="pending">Pending</option>
-                            <option value="suspended">Suspended</option>
+                           {
+                            FILTER
+                           }
                         </select>
                         <select className="vendor_filter" name="sort_by" id="sort_by">
                             <option value="date_newest">Newest</option>
