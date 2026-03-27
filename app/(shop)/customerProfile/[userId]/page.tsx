@@ -7,29 +7,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Counter } from "@/components/customer/Counter";
-
-
-
-
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.15
-        }
-    }
-};
-
-const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-        y: 0,
-        opacity: 1,
-        transition: { type: "spring" as const, stiffness: 50 }
-    }
-};
-
+import { containerVariants, itemVariants, ManagementCard } from "@/components/customer/ManagementCard";
 export default function UserProfilePage() {
     const { user } = useSelector((state: RootState) => state.auth);
     const {userId}=useParams()
@@ -172,21 +150,3 @@ export default function UserProfilePage() {
 }
 
 
-const ManagementCard = ({ icon, color, title, description, children }: any) => (
-    <motion.div
-        variants={itemVariants}
-        whileHover={{ scale: 1.02, backgroundColor: "#fafafa" }}
-        className="flex flex-col lg:p-6 p-3 border border-gray-200 rounded-2xl bg-white shadow-sm cursor-pointer transition-colors"
-    >
-        <div className="flex items-start gap-6">
-            <div className={`w-14 h-14 ${color} rounded-2xl flex justify-center items-center flex-shrink-0`}>
-                {icon}
-            </div>
-            <div>
-                <h2 className="font-bold lg:text-xl text-lg mb-2 text-gray-900">{title}</h2>
-                <p className="text-gray-500 text-sm leading-relaxed">{description}</p>
-            </div>
-        </div>
-        {children}
-    </motion.div>
-);

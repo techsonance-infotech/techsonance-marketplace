@@ -1,4 +1,4 @@
-import type { NavLinkType } from "./common";
+import { type NavLinkType } from "@/utils/Types";
 import {
   dashboard_icon,
   vendor_icon,

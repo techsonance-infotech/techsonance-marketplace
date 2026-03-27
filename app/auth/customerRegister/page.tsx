@@ -80,10 +80,10 @@ export default function CustomerRegisterPage() {
                 <div className="flex flex-col gap-4 mb-4">
                     {RegistrationFields.map((field, index) => (
                         <div key={index} className="flex flex-col gap-1">
-                            <label htmlFor={field.name} className="text-sm font-medium">{field.label}</label>
+                            <label htmlFor={field.id} className="text-sm font-medium">{field.label}</label>
                             <input
                                 type={field.type}
-                                name={field.name}
+                                name={field.id}
                                 placeholder={field.placeholder}
                                 onChange={handleChange}
                                 className="border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"

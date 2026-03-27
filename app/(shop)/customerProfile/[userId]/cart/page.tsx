@@ -30,7 +30,7 @@ const PriceTicker = ({ value }: { value: number }) => {
     );
 };
 
-export function CartList() {
+export default function CartList() {
     const { items } = useSelector((state: RootState) => state.cart);
     const router = useRouter()
     const cartItemsWithDetails = items.map(item => {
@@ -143,8 +143,4 @@ export function CartList() {
             </div >
         </>
     );
-}
-
-export default function CartPage() {
-    return <CartList />;
 }

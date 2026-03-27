@@ -324,3 +324,13 @@ export type ProductFormValues = {
   status: string;
   taxProfile: string;
 };
+
+export interface SelectedPaymentMethodProps {
+  method: string;
+  selectedMethod: string;
+  onSelect: (method: string) => void;
+  onInputChange: (val: string) => void;
+  isValid: boolean;
+  value: string; // The UPI ID string
+  description?: string; // Optional description
+}
