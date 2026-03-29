@@ -7,26 +7,13 @@ import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useAppSelector } from "@/hooks/reduxHooks";
-export const AUDIT_LOG_COLUMNS = [
-    { id: 'timestamp', label: 'TIMESTAMP' },
-    { id: 'actor', label: 'ACTOR(USER)' },
-    { id: 'tenant', label: 'COMPANY' },
-    { id: 'actionType', label: 'ACTION TYPE' },
-    { id: 'targetEntity', label: 'TARGET ENTITY' },
-    { id: 'details', label: 'DETAILS' },
-    { id: 'ipAddress', label: 'IP ADDRESS' },
-];
-export const AUTH_LOG_FILTERS = [
-    { id: 'all', label: 'All Status' },
-    { id: 'active', label: 'Active' },
-    { id: 'pending', label: 'Pending' },
-    { id: 'suspended', label: 'Suspended' },
-];
+import { AUDIT_LOG_COLUMNS, AUTH_LOG_FILTERS } from "@/constants/dynamicFields";
+
 export default function AuditLogPage() {
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [isOpen, setIsOpen] = useState(false);
     const [logs] = useState(AUDIT_LOG_DATA);
-    const { theme } = useAppSelector((state) => state.adminTheme);
+    const { theme } = useAppSelector((state: any) => state.adminTheme);
     const [count, setCount] = useState(1);
 
     const handleDateChange = (selectedDate: Date | undefined) => {

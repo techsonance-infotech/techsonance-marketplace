@@ -1,9 +1,9 @@
 ﻿import { COUNTRIES } from "@/constants";
 
-export default function FinancialCompliance({ country_code, style }: { country_code: string; style: string }) {
+export default function FinancialCompliance({ country_code, style }: { country_code: string; style?: string }) {
     return (
         <>
-            <section className={style +' my-4'}>
+            <section className={style + ' my-4'}>
 
 
                 {COUNTRIES.find((c) => c.country_code === country_code)?.fields.map((field) => (
@@ -20,7 +20,8 @@ export default function FinancialCompliance({ country_code, style }: { country_c
                         />
                         <p className="text-xs text-slate-500 mt-1">{field.helperText}</p>
                     </div>
-                ))}        </section>
+                ))}
+            </section>
         </>
     )
 }

@@ -1,8 +1,8 @@
 ﻿import { loginFailure, loginSuccess } from "@/lib/features/auth/authSlice";
 import axios from "axios";
 import { UserProfile, UserRole, VendorRegisterFormData } from "./Types";
-import { ADMIN_AUTH_URL, BASE_API_URL, VENDOR_AUTH_URL } from "@/constants/constants";
-import { authToken } from "./authToken";
+import { ADMIN_AUTH_URL, VENDOR_AUTH_URL } from "@/constants";
+
 
 export const vendorLogin = async (data: { email: string, password: string }, dispatch: any) => {
     try {
@@ -80,58 +80,3 @@ export const adminLogin = async (data: { admin_id: string, password: string }) =
     }
 }
 
-
-export const fetchRoles = async () => {
-    const response = await fetch(`${BASE_API_URL}roles`, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${authToken()}`,
-        },
-    });
-    if (!response.ok) {
-        throw new Error('Failed to fetch roles');
-    }
-    return await response.json();
-};
-export const fetchPermissions = async () => {
-    const response = await fetch(`${BASE_API_URL}permissions`, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${authToken()}`,
-        },
-    });
-    if (!response.ok) {
-        throw new Error('Failed to fetch permissions');
-    }
-    return await response.json();
-};
-export const createRole = async (role: string) => {
-    const response = await fetch(`${BASE_API_URL}roles/create`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${authToken()}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ role }),
-    });
-    console.log(response);
-    if (!response.ok) {
-        throw new Error('Failed to create role');
-    }
-    return await response.json();
-};
-
-export const createPermission = async (permissionName: string) => {
-    const response = await fetch(`${BASE_API_URL}permissions/create`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${authToken()}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ permissionName }),
-    });
-    if (!response.ok) {
-        throw new Error('Failed to create permission');
-    }
-    return await response.json();
-}

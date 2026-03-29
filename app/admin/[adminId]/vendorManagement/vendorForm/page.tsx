@@ -2,41 +2,26 @@
 import { Navbar } from "@/components/admin/Navbar";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-import { COUNTRIES, COUNTRY_CODES } from "@/constants/common";
+import { COUNTRIES } from "@/constants/common";
 import { useRouter } from "next/navigation";
 import { VendorRegisterTypes } from "@/utils/Types";
 import { useState } from "react";
-import { vendorRegister } from "@/utils/apiClient";
 import { VendorDocumentTypes } from "@/constants";
 import { BUSINESS_ADMIN_ACCOUNT_FIELDS, ORGANIZATION_DETAIL_FIELDS, RegistrationStages } from "@/constants/dynamicFields";
 import { DocUploadInput } from "@/components/vendor/DocUploadInput";
 import FinancialCompliance from "@/components/vendor/FinancialCompliance";
+import { Button } from "@/components/common/Button";
+import { RegistrationSuccessModal } from "@/components/common/RegistrationSuccessModal";
+
 const STEP_FIELDS: Record<number, (keyof VendorRegisterTypes)[]> = {
     0: ["company_name", "store_owner_first_name", "store_owner_last_name", "country_code", "phone_number", "category", "company_structure"],
     1: ["company_domain"],
-    2: [],  
-    3: [], 
+    2: [],
+    3: [],
     4: ["first_name", "last_name", "email", "password", "confirm_password"],
-    5: [], 
+    5: [],
 };
 
-export const Button = ({
-    label, onClick, className, disabled,
-}: {
-    label: string;
-    onClick: () => void;
-    className?: string;
-    disabled?: boolean;
-}) => (
-    <button
-        type="button"
-        onClick={onClick}
-        disabled={disabled}
-        className={className ?? `relative py-2 px-8 text-base font-bold rounded-2xl overflow-hidden bg-white transition-all duration-400 border ${disabled ? "text-gray-600" : "text-black"}`}
-    >
-        {label}
-    </button>
-);
 
 export default function VendorFormPage() {
     const {
@@ -65,16 +50,12 @@ export default function VendorFormPage() {
     });
 
     const router = useRouter();
-    const [globalError, setGlobalError] = useState<string | null>(null); // Fix 1: removed duplicate
-    const [showSuccessModal, setShowSuccessModal] = useState(false);     // Fix 6: was missing
+    const [globalError, setGlobalError] = useState<string | null>(null);
     const [countryCode, setCountryCode] = useState("");
     const [formStep, setFormStep] = useState(0);
-    const totalSteps = Object.keys(RegistrationStages).length; // should now be 6
-
-    // Fix 9: split into two separate fileMaps so docs don't mix
-    const [financialFileMap, setFinancialFileMap] = useState<{ file: File | null; type: string }[]>([]);
-    const [legalFileMap, setLegalFileMap] = useState<{ file: File | null; type: string }[]>([]);
-
+    const totalSteps = Object.keys(RegistrationStages).length;
+    const [fileMap, setFileMap] = useState<{ file: File | null; type: string }[]>([]);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const nextStep = async () => {
         const fields = STEP_FIELDS[formStep];
         const valid = fields.length > 0 ? await trigger(fields) : true;
@@ -88,29 +69,14 @@ export default function VendorFormPage() {
     const onSubmit = async (data: VendorRegisterTypes) => {
         setGlobalError(null);
 
-        const allPairs = [...financialFileMap, ...legalFileMap];
-        const incomplete = allPairs.some((p) => !p.file || !p.type);
-        if (incomplete) {
-            setGlobalError("Please select a file and document type for every document row.");
-            return;
-        }
 
         const formData = new FormData();
-
-        financialFileMap.forEach(({ file, type }) => {
+        fileMap.forEach(({ file, type }) => {
             if (file) {
-                const renamed = new File([file], `${type}__${file.name}`, { type: file.type });
-                formData.append("financial_document", renamed);
+                const renamedFile = new File([file], `${type}__${file.name}`, { type: file.type });
+                formData.append("documents", renamedFile);
             }
         });
-
-        legalFileMap.forEach(({ file, type }) => {
-            if (file) {
-                const renamed = new File([file], `${type}__${file.name}`, { type: file.type });
-                formData.append("legal_document", renamed);
-            }
-        });
-
         formData.append("vendor", JSON.stringify(data));
 
         try {
@@ -118,7 +84,10 @@ export default function VendorFormPage() {
             if (result.status) {
                 reset();
                 setShowSuccessModal(true);
-                router.push("/admin/vendorManagement");
+                setTimeout(() => {
+                    setShowSuccessModal(false);
+                    router.back();
+                }, 2000);
             } else {
                 setGlobalError(result.message ?? "Registration failed. Please try again.");
             }
@@ -130,6 +99,7 @@ export default function VendorFormPage() {
     return (
         <>
             <Navbar title={"Vendor Form"} />
+            <RegistrationSuccessModal isOpen={showSuccessModal} onClose={() => setShowSuccessModal(false)} />
             <main className="admin_vendorManagement">
                 <header className="flex justify-between items-center my-6">
                     <h1 className="font-bold text-2xl">Manage Vendor domains, and platform access.</h1>
@@ -276,12 +246,12 @@ export default function VendorFormPage() {
                                 ))}
                             </select>
                             <div>
-                            <FinancialCompliance style="grid grid-cols-2 gap-6" country_code={countryCode} />
+                                <FinancialCompliance style="grid grid-cols-2 gap-6" country_code={countryCode} />
 
                             </div>
                             <DocUploadInput
-                                setFileMap={setFinancialFileMap}   // Fix 9: dedicated financial state
-                                fileMap={financialFileMap}
+                                setFileMap={setFileMap}
+                                fileMap={fileMap}
                                 typeList={COUNTRIES.find((c) => c.country_code === countryCode)?.fields || []}
                                 title="Financial Documents"
                             />
@@ -298,8 +268,8 @@ export default function VendorFormPage() {
                             <h2 className="text-lg font-bold text-gray-800 mb-4">Legal & Financial Document Upload</h2>
                             <p className="text-sm text-gray-500 mb-6">Please ensure all documents are clear and legible.</p>
                             <DocUploadInput
-                                setFileMap={setLegalFileMap}       // Fix 9: dedicated legal state
-                                fileMap={legalFileMap}
+                                setFileMap={setFileMap}       // Fix 9: dedicated legal state
+                                fileMap={fileMap}
                                 typeList={VendorDocumentTypes}
                                 title="Legal Business / Store Documents"
                             />
@@ -310,7 +280,7 @@ export default function VendorFormPage() {
                         </section>
                     )}
 
-                    {/* ── Step 4: Business Admin Account ── */}  {/* Fix 3: was colliding with step 4 Review */}
+                    {/* ── Step 4: Business Admin Account ── */}
                     {formStep === 4 && (
                         <section className="border border-gray-100 bg-white p-6 rounded-2xl w-full shadow-md shadow-gray-100/80">
                             <h2 className="font-bold text-xl mb-1">Business Admin Account</h2>
@@ -353,7 +323,7 @@ export default function VendorFormPage() {
                         </section>
                     )}
 
-                    {/* ── Step 5: Review & Submit ── */}  {/* Fix 3: moved from 4 → 5 */}
+                    {/* ── Step 5: Review & Submit ── */}
                     {formStep === 5 && (
                         <section className="border border-gray-100 bg-white p-6 rounded-2xl w-full shadow-md shadow-gray-100/80">
                             <h2 className="font-bold text-xl mb-2">Review & Submit</h2>
@@ -380,7 +350,7 @@ export default function VendorFormPage() {
                         </section>
                     )}
 
-                    
+
                     <div className="flex justify-end gap-6 mb-6">
                         <Link
                             onClick={() => reset()}

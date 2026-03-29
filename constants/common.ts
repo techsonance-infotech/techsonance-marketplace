@@ -1,8 +1,8 @@
-import type { Link } from "@/components/common/InnerSideBar";
-
 // ============================================================
 // ASSET PATHS (served from /public/assets/)
 // ============================================================
+
+import { CountryComplianceType } from "@/utils/Types";
 
 export const BRAND_LOGO = "/assets/e-commerce_brand_logo.png";
 export const CUSTOMER_LOGIN_POSTER = "/assets/customer form poster 2.png";
@@ -121,21 +121,8 @@ export const COUNTRY_CODES = [
   { value: "+27", label: "🇿🇦 +27" },
   { value: "+971", label: "🇦🇪 +971" },
 ];
-export interface ComplianceField {
-  value: string;
-  label: string;
-  placeholder: string;
-  required: boolean;
-  helperText: string;
-}
 
-export interface CountryCompliance {
-  country_code: string;
-  country_name: string;
-  fields: ComplianceField[];
-}
-
-export const COUNTRIES: CountryCompliance[] = [
+export const COUNTRIES: CountryComplianceType[] = [
   {
     country_code: "IN",
     country_name: "India",
@@ -399,19 +386,4 @@ export const COUNTRIES: CountryCompliance[] = [
   }
 
 ];
-// ============================================================
-// BASE URLs (from environment variables)
-// ============================================================
 
-export const VENDOR_BASE_URL = process.env.NEXT_PUBLIC_VENDOR_URL;
-export const CUSTOMER_BASE_URL = process.env.NEXT_PUBLIC_CUSTOMER_BASE_URL;
-export const ADMIN_BASE_URL = process.env.NEXT_PUBLIC_ADMIN_BASE_URL;
-export const VENDOR_AUTH_URL = process.env.NEXT_PUBLIC_VENDOR_AUTH_URL;
-export const CUSTOMER_AUTH_URL = process.env.NEXT_PUBLIC_CUSTOMER_AUTH_URL;
-
-// ============================================================
-// HERO / HOME CONTENT
-// ============================================================
-
-export const HOME_HERO_TITLE = "Welcome to Sound Sphere - Your Ultimate Music Marketplace";
-export const HOME_HERO_DESC = "Discover, buy, and sell music products with ease. Join our vibrant community of music lovers and elevate your sound experience today!";

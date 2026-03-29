@@ -1,20 +1,9 @@
-import { IconName } from "lucide-react/dynamic";
 export const HOME_SECONDARY_IMG = "https://m.media-amazon.com/images/I/61KcQyhY6SL._SL1200_.jpg";
 
-import { BestSellingProductType, CATEGORY_LIST_TYPE, FeedbackType, NavLinkType, OrderFailedStatusTypes, OrderSuccessStatusTypes, PRODUCT_LIST_TYPE } from "@/utils/Types"
+import { BestSellingProductType, CATEGORY_LIST_TYPE, FeedbackType, FooterSectionType, NavLinkType, OrderFailedStatusTypes, OrderSuccessStatusTypes, PRODUCT_LIST_TYPE } from "@/utils/Types"
 
 
-export interface FooterLinkType {
-    title: string;
-    url: string;
-    icon?: string;
-    styles?: string;
-    category?: string;
-}
-export interface FooterSectionType {
-    header: string;
-    links: FooterLinkType[];
-}
+
 // Navigation Links
 
 //Cusomter Home hero title and description
@@ -22,17 +11,6 @@ export const HOME_HERO_TITLE = "Welcome to Sound Sphere - Your Ultimate Music Ma
 export const HOME_HERO_DESC = "Discover, buy, and sell music products with ease. Join our vibrant community of music lovers and elevate your sound experience today!";
 export const HERO_BTN_TEXT = "Shop Now";
 
-export interface FooterLinkType {
-    title: string;
-    url: string;
-    icon?: string;
-    styles?: string;
-    category?: string;
-}
-export interface FooterSectionType {
-    header: string;
-    links: FooterLinkType[];
-}
 // Navigation Links
 export const NAV_LINKS: NavLinkType[] = [{ Home: '/' }, { Shop: '/shopping' }, { About: '/about' }, { Contact: '/contact' }]
 export interface tabLinkType {
@@ -237,15 +215,15 @@ export const mockFailedStatus: OrderFailedStatusTypes = {
 export const HOME_BRAND_FEATURES: { title: string; icon: string }[] = [
     {
         title: 'Secure Payment',
-        icon: 'Wallet'
+        icon: 'wallet'
     },
     {
         title: 'Free Shipping',
-        icon: 'Package'
+        icon: 'package'
     },
     {
         title: 'Delivered with Care and on time',
-        icon: 'Truck'
+        icon: 'truck'
     },
     {
         title: 'High Quality audio',

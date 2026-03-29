@@ -74,3 +74,18 @@ export const PAYMENT_METHODS_FIELDS = [
     { id: 'CreditCard', label: 'Credit or Debit Card', placeholder: 'Card Number', type: 'text', description: 'We accept all major credit and debit cards. Your card details are processed securely.' },
     { id: 'cod', label: 'Cash on Delivery/Pay on Delivery', placeholder: '', type: 'text', description: 'Cash, UPI and Cards accepted. Know more.' }
 ];
+export const AUDIT_LOG_COLUMNS = [
+    { id: 'timestamp', label: 'TIMESTAMP' },
+    { id: 'actor', label: 'ACTOR(USER)' },
+    { id: 'tenant', label: 'COMPANY' },
+    { id: 'actionType', label: 'ACTION TYPE' },
+    { id: 'targetEntity', label: 'TARGET ENTITY' },
+    { id: 'details', label: 'DETAILS' },
+    { id: 'ipAddress', label: 'IP ADDRESS' },
+];
+export const AUTH_LOG_FILTERS = [
+    { id: 'all', label: 'All Status' },
+    { id: 'active', label: 'Active' },
+    { id: 'pending', label: 'Pending' },
+    { id: 'suspended', label: 'Suspended' },
+];

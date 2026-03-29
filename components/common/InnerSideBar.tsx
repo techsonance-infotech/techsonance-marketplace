@@ -7,7 +7,7 @@ export interface Link {
     section: string;
     list: {
         title: string;
-        path: string;
+        path: string | null;
         icon: string;
     }[];
 }

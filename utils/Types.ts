@@ -254,6 +254,76 @@ export interface Vendor {
   company_id: string;
   user_id: string;
 }
+export interface ActiveInstanceType {
+  id: number;
+  name: string;
+  email: string;
+  status: "Healthy" | "High Load" | "Degraded";
+}
+export interface VendorManagementEntryType {
+  id: number;
+  name: string;
+  email: string;
+  domain: string;
+  status: "Active" | "Pending" | "Suspended";
+  revenue: number;
+}
+export interface VendorRequestEntryType {
+  id: number;
+  businessName: string;
+  ownerName: string;
+  email: string;
+  phone: string;
+  category: string;
+  submittedAt: string;
+  status: "Pending" | "Approved" | "Rejected";
+}export interface AuditLogEntryType {
+  id: number;
+  timestamp: string;
+  actor: string;
+  tenant: string;
+  actionType: "Active" | "Inactive" | "Pending" | "Suspended";
+  targetEntity: string;
+  details: string;
+  ipAddress: string;
+}
+export interface TicketMessageType {
+  id: number;
+  sender: string;
+  role: string;
+  text: string;
+  time: string;
+  type: "vendor" | "system" | "super_admin";
+}
+
+export interface SupportTicketType {
+  id: string;
+  title: string;
+  company: string;
+  email: string;
+  status: "active" | "pending" | "closed";
+  time: string;
+  messages: TicketMessageType[];
+}
+export interface VendorApplicationType {
+  business_profile: {
+    business_name: string;
+    owner_name: string;
+    owner_email: string;
+    submission_date: string;
+    status: 'verified' | 'pending' | 'rejected';
+  };
+  submitted_documents: {
+    file_name: string;
+    size: string;
+    uploaded_at: string;
+  }[];
+  instance_details: {
+    requested_subdomain: string;
+    domain_extension: string;
+    dns_check: 'passed' | 'failed';
+  };
+}
 
 export interface User {
   id: string;
@@ -309,7 +379,7 @@ export interface tabLinkType {
 export type FeatureType = { title: string; description: string };
 export type OptionType = { name: string; values: string };
 export type VariantType = { attributes: Record<string, string>; sku: string; price: number; stock: number };
-export type ProductFormValues = {
+export type ProductFormValuesType = {
   productName: string;
   description: string;
   features: FeatureType[];
@@ -333,4 +403,122 @@ export interface SelectedPaymentMethodProps {
   isValid: boolean;
   value: string; // The UPI ID string
   description?: string; // Optional description
+}
+export interface CustomerTicketType {
+  id: number;
+  ticket_number: string;
+  customer_name: string;
+  related_order?: string;
+  subject: string;
+  description: string;
+  status: 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+  priority: 'High' | 'Medium' | 'Low';
+  created: string;
+}
+export interface UserReviewType{
+  id: number;
+  user_name: string;
+  purchased_item: string;
+  rating: number;
+  review_text: string;
+  time_posted: string;
+  actions: { can_reply: boolean; can_report: boolean };
+}
+export interface CouponType {
+  id: number;
+  code: string;
+  discount_type: 'PERCENTAGE' | 'FLAT_AMOUNT';
+  value: number;
+  currency?: string;
+  status: 'ACTIVE' | 'EXPIRED' | 'INACTIVE';
+  conditions: {
+    min_purchase_amount?: number;
+    customer_segment?: 'ALL' | 'NEW_CUSTOMERS';
+    expiry_text: string;
+  };
+}export interface GstInvoiceType {
+  id: number;
+  date: string;
+  invoice_no: string;
+  order_ref: string;
+  taxable_value: number;
+  total_tax: number;
+  currency: string;
+  download_available: boolean;
+}
+export interface InventoryProductType {
+  id: string;
+  productName: string;
+  sku: string;
+  category: string;
+  stock: number;
+  price: number;
+  warehouse: 'Main Warehouse' | 'North Hub';
+  status: 'In Stock' | 'Low Stock' | 'Out of Stock';
+  imageUrl: string;
+}export interface WarehouseType {
+  warehouse_id: number;
+  company_id: number;
+  name: string;
+  type: "Warehouse" | "Hub"; // Type of location
+  address: string;         // Street/area address
+  city: string;
+  is_active: boolean;
+  total_units: number;
+  is_default: boolean;
+  contactPerson?: string;  // Optional contact person
+  phone?: string;
+}
+export type OrderDetailType = {
+  id: string;
+  orderNumber: string;
+  dateTime: string;
+  customer: {
+    name: string;
+    location: string;
+  };
+  status: 'Pending' | 'Shipped' | 'Delivered';
+  total: number;
+  paymentMethod: 'Paid (UPI)' | 'COD' | 'Refunded' | 'Card payment';
+};
+export interface VendorProductType {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  status: "Active" | "Draft" | "Archived";
+  imageUrl: string;
+  sales: number;
+}export interface InventoryItemType {
+  id: string;
+  name: string;
+  sku: string;
+  category: string;
+  stock: number;
+  reorderLevel: number;
+  price: number;
+  status: "In Stock" | "Low Stock" | "Out of Stock";
+}
+export interface VendorOrderType {
+  orderId: string;
+  customerName: string;
+  status: "Pending" | "Shipped" | "Delivered";
+  amount: number;
+  action: "Ship Now" | "View";
+  date?: string;
+  items?: number;
+}
+export interface ComplianceFieldType {
+  value: string;
+  label: string;
+  placeholder: string;
+  required: boolean;
+  helperText: string;
+}
+
+export interface CountryComplianceType {
+  country_code: string;
+  country_name: string;
+  fields: ComplianceFieldType[];
 }

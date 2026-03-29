@@ -7,6 +7,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ADMIN_BASE_URL } from "@/constants/constants";
 import { useAppSelector } from "@/hooks/reduxHooks";
+export const FILTER_STATUS_OPTIONS = [
+    { value: 'all', label: 'All Statuses' },
+    { value: 'Pending', label: 'Pending' },
+    { value: 'Approved', label: 'Approved' },
+    { value: 'Rejected', label: 'Rejected' }
+];
 const getVendorRequests = async () => {
     try {
         const response = await fetch(`${ADMIN_BASE_URL}/vendor-applications`, {
@@ -76,9 +82,11 @@ export default function VendorManagementPage() {
                     </span>
                     <span className="flex gap-4">
                         <select className="vendor_filter" name="status" id="status">
-                           {
-                            FILTER
-                           }
+                            {
+                                FILTER_STATUS_OPTIONS.map((option) => (
+                                    <option key={option.value} value={option.value}>{option.label}</option>
+                                ))
+                            }
                         </select>
                         <select className="vendor_filter" name="sort_by" id="sort_by">
                             <option value="date_newest">Newest</option>

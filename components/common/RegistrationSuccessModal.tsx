@@ -1,22 +1,11 @@
-﻿import React from 'react';
-import { CheckCircle2, Mail, Clock, ArrowRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-
+﻿import { CheckCircle2, Mail, Clock, ArrowRight } from 'lucide-react';
 interface RegistrationSuccessModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
 export const RegistrationSuccessModal = ({ isOpen, onClose }: RegistrationSuccessModalProps) => {
-    const router = useRouter();
-
     if (!isOpen) return null;
-
-    // const handleGoToLogin = () => {
-    //     onClose();
-    //     router.push("/auth/vendorLogin");
-    // };
-
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all scale-100 animate-in zoom-in-95 duration-300">
@@ -58,16 +47,6 @@ export const RegistrationSuccessModal = ({ isOpen, onClose }: RegistrationSucces
                             </div>
                         </div>
                     </div>
-
-                    {/* Action Button */}
-                    {/* <button
-                        onClick={handleGoToLogin}
-                        className="w-full py-3.5 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-200"
-                    >
-                        Return to Login
-                        <ArrowRight className="w-4 h-4" />
-                    </button> */}
-
                     <p className="mt-4 text-xs text-gray-400">
                         Need help? Contact our support team at support@platform.com
                     </p>

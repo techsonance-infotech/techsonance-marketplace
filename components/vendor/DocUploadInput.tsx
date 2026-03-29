@@ -50,6 +50,8 @@ export const DocUploadInput = (
                     return [...prevMap, { file, type: fieldId ?? "", index }];
                 }
             });
+
+
         };
         console.log("   fileMap in change handler", fileMap);
         return (

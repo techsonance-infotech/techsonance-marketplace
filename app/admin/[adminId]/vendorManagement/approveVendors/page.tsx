@@ -1,47 +1,13 @@
 'use client';
 
 import { Navbar } from "@/components/admin/Navbar";
-import { ADMIN_BASE_URL, down_arrow, internet_icon } from "@/constants/common";
 import { useEffect, useState } from "react";
 import { Check, X, BadgeCheck, ShieldAlert } from "lucide-react";
 import { VendorApplication } from "@/utils/Types";
+import { ADMIN_BASE_URL, down_arrow, internet_icon } from "@/constants";
+import { approveVendor, fetchApplications, rejectVendor } from "@/utils/adminApiClients";
+import { set } from "date-fns";
 
-const approveVendor = async (vendorId: string) => {
-    try {
-        console.log(vendorId);
-        const response = await fetch(`${ADMIN_BASE_URL}/approve-vendor/${vendorId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        });
-        if (!response.ok) {
-            throw new Error('Failed to approve vendor');
-        }
-        // Update the UI or refetch the vendor applications
-    } catch (error) {
-        console.error('Error approving vendor:', error);
-    }
-};
-
-const rejectVendor = async (vendorId: string) => {
-    try {
-        const response = await fetch(`${ADMIN_BASE_URL}/reject-vendor/${vendorId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        });
-        if (!response.ok) {
-            throw new Error('Failed to reject vendor');
-        }
-        // Update the UI or refetch the vendor applications
-    } catch (error) {
-        console.error('Error rejecting vendor:', error);
-    }
-};
 
 const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString();
@@ -54,22 +20,14 @@ export default function ApproveVendorsPage() {
     const [vendorApplications, setVendorApplications] = useState<VendorApplication[]>([]);
 
     useEffect(() => {
-        const fetchApplications = async () => {
-            try {
-                const response = await fetch(`${ADMIN_BASE_URL}/vendor-applications`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                });
-                const resJson = await response.json();
-                setVendorApplications(resJson.data);
-            } catch (error) {
+        fetchApplications()
+            .then((applications) => {
+                setVendorApplications(applications.data);
+            })
+            .catch((error) => {
                 console.error('Error fetching vendor applications:', error);
-            }
-        };
-        fetchApplications();
+            });
+
     }, []);
 
     return (

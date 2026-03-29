@@ -6,11 +6,12 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { BusinessStructure, categoryOptions, COUNTRIES, COUNTRY_CODES } from "@/constants/common";
 import { vendorRegister } from "@/utils/apiClient";
 import { VendorRegisterFormData, VendorRegisterTypes } from "@/utils/Types";
-import { RegistrationSuccessModal } from "@/components/vendor/RegistrationSuccessModal";
+import { RegistrationSuccessModal } from "@/components/common/RegistrationSuccessModal";
 import FinancialCompliance from "@/components/vendor/FinancialCompliance";
 import { DocUploadInput, DocUploadInputRef } from "@/components/vendor/DocUploadInput";
 import { VendorDocumentTypes } from "@/constants";
-import { ORGANIZATION_DETAIL_FIELDS } from "@/constants/dynamicFields";
+import { ORGANIZATION_DETAIL_FIELDS, RegistrationStages } from "@/constants/dynamicFields";
+import { Button } from "@/components/common/Button";
 
 
 // Fields that belong to each step — used for per-step validation
@@ -22,24 +23,6 @@ const STEP_FIELDS: Record<number, (keyof VendorRegisterFormData)[]> = {
     4: ["first_name", "last_name", "email", "password", "confirm_password"],
 };
 
-export const Button = ({
-    label, onClick, className, disabled,
-}: {
-    label: string;
-    onClick: () => void;
-    className?: string;
-    disabled?: boolean;
-}) => (
-    <button
-        type="button"
-        onClick={onClick}
-        disabled={disabled}
-        className={className ?? `relative py-2 px-8 text-base font-bold rounded-2xl  overflow-hidden  bg-white transition-all duration-400 border  ${disabled ? ' text-gray-600' : 'before:block  text-black  '}`}
-    >
-        {label}
-    </button>
-);
-
 export default function VendorRegisterPage() {
     const router = useRouter();
     const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -49,7 +32,7 @@ export default function VendorRegisterPage() {
     const totalSteps = Object.keys(RegistrationStages).length;
     const [fileMap, setFileMap] = useState<{ file: File | null; type: string }[]>([]);
 
-   
+
 
     const {
         register,
@@ -144,12 +127,12 @@ export default function VendorRegisterPage() {
                                                         {subField.type === "select" ? (
                                                             <select
                                                                 className={`input-class w-full ${subField.styles ?? ""}`}
-                                                                {...register(subField.id as keyof VendorRegisterFormData, {
+                                                                {...register(subField.id as keyof VendorRegisterTypes, {
                                                                     required: "Country code is required",
                                                                 })}
                                                                 onChange={(e) => {
                                                                     setCountryCode(e.target.value);
-                                                                    register(subField.id as keyof VendorRegisterFormData).onChange(e);
+                                                                    register(subField.id as keyof VendorRegisterTypes).onChange(e);
                                                                 }}
                                                             >
                                                                 <option value="">Code</option>
@@ -162,15 +145,15 @@ export default function VendorRegisterPage() {
                                                                 type={subField.type ?? "text"}
                                                                 className={`input-class w-full ${subField.styles ?? ""}`}
                                                                 placeholder={subField.placeholder}
-                                                                {...register(subField.id as keyof VendorRegisterFormData, {
+                                                                {...register(subField.id as keyof VendorRegisterTypes, {
                                                                     required: "Phone number is required",
                                                                     pattern: { value: /^[0-9\-]+$/, message: "Please use format 123-456-7890" },
                                                                 })}
                                                             />
                                                         )}
-                                                        {errors[subField.id as keyof VendorRegisterFormData] && (
+                                                        {errors[subField.id as keyof VendorRegisterTypes] && (
                                                             <p className="input-error">
-                                                                {errors[subField.id as keyof VendorRegisterFormData]?.message}
+                                                                {errors[subField.id as keyof VendorRegisterTypes]?.message}
                                                             </p>
                                                         )}
                                                     </span>
