@@ -1,17 +1,17 @@
-﻿import { createAddress, updateAddress } from "@/Redux store/features/auth/authSlice";
+﻿import { createAddress, updateAddress } from "@/lib/features/auth/authSlice";
 import { FormInput } from "../common/FormInput";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { UserProfile } from "@/constants/common";
 import { motion } from "motion/react";
 import { ADDRESS_FIELDS } from "@/constants/dynamicFields";
+import { useAppDispatch } from "@/hooks/reduxHooks";
 export const AddressModal = ({ user, addressId, operation, onClose }: {
     user: UserProfile,
     addressId?: string,
     operation: 'edit' | 'add',
     onClose: () => void
 }) => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const existingAddress = user.addresses.find(addr => addr.address_id.toString() === addressId);
 
     const { register, handleSubmit, reset } = useForm({

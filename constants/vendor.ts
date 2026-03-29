@@ -1,15 +1,5 @@
 import type { Link } from "@/components/common/InnerSideBar";
-import type { NavLinkType } from "./common";
-import {
-  dashboard_icon,
-  product_icon,
-  order_icon,
-  inventory_icon,
-  finance_icon,
-  marketing_icon,
-  customer_care_icon,
-  settings_icon,
-} from "./common";
+import { NavLinkType } from "@/utils/Types";
 
 
 export const VendorDocumentTypes: { label: string; value: string }[] = [

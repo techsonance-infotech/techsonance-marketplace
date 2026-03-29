@@ -1,15 +1,15 @@
 'use client';
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+
 import { ChevronLeftCircle } from "lucide-react";
-import type { RootState } from "@/Redux store/store";
 import { FormInput } from "@/components/common/FormInput";
 import { PASSWORD_CHANGE_FORM_FIELDS } from "@/constants/dynamicFields";
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 
 export default function PasswordForm() {
-    const { user } = useSelector((state: RootState) => state.auth);
+    const { user } = useAppSelector((state) => state.auth);
     const router = useRouter();
     const { register, reset, handleSubmit } = useForm({
         defaultValues: {

@@ -1,11 +1,11 @@
 'use client';
-import { useDispatch, useSelector } from 'react-redux';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { DynamicIcon, IconName } from 'lucide-react/dynamic';
-import type { RootState } from '@/Redux store/store';
-import { logOut } from '@/Redux store/features/auth/authSlice';
+import type { RootState } from '@/lib/store';
+import { logOut } from '@/lib/features/auth/authSlice';
 import { useMediaQuery } from 'react-responsive';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 const ProfileSidebarLink = [
     { name: 'Profile Overview', path: '/customerProfile', icon: 'user' },
     { name: 'My Orders', path: '/orders', icon: 'shopping-bag' },
@@ -17,10 +17,10 @@ const ProfileSidebarLink = [
 ];
 
 export function ProfileSidebar() {
-    const { user } = useSelector((state: RootState) => state.auth);
+    const { user } = useAppSelector((state: RootState) => state.auth);
 
     const router = useRouter();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const currentPath = usePathname();
     const currentUserId = user?.user_id ? user.user_id : '';
     const isMobile = useMediaQuery({ maxWidth: 767 });

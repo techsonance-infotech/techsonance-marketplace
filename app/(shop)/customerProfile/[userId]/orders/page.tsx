@@ -1,6 +1,5 @@
 'use client';
-import { useSelector } from "react-redux";
-import type { RootState } from "@/Redux store/store";
+import type { RootState } from "@/lib/store";
 import { motion } from "motion/react";
 import { useState } from "react";
 import type { UserOrder } from "@/utils/Types";
@@ -9,14 +8,15 @@ import { useRouter } from "next/navigation";
 import { useMediaQuery } from "react-responsive";
 import { ChevronLeftCircle } from "lucide-react";
 import { OrdersList } from "@/components/customer/OrderList";
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 type ordersStatusType = 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled';
 
- 
+
 
 
 export default function OrdersPage() {
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user } = useAppSelector((state: RootState) => state.auth);
   const router = useRouter();
   const isMobile = useMediaQuery({ maxWidth: 640 });
   const [orderStatus, setOrderStatus] = useState<ordersStatusType>('Pending');

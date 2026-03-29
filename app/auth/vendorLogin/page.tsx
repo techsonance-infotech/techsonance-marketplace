@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { passwordValidationSchema } from "@/utils/validation";
 import { vendorLogin } from "@/utils/apiClient";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/Redux store/store";
+import { RootState } from "@/lib/store";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 
 interface LoginFormData {
     email: string;
@@ -14,7 +14,7 @@ interface LoginFormData {
 
 export default function VendorLoginPage() {
     const router = useRouter();
-    const { loading, error } = useSelector((state: RootState) => state.auth);
+    const { loading, error } = useAppSelector((state: RootState) => state.auth);
     const {
         reset,
         register,
@@ -23,7 +23,7 @@ export default function VendorLoginPage() {
     } = useForm<LoginFormData>({
         defaultValues: { email: "", password: "" }
     });
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const storedData = typeof window !== 'undefined' ? localStorage.getItem("auth") : null;
     const auth = storedData ? JSON.parse(storedData) : null;
     if (auth && auth?.isAuthenticated && auth?.user?.user_role
@@ -32,7 +32,7 @@ export default function VendorLoginPage() {
         router.replace('/vendor/dashboard');
     }
     const onSubmit = async (data: LoginFormData) => {
-        const result = await vendorLogin(data,dispatch);
+        const result = await vendorLogin(data, dispatch);
         if (result?.status) {
             reset();
             console.log(result.user);

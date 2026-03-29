@@ -5,8 +5,8 @@ import { VENDOR_LIST } from "@/constants/admin";
 import { searchImgDark } from "@/constants/common";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSelector } from "react-redux";
 import { ADMIN_BASE_URL } from "@/constants/constants";
+import { useAppSelector } from "@/hooks/reduxHooks";
 const getVendorRequests = async () => {
     try {
         const response = await fetch(`${ADMIN_BASE_URL}/vendor-applications`, {
@@ -37,7 +37,7 @@ const getVendorRequests = async () => {
     }
 };
 export default function VendorManagementPage() {
-    const { theme } = useSelector((state: any) => state.adminTheme);
+    const { theme } = useAppSelector((state) => state.adminTheme);
     const [count, setCount] = useState(1);
 
     const pageSize = 5;

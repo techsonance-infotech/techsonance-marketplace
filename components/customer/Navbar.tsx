@@ -4,22 +4,22 @@ import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { useMediaQuery } from 'react-responsive'
 import { BRAND_LOGO, searchImgDark, searchImgLight, userIcon } from "@/constants/common";
-import { useDispatch, useSelector } from "react-redux";
 import { Bell, Heart, ShoppingCart } from "lucide-react";
 
 import { NAV_LINKS } from "@/constants/customer";
-import { toggleCartSidebar } from "@/Redux store/features/CartSidebar";
+import { toggleCartSidebar } from "@/lib/features/CartSidebar";
 import { motion } from "motion/react";
-import { RootState } from "@/Redux store/store";
+import { RootState } from "@/lib/store";
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 
 
 
 export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: { styles?: string, logoUrl?: string, menuLinks?: { [key: string]: string }[] }) {
     const searchImg = false ? searchImgLight : searchImgDark;
-    const { items } = useSelector((state: RootState) => state.cart)
-    const { wishItems } = useSelector((state: any) => state.wishlist)
-    const { user } = useSelector((state: any) => state.auth)
-    const dispatch = useDispatch();
+    const { items } = useAppSelector((state: RootState) => state.cart);
+    const { wishItems } = useAppSelector((state: any) => state.wishlist);
+    const { user } = useAppSelector((state: any) => state.auth);
+    const dispatch = useAppDispatch();
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const wishlistCount = wishItems.length;
     const path = usePathname();

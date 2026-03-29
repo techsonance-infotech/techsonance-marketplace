@@ -2,11 +2,11 @@
 
 import { Sidebar } from "@/components/common/Sidebar";
 import { ADMIN_NAV_LINKS } from "@/constants/admin";
-import { useIsSidebarOpen } from "@/utils/sideBarCheck";
 import './index.css';
 import { useParams } from "next/navigation";
+import { useAppSelector } from "@/hooks/reduxHooks";
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-    const isSidebarOpen = useIsSidebarOpen();
+    const isSidebarOpen = useAppSelector((state) => state.sidebar.isSidebarOpen);
     const { adminId } = useParams();
     return (
         <>

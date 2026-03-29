@@ -1,16 +1,16 @@
 'use client';
-import { useSelector } from "react-redux";
+
 import { motion } from "motion/react";
 import { ShoppingBag, Mail, Phone, Timer, MapPin, Lock, Bell, ChevronLeftCircle } from "lucide-react";
-import type { RootState } from "@/Redux store/store";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Counter } from "@/components/customer/Counter";
 import { containerVariants, itemVariants, ManagementCard } from "@/components/customer/ManagementCard";
+import { useAppSelector } from "@/hooks/reduxHooks";
 export default function UserProfilePage() {
-    const { user } = useSelector((state: RootState) => state.auth);
-    const {userId}=useParams()
+    const { user } = useAppSelector((state) => state.auth);
+    const { userId } = useParams()
     console.log(user);
     const router = useRouter();
     if (!user) return null;

@@ -45,7 +45,7 @@ const toggle_light = "/assets/toggle-light.png";
 const toggle_dark = "/assets/toggle-dark.png";
 const replacement_icon = "/assets/replacement icon.png";
 
-import { Product, UserRole } from "../utils/Types"
+import { NavLinkType, Product, UserRole } from "../utils/Types"
 
 export { UserRole };
 
@@ -165,7 +165,6 @@ export const productData: Product[] = [
     },
     {
         "id": "prod-012",
-        "id": "prod-012",
         "productName": "Bose QuietComfort Ultra",
         "sku": "AUD-HDP-012",
         "stock": 198,
@@ -201,9 +200,6 @@ export const productData: Product[] = [
         "imageUrl": "https://picsum.photos/seed/AUD-HDP-015/200/200"
     }
 ]
-export interface NavLinkType {
-    [key: string]: string;
-}
 export const VENDOR_NAV_LINKS: NavLinkType[] = [
     { Dashboard: '/vendor', icon: dashboard_icon },
     { Products: '/vendor/products', icon: product_icon },

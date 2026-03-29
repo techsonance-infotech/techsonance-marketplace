@@ -1,9 +1,8 @@
 'use client';
-import { useSelector } from "react-redux";
-import type { RootState } from "@/Redux store/store";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { ChevronLeftCircle } from "lucide-react";
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 
 export const PROFILE_EDIT_FIELDS = [
@@ -15,14 +14,14 @@ export const PROFILE_EDIT_FIELDS = [
 ];
 
 export default function EditProfilePage() {
-    const { user } = useSelector((state: RootState) => state.auth);
-    const userId=user?.user_id ?user.user_id : '';
+    const { user } = useAppSelector((state) => state.auth);
+    const userId = user?.user_id ? user.user_id : '';
     const router = useRouter();
     const { register, reset, handleSubmit } = useForm({
         defaultValues: {
             profile_picture: user?.profileImgUrl || "",
-            first_name: user?.first_name|| "",
-            last_name: user?.last_name|| "",
+            first_name: user?.first_name || "",
+            last_name: user?.last_name || "",
             email: user?.email || "",
             phone: user?.phone || ""
         }

@@ -4,13 +4,13 @@ import { TAB_LINKS } from "@/constants/customer"
 import { DynamicIcon, IconName } from "lucide-react/dynamic"
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSelector } from "react-redux";
 import { useMemo } from "react"
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 
 
 export function TabNavBar() {
-    const { user } = useSelector((state: any) => state.auth)
+    const { user } = useAppSelector((state: any) => state.auth)
     const userId= user?.user_id ? user.user_id : '';
     const path = usePathname();
     const navLinks = useMemo((() => {

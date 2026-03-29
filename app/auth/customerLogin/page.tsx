@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { passwordValidationSchema } from "@/utils/validation";
 import axios from "axios";
 import { CUSTOMER_BASE_URL, CUSTOMER_LOGIN_POSTER } from "@/constants/common";
-import { useDispatch } from "react-redux";
-import { loginFailure, loginStart, loginSuccess } from "@/Redux store/features/auth/authSlice";
+import { loginFailure, loginStart, loginSuccess } from "@/lib/features/auth/authSlice";
+import { useAppDispatch } from "@/hooks/reduxHooks";
 
 interface FormData {
     customer_email: string | null;
@@ -21,7 +21,7 @@ export default function CustomerLoginPage() {
         password: null,
     });
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;

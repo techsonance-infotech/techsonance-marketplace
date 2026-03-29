@@ -1,13 +1,12 @@
 'use client';
-import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from "motion/react";
-import type { RootState } from "@/Redux store/store";
 import { PRODUCT_LIST } from "@/constants/customer";
 import { AddToCart } from "@/components/customer/AddToCart";
 import { BuyBtn } from "@/components/customer/BuyBtn";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeftCircle } from "lucide-react";
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 
 const PriceTicker = ({ value }: { value: number }) => {
@@ -31,7 +30,7 @@ const PriceTicker = ({ value }: { value: number }) => {
 };
 
 export default function CartList() {
-    const { items } = useSelector((state: RootState) => state.cart);
+    const { items } = useAppSelector((state) => state.cart);
     const router = useRouter()
     const cartItemsWithDetails = items.map(item => {
         const product = PRODUCT_LIST.find(p => p.id === item.id);

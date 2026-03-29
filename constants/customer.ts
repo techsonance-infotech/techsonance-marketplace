@@ -1,11 +1,9 @@
 import { IconName } from "lucide-react/dynamic";
 export const HOME_SECONDARY_IMG = "https://m.media-amazon.com/images/I/61KcQyhY6SL._SL1200_.jpg";
 
-import { BestSellingProductType, CATEGORY_LIST_TYPE, FeedbackType, OrderFailedStatusTypes, OrderSuccessStatusTypes, PRODUCT_LIST_TYPE } from "@/utils/Types"
+import { BestSellingProductType, CATEGORY_LIST_TYPE, FeedbackType, NavLinkType, OrderFailedStatusTypes, OrderSuccessStatusTypes, PRODUCT_LIST_TYPE } from "@/utils/Types"
 
-export interface NavLinkType {
-    [key: string]: string;
-}
+
 export interface FooterLinkType {
     title: string;
     url: string;
@@ -19,18 +17,11 @@ export interface FooterSectionType {
 }
 // Navigation Links
 
-export interface tabLinkType {
-    [key: string]: string;
-}
-
-
 //Cusomter Home hero title and description
 export const HOME_HERO_TITLE = "Welcome to Sound Sphere - Your Ultimate Music Marketplace";
 export const HOME_HERO_DESC = "Discover, buy, and sell music products with ease. Join our vibrant community of music lovers and elevate your sound experience today!";
 export const HERO_BTN_TEXT = "Shop Now";
-export interface NavLinkType {
-    [key: string]: string;
-}
+
 export interface FooterLinkType {
     title: string;
     url: string;

@@ -1,12 +1,12 @@
 'use client';
-import { use, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { loginStart, loginSuccess, loginFailure } from "@/Redux store/features/auth/authSlice";
+import { useEffect, useState } from "react";
+import { loginStart, loginSuccess, loginFailure } from "@/lib/features/auth/authSlice";
 import { adminLogin } from "@/utils/apiClient";
 import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/hooks/reduxHooks";
 
 export default function AdminLoginPage() {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const [adminLoginID, setAdminLoginID] = useState<string | null>(null);
     const [adminLoginPass, setAdminLoginPass] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);

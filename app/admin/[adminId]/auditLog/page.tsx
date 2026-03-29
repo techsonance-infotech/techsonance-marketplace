@@ -4,9 +4,9 @@ import { Pagination } from "@/components/common/Pagination";
 import { AUDIT_LOG_DATA } from "@/constants/admin";
 import { searchImgDark } from "@/constants/common";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import { Calendar } from "@/components/ui/calendar";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useAppSelector } from "@/hooks/reduxHooks";
 export const AUDIT_LOG_COLUMNS = [
     { id: 'timestamp', label: 'TIMESTAMP' },
     { id: 'actor', label: 'ACTOR(USER)' },
@@ -26,7 +26,7 @@ export default function AuditLogPage() {
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [isOpen, setIsOpen] = useState(false);
     const [logs] = useState(AUDIT_LOG_DATA);
-    const { theme } = useSelector((state: any) => state.adminTheme);
+    const { theme } = useAppSelector((state) => state.adminTheme);
     const [count, setCount] = useState(1);
 
     const handleDateChange = (selectedDate: Date | undefined) => {

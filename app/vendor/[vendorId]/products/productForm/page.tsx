@@ -2,10 +2,10 @@
 import { useFieldArray, useForm } from "react-hook-form";
 import { use, useEffect, useState } from "react";
 import { Trash2, Plus, UploadCloud, RefreshCw, Package, Tag, Image, Building2, ChevronDown, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import { useSelector } from "react-redux";
 import { BASE_API_URL } from "@/constants/constants";
-import { ORGANIZATION_TAXATION_FIELDS, FeatureType, ProductFormValues } from "@/constants/common";
-import { CATEGORY_LIST } from "@/constants";
+import { ORGANIZATION_TAXATION_FIELDS,} from "@/constants/common";
+import { ProductFormValues } from "@/utils/Types";
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 export default function ProductForm() {
     const {
@@ -34,7 +34,7 @@ export default function ProductForm() {
     });
 
     const { fields: featureFields, append: appendFeature, remove: removeFeature } = useFieldArray({ control, name: "features" });
-    const { user } = useSelector((state: any) => state.auth);
+    const { user } = useAppSelector((state) => state.auth);
     const [productFiles, setProductFiles] = useState<File[]>([]);
     const [featureFiles, setFeatureFiles] = useState<File[]>([]);
     const hasVariants = watch("has_variants");

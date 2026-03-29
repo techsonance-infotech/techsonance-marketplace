@@ -1,18 +1,18 @@
 'use client';
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeftCircle } from "lucide-react";
-import { deleteAddress, setDefaultAddress } from "@/Redux store/features/auth/authSlice";
-import type { RootState } from "@/Redux store/store";
+import { deleteAddress, setDefaultAddress } from "@/lib/features/auth/authSlice";
+
 import { useRouter } from "next/navigation";
 import { AddressCard } from "@/components/customer/AddressCard";
 import { AddressModal } from "@/components/customer/AddressModel";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 
 export default function Addresses() {
-    const { user } = useSelector((state: RootState) => state.auth);
-    const dispatch = useDispatch();
+    const user = useAppSelector((state) => state.auth.user);
+    const dispatch = useAppDispatch();
     const [isModalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
     const [selectedId, setSelectedId] = useState<string | undefined>(undefined);

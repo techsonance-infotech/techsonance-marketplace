@@ -1,18 +1,18 @@
 'use client';
 import { MapPin, CreditCard } from "lucide-react";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/Redux store/store";
+
 import { useState } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { PAYMENT_METHODS_FIELDS } from "@/constants/dynamicFields";
 import { SelectedPaymentMethod } from "@/components/customer/SelectedPaymentMethod";
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 
 
 export default function CheckoutPage() {
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
   const params = useParams<{ userId: string; id: string }>();
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('UPI');
@@ -122,7 +122,7 @@ export default function CheckoutPage() {
               }
             </div>
 
-            
+
 
             <button className="w-full bg-blue-600 text-white font-semibold lg:py-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
               Pay ₹{orderData.total.toLocaleString()}

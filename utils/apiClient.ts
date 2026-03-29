@@ -1,4 +1,4 @@
-﻿import { loginFailure, loginSuccess } from "@/Redux store/features/auth/authSlice";
+﻿import { loginFailure, loginSuccess } from "@/lib/features/auth/authSlice";
 import axios from "axios";
 import { UserProfile, UserRole, VendorRegisterFormData } from "./Types";
 import { ADMIN_AUTH_URL, BASE_API_URL, VENDOR_AUTH_URL } from "@/constants/constants";
