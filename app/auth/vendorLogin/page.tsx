@@ -33,7 +33,8 @@ export default function VendorLoginPage() {
     }
     const onSubmit = async (data: LoginFormData) => {
         const result = await vendorLogin(data, dispatch);
-        if (result?.status) {
+        console.log(result);
+        if (result?.status === 201) {
             reset();
             console.log(result.user);
             router.push(`/vendor/${result.user.vendor_id ?? ''}`);

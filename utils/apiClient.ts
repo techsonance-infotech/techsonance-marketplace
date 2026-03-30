@@ -6,19 +6,27 @@ import { ADMIN_AUTH_URL, VENDOR_AUTH_URL } from "@/constants";
 
 export const vendorLogin = async (data: { email: string, password: string }, dispatch: any) => {
     try {
-        const response = await axios.post(`${VENDOR_AUTH_URL}/login-vendor`, {
-            email: data.email,
-            password: data.password
-        },
-            { withCredentials: true });
+        const response = await fetch(`${VENDOR_AUTH_URL}/login-vendor`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: data.email,
+                password: data.password
+            }),
+            credentials: 'include'
+        });
+        const result = await response.json();
+        console.log(result);
         if (response.status === 201) {
             const payload: { user: UserProfile, token: string, role: UserRole } = {
-                user: response.data.user,
-                token: response.data.token,
-                role: response.data.user_role as UserRole
+                user: result.data,
+                token: result.data.token,
+                role: result.data.user_role as UserRole
             };
             dispatch(loginSuccess(payload));
-            return { user: response.data.user, status: true, message: "Login successful" };
+            return { user: result.data, status: true, message: "Login successful" };
         }
     } catch (err: any) {
         const errorMessage = err.response?.data?.message || err.message || "Login failed";
