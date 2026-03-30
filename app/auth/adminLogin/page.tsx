@@ -9,6 +9,7 @@ export default function AdminLoginPage() {
     const dispatch = useAppDispatch();
     const [adminLoginID, setAdminLoginID] = useState<string | null>(null);
     const [adminLoginPass, setAdminLoginPass] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const storedData = typeof window !== 'undefined' ? localStorage.getItem("auth") : null;
@@ -16,9 +17,11 @@ export default function AdminLoginPage() {
     useEffect(() => {
         if (auth && auth?.isAuthenticated && auth?.user?.user_role
             === "admin") {
+                setLoading(true);
             console.log("Already logged in as admin.");
             router.push(`/admin/${auth.user.id}`);
         }
+        setLoading(false);
     }, [auth, router]);
     const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -38,7 +41,8 @@ export default function AdminLoginPage() {
     return (
         <>
             <main className="flex font-[inter] justify-center items-center   h-[100vh]">
-                <form onSubmit={submitHandler} className="flex flex-col border rounded-2xl px-9 h-[580px] w-[540px] justify-center">
+                {loading && <p>Loading...</p>}
+                <form onSubmit={submitHandler} className={`${loading ? 'opacity-50' : ''} flex flex-col border rounded-2xl px-9 h-[580px] w-[540px] justify-center`}>
                     <p className="text-center font-bold text-[1.4rem] text-slate-600">Restricted Access</p>
                     <h1 className="font-bold text-[2rem] text-center mb-6">System Administration</h1>
                     <div className="flex flex-col gap-4 mb-8">

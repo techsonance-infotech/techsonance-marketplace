@@ -6,6 +6,11 @@ export const CUSTOMER_AUTH_URL = process.env.NEXT_PUBLIC_USER_AUTH_URL;
 export const ADMIN_AUTH_URL = process.env.NEXT_PUBLIC_ADMIN_AUTH_URL;
 export const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+export const isClient = typeof window !== 'undefined';
+export const USER_STORAGE_KEY = 'user';
+export const ACCESS_TOKEN_KEY = 'access_token';
+export const CART_KEY = 'cart';
+export const IS_AUTHENTICATED_KEY = 'isAuthenticated';
 import { NavLinkType, Product, UserRole } from "../utils/Types"
 
 export { UserRole };

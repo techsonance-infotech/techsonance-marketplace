@@ -1,14 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { RoleDefinition, UserProfile, UserRole } from '../../../utils/Types';
+import { UserProfile, UserRole } from '../../../utils/Types';
+import { ACCESS_TOKEN_KEY, CART_KEY, IS_AUTHENTICATED_KEY, isClient, USER_STORAGE_KEY } from '@/constants';
 
-const isClient = typeof window !== 'undefined';
-const AUTH_TOKEN = 'authToken';
-const USER_STORAGE_KEY = 'user';
+
 const getUserFromLocalStorage = () => {
     if (!isClient) return null;
     try {
         const serializedUser = localStorage.getItem(USER_STORAGE_KEY);
-        if (serializedUser !==undefined && serializedUser !== null) {
+        if (serializedUser !== undefined && serializedUser !== null) {
             return JSON.parse(serializedUser);
         } else {
             return null;
@@ -31,11 +30,11 @@ export interface AuthType {
 
 
 const initialState: AuthType = {
-    isAuthenticated: isClient ? !!localStorage.getItem(AUTH_TOKEN) : false,
-    user: getUserFromLocalStorage(), // Load user from localStorage if available
+    isAuthenticated: isClient ? !!localStorage.getItem(ACCESS_TOKEN_KEY) : false,
+    user: getUserFromLocalStorage(),
     loading: false,
     error: null,
-    token: isClient ? localStorage.getItem(AUTH_TOKEN) : null,
+    token: isClient ? sessionStorage.getItem(ACCESS_TOKEN_KEY) : null,
     role: UserRole.Customer,
 };
 
@@ -59,8 +58,12 @@ const authSlice = createSlice({
             state.loading = false;
             state.error = null;
             if (isClient) {
-                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(action.payload));
-                localStorage.setItem(AUTH_TOKEN, action.payload.token);
+                localStorage.setItem(IS_AUTHENTICATED_KEY, JSON.stringify({ isAuthenticated: true, role: action.payload.role }));
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(action.payload.user));
+                sessionStorage.setItem(ACCESS_TOKEN_KEY, JSON.stringify({
+                    token: action.payload.token,
+                    expiresAt: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString()
+                }));
             }
         },
         logOut(state) {
@@ -70,9 +73,10 @@ const authSlice = createSlice({
             state.loading = false;
             state.error = null;
             if (isClient) {
-                localStorage.removeItem(AUTH_TOKEN);
                 localStorage.removeItem(USER_STORAGE_KEY);
-                localStorage.removeItem('cart');
+                localStorage.removeItem(CART_KEY);
+                localStorage.removeItem(IS_AUTHENTICATED_KEY);
+                sessionStorage.removeItem(ACCESS_TOKEN_KEY);
             }
         },
 

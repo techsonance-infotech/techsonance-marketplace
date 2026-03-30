@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Edit } from "lucide-react";
 import { Pagination } from "@/components/common/Pagination";
-import { productData, searchImgDark } from "@/constants/constants";
+import { productData, searchImgDark } from "@/constants";
 
 
 
