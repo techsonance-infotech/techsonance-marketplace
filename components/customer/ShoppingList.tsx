@@ -10,17 +10,17 @@ import { useMediaQuery } from "react-responsive";
 import { ProductSkeleton } from "../common/ProductSkeleton";
 import { motion, MotionConfig } from "motion/react";
 import type { RootState } from "@/lib/store";
-import { PRODUCT_LIST_TYPE } from "@/utils/Types";
+
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 
 export function ShoppingList({
     products, styles
 }: {
-    products: PRODUCT_LIST_TYPE[];
+    products: ProductType[];
     styles?: string;
 }) {
     const pageSize = 8; // Number of products to show at a time
-    const [productsState, setProductsState] = useState<PRODUCT_LIST_TYPE[]>(products)
+    const [productsState, setProductsState] = useState<ProductType[]>(products)
     const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
     const [count, setCount] = useState(1); // Number of products to show at a time
     const totalPages = Math.ceil(productsState.length / pageSize);

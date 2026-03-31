@@ -4,13 +4,14 @@ import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { DynamicIcon, IconName } from 'lucide-react/dynamic';
 import { Star } from 'lucide-react';
-import { PRODUCT_LIST, type PRODUCT_LIST_TYPE } from '@/constants/customer';
 import { WishListBtn } from '@/components/customer/WishListBtn';
 import { AddToCart } from '@/components/customer/AddToCart';
 import { BuyBtn } from '@/components/customer/BuyBtn';
 import { ProductList } from '@/components/customer/ProductList';
 import { ProductReview } from '@/components/customer/ProductReview';
 import { ProductSpecifications } from '@/components/customer/ProductSpec';
+import { ProductType } from '@/utils/Types';
+import { PRODUCT_LIST } from '@/constants';
 
 const brandOffer = [
     { id: '1', title: '1 year warranty', icon: 'shopping-bag' },
@@ -23,8 +24,8 @@ const brandOffer = [
 export default function ProductPage() {
     const params = useParams();
     const id = params?.id as string;
-    const product: PRODUCT_LIST_TYPE | undefined = PRODUCT_LIST.find(pro => pro.id === id);
-    const [activeImage, setActiveImage] = useState(product?.imgUrl);
+    const product: ProductType[] | undefined = PRODUCT_LIST.filter(pro => pro.id === id);
+    const [activeImage, setActiveImage] = useState(product?.[0]?.images[0]?.image_url || '');
 
     if (!product) {
         return <h1 className='text-2xl font-bold text-gray-900 p-8'>Product not found</h1>;

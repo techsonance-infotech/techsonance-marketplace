@@ -2,14 +2,10 @@
 import PermissionsSection from "@/components/admin/PermissionsSection";
 import AssignSection from "@/components/admin/AssignSection";
 import { fetchPermissions, fetchRolePermissions, fetchRoles } from "@/utils/adminApiClients";
-// import { useParams } from "next/navigation";
-// params is a Promise in newer Next.js versions
 export default async function RolesPage({ params }: { params: Promise<{ adminId: string }> }) {
-    // Await the params
     const { adminId } = await params;
     const getRoles = await fetchRoles();
     const roles = getRoles?.data || [];
-
     const getPermissions = await fetchPermissions();
     const permissions = getPermissions?.data || [];
     const rolePerms = await fetchRolePermissions();

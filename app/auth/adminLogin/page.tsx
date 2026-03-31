@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from "react";
 import { loginStart, loginSuccess, loginFailure } from "@/lib/features/auth/authSlice";
-import { adminLogin } from "@/utils/apiClient";
+import { adminLogin } from "@/utils/authApiClient";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/hooks/reduxHooks";
 
@@ -17,7 +17,7 @@ export default function AdminLoginPage() {
     useEffect(() => {
         if (auth && auth?.isAuthenticated && auth?.user?.user_role
             === "admin") {
-                setLoading(true);
+            setLoading(true);
             console.log("Already logged in as admin.");
             router.push(`/admin/${auth.user.id}`);
         }

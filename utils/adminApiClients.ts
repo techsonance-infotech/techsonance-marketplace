@@ -3,7 +3,6 @@ import { ADMIN_BASE_URL, BASE_API_URL } from "@/constants";
 import { authToken } from "./authToken";
 import { revalidatePath } from "next/cache";
 
-// 1. DATA FETCHING (Works fine here)
 export const fetchRoles = async () => {
     const response = await fetch(`${BASE_API_URL}roles`, {
         headers: { Authorization: `Bearer ${authToken()}` },

@@ -3,9 +3,13 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { use, useEffect, useState } from "react";
 import { Trash2, Plus, UploadCloud, RefreshCw, Package, Tag, Image, Building2, ChevronDown, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { BASE_API_URL } from "@/constants/constants";
-import { ORGANIZATION_TAXATION_FIELDS,} from "@/constants/common";
-import { ProductFormValues } from "@/utils/Types";
+import { ORGANIZATION_TAXATION_FIELDS, } from "@/constants/common";
+import { ProductFormValuesType } from "@/utils/Types";
 import { useAppSelector } from "@/hooks/reduxHooks";
+import { fetchVendorsProductsCategory } from "@/utils/vendorApiClient";
+import { useParams } from "next/navigation";
+
+import { useRouter } from "next/navigation";
 
 export default function ProductForm() {
     const {
@@ -15,7 +19,7 @@ export default function ProductForm() {
         watch,
         setValue,
         formState: { errors, isSubmitting },
-    } = useForm<ProductFormValues>({
+    } = useForm<ProductFormValuesType>({
         defaultValues: {
             productName: "",
             description: "",
@@ -35,49 +39,45 @@ export default function ProductForm() {
 
     const { fields: featureFields, append: appendFeature, remove: removeFeature } = useFieldArray({ control, name: "features" });
     const { user } = useAppSelector((state) => state.auth);
+    const { vendorId } = useParams();
+    const router = useRouter();
     const [productFiles, setProductFiles] = useState<File[]>([]);
     const [featureFiles, setFeatureFiles] = useState<File[]>([]);
     const hasVariants = watch("has_variants");
     const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([]);
+
     const [categoriesLoading, setCategoriesLoading] = useState(true);
     const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
     const FILE_UPLOAD_FIELDS = [
-        { label: "Product Images / Thumbnail", files: productFiles, setFiles: setProductFiles, fieldName: "productMedia" as keyof ProductFormValues },
-        { label: "Feature / Spec Media", files: featureFiles, setFiles: setFeatureFiles, fieldName: "featureMedia" as keyof ProductFormValues },
+        { label: "Product Images / Thumbnail", files: productFiles, setFiles: setProductFiles, fieldName: "productMedia" as keyof ProductFormValuesType },
+        { label: "Feature / Spec Media", files: featureFiles, setFiles: setFeatureFiles, fieldName: "featureMedia" as keyof ProductFormValuesType },
     ] as const;
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await fetch(`${BASE_API_URL}categories`);
-                const data = await response.json();
-                setCategoryOptions(data.map((cat: any) => ({ value: cat.id, label: cat.name })));
-            } catch (error) {
-                console.error('Failed to load categories', error);
-            } finally {
-                setCategoriesLoading(false);
-            }
-        };
-        fetchCategories();
-    }, []);
+        fetchVendorsProductsCategory(vendorId?.toString() || "").then((res) => {
+            const options = res.data.map((c: any) => ({ value: c.id, label: c.name }));
+            setCategoryOptions(options);
+            setCategoriesLoading(false);
+        }).catch(() => setCategoriesLoading(false));
+    }, [vendorId]);
     // --- Unified file handler ---
     const handleFileSelect = (
         e: React.ChangeEvent<HTMLInputElement>,
         currentFiles: File[],
         setFiles: React.Dispatch<React.SetStateAction<File[]>>,
-        fieldName: keyof ProductFormValues
+        fieldName: keyof ProductFormValuesType
     ) => {
         if (!e.target.files) return;
         const updated = [...currentFiles, ...Array.from(e.target.files)];
         setFiles(updated);
         setValue(fieldName, updated as any);
-        e.target.value = ""; 
+        e.target.value = "";
     };
 
     const handleFileRemove = (
         index: number,
         currentFiles: File[],
         setFiles: React.Dispatch<React.SetStateAction<File[]>>,
-        fieldName: keyof ProductFormValues
+        fieldName: keyof ProductFormValuesType
     ) => {
         const updated = currentFiles.filter((_, i) => i !== index);
         setFiles(updated);
@@ -85,7 +85,7 @@ export default function ProductForm() {
     };
 
     // --- Submit ---
-    const onSubmit = async (data: ProductFormValues) => {
+    const onSubmit = async (data: ProductFormValuesType) => {
         console.log("submit started");
         if (productFiles.length === 0 || featureFiles.length === 0) {
             console.log("product file checking failed", { productFiles, featureFiles });
@@ -113,6 +113,7 @@ export default function ProductForm() {
             stock_quantity: totalStock,
             sku: data.has_variants ? undefined : data.sku,
         };
+
         const formData = new FormData();
         productFiles.forEach((file) => formData.append('product', file));
         featureFiles.forEach((file) => formData.append('product_spec', file));
@@ -125,7 +126,9 @@ export default function ProductForm() {
             });
             console.log("response", response);
             if (!response.status) throw new Error("Failed to create product");
+
             setSubmitStatus("success");
+            router.push(`/vendor/${vendorId}/products`);
         } catch {
             setSubmitStatus("error");
         }

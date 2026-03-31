@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { passwordValidationSchema } from "@/utils/validation";
-import { vendorLogin } from "@/utils/apiClient";
+import { vendorLogin } from "@/utils/authApiClient";
 import { RootState } from "@/lib/store";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 
@@ -29,7 +29,7 @@ export default function VendorLoginPage() {
     if (auth && auth?.isAuthenticated && auth?.user?.user_role
         === "vendor") {
         console.log("Already logged in as vendor.");
-        router.replace('/vendor/dashboard');
+        router.replace(`/vendor/${auth.user.vendor_id}`);
     }
     const onSubmit = async (data: LoginFormData) => {
         const result = await vendorLogin(data, dispatch);

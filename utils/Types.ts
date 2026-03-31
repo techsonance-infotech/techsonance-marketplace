@@ -218,27 +218,61 @@ export interface ReviewType {
   comment: string;
 }
 
-export interface PRODUCT_LIST_TYPE {
-  id: string;
-  title: string;
-  price: number;
-  discount: number;
-  category: string;
-  imgUrl: string;
-  description: string;
-  satisfaction: string;
-  rating?: number;
-  reviewCount?: number;
-  productDetails?: {
-    brand: string;
-    model: string;
-    specifications: {
-      [key: string]: string;
-    };
-  };
-  specificationsImgUrl?: string[];
-  reviews?: ReviewType[];
-}
+export type ProductStatus = 'active' | 'inactive' | 'archived'; // Add other status strings here
+
+export type ProductImageType = {
+    id: string;
+    image_url: string;
+    alt_text?: string;
+    imgType: string;
+    is_primary: boolean;
+    product_id: string;
+};
+
+export type ProductFeatureType = {
+    key: string;
+    value: string | boolean | number;
+};
+
+export type ProductType = {
+    id: string;
+    name: string;
+    description: string;
+    base_price: string;
+    discount_percent: string;
+    stock_quantity: number;
+    has_variants: boolean;
+    status: ProductStatus;
+    category_id: string;
+    company_id: string;
+    vendor_id: string;
+    features: ProductFeatureType[];
+    images: ProductImageType[];
+    created_at: string;
+    updated_at: string;
+};
+//Deleted the old PRODUCT_LIST_TYPE and replaced it with ProductType which is more comprehensive and closely aligned with the expected product data structure in a marketplace application.
+// export interface PRODUCT_LIST_TYPE {
+//   id: string;
+//   title: string;
+//   price: number;
+//   discount: number;
+//   category: string;
+//   imgUrl: string;
+//   description: string;
+//   satisfaction: string;
+//   rating?: number;
+//   reviewCount?: number;
+//   productDetails?: {
+//     brand: string;
+//     model: string;
+//     specifications: {
+//       [key: string]: string;
+//     };
+//   };
+//   specificationsImgUrl?: string[];
+//   reviews?: ReviewType[];
+// }
 
 export interface Vendor {
   id: string;

@@ -1,6 +1,6 @@
 export const HOME_SECONDARY_IMG = "https://m.media-amazon.com/images/I/61KcQyhY6SL._SL1200_.jpg";
 
-import { BestSellingProductType, CATEGORY_LIST_TYPE, FeedbackType, FooterSectionType, NavLinkType, OrderFailedStatusTypes, OrderSuccessStatusTypes, PRODUCT_LIST_TYPE } from "@/utils/Types"
+import { BestSellingProductType, CATEGORY_LIST_TYPE, FeedbackType, FooterSectionType, NavLinkType, OrderFailedStatusTypes, OrderSuccessStatusTypes, ProductType } from "@/utils/Types"
 
 
 

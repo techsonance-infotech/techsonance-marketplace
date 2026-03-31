@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { BusinessStructure, categoryOptions, COUNTRIES, COUNTRY_CODES } from "@/constants/common";
-import { vendorRegister } from "@/utils/apiClient";
+import { vendorRegister } from "@/utils/authApiClient";
 import { VendorRegisterFormData, VendorRegisterTypes } from "@/utils/Types";
 import { RegistrationSuccessModal } from "@/components/common/RegistrationSuccessModal";
 import FinancialCompliance from "@/components/vendor/FinancialCompliance";

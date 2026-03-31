@@ -1,4 +1,5 @@
-﻿export const Button = ({
+﻿"use client";
+export const Button = ({
     label, onClick, className, disabled,
 }: {
     label: string;
