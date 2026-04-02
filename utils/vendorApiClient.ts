@@ -214,3 +214,22 @@ export const deleteProductVariant = async (variantId: string, vendorId: string, 
         console.error('Error deleting product variant:', error);
     }
 }
+export const fetchVariant = async (variantId: string, vendorId: string, productId: string) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}product-variant/variant/${variantId}`, {
+            method: 'GET',
+            headers: {
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+
+        });
+        if (response.status !== 200) {
+            console.error('Failed to fetch variant data');
+
+            return null;
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching variant data:', error);
+    }
+}
