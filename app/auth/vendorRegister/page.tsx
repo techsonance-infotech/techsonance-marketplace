@@ -43,6 +43,7 @@ export default function VendorRegisterPage() {
         control,
         formState: { errors, isSubmitting },
     } = useForm<VendorRegisterTypes>({
+        mode: "onChange",
         resolver: zodResolver(vendorRegisterSchema),
         defaultValues: {
             first_name: null,
@@ -122,9 +123,13 @@ export default function VendorRegisterPage() {
                                         </label>
 
                                         {field.groupField ? (
-                                            <div className=" w-full">
+                                            <div className="w-full flex items-start gap-2"> {/* Changed grid to flex */}
                                                 {field.groupField.map((subField) => (
-                                                    <span key={subField.id} className="w-full">
+                                                    <div
+                                                        key={subField.id}
+                                                        className={`flex flex-col gap-1 ${subField.type === "select" ? "w-32" : "flex-1" // Select gets fixed width, Input fills remaining
+                                                            }`}
+                                                    >
                                                         {subField.type === "select" ? (
                                                             <select
                                                                 className={`input-class w-full ${subField.styles ?? ""}`}
@@ -147,33 +152,15 @@ export default function VendorRegisterPage() {
                                                                 {...register(subField.id as keyof VendorRegisterTypes)}
                                                             />
                                                         )}
+
                                                         {errors[subField.id as keyof VendorRegisterTypes] && (
-                                                            <p className="input-error">
+                                                            <p className="input-error text-xs">
                                                                 {errors[subField.id as keyof VendorRegisterTypes]?.message}
                                                             </p>
                                                         )}
-                                                    </span>
+                                                    </div>
                                                 ))}
                                             </div>
-
-                                        ) : field.type === "select" ? (
-                                            <>
-                                                <select
-                                                    className="input-class"
-                                                    {...register(field.id as keyof VendorRegisterFormData)}
-                                                >
-                                                    <option value="">Select {field.label}</option>
-                                                    {field.options?.map((o) => (
-                                                        <option key={o.value} value={o.value}>{o.label}</option>
-                                                    ))}
-                                                </select>
-                                                {errors[field.id as keyof VendorRegisterFormData] && (
-                                                    <p className="input-error">
-                                                        {errors[field.id as keyof VendorRegisterFormData]?.message}
-                                                    </p>
-                                                )}
-                                            </>
-
                                         ) : (
                                             <>
                                                 <input

@@ -25,6 +25,7 @@ export default function CustomerLoginPage() {
         formState: { errors, isSubmitting },
     } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
+        mode: "onChange",
         defaultValues: {
             email: "",
             password: "",

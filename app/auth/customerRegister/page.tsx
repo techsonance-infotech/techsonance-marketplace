@@ -20,6 +20,7 @@ export default function CustomerRegisterPage() {
         formState: { errors, isSubmitting },
     } = useForm<CustomerRegisterSchemaType>({
         resolver: zodResolver(customerRegisterSchema),
+        mode: "onChange",
         defaultValues: {
             first_name: "",
             last_name: "",
