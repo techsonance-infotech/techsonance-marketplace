@@ -2,10 +2,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { passwordValidationSchema } from "@/utils/validation";
+import { loginSchema, passwordValidationSchema } from "@/utils/validation";
 import { vendorLogin } from "@/utils/authApiClient";
 import { RootState } from "@/lib/store";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface LoginFormData {
     email: string;
@@ -21,6 +22,7 @@ export default function VendorLoginPage() {
         handleSubmit,
         formState: { errors, isSubmitting },
     } = useForm<LoginFormData>({
+        resolver: zodResolver(loginSchema),
         defaultValues: { email: "", password: "" }
     });
     const dispatch = useAppDispatch();
@@ -56,13 +58,7 @@ export default function VendorLoginPage() {
                             type="text"
                             placeholder="Enter your business email"
                             className="border-2 border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            {...register("email", {
-                                required: "Email is required",
-                                pattern: {
-                                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                    message: "Invalid email address"
-                                }
-                            })}
+                            {...register("email")}
                         />
                         {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
                     </div>
@@ -75,10 +71,7 @@ export default function VendorLoginPage() {
                             type="password"
                             placeholder="Password"
                             className="border-2 border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            {...register("password", {
-                                required: "Password is required",
-                                validate: (val) => passwordValidationSchema.safeParse(val).success || "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
-                            })}
+                            {...register("password")}
                         />
                         {errors.password ? (
                             <p className="text-red-600 text-[.8rem]">{errors.password.message}</p>
