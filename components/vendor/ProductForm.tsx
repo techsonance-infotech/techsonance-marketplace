@@ -2,7 +2,8 @@
 import { PRODUCT_FORM_FIELDS } from "@/app/vendor/[vendorId]/products/productUpdateForm/[id]/page";
 import { BASE_API_URL, ORGANIZATION_TAXATION_OPTIONS, PRODUCT_FORM_PRICING_FIELDS } from "@/constants";
 import { useAppSelector } from "@/hooks/reduxHooks";
-import { usePreviewUrls } from "@/lib/utils";
+import { usePreviewUrls } from "@/lib/clientUtils";
+
 import { FileOrImage, ProductImageType } from "@/utils/Types";
 import { ProductFormValuesType, productSchema } from "@/utils/validation";
 import { zodResolver } from "@hookform/resolvers/zod/dist/zod.js";

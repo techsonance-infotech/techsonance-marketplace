@@ -20,9 +20,9 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
     const { wishItems } = useAppSelector((state: any) => state.wishlist);
     const { user } = useAppSelector((state: any) => state.auth);
     const dispatch = useAppDispatch();
-    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const wishlistCount = wishItems.length;
     const path = usePathname();
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -34,14 +34,15 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
     if (path.startsWith('/admin') || path.startsWith('/vendor') || path.includes('checkout') || path.includes('cart') || path.includes('wishlist') || path.includes('orders') || path.includes('changePassword') || path.includes('address') || path.includes('customerProfile')) {
         return <></>
     }
+    if (!isMounted) {
 
+        return <nav className="h-16" />;
+    }
     if (isTabletOrMobile) {
         return (
-            <nav className="flex justify-between items-center  align-middle  px-4 py-2 h-16   ">
-                <Link href="/"><img src={logoUrl} alt="brand logo" className="h-10  " /></Link>
-                <Link href='/notifications'>
-                    <Bell />
-                </Link>
+            <nav className="flex justify-between items-center align-middle px-4 py-2 h-16">
+                <Link href="/"><img src={logoUrl} alt="brand logo" className="h-10" /></Link>
+                <Bell />
             </nav>
         )
     }

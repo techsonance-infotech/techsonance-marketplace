@@ -6,8 +6,8 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { DynamicIcon } from "lucide-react/dynamic";
 import { createProductVariant } from "@/utils/vendorApiClient";
-import { usePreviewUrls } from "@/lib/utils";
 import { PRODUCT_FORM_FIELDS } from "@/app/vendor/[vendorId]/products/productUpdateForm/[id]/page";
+import { usePreviewUrls } from "@/lib/clientUtils";
 const FILE_UPLOAD_FIELD_LABELS = [
     { label: "Product Images / Thumbnail", fieldName: "variantMediaMain" as keyof VariantFormValuesType },
     { label: "Feature / Specification Media", fieldName: "variantMediaGallery" as keyof VariantFormValuesType },
