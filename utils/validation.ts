@@ -1,8 +1,4 @@
 ﻿import * as z from 'zod'
-export const User = z.object({
-  name: z.string(),
-  password: z.string().min(8, "Password must be at least 8 characters long").regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, "Password must contain at least one letter and one number"),
-})
 export const passwordValidation = new RegExp(
   /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/
 );
@@ -37,7 +33,7 @@ export type VendorRegisterSchemaType = z.infer<typeof vendorRegisterSchema>;
 export const loginSchema = z.object({
   email: z.email({ message: "Invalid email address" }),
   password: z
-    .string().regex(passwordValidation, "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"),
+    .string().regex(passwordValidation, "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character").min(1, { message: "Password is required" }).max(36, { message: "Password cannot exceed 36 characters" }),
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;
@@ -47,11 +43,11 @@ export const customerRegisterSchema = z.object({
   first_name: z
     .string()
     .min(2, { message: "First name must be at least 2 characters" })
-    .max(50),
+    .max(50, { message: "First name cannot exceed 50 characters" }),
   last_name: z
     .string()
     .min(2, { message: "Last name must be at least 2 characters" })
-    .max(50),
+    .max(50, { message: "Last name cannot exceed 50 characters" }),
   email: z.email({ message: "Invalid email address" }).min(1, { message: "Email is required" }),
   phone_number: z
     .string()
@@ -62,8 +58,10 @@ export const customerRegisterSchema = z.object({
     .or(z.literal("")),
   password: z
     .string()
-    .regex(passwordValidation, { message: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character" }),
-  confirm_password: z.string().regex(passwordValidation, { message: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character" }),
+    .regex(passwordValidation, { message: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character" })
+    .max(36, { message: "Password cannot exceed 36 characters" }),
+  confirm_password: z.string().regex(passwordValidation, { message: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character" })
+    .max(36, { message: "Password cannot exceed 36 characters" }),
 
   terms_accepted: z.literal(true, {
     message: "You must accept the terms and conditions",
@@ -79,21 +77,21 @@ export const productSchema = z.object({
   productName: z
     .string()
     .min(1, { message: "Product name is required" })
-    .max(100, { message: "Name is too long" }),
+    .max(255, { message: "Name is too long" }),
   description: z
     .string()
-    .min(10, { message: "Description must be at least 10 characters" }),
+    .min(10, { message: "Description must be at least 10 characters" }).max(1000, { message: "Description cannot exceed 1000 characters" }),
   features: z.array(
     z.object({
-      title: z.string().min(1, { message: "Feature title required" }),
-      description: z.string().min(1, { message: "Feature details required" }),
+      title: z.string().min(1, { message: "Feature title required" }).max(255, { message: "Feature title is too long" }),
+      description: z.string().min(1, { message: "Feature details required" }).max(1000, { message: "Feature details cannot exceed 1000 characters" }),
     })
   ).min(1, { message: "Add at least one feature" }),
 
   attributes: z.array(
     z.object({
-      name: z.string().min(1, { message: "Attribute name required" }),
-      values: z.string().min(1, { message: "Attribute value required" }),
+      name: z.string().min(1, { message: "Attribute name required" }).max(36, { message: "Attribute name is too long" }),
+      values: z.string().min(1, { message: "Attribute value required" }).max(255, { message: "Attribute value is too long" }),
     })
   ),
   basePrice: z.string()
@@ -135,17 +133,15 @@ export const contactSchema = z.object({
     .min(1, { message: "Name is required" })
     .max(50, { message: "Name is too long" }),
 
-  email: z
-    .string()
-    .min(1, { message: "Email is required" })
-    .email({ message: "Invalid email address" }),
+  email: z.email({ message: "Invalid email address" }).min(3, { message: "Email is required" })
+    .max(100, { message: "Email cannot exceed 100 characters" }),
 
   phone: z
     .string()
     .min(1, { message: "Phone number is required" })
     // Regex ensures ONLY digits. No 'e', '+', or '-' allowed.
     .regex(/^[0-9]+$/, { message: "Please enter digits only" })
-    .min(10, { message: "Phone number must be at least 10 digits" }),
+    .min(10, { message: "Phone number must be at least 10 digits" }).max(15, { message: "Phone number cannot exceed 15 digits" }),
 
   message: z
     .string()
@@ -158,10 +154,11 @@ export type ContactFormData = z.infer<typeof contactSchema>;
 export const changePasswordSchema = z.object({
   current_password: z
     .string()
-    .min(1, { message: "Current password is required" }),
+    .min(1, { message: "Current password is required" }).max(36, { message: "Current password cannot exceed 36 characters" })
+    .regex(passwordValidation, { message: "Current password must be at least 8 characters long and include uppercase, lowercase, number, and special character" }),
 
   new_password: z
-    .string().regex(passwordValidation, { message: "New password must be at least 8 characters long and include uppercase, lowercase, number, and special character" }),
+    .string().max(36, { message: "New password cannot exceed 36 characters" }).regex(passwordValidation, { message: "New password must be at least 8 characters long and include uppercase, lowercase, number, and special character" }),
 
   confirm_password: z
     .string()
@@ -181,19 +178,23 @@ export const profileEditSchema = z.object({
 
   first_name: z
     .string()
-    .min(2, { message: "First name must be at least 2 characters" }),
+    .min(2, { message: "First name must be at least 2 characters" })
+    .max(50, { message: "First name cannot exceed 50 characters" }),
 
   last_name: z
     .string()
-    .min(2, { message: "Last name must be at least 2 characters" }),
+    .min(2, { message: "Last name must be at least 2 characters" })
+    .max(50, { message: "Last name cannot exceed 50 characters" }),
 
   email: z
     .email({ message: "Invalid email address" })
-    .min(1, { message: "Email is required" }),
+    .min(1, { message: "Email is required" })
+    .max(24, { message: "Email cannot exceed 24 characters" }),
 
   phone: z
     .string()
     .min(10, { message: "Phone number must be at least 10 digits" })
+    .max(15, { message: "Phone number cannot exceed 15 digits" })
     .regex(/^[0-9]+$/, { message: "Please enter digits only (no 'e' or symbols)" }),
 });
 
@@ -204,12 +205,12 @@ export const ticketSchema = z.object({
     .string()
     .min(5, { message: "Subject must be at least 5 characters" })
     .max(100, { message: "Subject is too long" }),
-    
+
   description: z
     .string()
     .min(20, { message: "Please provide a more detailed description (min 20 chars)" })
     .max(1000, { message: "Description is too long" }),
-    
+
   priority: z.enum(["High", "Medium", "Low"], {
     error: () => ({ message: "Please select a valid priority" }),
   }),
@@ -218,8 +219,8 @@ export const ticketSchema = z.object({
     .optional()
     .refine((files) => {
       if (!files || files.length === 0) return true; // Optional
-      return files[0]?.size <= 5 * 1024 * 1024; // Max 5MB
-    }, { message: "Max file size is 5MB" }),
+      return files[0]?.size <= 25 * 1024 * 1024; // Max 25MB
+    }, { message: "Max file size is 25MB" }),
 });
 
 export type TicketFormData = z.infer<typeof ticketSchema>;
@@ -228,15 +229,15 @@ export const couponSchema = z.object({
   type: z.enum(["percentage", "flat"]),
   code: z
     .string()
-    .min(3, { message: "Code must be at least 3 characters" })
+    .min(3, { message: "Code must be at least 3 characters" }).max(20, { message: "Code cannot exceed 20 characters" })
     .regex(/^[A-Z0-9]+$/, { message: "Code must be uppercase alphanumeric" }),
   value: z.coerce
     .number()
     .min(1, { message: "Value must be greater than 0" }),
   rules: z.array(
     z.object({
-      rule_type: z.string().min(1, { message: "Required" }),
-      rule_value: z.string().min(1, { message: "Required" }),
+      rule_type: z.string().min(1, { message: "Required" }).max(50, { message: "Rule type is too long" }),
+      rule_value: z.string().min(1, { message: "Required" }).max(100, { message: "Rule value is too long" }),
     })
   ).optional(),
 });
@@ -250,31 +251,32 @@ export const billingSchema = z.object({
     .regex(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, {
       message: "Invalid GSTIN format (e.g., 24ABCDE1234F1Z5)",
     }),
-    
+
   pan: z
     .string()
     .min(1, { message: "PAN is required" })
     .regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, {
       message: "Invalid PAN format (e.g., ABCDE1234F)",
     }),
-    
+
   businessName: z
     .string()
-    .min(3, { message: "Business name must be at least 3 characters" }),
-    
+    .min(3, { message: "Business name must be at least 3 characters" })
+    .max(50, { message: "Business name cannot exceed 50 characters" }),
+
   prefix: z
     .string()
     .min(1, { message: "Prefix is required" })
     .max(5, { message: "Prefix too long (max 5)" }),
-    
+
   year: z.coerce.number(),
-  
+
   startSequence: z.coerce
     .number()
     .min(1, { message: "Sequence must start at 1 or higher" }),
-    
+
   termsAndNotes: z.string().optional(),
-  
+
   // Note: signatureUrl is handled as a string URL in the final data
   signatureUrl: z.string().optional(),
 });

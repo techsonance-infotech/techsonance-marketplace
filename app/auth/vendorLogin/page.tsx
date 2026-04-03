@@ -7,6 +7,12 @@ import { vendorLogin } from "@/utils/authApiClient";
 import { RootState } from "@/lib/store";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { use, useEffect, useState } from "react";
+import { loginEnd, loginFailure, loginStart } from "@/lib/features/auth/authSlice";
+import { Loader } from "lucide-react";
+import { LoaderSpinner } from "@/components/common/LoaderSpinner";
+import { set } from "zod";
+import { se } from "date-fns/locale";
 
 interface LoginFormData {
     email: string;
@@ -16,6 +22,7 @@ interface LoginFormData {
 export default function VendorLoginPage() {
     const router = useRouter();
     const { loading, error } = useAppSelector((state: RootState) => state.auth);
+    const [loadingState, setLoadingState] = useState(false);
     const {
         reset,
         register,
@@ -26,29 +33,45 @@ export default function VendorLoginPage() {
         defaultValues: { email: "", password: "" }
     });
     const dispatch = useAppDispatch();
-    const storedData = typeof window !== 'undefined' ? localStorage.getItem("auth") : null;
-    const auth = storedData ? JSON.parse(storedData) : null;
-    if (auth && auth?.isAuthenticated && auth?.user?.user_role
-        === "vendor") {
-        console.log("Already logged in as vendor.");
-        router.replace(`/vendor/${auth.user.vendor_id}`);
-    }
+    console.log("loading", loadingState)
+    useEffect(() => {
+        const storedData = typeof window !== 'undefined' ? localStorage.getItem("auth") : null;
+        const auth = storedData ? JSON.parse(storedData) : null;
+        if (auth && auth?.isAuthenticated && auth?.user?.user_role
+            === "vendor") {
+            setLoadingState(true);
+            dispatch(loginStart());
+            console.log("Already logged in as vendor.");
+            router.replace(`/vendor/${auth.user.vendor_id}`);
+            setLoadingState(false);
+            dispatch(loginEnd());
+        }
+    }, []);
     const onSubmit = async (data: LoginFormData) => {
+        dispatch(loginStart());
+        setLoadingState(true);
         const result = await vendorLogin(data, dispatch);
         console.log(result);
         if (result?.status === 201) {
             reset();
             console.log(result.user);
-            router.push(`/vendor/${result.user.vendor_id ?? ''}`);
+            router.push(`/vendor/${result.user.vendor_id}`);
+            dispatch(loginEnd());
+            setLoadingState(false);
         } else {
             result?.status === false && console.log(result?.message);
+            dispatch(loginFailure(result?.message || "Login failed"));
         }
 
     };
+    console.log("loading", loadingState)
 
     return (
-        <main className="flex font-[roboto] justify-center items-center   h-[100vh] gap-16">
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col border rounded-2xl px-9 h-[620px] w-[540px] justify-center">
+        <main className={`flex font-[roboto] justify-center items-center   h-[100vh] gap-16 `}>
+            {
+                loadingState && <LoaderSpinner />
+            }
+            <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col border rounded-2xl px-9 h-[620px] w-[540px] justify-center ${loadingState ? 'pointer-events-none opacity-50' : ''}`}>
                 <h1 className="font-bold lg:text-[2rem] md:text-[1.5rem]">Manage your Store</h1>
                 <p className="font-bold text-[1rem] text-slate-600 mb-8">Welcome back! Please enter your details.</p>
                 <div className="flex flex-col gap-4 mb-8">
@@ -83,10 +106,10 @@ export default function VendorLoginPage() {
                 {error && <p className="text-red-600 text-center font-bold mb-4">{error}</p>}
                 <button
                     type="submit"
-                    disabled={isSubmitting || loading}
+                    disabled={isSubmitting || loadingState}
                     className="cursor-pointer bg-blue-500 text-center text-white font-bold py-2 rounded-xl mb-4 disabled:opacity-50"
                 >
-                    {loading || isSubmitting ? "Logging in..." : "Log in to Dashboard"}
+                    {loadingState || isSubmitting ? "Logging in..." : "Log in to Dashboard"}
                 </button>
                 <p className="text-center text-balance text-slate-500">
                     Don&apos;t have a Business account?

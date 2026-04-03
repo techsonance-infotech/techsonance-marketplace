@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { CUSTOMER_REGISTRATION_POSTER } from "@/constants/common";
 import { CUSTOMER_REGISTRATION_FIELDS } from "@/constants/dynamicFields";
 import { CustomerRegister } from "@/utils/authApiClient";
 import { customerRegisterSchema, CustomerRegisterSchemaType, } from "@/utils/validation";

@@ -4,6 +4,7 @@ import { fetchProductVariants } from "@/utils/vendorApiClient";
 import { DeleteBtn } from "@/components/vendor/DeleteBtn";
 import { VariantImgGrid } from "@/components/vendor/VariantImgGrid";
 import { ProductImageType } from "@/utils/Types";
+import { formatCurrency } from "@/lib/utils";
 
 interface ProductVariant {
     id: string;
@@ -141,7 +142,7 @@ export default async function VariantListingPage({
                                         <div>
                                             <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Price</p>
                                             <p className="text-lg font-bold text-slate-900 mt-0.5">
-                                                ₹{variant.price.toLocaleString("en-IN")}
+                                                ₹{formatCurrency(variant.price)}
                                             </p>
                                         </div>
                                         <div className="text-right">
