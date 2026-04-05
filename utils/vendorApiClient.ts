@@ -6,6 +6,7 @@ export const fetchVendorsProductsCategory = async (vendorId: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}categories/${vendorId}`, {
             method: 'GET',
+            cache: 'force-cache',
             next: { revalidate: 3600 },
         });
         if (response.status !== 200) {

@@ -1,5 +1,4 @@
 ﻿"use client";
-
 import { FileOrImage, ProductImageType } from "@/utils/Types";
 import { useCallback, useRef } from "react";
 
