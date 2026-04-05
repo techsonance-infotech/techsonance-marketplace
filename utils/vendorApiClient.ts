@@ -123,6 +123,25 @@ export const fetchVendorProducts = async (vendorId: string) => {
         throw error;
     }
 }
+export const fetchVendorOneProducts = async ( id: string) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}products/${id}`, {
+            method: 'GET',
+            cache: 'force-cache',
+            next: { revalidate: 3600 },
+            headers: {
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+        });
+        if (response.status !== 200) {
+            console.error('Failed to fetch products');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        throw error;
+    }
+}
 export const updateProduct = async (productId: string, productData: FormData) => {
     try {
         const response = await fetch(`${BASE_API_URL}products/update/${productId}`, {
