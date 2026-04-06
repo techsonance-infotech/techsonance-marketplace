@@ -2,7 +2,7 @@
 export const CUSTOMER_BASE_URL = process.env.NEXT_PUBLIC_USER_BASE_URL;
 export const ADMIN_BASE_URL = process.env.NEXT_PUBLIC_ADMIN_BASE_URL;
 export const VENDOR_AUTH_URL = process.env.NEXT_PUBLIC_VENDOR_AUTH_URL;
-export const CUSTOMER_AUTH_URL = process.env.NEXT_PUBLIC_USER_AUTH_URL;
+export const CUSTOMER_AUTH_URL = process.env.NEXT_PUBLIC_CUSTOMER_AUTH_URL;
 export const ADMIN_AUTH_URL = process.env.NEXT_PUBLIC_ADMIN_AUTH_URL;
 export const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL;
 

@@ -223,10 +223,13 @@ export type ProductStatus = 'active' | 'inactive' | 'archived'; // Add other sta
 export type ProductImageType = {
   id: string;
   image_url: string;
-  alt_text?: string;
-  imgType: string;
+  alt_text: string;
+  imgType: "main" | "gallery";
   is_primary: boolean;
+  created_at: string;
+  updated_at: string;
   product_id: string;
+  variant_id: string;
 };
 
 export type ProductFeatureType = {
@@ -412,13 +415,12 @@ export interface tabLinkType {
 }
 
 export type FeatureType = { title: string; description: string };
-export type OptionType = { name: string; values: string };
 export type VariantType = { attributes: Record<string, string>; sku: string; price: number; stock: number };
 export type ProductFormValuesType = {
   productName: string;
   description: string;
   features: FeatureType[];
-  attributes: OptionType[];
+  attributes: AttributesType[];
   basePrice: string;
   discountPercent: string;
   stocks: string;
@@ -572,4 +574,36 @@ export type VariantFormValuesType = {
   variantMediaMain: FileOrImage[];
   variantMediaGallery: FileOrImage[];
   status: string;
+};
+
+export type AttributesType = {
+  name: string,
+  values: string
+}
+export type VariantsType = {
+  id: string
+  variant_name: string,
+  sku: string,
+  attributes: AttributesType[]
+
+}
+export type ProductResponseType = {
+  id: string;
+  name: string;
+  description: string;
+  features: ProductFeatureType[];
+  base_price: string;
+  discount_percent: string;
+  stock_quantity: string;
+  status: "active" | "inactive";
+  has_variants: boolean;
+  created_at: string;
+  updated_at: string;
+  company_id: string;
+  vendor_id: string;
+  category_id: string;
+  images: ProductImageType[];
+  variants: VariantsType,
+  tax_profile: string,
+
 };

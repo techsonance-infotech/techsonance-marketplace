@@ -38,40 +38,40 @@ export const loginSchema = z.object({
 
 export type LoginFormData = z.infer<typeof loginSchema>;
 
-
 export const customerRegisterSchema = z.object({
   first_name: z
     .string()
-    .min(2, { message: "First name must be at least 2 characters" })
-    .max(50, { message: "First name cannot exceed 50 characters" }),
+    .min(2, "First name must be at least 2 characters")
+    .max(50)
+    .regex(/^[A-Za-z\s\-']+$/, "Invalid characters in name"), // Allows spaces/hyphens
+
   last_name: z
     .string()
-    .min(2, { message: "Last name must be at least 2 characters" })
-    .max(50, { message: "Last name cannot exceed 50 characters" }),
-  email: z.email({ message: "Invalid email address" }).min(1, { message: "Email is required" }),
+    .min(2, "Last name must be at least 2 characters")
+    .max(50)
+    .regex(/^[A-Za-z\s\-']+$/, "Invalid characters in name"),
+
+  email: z.string().email("Invalid email address").min(1, "Email is required"),
+
   phone_number: z
     .string()
-    .regex(/^\+?[1-9]\d{1,14}$/, {
-      message: "Invalid phone number format (e.g., +1234567890)"
-    })
+    .regex(/^\+?[1-9]\d{1,14}$/, "Invalid format (e.g., +1234567890)")
     .optional()
     .or(z.literal("")),
+
   password: z
     .string()
-    .regex(passwordValidation, { message: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character" })
-    .max(36, { message: "Password cannot exceed 36 characters" }),
-  confirm_password: z.string().regex(passwordValidation, { message: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character" })
-    .max(36, { message: "Password cannot exceed 36 characters" }),
+    .min(8, "Password too short")
+    .regex(passwordValidation, "Password must include uppercase, lowercase, number, and special character"),
 
-  terms_accepted: z.literal(true, {
-    message: "You must accept the terms and conditions",
-  }),
+  confirm_password: z.string(),
+
+  terms_accepted: z.boolean().optional(),
 }).refine((data) => data.password === data.confirm_password, {
   message: "Passwords do not match",
   path: ["confirm_password"],
 });
-
-export type CustomerRegisterSchemaType = z.infer<typeof customerRegisterSchema>;
+export type CustomerRegisterSchemaType = Partial<z.infer<typeof customerRegisterSchema>>;
 
 export const productSchema = z.object({
   productName: z
@@ -104,13 +104,13 @@ export const productSchema = z.object({
   discountPercent: z.string()
     .regex(/^\d+(\.\d{1,2})?$/, { message: "Invalid discount format" })
     .optional()
-    .or(z.literal(''))  
+    .or(z.literal(''))
     .transform((val) => val ? parseFloat(val) : null),
 
   stocks: z.string()
     .regex(/^\d+$/, { message: "Stock must be a non-negative integer" })
     .optional()
-    .or(z.literal(''))   
+    .or(z.literal(''))
     .transform((val) => val ? parseInt(val, 10) : null),
 
   sku: z.string().optional(),

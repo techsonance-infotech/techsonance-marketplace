@@ -7,11 +7,32 @@ import { removeFromWishlist } from "@/lib/features/Wishlist";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "react-responsive";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { useEffect, useState } from "react";
+import { fetchCustomerWishlist } from "@/utils/customerApiClient";
+import { companyDomain } from "@/config";
 
 export default function WishlistPage() {
     const router = useRouter();
     const wishItems = useAppSelector((state: RootState) => state.wishlist);
-    const wishlistItems = Array.isArray(wishItems) ? PRODUCT_LIST.filter(item => wishItems.some((wishItem: any) => wishItem.productId === item.id)) : [];
+    const user = useAppSelector((state: RootState) => state.auth.user);
+
+    const [wishlistItems, setWishlistItems] = useState([]);
+    useEffect(() => {
+        const getWishlistProducts = () => {
+            fetchCustomerWishlist(user.id, companyDomain).then((response) => {
+                if (response?.status === 200) {
+                    setWishlistItems(response.data);
+                } else {
+                    console.error("Failed to fetch wishlist products:", response?.error);
+                }
+            }).catch((error) => {
+                console.error("Error fetching wishlist products:", error);
+            });
+        }
+        if (user?.id) {
+            getWishlistProducts();
+        }
+    }, [wishItems]);
     const isMobileOrTablet = useMediaQuery({ minWidth: 340, maxWidth: 1024 });
     const isEmpty = Array.isArray(wishItems) ? wishItems.length === 0 : [];
     const dispatch = useAppDispatch();

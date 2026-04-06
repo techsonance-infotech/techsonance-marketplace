@@ -134,7 +134,7 @@ export function ProductForm({
     // ── Submit ──
     const onSubmit = async (data: ProductFormValuesType) => {
         if (!existingData && (productFiles.length === 0 || featureFiles.length === 0)) {
-            console.warn("Product or feature files are missing.");
+            console.warn("Product or feature files are missing.");  
             return;
         }
         if (!user || !user.vendor_id || !user.company_id) {

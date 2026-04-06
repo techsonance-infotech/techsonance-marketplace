@@ -35,7 +35,7 @@ export const CUSTOMER_REGISTRATION_FIELDS = [
     { id: "last_name", label: "Last name", type: "text", placeholder: "Enter your last name" },
     { id: "email", label: "Email", type: "text", placeholder: "Enter your email" },
     { id: "password", label: "Password", type: "password", placeholder: "Password" },
-    { id: "password_confirm", label: "Confirm Password", type: "password", placeholder: "Please reenter password" },
+    { id: "confirm_password", label: "Confirm Password", type: "password", placeholder: "Please reenter password" },
 ]
 export const PASSWORD_CHANGE_FORM_FIELDS = [
     {

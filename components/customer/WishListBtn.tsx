@@ -5,6 +5,8 @@ import { useMediaQuery } from 'react-responsive'
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'motion/react';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import { addWishList, deleteWishList } from '@/utils/customerApiClient';
+import { companyDomain } from '@/config';
 export function WishListBtn({ productId, styles, iconSize }: { productId?: string, styles?: string, iconSize?: number }) {
   const dispatch = useAppDispatch();
   const { wishItems } = useAppSelector((state: any) => state.wishlist)
@@ -14,17 +16,23 @@ export function WishListBtn({ productId, styles, iconSize }: { productId?: strin
   const iconSizeValue = iconSize || (isMobile ? 28 : 32);
   const router = useRouter();
 
-  const handleAddToWishlist = () => {
-    if (!user.user_role || user.user_role.toLowerCase() !== 'customer') {
+  const handleAddToWishlist = async () => {
+    if (!productId) {
+      console.error('Product ID is missing');
+      return;
+    }
+    if (!user.role || user.role.toLowerCase() !== 'customer') {
       router.push('/auth/customerLogin');
       return;
     }
 
     if (isAlreadyInWishlist) {
       dispatch(removeFromWishlist(productId));
+      await deleteWishList(productId, user.id, companyDomain);
       console.log(`Removing product ${productId} from wishlist`);
       return;
     }
+    await addWishList(productId, user.id, companyDomain);
     dispatch(addToWishlist({ productId }));
     console.log(`Adding product ${productId} to wishlist`);
   }
