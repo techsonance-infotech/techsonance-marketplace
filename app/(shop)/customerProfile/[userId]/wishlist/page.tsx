@@ -84,7 +84,7 @@ export default function WishlistPage() {
                             {wishlistItems.map((item, idx) => (
                                 <li key={idx} className="flex justify-between lg:px-6 px-2 lg:py-4 py-2 lg:my-4 my-2 lg:gap-6 gap-2 border-2 border-gray-200 rounded-2xl">
                                     <span className="flex lg:gap-4 gap-2 items-start">
-                                        <button onClick={() => deleteItemFromWishlist(item.id)} className="text-red-500  h-full flex items-center justify-center cursor-pointer hover:text-red-600 hover:scale-140 transition-transform">
+                                        <button onClick={() => deleteItemFromWishlist(item.productVariant.id)} className="text-red-500  h-full flex items-center justify-center cursor-pointer hover:text-red-600 hover:scale-140 transition-transform">
                                             <X />
                                         </button>
 
