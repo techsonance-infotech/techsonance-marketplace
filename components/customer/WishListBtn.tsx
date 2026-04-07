@@ -51,7 +51,7 @@ export function WishListBtn({ productId, styles, iconSize }: { productId?: strin
             : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
           }
       `}
-        aria-label={isAlreadyInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+        // aria-label={isAlreadyInWishlist ? "Remove from wishlist" : "Add to wishlist"}
       >
         <AnimatePresence mode="wait">
           <motion.div

@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { useEffect, useState } from "react";
 import { deleteWishList, fetchCustomerWishlist } from "@/utils/customerApiClient";
 import { companyDomain } from "@/config";
+import Link from "next/link";
 interface WishlistItemType {
     created_at: string;
     id: string;
@@ -22,6 +23,7 @@ interface WishlistItemType {
         sku: string;
         price: string;
         attributes: unknown[];
+        product_id: string;
         images: {
             id: string;
             image_url: string;
@@ -64,7 +66,8 @@ export default function WishlistPage() {
         if (!user?.id) {
             console.error('User ID is missing');
             return;
-        } dispatch(removeFromWishlist(productVariantId));
+        }
+        dispatch(removeFromWishlist(productVariantId));
         await deleteWishList(productVariantId, user.id, companyDomain);
         console.log(`Removing product ${productVariantId} from wishlist`);
     }
@@ -81,10 +84,13 @@ export default function WishlistPage() {
                             {wishlistItems.map((item, idx) => (
                                 <li key={idx} className="flex justify-between lg:px-6 px-2 lg:py-4 py-2 lg:my-4 my-2 lg:gap-6 gap-2 border-2 border-gray-200 rounded-2xl">
                                     <span className="flex lg:gap-4 gap-2 items-start">
-                                        <button onClick={() => deleteItemFromWishlist(item.id)} className="text-gray-500 hover:text-gray-700 h-full flex items-center justify-center">
+                                        <button onClick={() => deleteItemFromWishlist(item.id)} className="text-red-500  h-full flex items-center justify-center cursor-pointer hover:text-red-600 hover:scale-140 transition-transform">
                                             <X />
                                         </button>
-                                        <img src={item?.productVariant?.images?.[0]?.image_url} alt={item?.productVariant?.variant_name.slice(0, 30) + '...'} className="lg:w-28 w-20 aspect-square object-cover rounded-2xl" />
+
+                                        <Link href={`/shopping/${item?.productVariant?.product_id}`} className="block lg:w-28 w-20 h-20 lg:h-28 aspect-square rounded-lg">
+                                            <img src={item?.productVariant?.images?.[0]?.image_url} alt={item?.productVariant?.variant_name.slice(0, 30) + '...'} className="lg:w-28 w-20 aspect-square object-cover rounded-2xl border-2 border-gray-100" />
+                                        </Link>
                                         <div className="flex flex-col gap-2">
                                             <p className="font-semibold lg:text-xl text-xs line-clamp-2">{item?.productVariant?.variant_name}</p>
                                             <p className="lg:text-lg text-sm font-medium">₹ {item?.productVariant?.price}</p>

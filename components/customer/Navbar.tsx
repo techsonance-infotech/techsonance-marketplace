@@ -24,7 +24,7 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: 
     const path = usePathname();
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const [isMounted, setIsMounted] = useState(false);
-    console.log("nav user",user.id)
+    console.log("nav user",user?.id)
     useEffect(() => {
         setIsMounted(true);
     }, []);
