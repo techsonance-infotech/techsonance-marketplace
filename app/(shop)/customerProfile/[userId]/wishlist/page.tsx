@@ -8,7 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMediaQuery } from "react-responsive";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { useEffect, useState } from "react";
-import { deleteWishList, fetchCustomerWishlist } from "@/utils/customerApiClient";
+import { fetchCustomerWishlist, fetchDeleteWishList } from "@/utils/customerApiClient";
 import { companyDomain } from "@/config";
 import Link from "next/link";
 interface WishlistItemType {
@@ -68,7 +68,7 @@ export default function WishlistPage() {
             return;
         }
         dispatch(removeFromWishlist(productVariantId));
-        await deleteWishList(productVariantId, user.id, companyDomain);
+        await fetchDeleteWishList(productVariantId, user.id, companyDomain);
         console.log(`Removing product ${productVariantId} from wishlist`);
     }
     return (

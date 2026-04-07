@@ -101,7 +101,7 @@ export function ShoppingList({
                                                 {
                                                     !isMobile &&
                                                     <div className={`flex gap-2 mt-2   justify-between items-center`}>
-                                                        <AddToCart productId={product.id} styles="w-full " />
+                                                        <AddToCart productVariantId={product?.variants[0]?.id} styles="w-full " />
                                                         <BuyBtn productId={product.id} styles=" scale-[.9]" />
 
                                                     </div>

@@ -5,7 +5,7 @@ import { useMediaQuery } from 'react-responsive'
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'motion/react';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
-import { addWishList, deleteWishList } from '@/utils/customerApiClient';
+import { fetchAddWishList, fetchDeleteWishList } from '@/utils/customerApiClient';
 import { companyDomain } from '@/config';
 export function WishListBtn({ productId, styles, iconSize }: { productId?: string, styles?: string, iconSize?: number }) {
   const dispatch = useAppDispatch();
@@ -28,11 +28,11 @@ export function WishListBtn({ productId, styles, iconSize }: { productId?: strin
 
     if (isAlreadyInWishlist) {
       dispatch(removeFromWishlist(productId));
-      await deleteWishList(productId, user.id, companyDomain);
+      await fetchDeleteWishList(productId, user.id, companyDomain);
       console.log(`Removing product ${productId} from wishlist`);
       return;
     }
-    await addWishList(productId, user.id, companyDomain);
+    await fetchAddWishList(productId, user.id, companyDomain);
     dispatch(addToWishlist({ productId }));
     console.log(`Adding product ${productId} to wishlist`);
   }
@@ -51,7 +51,7 @@ export function WishListBtn({ productId, styles, iconSize }: { productId?: strin
             : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
           }
       `}
-        // aria-label={isAlreadyInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+      // aria-label={isAlreadyInWishlist ? "Remove from wishlist" : "Add to wishlist"}
       >
         <AnimatePresence mode="wait">
           <motion.div

@@ -40,7 +40,7 @@ export const fetchCustomerWishlist = async (customerId: string, companyDomain: s
 
     }
 }
-export const addWishList = async (productId: string, customerId: string, companyDomain: string) => {
+export const fetchAddWishList = async (productId: string, customerId: string, companyDomain: string) => {
     console.log("productId", productId);
     console.log("customerId", customerId);
 
@@ -62,7 +62,7 @@ export const addWishList = async (productId: string, customerId: string, company
         console.error('Error updating wishlist:', error);
     }
 };
-export const deleteWishList = async (productId: string, customerId: string, companyDomain: string) => {
+export const fetchDeleteWishList = async (productId: string, customerId: string, companyDomain: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}wishlist/${customerId}`, {
             method: 'DELETE',
@@ -82,7 +82,7 @@ export const deleteWishList = async (productId: string, customerId: string, comp
         console.error('Error updating wishlist:', error);
     }
 };
-export const addToCart = async (productId: string, quantity: number, customerId: string, companyDomain: string) => {
+export const fetchAddToCart = async (productVariantId: string, quantity: number, customerId: string, companyDomain: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}cart/${customerId}`, {
             method: 'POST',
@@ -91,7 +91,7 @@ export const addToCart = async (productId: string, quantity: number, customerId:
                 "company-domain": companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,
             },
-            body: JSON.stringify({ productId, quantity }),
+            body: JSON.stringify({ productVariantId, quantity }),
         });
         if (response.status !== 200) {
             console.error('Failed to add to cart');
@@ -101,7 +101,12 @@ export const addToCart = async (productId: string, quantity: number, customerId:
         console.error('Error adding to cart:', error);
     }
 };
-export const removeFromCart = async (productId: string, customerId: string, companyDomain: string) => {
+export const fetchRemoveFromCart = async (customerId: string, cartId: string, cartItemId: string, companyDomain: string) => {
+    console.log('8888888888888')
+    console.log('customerId', customerId)
+    console.log('cartId', cartId)
+    console.log('cartItemId', cartItemId)
+
     try {
         const response = await fetch(`${BASE_API_URL}cart/${customerId}`, {
             method: 'DELETE',
@@ -110,7 +115,7 @@ export const removeFromCart = async (productId: string, customerId: string, comp
                 "company-domain": companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,    
             },
-            body: JSON.stringify({ productId }),
+            body: JSON.stringify({ cartId, cartItemId }),
         });
         if (response.status !== 200) {
             console.error('Failed to remove from cart');
@@ -120,7 +125,7 @@ export const removeFromCart = async (productId: string, customerId: string, comp
         console.error('Error removing from cart:', error);
     }
 };
-export const fetchCart = async (customerId: string, companyDomain: string) => {
+export const fetchGetCart = async (customerId: string, companyDomain: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}cart/${customerId}`, {
             method: 'GET',
@@ -139,7 +144,7 @@ export const fetchCart = async (customerId: string, companyDomain: string) => {
         console.error('Error fetching cart:', error);
     }
 };
-export const updateCartQuantity = async (productId: string, quantity: number, customerId: string, companyDomain: string) => {
+export const fetchUpdateCartQuantity = async (productVariantId: string, quantity: number, customerId: string, companyDomain: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}cart/${customerId}`, {
             method: 'PATCH',
@@ -148,7 +153,7 @@ export const updateCartQuantity = async (productId: string, quantity: number, cu
                 "company-domain": companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,    
             },
-            body: JSON.stringify({ productId, quantity }),
+            body: JSON.stringify({ productVariantId, quantity }),
         });
         if (response.status !== 200) {
             console.error('Failed to update cart quantity');

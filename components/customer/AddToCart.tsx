@@ -1,25 +1,35 @@
 'use client';
 import { ShoppingCart, Plus, Minus } from "lucide-react";
 import type { RootState } from "@/lib/store";
-import { addToCart, removeFromCart, updateQuantity } from "@/lib/features/Cart";
+import { addToCart, removeFromCart } from "@/lib/features/Cart";
 import { toggleCartSidebar } from "@/lib/features/CartSidebar";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { companyDomain } from "@/config";
+import { fetchAddToCart, fetchRemoveFromCart } from "@/utils/customerApiClient";
 
 interface AddToCartProps {
-    productId: string;
+    productVariantId: string;
     styles?: string;
+
+}
+export interface CartItemResponse {
+    cart_id: string;
+    cart_item_id: string;
+    quantity: number;
+    product_variant_id: string;
 }
 
-export function AddToCart({ productId, styles }: AddToCartProps) {
+
+export function AddToCart({ productVariantId, styles }: AddToCartProps) {
     const dispatch = useAppDispatch();
     const { items } = useAppSelector((state: RootState) => state.cart);
     const { user } = useAppSelector((state: RootState) => state.auth);
     const path = usePathname();
     const router = useRouter();
-
-    const cartItem = items?.find(item => item.id === productId);
+    const cartItem = items?.find(item => item.productVariantId === productVariantId);
+    console.log("cartItem", cartItem)
     const quantity = cartItem ? cartItem.quantity : 0;
 
     const isSmall = styles?.includes("small");
@@ -38,27 +48,36 @@ export function AddToCart({ productId, styles }: AddToCartProps) {
         };
     }
 
-
-    const handleIncrement = () => {
+    console.log("productVariantId  ", productVariantId)
+    const handleIncrement = async () => {
         if (!user) {
             router.push('/auth/customerLogin');
             return;
         }
 
-        dispatch(addToCart({ id: productId, user_id: user.user_id }));
+        const response = await fetchAddToCart(productVariantId, quantity, user?.id, companyDomain);
+        console.log("add to cart response", response)
 
-        // Only open sidebar if we aren't already on the cart page
+        const cartResponse: CartItemResponse = response.data;
+        dispatch(addToCart({ cartId: cartResponse.cart_id, cartItemId: cartResponse.cart_item_id, productVariantId: cartResponse.product_variant_id, userId: user.id, quantity: cartResponse.quantity }));
         if (!path.includes("cart") && !path.includes("wishlist")) {
             debounceFunction({ func: () => dispatch(toggleCartSidebar('open')), delay: 300 })();
         }
     };
 
-    const handleDecrement = () => {
-        if (quantity > 1) {
-            dispatch(updateQuantity({ id: productId, quantity: quantity - 1, user_id: user?.user_id }));
+    const handleDecrement = async () => {
 
+        const response = await fetchRemoveFromCart(user?.id, cartItem?.cartId, cartItem?.cartItemId, companyDomain);
+        console.log("remove response", response)
+        const cartResponse: CartItemResponse | {
+            cartId: string;
+            message: string;
+            success: boolean;
+        } = response.data;
+        if (cartResponse.success) {
+            dispatch(removeFromCart({ cartId: cartResponse.cartId, cartItemId: null, productVariantId: null, userId: user?.id || '', quantity: 0 }));
         } else {
-            dispatch(removeFromCart({ id: productId, user_id: user?.user_id }));
+            dispatch(removeFromCart({ cartId: cartResponse?.cart_id || '', cartItemId: cartResponse?.cart_item_id || '', productVariantId: cartResponse?.product_variant_id, userId: user?.id || '', quantity: cartResponse?.quantity }));
         }
     };
 
