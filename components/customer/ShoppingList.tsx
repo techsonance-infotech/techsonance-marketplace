@@ -65,7 +65,7 @@ export function ShoppingList({
                                         >
 
                                             <div className="flex flex-col h-full">
-                                                <WishListBtn productId={product.id} styles="absolute top-2 right-6 z-10" />
+                                                <WishListBtn productId={product.variants[0]?.id} styles="absolute top-2 right-6 z-10" />
 
                                                 <Link href={`/shopping/${product.id}`} className="block overflow-hidden rounded-lg">
                                                     <img loading="lazy"

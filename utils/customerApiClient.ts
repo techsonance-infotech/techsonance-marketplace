@@ -22,7 +22,7 @@ export const fetchCustomerProfile = async () => {
 };
 export const fetchCustomerWishlist = async (customerId: string, companyDomain: string) => {
     try {
-        const response = await fetch(`${BASE_API_URL}/wishlist/${customerId} `, {
+        const response = await fetch(`${BASE_API_URL}wishlist/${customerId} `, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -30,6 +30,7 @@ export const fetchCustomerWishlist = async (customerId: string, companyDomain: s
                 // Authorization: `Bearer ${await authToken()}`,
             },
         });
+        console.log(response)
         if (response.status !== 200) {
             console.error('Failed to fetch wishlist');
         }
@@ -40,6 +41,9 @@ export const fetchCustomerWishlist = async (customerId: string, companyDomain: s
     }
 }
 export const addWishList = async (productId: string, customerId: string, companyDomain: string) => {
+    console.log("productId", productId);
+    console.log("customerId", customerId);
+
     try {
         const response = await fetch(`${BASE_API_URL}wishlist/${customerId}`, {
             method: 'POST',
@@ -48,7 +52,7 @@ export const addWishList = async (productId: string, customerId: string, company
                 "company-domain": companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,
             },
-            body: JSON.stringify({ productId }),
+            body: JSON.stringify({ productVariantId: productId }),
         });
         if (response.status !== 200) {
             console.error('Failed to update wishlist');
@@ -67,7 +71,7 @@ export const deleteWishList = async (productId: string, customerId: string, comp
                 "company-domain": companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,    
             },
-            body: JSON.stringify({ productId }),
+            body: JSON.stringify({ productVariantId: productId }),
         });
         console.log(response)
         if (response.status !== 200) {

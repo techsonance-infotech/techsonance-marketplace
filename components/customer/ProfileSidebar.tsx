@@ -22,7 +22,8 @@ export function ProfileSidebar() {
     const router = useRouter();
     const dispatch = useAppDispatch();
     const currentPath = usePathname();
-    const currentUserId = user?.user_id ? user.user_id : '';
+    const currentUserId = user?.id ? user.id : '';
+
     const isMobile = useMediaQuery({ maxWidth: 767 });
     const handleNavigation = (linkPath: string) => {
         if (linkPath === '/logout') {
@@ -105,7 +106,7 @@ export function ProfileSidebar() {
                 </div> */}
                 <div className="overflow-hidden">
                     <h1 className="text-lg font-bold text-gray-900 truncate">
-                        {user?.name || 'User'}
+                        {user?.first_name} {user?.last_name || 'User'}
                     </h1>
                     <p className="text-gray-500 text-xs truncate max-w-[150px]">
                         {user?.email}

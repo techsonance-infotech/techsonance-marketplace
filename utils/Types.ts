@@ -1,7 +1,7 @@
 ﻿export interface UserProfile {
   company_id: string;
   vendor_id: string | null;
-  user_id: string;
+  id: string;
   role: string;
   email: string;
   phone: string;
@@ -415,7 +415,7 @@ export interface tabLinkType {
 }
 
 export type FeatureType = { title: string; description: string };
-export type VariantType = { attributes: Record<string, string>; sku: string; price: number; stock: number };
+export type VariantType = { id: string; attributes: Record<string, string>; sku: string; price: number; stock: number };
 export type ProductFormValuesType = {
   productName: string;
   description: string;
@@ -425,7 +425,6 @@ export type ProductFormValuesType = {
   discountPercent: string;
   stocks: string;
   sku: string;
-  has_variants: boolean;
   productMedia: File[] | string[];
   featureMedia: File[] | string[];
   category: string;
@@ -603,7 +602,7 @@ export type ProductResponseType = {
   vendor_id: string;
   category_id: string;
   images: ProductImageType[];
-  variants: VariantsType,
+  variants: VariantsType;
   tax_profile: string,
 
 };
