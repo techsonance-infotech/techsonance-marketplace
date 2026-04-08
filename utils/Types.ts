@@ -44,19 +44,20 @@ export interface Address {
 
 export interface Cart {
   cart_id: string;
-  items: CartItem[];
+  items: CartItemType[];
   created_at: string;
 }
-
-export interface CartItem {
-  cart_item_id: number;
-  variant_id: number;
+  //used in cart 
+export interface CartItemType {
+  cartId: string;
+  cartItemId: string;
   quantity: number;
+  productVariantId: string;
 }
 
 export interface Wishlist {
-  wishlist_id: number;
-  items: number[]; // Array of product_ids
+  wishlist_id: string;
+  items: string[];  
 }
 
 export interface UserOrder {
@@ -223,11 +224,11 @@ export type ProductStatus = 'active' | 'inactive' | 'archived'; // Add other sta
 export type ProductImageType = {
   id: string;
   image_url: string;
-  alt_text: string;
+  alt_text?: string;
   imgType: "main" | "gallery";
   is_primary: boolean;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
   product_id: string;
   variant_id: string;
 };
@@ -415,7 +416,6 @@ export interface tabLinkType {
 }
 
 export type FeatureType = { title: string; description: string };
-export type VariantType = { id: string; attributes: Record<string, string>; sku: string; price: number; stock: number };
 export type ProductFormValuesType = {
   productName: string;
   description: string;
@@ -579,13 +579,18 @@ export type AttributesType = {
   name: string,
   values: string
 }
+//used
 export type VariantsType = {
   id: string
   variant_name: string,
   sku: string,
-  attributes: AttributesType[]
-
+  attributes: AttributesType[],
+  product_id: string;
+  price: string;
+  stock_quantity: number;
+  images: ProductImageType[];
 }
+//used
 export type ProductResponseType = {
   id: string;
   name: string;

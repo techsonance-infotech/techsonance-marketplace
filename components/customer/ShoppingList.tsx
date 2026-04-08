@@ -24,12 +24,11 @@ export function ShoppingList({
     console.log(products)
     const pageSize = 8;
     const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
-    const [count, setCount] = useState(1); // Number of products to show at a time
+    const [count, setCount] = useState(1);
     const totalPages = Math.ceil(products.length / pageSize);
     const firstIndex = (count - 1) * pageSize;
     const lastIndex = firstIndex + pageSize - 1;
     const [isLoading, setIsLoading] = useState(false);
-    const { isCartOpen } = useAppSelector((state: RootState) => state.cartSidebar);
     const dispatch = useAppDispatch();
     const sectionRef = useRef<HTMLElement>(null);
 
@@ -42,9 +41,7 @@ export function ShoppingList({
         )
     }
     console.log("firstIndex, lastIndex", firstIndex, lastIndex);
-    // const productsToShow = productsState.slice(firstIndex, lastIndex + 1)
     const productsToShow = products
-    // console.log("productsState", productsState)
     console.log("productsToShow", productsToShow);
     return (
         <>
@@ -102,7 +99,7 @@ export function ShoppingList({
                                                     !isMobile &&
                                                     <div className={`flex gap-2 mt-2   justify-between items-center`}>
                                                         <AddToCart productVariantId={product?.variants[0]?.id} styles="w-full " />
-                                                        <BuyBtn productId={product.id} styles=" scale-[.9]" />
+                                                        <BuyBtn productId={product.variants[0]?.id} styles=" scale-[.9]" />
 
                                                     </div>
                                                 }

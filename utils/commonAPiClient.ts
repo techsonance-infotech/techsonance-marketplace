@@ -1,4 +1,5 @@
-﻿import { BASE_API_URL } from "@/constants";
+﻿import { companyDomain } from "@/config";
+import { BASE_API_URL } from "@/constants";
 
 export const fetchProduct = async (productId: string) => {
     try {
@@ -17,13 +18,18 @@ export const fetchProduct = async (productId: string) => {
         throw error;
     }
 }
-export const fetchProductVendorProducts = async (companyId: string = '975b2777-b12e-4188-9236-954dae4397e2') => {
+export const fetchProductVendorProducts = async () => {
     try {
-        // const response = await fetch(`${BASE_API_URL}products/${companyId}/all`, {
-        const response = await fetch(`${BASE_API_URL}products/${'975b2777-b12e-4188-9236-954dae4397e2'}/all`, {
+        const response = await fetch(`${BASE_API_URL}products/all`, {
             method: 'GET',
             cache: "force-cache",
             next: { revalidate: 3600 },
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+
         });
         if (response.status !== 200) {
             console.error('Failed to fetch vendor products');

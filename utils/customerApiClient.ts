@@ -125,11 +125,11 @@ export const fetchRemoveFromCart = async (customerId: string, cartId: string, ca
         console.error('Error removing from cart:', error);
     }
 };
-export const fetchGetCart = async (customerId: string, companyDomain: string) => {
+export const fetchGetCartList = async (customerId: string, companyDomain: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}cart/${customerId}`, {
             method: 'GET',
-
+            cache: 'no-cache',
             headers: {
                 'Content-Type': 'application/json',
                 "company-domain": companyDomain,

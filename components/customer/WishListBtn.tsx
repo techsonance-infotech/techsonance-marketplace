@@ -7,17 +7,24 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import { fetchAddWishList, fetchDeleteWishList } from '@/utils/customerApiClient';
 import { companyDomain } from '@/config';
-export function WishListBtn({ productId, styles, iconSize }: { productId?: string, styles?: string, iconSize?: number }) {
+export function WishListBtn({ productVariantId
+  , styles, iconSize }: {
+    productVariantId
+    ?: string, styles?: string, iconSize?: number
+  }) {
   const dispatch = useAppDispatch();
   const { wishItems } = useAppSelector((state: any) => state.wishlist)
   const { user } = useAppSelector((state: any) => state.auth)
-  const isAlreadyInWishlist = wishItems.some((item: any) => item.productId === productId);
+  const isAlreadyInWishlist = wishItems.some((item: any) => item.productVariantId
+    === productVariantId
+  );
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
   const iconSizeValue = iconSize || (isMobile ? 28 : 32);
   const router = useRouter();
 
   const handleAddToWishlist = async () => {
-    if (!productId) {
+    if (!productVariantId
+    ) {
       console.error('Product ID is missing');
       return;
     }
@@ -27,14 +34,33 @@ export function WishListBtn({ productId, styles, iconSize }: { productId?: strin
     }
 
     if (isAlreadyInWishlist) {
-      dispatch(removeFromWishlist(productId));
-      await fetchDeleteWishList(productId, user.id, companyDomain);
-      console.log(`Removing product ${productId} from wishlist`);
+      dispatch(removeFromWishlist(productVariantId
+      ));
+      await fetchDeleteWishList(productVariantId
+        , user.id, companyDomain);
+      console.log(`Removing product ${productVariantId
+        } from wishlist`);
       return;
     }
-    await fetchAddWishList(productId, user.id, companyDomain);
-    dispatch(addToWishlist({ productId }));
-    console.log(`Adding product ${productId} to wishlist`);
+    const response = await fetchAddWishList(productVariantId
+      , user.id, companyDomain);
+    const data: {
+      id: string;
+      wishlist_id: string | null;
+      product_variant_id: string | null;
+      created_at: string | null;
+      updated_at: string | null
+    } = response.data;
+    dispatch(addToWishlist({
+      id: data.id,
+      wishlist_id: data.wishlist_id ?? '',
+      product_variant_id: productVariantId,
+      created_at: data.created_at ?? '',
+      updated_at: data.updated_at ?? '',
+
+    }));
+    console.log(`Adding product ${productVariantId
+      } to wishlist`);
   }
   return (
     <>

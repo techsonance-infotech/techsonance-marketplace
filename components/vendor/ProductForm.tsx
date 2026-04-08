@@ -4,6 +4,7 @@ import { useAppSelector } from "@/hooks/reduxHooks";
 import { usePreviewUrls } from "@/lib/clientUtils";
 import { FileOrImage, ProductImageType } from "@/utils/Types";
 import { ProductFormValuesType, productSchema } from "@/utils/validation";
+import { createProduct } from "@/utils/vendorApiClient";
 import { zodResolver } from "@hookform/resolvers/zod/dist/zod.js";
 import { DynamicIcon } from "lucide-react/dynamic";
 import { useRouter } from "next/navigation";
@@ -134,7 +135,7 @@ export function ProductForm({
     // ── Submit ──
     const onSubmit = async (data: ProductFormValuesType) => {
         if (!existingData && (productFiles.length === 0 || featureFiles.length === 0)) {
-            console.warn("Product or feature files are missing.");  
+            console.warn("Product or feature files are missing.");
             return;
         }
         if (!user || !user.vendor_id || !user.company_id) {
@@ -176,10 +177,7 @@ export function ProductForm({
                 );
             } else {
                 console.log("creating")
-                response = await fetch(
-                    `${BASE_API_URL}products/${user.company_id}/${user.vendor_id}`,
-                    { method: "POST", body: formData }
-                );
+                response = await createProduct(formData, vendorId);
             }
             if (!response.ok) console.log(response.status, response.statusText);
             router.push(`/vendor/${vendorId}/products`);

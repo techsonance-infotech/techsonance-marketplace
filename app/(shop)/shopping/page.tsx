@@ -3,9 +3,9 @@ import { PRODUCT_LIST } from "@/constants/customer";
 import { fetchProductVendorProducts } from "@/utils/commonAPiClient";
 
 export default async function ShoppingPage({ Params }: { Params: { id: string } }) {
-    const getProducts = await fetchProductVendorProducts('');
+    const getProducts = await fetchProductVendorProducts();
     console.log("Products from API:", getProducts);
-    const products = getProducts.data.length > 0 ? getProducts.data : [];
+    const products = getProducts.data && getProducts.data.length > 0 ? getProducts.data : [];
     return (
         <>
             <main className="flex gap-8 xl:pt-10 pb-8 xl:px-32 lg:px-8 md:px-4 sm:px-2 py-1 px-2">
