@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { UserProfile, UserRole } from '../../../utils/Types';
+import { UserProfile, UserRole, UserType } from '../../../utils/Types';
 import { ACCESS_TOKEN_KEY, CART_KEY, IS_AUTHENTICATED_KEY, isClient, USER_STORAGE_KEY, WISHLIST_KEY } from '@/constants';
 
 
@@ -21,11 +21,12 @@ const getUserFromLocalStorage = () => {
 
 export interface AuthType {
     isAuthenticated: boolean;
-    user: Partial<UserProfile> | null;
+    user: Partial<UserType> | null;
     loading: boolean;
     error: string | null;
     token: string | null;
     role: UserRole;
+    addresses: any[] | null;
 }
 
 
@@ -36,6 +37,7 @@ const initialState: AuthType = {
     error: null,
     token: null,
     role: UserRole.Customer,
+    addresses: null,
 };
 export const getPreloadedAuthState = (): { auth: AuthType } => {
     if (!isClient) {
@@ -60,6 +62,7 @@ export const getPreloadedAuthState = (): { auth: AuthType } => {
             error: null,
             token: null,
             role: parsedAuth?.role || UserRole.Customer,
+            addresses: null,
         }
     };
 };
@@ -123,17 +126,17 @@ const authSlice = createSlice({
         // ========== ADDRESS MANAGEMENT ==========
         createAddress: (state, action) => {
             if (state.user) {
-                state.user.addresses.push(action.payload);
+                state.addresses.push(action.payload);
             }
         },
 
         updateAddress: (state, action) => {
             if (state.user) {
-                const index = state.user.addresses.findIndex(
+                const index = state.addresses.findIndex(
                     address => address.address_id === action.payload.address_id
                 );
                 if (index !== -1) {
-                    state.user.addresses[index] = action.payload;
+                    state.addresses[index] = action.payload;
                 }
             }
         },

@@ -11,6 +11,7 @@ const ProfileSidebarLink = [
     { name: 'My Orders', path: '/orders', icon: 'shopping-bag' },
     { name: "My Cart", path: '/cart', icon: 'shopping-cart' },
     { name: 'Wishlist', path: '/wishlist', icon: 'heart' },
+    { name: 'My Addresses', path: '/addresses', icon: 'map-pin' },
     { name: 'Change Password', path: '/changePassword', icon: 'lock' },
     { name: 'Customer Support', path: '/support', icon: 'headphones' },
     { name: 'Logout', path: '/logout', icon: 'log-out', isDanger: true }
@@ -24,7 +25,7 @@ export function ProfileSidebar() {
     const currentPath = usePathname();
     const currentUserId = user?.id ? user.id : '';
 
-    const isMobile = useMediaQuery({ maxWidth: 767 });
+    const isMobileTablet = useMediaQuery({ maxWidth: 768 });
     const handleNavigation = (linkPath: string) => {
         if (linkPath === '/logout') {
             dispatch(logOut());
@@ -39,62 +40,64 @@ export function ProfileSidebar() {
         return null; // Don't render sidebar on checkout pages
     }
     const mobileLinks = ProfileSidebarLink.filter(link => link.path !== '/customerProfile' && link.path !== '/logout');
-    if (isMobile) {
+    if (isMobileTablet && currentPath.endsWith(`/customerProfile/${currentUserId}`)) {
         return (
-            <motion.ul
-                className="space-y-1 grid grid-cols-2 gap-2"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                    visible: { transition: { staggerChildren: 0.05 } }
-                }}
+            <>
 
-            >
-                {mobileLinks.map((link) => {
-                    const targetPath = link.path === '/customerProfile'
-                        ? `/customerProfile/${currentUserId}`
-                        : `/customerProfile/${currentUserId}${link.path}`;
+                <motion.ul
+                    className="space-y-1 grid grid-cols-2 gap-2"
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                        visible: { transition: { staggerChildren: 0.05 } }
+                    }}
 
-                    const isActive = currentPath === targetPath || (link.path !== '/customerProfile' && currentPath.startsWith(targetPath));
-                    const isDanger = link.path === '/logout';
-                    return (
+                >
+                    {mobileLinks.map((link) => {
+                        const targetPath = link.path === '/customerProfile'
+                            ? `/customerProfile/${currentUserId}`
+                            : `/customerProfile/${currentUserId}${link.path}`;
 
-                        <motion.li
-                            key={link.name}
-                            variants={{
-                                hidden: { opacity: 0, x: -10 },
-                                visible: { opacity: 1, x: 0 }
-                            }}
-                            className='  border-2 border-gray-200 rounded-md flex-1 '
-                        >
-                            <button
-                                onClick={() => handleNavigation(link.path)}
-                                className={`
+                        const isActive = currentPath === targetPath || (link.path !== '/customerProfile' && currentPath.startsWith(targetPath));
+                        const isDanger = link.path === '/logout';
+                        return (
+
+                            <motion.li
+                                key={link.name}
+                                variants={{
+                                    hidden: { opacity: 0, x: -10 },
+                                    visible: { opacity: 1, x: 0 }
+                                }}
+                                className='  border-2 border-gray-200 rounded-md flex-1 '
+                            >
+                                <button
+                                    onClick={() => handleNavigation(link.path)}
+                                    className={`
                                     relative w-full flex items-center gap-4 px-2 py-2  text-sm font-medium transition-colors group
                                     ${isDanger
-                                        ? 'text-red-500 hover:bg-red-50'
-                                        : isActive
-                                            ? 'text-brand-primary'
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                                    }
+                                            ? 'text-red-500 hover:bg-red-50'
+                                            : isActive
+                                                ? 'text-brand-primary'
+                                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                        }
                                 `}
-                            >
-                                <span className="relative z-10 flex items-start justify-start w-5 h-5">
-                                    <DynamicIcon name={link.icon as IconName} size={20} />
-                                </span>
-                                <span className="relative text-start z-10 font-semibold">
-                                    {link.name}
-                                </span>
-                            </button>
-                        </motion.li>
-                    );
-                })}
-            </motion.ul>
-
+                                >
+                                    <span className="relative z-10 flex items-start justify-start w-5 h-5">
+                                        <DynamicIcon name={link.icon as IconName} size={20} fallback={() => <p></p>} />
+                                    </span>
+                                    <span className="relative text-start z-10 font-semibold">
+                                        {link.name}
+                                    </span>
+                                </button>
+                            </motion.li>
+                        );
+                    })}
+                </motion.ul>
+            </>
         )
     }
     return (
-        <aside className="w-full lg:w-72 flex-shrink-0">
+        <aside className="w-full lg:w-72 flex-shrink-0 hidden lg:block   border-gray-200 rounded-xl p-6">
             {/* User Header Card */}
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -102,12 +105,16 @@ export function ProfileSidebar() {
                 className="mb-8 p-6  border-l-4    flex items-center gap-4"
             >
                 <div className="overflow-hidden">
-                    <h1 className="text-lg font-bold text-gray-900 truncate">
-                        {`${user?.first_name} ${user?.last_name}` || 'User'}
-                    </h1>
-                    <p className="text-gray-500 text-xs truncate max-w-[150px]">
-                        {user?.email}
-                    </p>
+                    {user?.first_name  && (
+                        <>
+                            <h1 className="text-lg font-bold text-gray-900 truncate">
+                                {`${user?.first_name} ${user?.last_name}` || 'User'}
+                            </h1>
+                            <p className="text-gray-500 text-xs truncate max-w-[150px]">
+                                {user?.email}
+                            </p>
+                        </>
+                    )}
                 </div>
             </motion.div>
 
@@ -160,7 +167,7 @@ export function ProfileSidebar() {
 
                                 {/* Icon & Text - z-index ensures they sit ON TOP of the pill */}
                                 <span className="relative z-10 flex items-center justify-center w-5 h-5">
-                                    <DynamicIcon name={link.icon as IconName} size={20} />
+                                    <DynamicIcon name={link.icon as IconName} size={20} fallback={() => <p></p>} />
                                 </span>
                                 <span className="relative z-10 font-semibold">
                                     {link.name}
@@ -173,7 +180,7 @@ export function ProfileSidebar() {
                                         whileHover={{ opacity: 1, x: 0 }}
                                         className="absolute right-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
-                                        <DynamicIcon name="chevron-right" size={16} />
+                                        <DynamicIcon name="chevron-right" size={16} fallback={() => <p></p>} />
                                     </motion.div>
                                 )}
                             </button>

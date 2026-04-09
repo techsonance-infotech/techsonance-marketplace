@@ -19,9 +19,9 @@ export function TabNavBar() {
         setIsMounted(true);
     }, []);
     const navLinks = useMemo(() => {
-      
+
         return TAB_LINKS.map((link) => {
-            const newLink = { ...link };  
+            const newLink = { ...link };
 
             if (isMounted && user) {
                 const userId = user.user_id || '';
@@ -78,7 +78,10 @@ export function TabNavBar() {
                                     <DynamicIcon
                                         name={link.iconNames as IconName}
                                         size={20}
-                                        className={`${isActive ? 'text-primary' : 'text-gray-500'} z-60 transition-colors duration-200`}
+                                        fallback={() => <p></p>}
+                                        className={`${isActive ? 'text-primary' : 'text-gray-500'} z-60 transition-colors duration-200`
+
+                                        }
                                     />
                                 </Link>
                             </motion.div>

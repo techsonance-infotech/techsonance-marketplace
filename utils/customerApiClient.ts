@@ -1,4 +1,5 @@
 ﻿import { BASE_API_URL, CUSTOMER_BASE_URL } from "@/constants";
+import { authToken } from "./authToken";
 
 export const fetchCustomerProfile = async () => {
     try {
@@ -164,3 +165,86 @@ export const fetchUpdateCartQuantity = async (productVariantId: string, quantity
 
     }
 }
+
+export const fetchGetUserAddresses = async (customerId: string,) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}address/customer/${customerId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // "company-domain": companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,    
+            },
+        });
+        if (response.status !== 200) {
+            console.log('Failed to fetch addresses');
+            return [];
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching addresses:', error);
+    }
+};
+export const fetchCreateUserAddress = async (customerId: string, addressData: any) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}address/customer/${customerId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // "company-domain": companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+            body: JSON.stringify(addressData),
+        });
+        if (response.status !== 200) {
+            console.log('Failed to create address');
+            return;
+        }
+        return await response.json();
+
+    } catch (error) {
+        console.error('Error creating address:', error);
+    }
+}
+export const fetchUpdateUserAddress = async (customerId: string, addressId: string, addressData: any) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}address/customer/${customerId}/${addressId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                // "company-domain": companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+            body: JSON.stringify(addressData),
+        });
+        if (response.status !== 200) {
+            console.log('Failed to update address');
+            return;
+        }
+        return await response.json();
+    }
+    catch (error) {
+        console.error('Error updating address:', error);
+    }
+}
+export const fetchDeleteUserAddress = async (customerId: string, addressId: string) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}address/customer/${customerId}/${addressId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                // "company-domain": companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+        });
+        if (response.status !== 200) {
+            console.log('Failed to delete address');
+            return;
+        }
+        return await response.json();
+    }
+    catch (error) {
+        console.error('Error deleting address:', error);
+    }
+}
+export const fetchGetAddressById = async (customerId: string, addressId: string) => { }

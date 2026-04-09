@@ -47,7 +47,7 @@ export interface Cart {
   items: CartItemType[];
   created_at: string;
 }
-  //used in cart 
+//used in cart 
 export interface CartItemType {
   cartId: string;
   cartItemId: string;
@@ -57,7 +57,7 @@ export interface CartItemType {
 
 export interface Wishlist {
   wishlist_id: string;
-  items: string[];  
+  items: string[];
 }
 
 export interface UserOrder {
@@ -234,8 +234,8 @@ export type ProductImageType = {
 };
 
 export type ProductFeatureType = {
-  key: string;
-  value: string | boolean | number;
+  title: string;
+  description: string | boolean | number;
 };
 
 export type ProductType = {
@@ -252,7 +252,7 @@ export type ProductType = {
   vendor_id: string;
   features: ProductFeatureType[];
   images: ProductImageType[];
-  variants?: VariantType[];
+  variants?: VariantsType[];
   created_at: string;
   updated_at: string;
 };
@@ -364,7 +364,7 @@ export interface VendorApplicationType {
   };
 }
 
-export interface User {
+export interface UserType {
   id: string;
   profile_picture_url: string | null;
   first_name: string;
@@ -391,7 +391,7 @@ export interface Company {
 
 export interface VendorApplication {
   vendor: Vendor;
-  user: User;
+  user: UserType;
   company: Company;
 }
 export interface NavLinkType {

@@ -1,32 +1,72 @@
-﻿import { createAddress, updateAddress } from "@/lib/features/auth/authSlice";
+﻿"use client";
+import { createAddress, updateAddress } from "@/lib/features/auth/authSlice";
 import { FormInput } from "../common/FormInput";
 import { useForm } from "react-hook-form";
 import { UserProfile } from "@/constants/common";
 import { motion } from "motion/react";
 import { ADDRESS_FIELDS } from "@/constants/dynamicFields";
 import { useAppDispatch } from "@/hooks/reduxHooks";
+import { UserType } from "@/utils/Types";
+import { fetchCreateUserAddress, fetchGetAddressById, fetchGetUserAddresses, fetchUpdateUserAddress } from "@/utils/customerApiClient";
+import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 export const AddressModal = ({ user, addressId, operation, onClose }: {
-    user: UserProfile,
+    user: UserType,
     addressId?: string,
     operation: 'edit' | 'add',
     onClose: () => void
 }) => {
+    const [existingAddress, setExistingAddress] = useState<any>(null);
     const dispatch = useAppDispatch();
-    const existingAddress = user.addresses.find(addr => addr.address_id.toString() === addressId);
 
     const { register, handleSubmit, reset } = useForm({
-        defaultValues: operation === 'edit' && existingAddress ? existingAddress : {
+        defaultValues: {
+            name: "",
             address_for: 'home',
-            is_default: false
+            is_default: false,
+            phone: "",
+            address_line_1: "",
+            address_line_2: "",
+            city: "",
+            state: "",
+            street: "",
+            postal_code: "",
+            country: "",
+            landmark: ""
         }
     });
+    useEffect(() => {
+        const fetchAddressDetails = async () => {
+            if (operation === 'edit' && addressId) {
+                const response = await fetchGetAddressById(user.id, addressId);
+                const addressData = response.data;
+                setExistingAddress(addressData);
+                reset({
+                    name: addressData.name,
+                    address_for: addressData.address_for,
+                    is_default: addressData.is_default,
+                    phone: addressData.phone,
+                    address_line_1: addressData.address_line_1,
+                    address_line_2: addressData.address_line_2,
+                    city: addressData.city,
+                    state: addressData.state,
+                    street: addressData.street,
+                    postal_code: addressData.postal_code,
+                    country: addressData.country,
+                    landmark: addressData.landmark
 
-    const onSubmit = (data: any) => {
+                });
+            }
+        };
+        fetchAddressDetails();
+    }, [existingAddress, user]);
+    const onSubmit = async (data: any) => {
         if (operation === 'edit') {
-            dispatch(updateAddress({ ...data, address_id: existingAddress?.address_id }));
-
+            // dispatch(updateAddress({ ...data, address_id: existingAddress?.address_id }));
+            await fetchUpdateUserAddress(user.id, existingAddress?.address_id, data);
         } else {
-            dispatch(createAddress({ ...data, address_id: Date.now() }));
+            await fetchCreateUserAddress(user.id, data);
+            // dispatch(createAddress({ ...data, address_id: Date.now() }));
         }
 
         onClose();
@@ -58,7 +98,7 @@ export const AddressModal = ({ user, addressId, operation, onClose }: {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="lg:p-6 p-3 space-y-4 max-h-[70dvh] overflow-y-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                         {ADDRESS_FIELDS.map((field) => (
                             <div key={field.id}>
                                 {field.type !== "checkbox" ? (
@@ -66,16 +106,17 @@ export const AddressModal = ({ user, addressId, operation, onClose }: {
                                         label={field.label}
                                         id={field.id}
                                         register={register}
-                                        required={true}
+                                        required={field.required}
                                         options={field.options}
                                         type={field.type}
+                                        placeholder={field.placeholder}
                                     />
 
                                 ) : (
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="checkbox"
-                                            {...register(field.id)}
+                                            {...register(field.id as keyof typeof register)}
                                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                         />
                                         <label className="text-sm font-semibold text-gray-600">

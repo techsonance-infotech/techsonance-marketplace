@@ -1,5 +1,5 @@
 'use client';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeftCircle } from "lucide-react";
 import { deleteAddress, setDefaultAddress } from "@/lib/features/auth/authSlice";
@@ -8,13 +8,26 @@ import { useRouter } from "next/navigation";
 import { AddressCard } from "@/components/customer/AddressCard";
 import { AddressModal } from "@/components/customer/AddressModel";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { RootState } from "@/lib/store";
+import { fetchGetUserAddresses } from "@/utils/customerApiClient";
 
 export default function Addresses() {
-    const user = useAppSelector((state) => state.auth.user);
+    const user = useAppSelector((state: RootState) => state.auth.user);
     const dispatch = useAppDispatch();
     const [isModalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
     const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
+    const [addressList, setAddressList] = useState([]);
+    useEffect(() => {
+        const fetchAddresses = async () => {
+            if (user) {
+                const response = await fetchGetUserAddresses(user.id);
+                console.log("address Response", response);
+                setAddressList(response.data);
+            }
+        }
+        fetchAddresses();
+    }, [user]);
     const router = useRouter()
     const openAdd = () => {
         setModalMode('add');
@@ -49,10 +62,10 @@ export default function Addresses() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <AnimatePresence mode="popLayout">
-                    {user?.addresses.length ? (
-                        user.addresses.map((address) => (
+                    {addressList.length ? (
+                        addressList.map((address) => (
                             <AddressCard
-                                key={address.address_id}
+                                key={address.id}
                                 address={address}
                                 onEdit={openEdit}
                                 onDelete={(id: number) => dispatch(deleteAddress(id))}
