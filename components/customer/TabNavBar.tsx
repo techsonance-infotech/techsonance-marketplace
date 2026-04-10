@@ -11,7 +11,7 @@ import { useAppSelector } from "@/hooks/reduxHooks";
 
 export function TabNavBar() {
     const { user } = useAppSelector((state: any) => state.auth)
-    const userId = user?.user_id ? user.user_id : '';
+    const userId = user?.id ? user.id : '';
     const path = usePathname();
     const [isMounted, setIsMounted] = useState(false);
 
@@ -24,7 +24,7 @@ export function TabNavBar() {
             const newLink = { ...link };
 
             if (isMounted && user) {
-                const userId = user.user_id || '';
+                const userId = user.id || '';
                 if (newLink.title.toLowerCase() === 'profile') {
                     newLink.url = `/customerProfile/${userId}`;
                 } else if (newLink.title.toLowerCase() === 'cart') {

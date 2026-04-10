@@ -26,7 +26,7 @@ export interface AuthType {
     error: string | null;
     token: string | null;
     role: UserRole;
-    addresses: any[] | null;
+    // addresses: any[] | null;
 }
 
 
@@ -37,7 +37,7 @@ const initialState: AuthType = {
     error: null,
     token: null,
     role: UserRole.Customer,
-    addresses: null,
+    // addresses: null,
 };
 export const getPreloadedAuthState = (): { auth: AuthType } => {
     if (!isClient) {
@@ -110,7 +110,6 @@ const authSlice = createSlice({
                 localStorage.removeItem(USER_STORAGE_KEY);
                 localStorage.removeItem(CART_KEY);
                 localStorage.removeItem(IS_AUTHENTICATED_KEY);
-                localStorage.removeItem(CART_KEY);
                 localStorage.removeItem(WISHLIST_KEY);
                 sessionStorage.removeItem(ACCESS_TOKEN_KEY);
             }
@@ -124,44 +123,44 @@ const authSlice = createSlice({
         },
 
         // ========== ADDRESS MANAGEMENT ==========
-        createAddress: (state, action) => {
-            if (state.user) {
-                state.addresses.push(action.payload);
-            }
-        },
+        //     createAddress: (state, action) => {
+        //         if (state.user) {
+        //             state.addresses.push(action.payload);
+        //         }
+        //     },
 
-        updateAddress: (state, action) => {
-            if (state.user) {
-                const index = state.addresses.findIndex(
-                    address => address.address_id === action.payload.address_id
-                );
-                if (index !== -1) {
-                    state.addresses[index] = action.payload;
-                }
-            }
-        },
+        //     updateAddress: (state, action) => {
+        //         if (state.user) {
+        //             const index = state.addresses.findIndex(
+        //                 address => address.address_id === action.payload.address_id
+        //             );
+        //             if (index !== -1) {
+        //                 state.addresses[index] = action.payload;
+        //             }
+        //         }
+        //     },
 
-        deleteAddress: (state, action) => {
-            if (state.user) {
-                state.user.addresses = state.user.addresses.filter(
-                    address => address.address_id !== action.payload
-                );
-            }
-        },
+        //     deleteAddress: (state, action) => {
+        //         if (state.user) {
+        //             state.user.addresses = state.user.addresses.filter(
+        //                 address => address.address_id !== action.payload
+        //             );
+        //         }
+        //     },
 
-        setDefaultAddress: (state, action) => {
-            if (state.user) {
-                state.user.addresses.forEach(address => {
-                    address.is_default = false;
-                });
-                const address = state.user.addresses.find(
-                    addr => addr.address_id === action.payload
-                );
-                if (address) {
-                    address.is_default = true;
-                }
-            }
-        }
+        //     setDefaultAddress: (state, action) => {
+        //         if (state.user) {
+        //             state.user.addresses.forEach(address => {
+        //                 address.is_default = false;
+        //             });
+        //             const address = state.user.addresses.find(
+        //                 addr => addr.address_id === action.payload
+        //             );
+        //             if (address) {
+        //                 address.is_default = true;
+        //             }
+        //         }
+        //     }
     }
 });
 

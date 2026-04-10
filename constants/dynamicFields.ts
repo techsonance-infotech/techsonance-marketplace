@@ -73,7 +73,7 @@ export const ADDRESS_FIELDS = [
     { id: "landmark", label: "Landmark", type: "text", placeholder: "Enter nearby landmark", required: true },
     { id: "is_default", label: "Set as default address", type: "checkbox" }
 
-]
+] as const;
 export const PAYMENT_METHODS_FIELDS = [
     { id: 'UPI', label: 'UPI', placeholder: 'Enter your UPI ID', type: 'text', description: 'We will redirect you to your UPI app to complete the payment.' },
     { id: 'CreditCard', label: 'Credit or Debit Card', placeholder: 'Card Number', type: 'text', description: 'We accept all major credit and debit cards. Your card details are processed securely.' },

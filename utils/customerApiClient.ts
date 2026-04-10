@@ -196,18 +196,27 @@ export const fetchCreateUserAddress = async (customerId: string, addressData: an
             },
             body: JSON.stringify(addressData),
         });
-        if (response.status !== 200) {
+        console.warn(response)
+        if (response.status !== 201) {
             console.log('Failed to create address');
-            return;
+            return {
+                success: false,
+                message: 'Failed to create address'
+            }
         }
-        return await response.json();
-
+        const responseData = await response.json();
+        return {
+            success: true,
+            message: 'Address created successfully',
+            data: responseData
+        };
     } catch (error) {
         console.error('Error creating address:', error);
     }
 }
 export const fetchUpdateUserAddress = async (customerId: string, addressId: string, addressData: any) => {
     try {
+        console.log("customerId", customerId, '\n address id', addressId)
         const response = await fetch(`${BASE_API_URL}address/customer/${customerId}/${addressId}`, {
             method: 'PATCH',
             headers: {
@@ -217,11 +226,20 @@ export const fetchUpdateUserAddress = async (customerId: string, addressId: stri
             },
             body: JSON.stringify(addressData),
         });
-        if (response.status !== 200) {
+        console.warn(response)
+        if (response.status !== 202) {
             console.log('Failed to update address');
-            return;
+            return {
+                success: false,
+                message: 'Failed to update address'
+            }
         }
-        return await response.json();
+        const responseData = await response.json();
+        return {
+            success: true,
+            message: 'Address updated successfully',
+            data: responseData
+        };
     }
     catch (error) {
         console.error('Error updating address:', error);
@@ -229,6 +247,7 @@ export const fetchUpdateUserAddress = async (customerId: string, addressId: stri
 }
 export const fetchDeleteUserAddress = async (customerId: string, addressId: string) => {
     try {
+        console.log(customerId, addressId)
         const response = await fetch(`${BASE_API_URL}address/customer/${customerId}/${addressId}`, {
             method: 'DELETE',
             headers: {
@@ -248,3 +267,47 @@ export const fetchDeleteUserAddress = async (customerId: string, addressId: stri
     }
 }
 export const fetchGetAddressById = async (customerId: string, addressId: string) => { }
+
+export const fetchSetDefaultAddress = async (customerId: string, addressId: string) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}address/customer/${customerId}/${addressId}/default`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                // "company-domain": companyDomain, 
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+        });
+        if (response.status !== 200) {
+            console.log('Failed to set default address');
+            return;
+        }
+        return await response.json();
+    }
+    catch (error) {
+        console.error('Error setting default address:', error);
+    }
+}
+
+export const checkAddressExistence = async (customerId: string) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}address/customer/${customerId}/addresses-exist`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        const responseData = await response.json();
+        console.log('Address existence check response:', responseData);
+        if (response.ok) {
+            return responseData.data;
+        }
+        return {
+            count: 0,
+            hasAddresses: false
+        }
+    } catch (error) {
+        console.error('Error checking address:', error);
+        return false;
+    }
+}

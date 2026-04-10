@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Counter } from "@/components/customer/Counter";
 import { containerVariants, itemVariants, ManagementCard } from "@/components/customer/ManagementCard";
 import { useAppSelector } from "@/hooks/reduxHooks";
+import { ProfileSidebar } from "@/components/customer/ProfileSidebar";
 export default function UserProfilePage() {
     const { user } = useAppSelector((state) => state.auth);
     const { userId } = useParams()
@@ -63,7 +64,7 @@ export default function UserProfilePage() {
                         </p>
                     </div>
                 </div>
-                <Link href={`/customerProfile/${user?.user_id}/editProfile`}>
+                <Link href={`/customerProfile/${user?.id}/editProfile`}>
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -73,8 +74,6 @@ export default function UserProfilePage() {
                     </motion.button>
                 </Link>
             </motion.section>
-
-
 
             <div className="mt-8 lg:flex flex-col md:flex-row gap-6 hidden  ">
                 {[
@@ -128,7 +127,7 @@ export default function UserProfilePage() {
                     </ManagementCard>
 
                     <ManagementCard
-                    link=""
+                        link=""
                         icon={<Lock size={28} className="text-green-600" />}
                         color="bg-green-50"
                         title="Login & Security"
