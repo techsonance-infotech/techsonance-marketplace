@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { DynamicIcon, IconName } from "lucide-react/dynamic";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { keyof } from "zod";
 
 export const CONTACT_FORM_FIELDS = [
     {
@@ -40,10 +39,10 @@ export default function Contact() {
         resolver: zodResolver(contactSchema),
         mode: "onChange",
         defaultValues: {
-            name: null,
-            email: null,
-            phone: null,
-            message: null
+            name: '',
+            email: '',
+            phone: '',
+            message:''
         }
     });
     const [copied, setCopied] = useState(false);
@@ -52,7 +51,7 @@ export default function Contact() {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     }
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: ContactFormData) => {
         try {
             console.log("Form Data:", data);
 

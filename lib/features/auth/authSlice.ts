@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { UserProfile, UserRole, UserType } from '../../../utils/Types';
+import { UserRole, UserType, VendorUserType } from '../../../utils/Types';
 import { ACCESS_TOKEN_KEY, CART_KEY, IS_AUTHENTICATED_KEY, isClient, USER_STORAGE_KEY, WISHLIST_KEY } from '@/constants';
 
 
@@ -21,7 +21,7 @@ const getUserFromLocalStorage = () => {
 
 export interface AuthType {
     isAuthenticated: boolean;
-    user: Partial<UserType> | null;
+    user: Partial<UserType | VendorUserType> | null;
     loading: boolean;
     error: string | null;
     token: string | null;
@@ -62,7 +62,7 @@ export const getPreloadedAuthState = (): { auth: AuthType } => {
             error: null,
             token: null,
             role: parsedAuth?.role || UserRole.Customer,
-            addresses: null,
+            // addresses: null,
         }
     };
 };
@@ -171,10 +171,10 @@ export const {
     loginSuccess,
     logOut,
     updateUserProfile,
-    createAddress,
-    updateAddress,
-    deleteAddress,
-    setDefaultAddress
+    // createAddress,
+    // updateAddress,
+    // deleteAddress,
+    // setDefaultAddress
 } = authSlice.actions;
 
 export const authReducer = authSlice.reducer;
