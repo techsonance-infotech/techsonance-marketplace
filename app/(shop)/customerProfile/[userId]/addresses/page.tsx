@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeftCircle } from "lucide-react";
-import { deleteAddress, setDefaultAddress } from "@/lib/features/auth/authSlice";
+// import { deleteAddress, setDefaultAddress } from "@/lib/features/auth/authSlice";
 
 import { useRouter } from "next/navigation";
 import { AddressCard } from "@/components/customer/AddressCard";
@@ -38,7 +38,7 @@ export default function Addresses() {
     const [addressList, setAddressList] = useState<AddressType[]>([]);
     useEffect(() => {
         const fetchAddresses = async () => {
-            if (user) {
+            if (user?.id) {
                 const response = await fetchGetUserAddresses(user.id);
                 console.log("address Response", response);
                 setAddressList(response.data);
@@ -113,7 +113,7 @@ export default function Addresses() {
 
 
             <AnimatePresence>
-                {isModalOpen && user && (
+                {isModalOpen && user?.id && (
                     <AddressModal
                         user={user}
                         addressId={selectedId}

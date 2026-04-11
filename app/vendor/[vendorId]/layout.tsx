@@ -1,8 +1,9 @@
 'use client';
+// @ts-ignore
+import './index.css';
 import { Sidebar } from "@/components/common/Sidebar";
 import { VENDOR_NAV_LINKS } from "@/constants/vendor";
 import { useParams, useRouter } from "next/navigation";
-import './index.css';
 import { useAppSelector } from "@/hooks/reduxHooks";
 import { useEffect } from "react";
 import { RootState } from "@/lib/store";

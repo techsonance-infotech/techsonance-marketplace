@@ -76,7 +76,7 @@ export const adminLogin = async (data: { admin_id: string, password: string }) =
             console.log(errorMessage);
             return { status: false, message: errorMessage };
         }
-        const payload: { user: UserProfile, token: string, role: UserRole } = {
+        const payload: { user: UserType, token: string, role: UserRole } = {
             user: result.data,
             token: result.data.token,
             role: result.data.user_role as UserRole

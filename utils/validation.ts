@@ -74,6 +74,7 @@ export const customerRegisterSchema = z.object({
 export type CustomerRegisterSchemaType = Partial<z.infer<typeof customerRegisterSchema>>;
 
 export const productSchema = z.object({
+  variantId: z.string().optional(),
   productName: z
     .string()
     .min(1, { message: "Product name is required" })
@@ -120,7 +121,6 @@ export const productSchema = z.object({
   status: z.enum(["active", "inactive",], {
     error: () => ({ message: "Please select a status" }),
   }),
-  has_variants: z.boolean().optional(),
   taxProfile: z.string().min(1, { message: "Tax profile is required" }),
   productMedia: z.array(z.any()).min(0, { message: "At least one product image is required" }).max(1, { message: "You can upload up to 1 image" }),
   featureMedia: z.array(z.any()).min(0, { message: "At least one feature image is required" }).max(10, { message: "You can upload up to 10 images" }),

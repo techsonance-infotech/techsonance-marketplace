@@ -1,6 +1,6 @@
 'use client';
 import { ContactList, ContactPageContent } from "@/constants/customer";
-import { contactSchema } from "@/utils/validation";
+import { ContactFormData, contactSchema } from "@/utils/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { DynamicIcon, IconName } from "lucide-react/dynamic";
@@ -42,7 +42,7 @@ export default function Contact() {
             name: '',
             email: '',
             phone: '',
-            message:''
+            message: ''
         }
     });
     const [copied, setCopied] = useState(false);
@@ -114,7 +114,7 @@ export default function Contact() {
                                     />
                                 ) : (
                                     <input
-                                        {...register(field.id)}
+                                        {...register(field.id as keyof typeof register)}
                                         type={field.type}
                                         placeholder={field.placeholder}
                                         className="border-2 border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"

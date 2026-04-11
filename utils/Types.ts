@@ -1,4 +1,4 @@
-﻿import InventoryPage from "@/app/vendor/[vendorId]/inventory/page";
+﻿
 import { VendorRegisterSchemaType } from "./validation";
 export enum UserStatusEnum {
   ACTIVE = 'active',
@@ -34,6 +34,17 @@ export enum InventoryItemStatusEnum {
   LOW_STOCK = 'low stock',
   OUT_OF_STOCK = 'out of stock'
 }
+// used in multiple places
+export enum AddressOperationEnum {
+  ADD = 'add',
+  EDIT = 'edit'
+}
+//used in multiple places
+export enum AddressForEnum {
+  HOME = 'home',
+  WORK = 'work',
+  OTHER = 'other'
+}
 export interface VendorUserType {
   company_id: string;
   vendor_id: string | null;
@@ -62,7 +73,7 @@ export interface UserType {
   country_code: string | null;
   phone_number: string | null;
   password_hash: string;
-  user_status: | null;
+  user_status: UserStatusEnum | null;
   created_at: Date;
   updated_at: Date;
   company_id: string | null;
@@ -274,6 +285,7 @@ export type ProductType = {
   features: ProductFeatureType[];
   images: ProductImageType[];
   variants?: VariantsType[];
+  reviews?: ReviewType[];
   created_at: string;
   updated_at: string;
 };
@@ -527,6 +539,7 @@ export interface InventoryProductType {
   is_default: boolean;
   contactPerson?: string;  // Optional contact person
   phone?: string;
+  location: string
 }
 export type OrderDetailType = {
   id: string;
