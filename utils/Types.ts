@@ -251,7 +251,10 @@ export interface ReviewType {
   comment: string;
 }
 
-export type ProductStatus = 'active' | 'inactive' | 'archived'; // Add other status strings here
+export enum ProductStatusEnum {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive'
+}
 
 export type ProductImageType = {
   id: string;
@@ -449,21 +452,21 @@ export interface tabLinkType {
 }
 
 export type FeatureType = { title: string; description: string };
-export type ProductFormValuesType = {
-  productName: string;
-  description: string;
-  features: FeatureType[];
-  attributes: AttributesType[];
-  basePrice: string;
-  discountPercent: string;
-  stocks: string;
-  sku: string;
-  productMedia: File[] | string[];
-  featureMedia: File[] | string[];
-  category: string;
-  status: string;
-  taxProfile: string;
-};
+// export type ProductFormValuesType = {
+//   productName: string;
+//   description: string;
+//   features: FeatureType[];
+//   attributes: AttributesType[];
+//   basePrice: string;
+//   discountPercent: string;
+//   stocks: string;
+//   sku: string;
+//   productMedia: FileOrImage[];
+//   featureMedia: FileOrImage[];
+//   category: string;
+//   status: string;
+//   taxProfile: string;
+// };
 
 export interface SelectedPaymentMethodProps {
   method: string;

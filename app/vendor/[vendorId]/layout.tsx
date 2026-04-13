@@ -23,7 +23,7 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
     }, [])
     return (
         <>
-            <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} basePath={`/vendor/${vendorId}`} id={vendorId} />
+            <Sidebar NAV_LINKS={VENDOR_NAV_LINKS} basePath={`/vendor/${vendorId}`}  />
             <main className={`vendor_dashboard mr-6 ${isSidebarOpen ? 'ml-50' : 'ml-24'}`}>
                 {children}
             </main>

@@ -2,8 +2,8 @@
 import { BASE_API_URL, ORGANIZATION_TAXATION_OPTIONS, PRODUCT_FORM_FIELDS, PRODUCT_FORM_PRICING_FIELDS } from "@/constants";
 import { useAppSelector } from "@/hooks/reduxHooks";
 import { usePreviewUrls } from "@/lib/clientUtils";
-import { FileOrImage, ProductImageType, VendorUserType } from "@/utils/Types";
-import { ProductFormValuesType, productSchema } from "@/utils/validation";
+import { FileOrImage, ProductImageType, ProductStatusEnum, VendorUserType } from "@/utils/Types";
+import { ProductFormInput, ProductFormOutput, ProductFormValuesType, productSchema } from "@/utils/validation";
 import { createProduct } from "@/utils/vendorApiClient";
 import { zodResolver } from "@hookform/resolvers/zod/dist/zod.js";
 import { DynamicIcon } from "lucide-react/dynamic";
@@ -41,7 +41,7 @@ export function ProductForm({
 }: {
     categoryOptions: { value: string; label: string }[];
     vendorId: string;
-    existingData?: Partial<ProductFormValuesType>;
+    existingData?: Partial<ProductFormInput | ProductFormOutput>;
     productId?: string
 }) {
     const {
@@ -66,7 +66,7 @@ export function ProductForm({
             productMedia: [],
             featureMedia: [],
             category: "",
-            status: "inactive",
+            status: ProductStatusEnum.INACTIVE,
             taxProfile: "",
         },
     });
@@ -99,7 +99,7 @@ export function ProductForm({
                 stocks: String(existingData.stocks) || "",
                 sku: existingData.sku || "",
                 category: existingData.category || "",
-                status: existingData.status || "inactive",
+                status: existingData.status || ProductStatusEnum.INACTIVE,
                 taxProfile: existingData.taxProfile || "",
             });
             setProductFiles(existingData.productMedia || []);
@@ -149,7 +149,7 @@ export function ProductForm({
             console.warn("Product or feature files are missing.");
             return;
         }
-        if (!user || !user.vendor_id || !user.company_id) {
+        if (!user || 'vendor_id' in user && !user.vendor_id || !user.company_id) {
             console.warn("User vendor and company information is missing.");
             return;
         }
