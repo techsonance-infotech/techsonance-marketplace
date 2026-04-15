@@ -363,3 +363,23 @@ export const fetchUserOrderHistory = async (customerId: string) => {
         console.log('Error fetching order history:', error);
     }
 };
+export const fetchOrderDetails = async (orderId: string) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}orders/${orderId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                "company-domain": companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+        });
+        console.log("Order Details Response:", response);
+        if (response.status !== 200) {
+            console.log('Failed to fetch order details');
+        }
+        return await response.json();
+
+    } catch (error) {
+        console.log('Error fetching order details:', error);
+    }
+}

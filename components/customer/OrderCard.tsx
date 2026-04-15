@@ -221,7 +221,7 @@ export const OrderCard = ({ order }: { order: OrderType }) => {
                 <div className="text-right">
                     <h1 className="text-gray-500 text-sm mb-1">ORDER #{order.id}</h1>
                     <span className="space-x-4 text-sm">
-                        <Link href={`/shop/order-details/${order.id}`} className="text-blue-500 hover:underline">View Details</Link>
+                        <Link href={`orders/${order.id}`} className="text-blue-500 hover:underline">View Details</Link>
                         <select name="invoice" className="text-blue-500 bg-transparent cursor-pointer focus:outline-none hover:underline">
                             <option value="invoice">Invoice</option>
                             <option value="receipt">Receipt</option>
