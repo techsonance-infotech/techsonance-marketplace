@@ -1,5 +1,7 @@
 ﻿import { BASE_API_URL, CUSTOMER_BASE_URL } from "@/constants";
 import { authToken } from "./authToken";
+import { companyDomain } from "@/config";
+import { getCompanyDomain } from "@/lib/get-domain";
 
 export const fetchCustomerProfile = async () => {
     try {
@@ -325,16 +327,39 @@ export const fetchInitiatePayment = async (customerId: string, paymentData: any,
             },
             body: JSON.stringify(paymentData),
         });
-        
+
         if (!response.ok) {
             console.log('Failed to initiate payment');
             return { success: false };
         }
-        
+
         const data = await response.json();
         return { success: true, data };
     } catch (error) {
         console.log('Error initiating payment:', error);
         return { success: false };
+    }
+};
+
+export const fetchUserOrderHistory = async (customerId: string) => {
+    const companyDomainTest = await getCompanyDomain();
+    console.log("companyDomainTest", companyDomainTest)
+    try {
+        const response = await fetch(`${BASE_API_URL}orders/user/${customerId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                "company-domain": companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+        }
+        );
+        console.log("Order History Response:", response);
+        if (response.status !== 200) {
+            console.log('Failed to fetch order history');
+        }
+        return await response.json();
+    } catch (error) {
+        console.log('Error fetching order history:', error);
     }
 };

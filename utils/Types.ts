@@ -17,10 +17,10 @@ export enum UserAddressTypeEnum {
   OTHER = 'other'
 }
 export enum OrderStatusEnum {
-  PENDING = 'pending',
-  SHIPPING = 'shipping',
-  SHIPPED = 'shipped',
   DELIVERED = 'delivered',
+  SHIPPING = 'shipping',
+  PENDING = 'pending',
+  SHIPPED = 'shipped',
   CANCELLED = 'cancelled'
 }
 export enum PermissionEnum {
