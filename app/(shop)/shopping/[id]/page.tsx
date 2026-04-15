@@ -12,6 +12,8 @@ import { ProductSpecifications } from '@/components/customer/ProductSpec';
 import { BuyBtnMode, ProductImageType, ProductType, VariantsType } from '@/utils/Types';
 import { formatCurrency } from '@/lib/utils';
 import { fetchProduct } from '@/utils/commonAPiClient';
+import { get } from 'http';
+import { getCompanyDomain } from '@/lib/get-domain';
 
 const brandOffer = [
     { id: '1', title: '1 year warranty', icon: 'shopping-bag' },
@@ -24,6 +26,13 @@ const brandOffer = [
 export default function ProductPage() {
     const params = useParams();
     const id = params?.id as string;
+    const companyDomain = async () => {
+        return await getCompanyDomain().then(domain => {
+            console.log("company domain in product page", domain);
+            return domain;
+        })
+    }
+    console.log("company domain call in product", companyDomain())
     const [activeImage, setActiveImage] = useState<string | undefined>();
     const [productImages, setProductImages] = useState<ProductImageType[]>([]);
     const [activeVariant, setActiveVariant] = useState<VariantsType | undefined>();
@@ -49,10 +58,6 @@ export default function ProductPage() {
     console.log("activeImage", activeImage)
     const containerStagger = { visible: { transition: { staggerChildren: 0.1 } } };
     const fadeInUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 50 } } };
-    // console.log(!product)
-    // if (!product?.id) {
-    //     return <h1 className='text-2xl font-bold text-gray-900 p-8'>Product not found</h1>;
-    // }
     const handleActiveVariantChange = (variant: VariantsType) => {
         setActiveVariant(variant);
         setProductImages(variant.images);
@@ -116,7 +121,7 @@ export default function ProductPage() {
                     </div>
                     <motion.div variants={fadeInUp} className='flex gap-4 items-center'>
                         <AddToCart productVariantId={activeVariant?.id || ''} styles="text-xl w-32 lg:w-40" />
-                        <BuyBtn id={product?.id} mode={BuyBtnMode.QUICK_BUY} styles="scale-[0.95]" />
+                        <BuyBtn id={activeVariant?.id} mode={BuyBtnMode.QUICK_BUY} styles="scale-[0.95]" />
                     </motion.div>
 
 
@@ -146,8 +151,8 @@ export default function ProductPage() {
             <section className='mt-20'>
                 <h2 className='text-2xl font-bold text-gray-900 mb-8'>Customer Reviews</h2>
                 {
-product?.reviews &&
-                <ProductReview product={product} />
+                    product?.reviews &&
+                    <ProductReview product={product} />
                 }
             </section>
             <section className='mt-20'>
