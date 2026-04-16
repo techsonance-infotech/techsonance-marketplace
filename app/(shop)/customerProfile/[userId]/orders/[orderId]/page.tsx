@@ -65,7 +65,9 @@ interface OrderDetailType {
     items: OrderItem[];
     address: Address;
     payment: Payment;
-    shipping: null | ShippingAddress; // define Shipping interface when structure is known
+    shipping: {
+        tracking_url: string;
+    } | null;
 }
 
 export default function OrderDetailsPage() {
@@ -74,7 +76,7 @@ export default function OrderDetailsPage() {
     const [order, setOrder] = useState<OrderDetailType | null>(null);
     // Helper for Status UI
     const getStatusSteps = (currentStatus: string) => {
-        const steps = ['pending', 'shipped', 'out_for_delivery', 'delivered'];
+        const steps = ['pending', 'shipped', 'delivered'];
         const currentIndex = steps.indexOf(currentStatus);
         return steps.map((step, index) => ({
             name: step.replace(/_/g, ' ').toUpperCase(),
@@ -134,14 +136,13 @@ export default function OrderDetailsPage() {
                                 ></div>
 
                                 {/* Status Points */}
-                                { order?.order_status && getStatusSteps(order?.order_status).map((step, idx) => (
+                                {order?.order_status && getStatusSteps(order?.order_status).map((step, idx) => (
                                     <div key={idx} className="relative z-10 flex flex-col items-center gap-2">
                                         <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 bg-white transition-colors
                                             ${step.completed ? 'border-green-500 text-green-500' : 'border-gray-300 text-gray-400'}`}>
                                             {idx === 0 && <Package size={18} />}
                                             {idx === 1 && <Truck size={18} />}
-                                            {idx === 2 && <Truck size={18} />}
-                                            {idx === 3 && <CheckCircle2 size={18} />}
+                                            {idx === 2 && <CheckCircle2 size={18} />}
                                         </div>
                                         <span className={`text-[10px] sm:text-xs font-semibold ${step.completed ? 'text-gray-800' : 'text-gray-400'} text-center max-w-[60px] sm:max-w-none leading-tight`}>
                                             {step.name}
