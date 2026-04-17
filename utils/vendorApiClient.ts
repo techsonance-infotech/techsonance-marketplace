@@ -131,10 +131,11 @@ export const fetchVendorOneProducts = async (id: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}products/${id}`, {
             method: 'GET',
-            cache: 'force-cache',
-            next: { revalidate: 3600 },
+            cache: 'no-cache',
+            // next: { revalidate: 3600 },
             headers: {
                 // Authorization: `Bearer ${await authToken()}`,
+                'company-domain': companyDomain,
             },
         });
         if (response.status !== 200) {
@@ -255,11 +256,12 @@ export const deleteProductVariant = async (productId: string, variantId: string,
         console.error('Error deleting product variant:', error);
     }
 }
-export const fetchVariant = async (variantId: string, vendorId: string, productId: string) => {
+export const fetchVariant = async (variantId: string,) => {
     try {
         const response = await fetch(`${BASE_API_URL}product-variant/variant/${variantId}`, {
             method: 'GET',
             headers: {
+                'company-domain': companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,
             },
 
@@ -374,4 +376,70 @@ export const fetchUpdateTrackingUrl = async (orderId: string, trackingUrl: strin
         console.error('Error updating tracking URL:', error);
     }
 
+}
+export const fetchCreateWarehouseLocation = async (warehouseAddress: any) => {
+    console.log(warehouseAddress)
+    try {
+        const response = await fetch(`${BASE_API_URL}warehouse`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+            body: JSON.stringify(warehouseAddress)
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error creating warehouse location:', error);
+        return { message: 'Error creating warehouse location', success: false };
+    }
+}
+export const fetchUpdateWarehouseLocation = async (locationId: string, warehouseData: any) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}warehouse/${locationId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+            body: JSON.stringify(warehouseData)
+        });
+
+        return await response.json();
+    }
+    catch (error) {
+        console.error('Error updating warehouse location:', error);
+        return { message: 'Error updating warehouse location', success: false };
+    }
+}
+export const fetchVendorWarehouseLocations = async () => {
+    try {
+        const response = await fetch(`${BASE_API_URL}warehouse`, {
+            method: 'GET',
+            headers: {
+                'company-domain': companyDomain,
+            }
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching warehouse locations:', error);
+        return { data: {}, message: 'Error fetching warehouse locations' };
+    }
+}
+
+export const fetchDeleteWarehouseLocation = async (locationId: string) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}warehouse/${locationId}`, {
+            method: 'DELETE',
+            headers: {
+                'company-domain': companyDomain,
+            }
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error deleting warehouse location:', error);
+        return { message: 'Error deleting warehouse location', success: false };
+    }
 }
