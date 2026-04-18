@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { UserProfile, UserRole } from '../../../utils/Types';
-import { ACCESS_TOKEN_KEY, CART_KEY, IS_AUTHENTICATED_KEY, isClient, USER_STORAGE_KEY } from '@/constants';
+import { UserRole, UserType, VendorUserType } from '../../../utils/Types';
+import { ACCESS_TOKEN_KEY, CART_KEY, IS_AUTHENTICATED_KEY, isClient, USER_STORAGE_KEY, WISHLIST_KEY } from '@/constants';
 
 
 const getUserFromLocalStorage = () => {
@@ -21,11 +21,12 @@ const getUserFromLocalStorage = () => {
 
 export interface AuthType {
     isAuthenticated: boolean;
-    user: Partial<UserProfile> | null;
+    user: Partial<UserType | VendorUserType> | null;
     loading: boolean;
     error: string | null;
     token: string | null;
     role: UserRole;
+    // addresses: any[] | null;
 }
 
 
@@ -36,6 +37,7 @@ const initialState: AuthType = {
     error: null,
     token: null,
     role: UserRole.Customer,
+    // addresses: null,
 };
 export const getPreloadedAuthState = (): { auth: AuthType } => {
     if (!isClient) {
@@ -60,6 +62,7 @@ export const getPreloadedAuthState = (): { auth: AuthType } => {
             error: null,
             token: null,
             role: parsedAuth?.role || UserRole.Customer,
+            // addresses: null,
         }
     };
 };
@@ -81,11 +84,12 @@ const authSlice = createSlice({
         },
         loginSuccess(state, action: { payload: { user: any, token: string, role: UserRole } }) {
             state.isAuthenticated = true;
-            state.user = action.payload;
+            state.user = action.payload.user;
             state.token = action.payload.token;
             state.role = action.payload.role;
             state.loading = false;
             state.error = null;
+            console.log("state.user", state.user);
             if (isClient) {
                 localStorage.setItem(IS_AUTHENTICATED_KEY, JSON.stringify({ isAuthenticated: true, role: action.payload.role }));
                 localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(action.payload.user));
@@ -96,6 +100,7 @@ const authSlice = createSlice({
             }
         },
         logOut(state) {
+
             state.isAuthenticated = false;
             state.user = null;
             state.token = null;
@@ -105,6 +110,7 @@ const authSlice = createSlice({
                 localStorage.removeItem(USER_STORAGE_KEY);
                 localStorage.removeItem(CART_KEY);
                 localStorage.removeItem(IS_AUTHENTICATED_KEY);
+                localStorage.removeItem(WISHLIST_KEY);
                 sessionStorage.removeItem(ACCESS_TOKEN_KEY);
             }
         },
@@ -117,44 +123,44 @@ const authSlice = createSlice({
         },
 
         // ========== ADDRESS MANAGEMENT ==========
-        createAddress: (state, action) => {
-            if (state.user) {
-                state.user.addresses.push(action.payload);
-            }
-        },
+        //     createAddress: (state, action) => {
+        //         if (state.user) {
+        //             state.addresses.push(action.payload);
+        //         }
+        //     },
 
-        updateAddress: (state, action) => {
-            if (state.user) {
-                const index = state.user.addresses.findIndex(
-                    address => address.address_id === action.payload.address_id
-                );
-                if (index !== -1) {
-                    state.user.addresses[index] = action.payload;
-                }
-            }
-        },
+        //     updateAddress: (state, action) => {
+        //         if (state.user) {
+        //             const index = state.addresses.findIndex(
+        //                 address => address.address_id === action.payload.address_id
+        //             );
+        //             if (index !== -1) {
+        //                 state.addresses[index] = action.payload;
+        //             }
+        //         }
+        //     },
 
-        deleteAddress: (state, action) => {
-            if (state.user) {
-                state.user.addresses = state.user.addresses.filter(
-                    address => address.address_id !== action.payload
-                );
-            }
-        },
+        //     deleteAddress: (state, action) => {
+        //         if (state.user) {
+        //             state.user.addresses = state.user.addresses.filter(
+        //                 address => address.address_id !== action.payload
+        //             );
+        //         }
+        //     },
 
-        setDefaultAddress: (state, action) => {
-            if (state.user) {
-                state.user.addresses.forEach(address => {
-                    address.is_default = false;
-                });
-                const address = state.user.addresses.find(
-                    addr => addr.address_id === action.payload
-                );
-                if (address) {
-                    address.is_default = true;
-                }
-            }
-        }
+        //     setDefaultAddress: (state, action) => {
+        //         if (state.user) {
+        //             state.user.addresses.forEach(address => {
+        //                 address.is_default = false;
+        //             });
+        //             const address = state.user.addresses.find(
+        //                 addr => addr.address_id === action.payload
+        //             );
+        //             if (address) {
+        //                 address.is_default = true;
+        //             }
+        //         }
+        //     }
     }
 });
 
@@ -165,10 +171,10 @@ export const {
     loginSuccess,
     logOut,
     updateUserProfile,
-    createAddress,
-    updateAddress,
-    deleteAddress,
-    setDefaultAddress
+    // createAddress,
+    // updateAddress,
+    // deleteAddress,
+    // setDefaultAddress
 } = authSlice.actions;
 
 export const authReducer = authSlice.reducer;

@@ -1,33 +1,56 @@
 'use client';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeftCircle } from "lucide-react";
-import { deleteAddress, setDefaultAddress } from "@/lib/features/auth/authSlice";
+// import { deleteAddress, setDefaultAddress } from "@/lib/features/auth/authSlice";
 
 import { useRouter } from "next/navigation";
 import { AddressCard } from "@/components/customer/AddressCard";
 import { AddressModal } from "@/components/customer/AddressModel";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { RootState } from "@/lib/store";
+import { fetchDeleteUserAddress, fetchGetUserAddresses, fetchSetDefaultAddress } from "@/utils/customerApiClient";
+import { AddressOperationEnum, AddressType } from "@/utils/Types";
 
 export default function Addresses() {
-    const user = useAppSelector((state) => state.auth.user);
+    const user = useAppSelector((state: RootState) => state.auth.user);
     const dispatch = useAppDispatch();
     const [isModalOpen, setModalOpen] = useState(false);
-    const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+    const [modalMode, setModalMode] = useState<AddressOperationEnum>(AddressOperationEnum.ADD);
     const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
+    const [addressList, setAddressList] = useState<AddressType[]>([]);
+    useEffect(() => {
+        const fetchAddresses = async () => {
+            if (user?.id) {
+                const response = await fetchGetUserAddresses(user.id);
+                console.log("address Response", response);
+                setAddressList(response.data);
+            }
+        }
+        fetchAddresses();
+    }, [user, addressList.length]);
     const router = useRouter()
     const openAdd = () => {
-        setModalMode('add');
+        setModalMode(AddressOperationEnum.ADD);
         setSelectedId(undefined);
         setModalOpen(true);
     };
 
-    const openEdit = (id: number) => {
-        setModalMode('edit');
-        setSelectedId(id.toString());
+    const openEdit = (id: string) => {
+        setModalMode(AddressOperationEnum.EDIT);
+        setSelectedId(id);
         setModalOpen(true);
     };
-
+    const handleDelete = async (userId: string, id: string) => {
+        if (confirm(`Are you sure you want to delete this address? ${id}`)) {
+            await fetchDeleteUserAddress(userId, id);
+            setAddressList(prev => prev.filter(addr => addr.id !== id));
+        }
+    };
+    const handleSetDefault = async (userId: string, id: string) => {
+        await fetchSetDefaultAddress(userId, id);
+        setAddressList(prev => prev.map(addr => ({ ...addr, is_default: addr.id === id })));
+    };
     return (
         <section className="w-full  mt-2 mx-auto mb-20">
             <ChevronLeftCircle className="mb-4 block lg:hidden" size={36} onClick={() => router.back()} />
@@ -49,14 +72,14 @@ export default function Addresses() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <AnimatePresence mode="popLayout">
-                    {user?.addresses.length ? (
-                        user.addresses.map((address) => (
+                    {addressList && addressList.length > 0 ? (
+                        addressList.map((address) => (
                             <AddressCard
-                                key={address.address_id}
+                                key={address.id}
                                 address={address}
                                 onEdit={openEdit}
-                                onDelete={(id: number) => dispatch(deleteAddress(id))}
-                                onSetDefault={(id: number) => dispatch(setDefaultAddress(id))}
+                                onDelete={handleDelete}
+                                onSetDefault={handleSetDefault}
                             />
                         ))
                     ) : (
@@ -73,10 +96,11 @@ export default function Addresses() {
 
 
             <AnimatePresence>
-                {isModalOpen && user && (
+                {isModalOpen && user?.id && (
                     <AddressModal
                         user={user}
                         addressId={selectedId}
+                        addressList={addressList}
                         operation={modalMode}
                         onClose={() => setModalOpen(false)}
                     />

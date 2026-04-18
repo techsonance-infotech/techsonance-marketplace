@@ -10,7 +10,7 @@ import { DynamicIcon } from "lucide-react/dynamic";
 export const PRODUCT_TABLE_HEAD = ['', "PRODUCT NAME", "VARIANT", "SKU", "STOCK", "PRICE", "STATUS", "ACTION"];
 export default async function Products({ params }: { params: Promise<{ vendorId: string }> }) {
     const { vendorId } = await params;
-    const categoryOptions = await fetchVendorsProductsCategory(vendorId).then((res) => {
+    const categoryOptions: { value: string; label: string }[] = await fetchVendorsProductsCategory(vendorId).then((res) => {
         const categories = res?.data || [];
         return categories.map((cat: any) => ({ value: cat.id, label: cat.name }));
     }).catch((error) => {
@@ -21,8 +21,8 @@ export default async function Products({ params }: { params: Promise<{ vendorId:
         console.error("Error fetching products:", error);
         return [];
     });
+    console.log('vendor product list ', getProducts);
     const productList: ProductType[] = getProducts || [];
-    // console.log("productList[2].variants", productList[2]?.variants?.length);
     let count = 1
     const pageSize = 5;
     const totalPages = Math.ceil(productList.length / pageSize);
@@ -33,13 +33,12 @@ export default async function Products({ params }: { params: Promise<{ vendorId:
     console.log(productList[pageSize - 1]?.id);
     console.log(currentData)
     const handleDelete = (productId: string) => {
-        // Implement the logic to delete the product with the given productId
         console.log(`Delete product with ID: ${productId}`);
     }
     return (
 
         <>
-            <main>
+            <main className="w-full">
                 <div className="flex gap-6 my-6 justify-end">
                     <Link className="rounded-xl bg-black text-white px-4 py-2" href="products/productForm">+ Add New Product</Link>
                     <button className="rounded-xl bg-blue-500 text-white px-4 py-2"> Export CSV</button>
@@ -97,9 +96,9 @@ export default async function Products({ params }: { params: Promise<{ vendorId:
                                         {item.name.trimStart()}
                                     </TableCell>
                                     <TableCell >
-                                        {item.variants?.length > 0 ? (
+                                        {item?.variants && item?.variants?.length > 0 ? (
                                             <div className="flex flex-col items-center border p-2 gap-2   border-emerald-600 border-b-3  hover:border-b-1 hover:border-emerald-800 rounded-lg">
-                                                <Link href={`/vendor/${vendorId}/products/${item.id}/variants`} className="flex gap-2 text-emerald-600 hover:text-emerald-800 items-center justify-center" title="View Variants">
+                                                <Link href={`/vendor/${vendorId}/products/${item.id}/productVariants`} className="flex gap-2 text-emerald-600 hover:text-emerald-800 items-center justify-center" title="View Variants">
                                                     {item.variants?.length} Variants <DynamicIcon name="tag" size={18} />
                                                 </Link>
                                             </div>
@@ -115,8 +114,7 @@ export default async function Products({ params }: { params: Promise<{ vendorId:
 
                                     </TableCell>
                                     <TableCell className={`p-4 text-start `}>
-                                        {/* {item.variants.sku ? item.variants.sku : 'No'} */}
-                                        {item.variants[0]?.sku || 'No SKU'}
+                                        {item.variants && item?.variants[0]?.sku || 'No SKU'}
                                     </TableCell>
 
                                     <TableCell className={`p-4 text-start  `}>
@@ -134,11 +132,11 @@ export default async function Products({ params }: { params: Promise<{ vendorId:
                                         }
                                     </TableCell>
                                     <TableCell className={`p-4 text-start flex gap-4  items-center  justify-around  `}>
-                                        <Link href={`/vendor/${vendorId}/products/productUpdateForm/${item.id}`} className="flex gap-2 border border-blue-600
+                                        <Link href={`/vendor/${vendorId}/products/productUpdateForm/${item?.variants && item?.variants[0]?.id ? item?.variants[0]?.id : item?.id}`} className="flex gap-2 border border-blue-600
                                         border-b-3 hover:border-b hover:border-blue-800 text-blue-600 hover:text-blue-800 py-2 px-3 rounded-lg" title="Edit Product">
                                             Edit<Edit />
                                         </Link>
-                                        <DeleteBtn id={item.id} toDelete="PRODUCT" style="flex gap-2 border border-red-600
+                                        <DeleteBtn id={item.id} vendorId={vendorId} toDelete="PRODUCT" style="flex gap-2 border border-red-600
                                         border-b-3 hover:border-b hover:border-red-800 text-red-600 hover:text-red-800 py-2 px-3 rounded-lg" />
 
                                     </TableCell>

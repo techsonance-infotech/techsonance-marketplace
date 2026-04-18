@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Counter } from "@/components/customer/Counter";
 import { containerVariants, itemVariants, ManagementCard } from "@/components/customer/ManagementCard";
 import { useAppSelector } from "@/hooks/reduxHooks";
+import { ProfileSidebar } from "@/components/customer/ProfileSidebar";
 export default function UserProfilePage() {
     const { user } = useAppSelector((state) => state.auth);
     const { userId } = useParams()
@@ -20,7 +21,7 @@ export default function UserProfilePage() {
 
     return (
         <motion.section
-            className="w-full mx-auto lg:px-4 py-0 px-2 mb-4"
+            className="w-full mx-auto lg:px-4  lg:py-2 py-1 px-2 mb-0 lg:mb-4"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -39,7 +40,8 @@ export default function UserProfilePage() {
                         className="relative"
                     >
                         <Image
-                            src={user?.profileImgUrl || "https://i.pinimg.com/originals/74/a3/b6/74a3b6a8856b004dfff824ae9668fe9b.jpg"}
+                            src={'profile_picture_url' in user && user.profile_picture_url
+                                ? user.profile_picture_url : "https://i.pinimg.com/originals/74/a3/b6/74a3b6a8856b004dfff824ae9668fe9b.jpg"}
                             alt={user?.first_name || "User"}
                             width={128}
                             height={128}
@@ -55,15 +57,15 @@ export default function UserProfilePage() {
                                 <Mail size={14} /> {user.email}
                             </span>
                             <span className="flex items-center gap-2 lg:px-3 py-1 lg:bg-gray-50 rounded-full lg:border border-gray-100">
-                                <Phone size={14} /> {user.phone}
+                                <Phone size={14} /> {user.phone_number || "No phone number"}
                             </span>
                         </div>
                         <p className="text-gray-400 text-xs lg:mt-2 text-left font-medium">
-                            Member since: {new Date(user.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+                            Member since: {new Date('created_at' in user && user.created_at ? user.created_at : 'NAN').toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
                     </div>
                 </div>
-                <Link href={`/customerProfile/${user?.user_id}/editProfile`}>
+                <Link href={`/customerProfile/${user?.id}/editProfile`}>
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -74,11 +76,9 @@ export default function UserProfilePage() {
                 </Link>
             </motion.section>
 
-
-
-            <div className="mt-8 flex flex-col md:flex-row gap-6">
+            <div className="mt-8 lg:flex flex-col md:flex-row gap-6 hidden  ">
                 {[
-                    { label: "TOTAL ORDERS", value: user?.orders?.length ?? 3, icon: ShoppingBag, color: "bg-brand-primary", text: "text-brand-primary" },
+                    { label: "TOTAL ORDERS", value:3, icon: ShoppingBag, color: "bg-brand-primary", text: "text-brand-primary" },
                     { label: "ACTIVE ORDERS", value: activeOrders, icon: Timer, color: "bg-yellow", text: "text-yellow-500" }
                 ].map((stat, idx) => (
                     <motion.div
@@ -101,32 +101,34 @@ export default function UserProfilePage() {
             </div>
 
 
-            <motion.section variants={itemVariants} className="my-8">
+            <motion.section variants={itemVariants} className="my-8 hidden lg:block">
                 <h1 className="font-bold lg:text-2xl text-xl text-gray-900 mb-6">Account Management</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <ManagementCard
+                        link={`/customerProfile/${user?.id}/addresses`}
                         icon={<MapPin size={28} className="text-blue-600" />}
                         color="bg-blue-50"
                         title="Saved Addresses"
                         description="Manage your saved addresses for faster checkout and delivery."
                     >
-                        <Link href={`/customerProfile/${user?.user_id}/addresses`}>
-                            <div className="mt-4 pt-4 border-t border-gray-100">
-                                <p className="text-xs font-bold text-gray-400 uppercase mb-2">Default Address</p>
-                                {user?.addresses?.filter(a => a.is_default).length > 0 ? (
-                                    user?.addresses?.filter(a => a.is_default).map(address => (
-                                        <p key={address.address_id} className="text-sm text-gray-600 line-clamp-1">
-                                            {address.address_line1}, {address.city}...
-                                        </p>
-                                    ))
-                                ) : (
-                                    <p className="text-sm text-gray-400 italic">No default address set</p>
-                                )}
-                            </div>
-                        </Link>
+
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                            <p className="text-xs font-bold text-gray-400 uppercase mb-2">Default Address</p>
+                            {/* { 'addresses' in user && user.addresses?.filter(a => a.is_default).length > 0 ? (
+                                user?.addresses?.filter(a => a.is_default).map(address => (
+                                    <p key={address.address_id} className="text-sm text-gray-600 line-clamp-1">
+                                        {address.address_line1}, {address.city}...
+                                    </p>
+                                ))
+                            ) : ( */}
+                                <p className="text-sm text-gray-400 italic">No default address set</p>
+                            {/* )} */}
+                        </div>
+
                     </ManagementCard>
 
                     <ManagementCard
+                        link=""
                         icon={<Lock size={28} className="text-green-600" />}
                         color="bg-green-50"
                         title="Login & Security"
@@ -134,6 +136,7 @@ export default function UserProfilePage() {
                     />
 
                     <ManagementCard
+                        link=""
                         icon={<Bell size={28} className="text-yellow-600" />}
                         color="bg-yellow-50"
                         title="Notifications"

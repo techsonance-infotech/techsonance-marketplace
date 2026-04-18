@@ -12,7 +12,7 @@ import { motion, MotionConfig } from "motion/react";
 import type { RootState } from "@/lib/store";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { ProductType } from "@/utils/Types";
+import { BuyBtnMode, ProductType } from "@/utils/Types";
 import { formatCurrency } from "@/lib/utils";
 
 export function ShoppingList({
@@ -24,12 +24,11 @@ export function ShoppingList({
     console.log(products)
     const pageSize = 8;
     const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
-    const [count, setCount] = useState(1); // Number of products to show at a time
+    const [count, setCount] = useState(1);
     const totalPages = Math.ceil(products.length / pageSize);
     const firstIndex = (count - 1) * pageSize;
     const lastIndex = firstIndex + pageSize - 1;
     const [isLoading, setIsLoading] = useState(false);
-    const { isCartOpen } = useAppSelector((state: RootState) => state.cartSidebar);
     const dispatch = useAppDispatch();
     const sectionRef = useRef<HTMLElement>(null);
 
@@ -42,9 +41,7 @@ export function ShoppingList({
         )
     }
     console.log("firstIndex, lastIndex", firstIndex, lastIndex);
-    // const productsToShow = productsState.slice(firstIndex, lastIndex + 1)
-    const productsToShow = products
-    // console.log("productsState", productsState)
+    const productsToShow: ProductType[] = products
     console.log("productsToShow", productsToShow);
     return (
         <>
@@ -65,7 +62,7 @@ export function ShoppingList({
                                         >
 
                                             <div className="flex flex-col h-full">
-                                                <WishListBtn productId={product.variants[0]?.id} styles="absolute top-2 right-6 z-10" />
+                                                <WishListBtn productVariantId={product.variants && product.variants.length > 0 ? product.variants[0].id : ''} styles="absolute top-2 right-6 z-10" />
 
                                                 <Link href={`/shopping/${product.id}`} className="block overflow-hidden rounded-lg">
                                                     <img loading="lazy"
@@ -101,8 +98,8 @@ export function ShoppingList({
                                                 {
                                                     !isMobile &&
                                                     <div className={`flex gap-2 mt-2   justify-between items-center`}>
-                                                        <AddToCart productId={product.id} styles="w-full " />
-                                                        <BuyBtn productId={product.id} styles=" scale-[.9]" />
+                                                        <AddToCart productVariantId={product?.variants && product.variants.length > 0 ? product.variants[0].id : ''} styles="w-full " />
+                                                        <BuyBtn id={product?.variants && product.variants.length > 0 ? product.variants[0].id : ''} mode={BuyBtnMode.QUICK_BUY} styles=" scale-[.9]" />
 
                                                     </div>
                                                 }

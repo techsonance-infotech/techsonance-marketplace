@@ -29,8 +29,8 @@ export default async function VariantListingPage({
 
     console.log(variants)
     return (
-        <main className="min-h-screen bg-slate-50 py-10 px-4">
-            <div className="mx-auto max-w-6xl space-y-8">
+        <main className="min-h-screen w-full py-10 ">
+            <div className="mx-auto  space-y-8">
 
 
                 <div className="flex flex-wrap items-center justify-between gap-4">
@@ -91,8 +91,10 @@ export default async function VariantListingPage({
                                 key={variant.id}
                                 className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
                             >
-
-                                < VariantImgGrid variantImages={variant.images} />
+                                {
+                                    variant.images && variant.images.length > 0 &&
+                                    < VariantImgGrid variantImages={variant?.images} />
+                                }
 
                                 {/* ── CARD BODY ── */}
                                 <div className="p-4 flex flex-col gap-3 flex-1">
@@ -161,9 +163,9 @@ export default async function VariantListingPage({
                                     </div>
 
                                     <div className="flex gap-10">
-                                        <DeleteBtn id={variant.id} style="mt-auto flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:border-red-400 hover:text-red-600 hover:bg-red-50 active:scale-95 transition-all" toDelete="VARIANT" vendorId={vendorId} productId={productId} />
+                                        <DeleteBtn id={variant.id} style="mt-auto flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:border-red-400 hover:text-red-600 hover:bg-red-50 active:scale-95 transition-all" toDelete="VARIANT" vendorId={vendorId} variantId={variant.id} />
                                         <Link
-                                            href={`/vendor/${vendorId}/products/variantUpdateForm/${productId}/${variant.id}`}
+                                            href={`/vendor/${vendorId}/products/variantUpdateForm/${variant.id}`}
                                             className="mt-auto flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 active:scale-95 transition-all"
                                         >
                                             <Edit size={14} />

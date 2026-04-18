@@ -1,14 +1,13 @@
 'use client';
 import type { RootState } from "@/lib/store";
 import { ChevronLeftCircle, X } from "lucide-react";
-import { PRODUCT_LIST } from "@/constants/customer";
 import { AddToCart } from "@/components/customer/AddToCart";
 import { removeFromWishlist } from "@/lib/features/Wishlist";
 import { useParams, useRouter } from "next/navigation";
 import { useMediaQuery } from "react-responsive";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { useEffect, useState } from "react";
-import { deleteWishList, fetchCustomerWishlist } from "@/utils/customerApiClient";
+import { fetchCustomerWishlist, fetchDeleteWishList } from "@/utils/customerApiClient";
 import { companyDomain } from "@/config";
 import Link from "next/link";
 interface WishlistItemType {
@@ -38,7 +37,7 @@ export default function WishlistPage() {
     const wishItems = useAppSelector((state: RootState) => state.wishlist);
     const user = useAppSelector((state: RootState) => state.auth.user);
     const dispatch = useAppDispatch();
-    const { userId } = useParams();
+    const { userId } = useParams<{ userId: string }>();
     console.log("userId", userId)
     const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>([]);
     useEffect(() => {
@@ -49,8 +48,7 @@ export default function WishlistPage() {
             }
             fetchCustomerWishlist(userId, companyDomain).then((response) => {
                 console.log(response)
-                setWishlistItems(response.data[0].items
-                );
+                setWishlistItems(response?.data[0].items || []);
             }).catch((error) => {
                 console.error("Error fetching wishlist products:", error);
             });
@@ -68,7 +66,7 @@ export default function WishlistPage() {
             return;
         }
         dispatch(removeFromWishlist(productVariantId));
-        await deleteWishList(productVariantId, user.id, companyDomain);
+        await fetchDeleteWishList(productVariantId, user.id, companyDomain);
         console.log(`Removing product ${productVariantId} from wishlist`);
     }
     return (
@@ -97,7 +95,7 @@ export default function WishlistPage() {
                                         </div>
                                     </span>
                                     <div className="flex justify-end items-center">
-                                        <AddToCart productId={item.id} styles={`lg:w-24 w-16 ${isMobileOrTablet ? 'small' : ''}`} />
+                                        <AddToCart productVariantId={item.id} styles={`lg:w-24 w-16 ${isMobileOrTablet ? 'small' : ''}`} />
                                     </div>
                                 </li>
                             ))}

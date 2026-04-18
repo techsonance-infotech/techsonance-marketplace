@@ -1,6 +1,10 @@
-﻿import { BASE_API_URL } from "@/constants";
+﻿import { companyDomain } from "@/config";
+import { BASE_API_URL } from "@/constants";
+import { getCompanyDomain } from "@/lib/get-domain";
 
 export const fetchProduct = async (productId: string) => {
+    const companyDomain = await getCompanyDomain();
+    console.log('comapny dmain  in prohdct by id', companyDomain)
     try {
         const response = await fetch(`${BASE_API_URL}products/${productId}`, {
             method: 'GET',
@@ -13,25 +17,59 @@ export const fetchProduct = async (productId: string) => {
         console.log("Product Response:", response);
         return await response.json();
     } catch (error) {
-        console.error('Error fetching product:', error);
-        throw error;
+        console.log('Error fetching product:', error);
+        // throw error;
     }
 }
-export const fetchProductVendorProducts = async (companyId: string = '975b2777-b12e-4188-9236-954dae4397e2') => {
+export const fetchProductVariantDetails = async (id: string) => {
     try {
-        // const response = await fetch(`${BASE_API_URL}products/${companyId}/all`, {
-        const response = await fetch(`${BASE_API_URL}products/${'975b2777-b12e-4188-9236-954dae4397e2'}/all`, {
+        const response = await fetch(`${BASE_API_URL}product-variant/details/${id}`, {
+            method: 'GET',
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+            },
+        });
+
+        const result = await response.json(); // Renamed 'data' to 'result' for clarity
+        
+        if (response.status !== 200) {
+            console.error('Failed to fetch product variant details:', result);
+        }
+
+        return {
+            data: result.data,
+            success: response.status === 200,
+            message: result?.message || (response.status === 200 ? "Success" : "Failed")
+        };
+    } catch (error) {
+        console.error('Error fetching product variants:', error);
+        return { data: undefined, success: false, message: "Error occurred" };
+    }
+};
+export const fetchProductVendorProducts = async () => {
+    const companyDomainTest = await getCompanyDomain();
+    console.log("(companyDomainTest", companyDomainTest)
+    try {
+        const response = await fetch(`${BASE_API_URL}products/all`, {
             method: 'GET',
             cache: "force-cache",
             next: { revalidate: 3600 },
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+
         });
         if (response.status !== 200) {
-            console.error('Failed to fetch vendor products');
+            console.log('Failed to fetch vendor products');
         }
         console.log("Vendor Products Response:", response);
         return await response.json();
     } catch (error) {
-        console.error('Error fetching vendor products:', error);
+        console.log('Error fetching vendor products:', error);
         return [];
     }
 }
