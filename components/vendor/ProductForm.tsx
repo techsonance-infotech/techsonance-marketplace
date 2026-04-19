@@ -54,14 +54,14 @@ export function ProductForm({
         handleSubmit,
         setValue,
         formState: { errors, isSubmitting },
-    } = useForm<ProductFormValuesType>({
+    } = useForm({
         resolver: zodResolver(productSchema),
         mode: "onChange",
         defaultValues: {
             productName: "",
             description: "",
             features: [{ title: "", description: "" }],
-            attributes: [{ name: "", values: "" }],
+            attributes: [{ name: "", value: "" }],
             basePrice: "",
             discountPercent: "",
             stocks: "",
@@ -106,11 +106,11 @@ export function ProductForm({
                 ? existingData.features.map((feat) => ({ title: feat.title, description: feat.description }))
                 : [{ title: "", description: "" }],
             attributes: existingData.attributes?.length
-                ? existingData.attributes.map((attr) => ({ name: attr.name, values: attr.values }))
-                : [{ name: "", values: "" }],
-            basePrice: Number(existingData.basePrice ?? ""),
-            discountPercent: Number(existingData.discountPercent ?? ""),
-            stocks: Number(existingData.stocks ?? ""),
+                ? existingData.attributes.map((attr) => ({ name: attr.name, value: attr.value }))
+                : [{ name: "", value: "" }],
+            basePrice: String(existingData.basePrice) ?? "",
+            discountPercent: String(existingData.discountPercent) ?? "",
+            stocks: String(existingData.stocks) ?? "",
             sku: existingData.sku || "",
             productMedia: [],
             featureMedia: [],
@@ -338,7 +338,7 @@ export function ProductForm({
                                 <h3 className="text-sm font-semibold text-slate-700">Product Attributes</h3>
                                 <button
                                     type="button"
-                                    onClick={() => appendAttribute({ name: "", values: "" })}
+                                    onClick={() => appendAttribute({ name: "", value: "" })}
                                     className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 border border-blue-200 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition"
                                 >
                                     <DynamicIcon fallback={() => <p></p>} name="plus" size={14} /> Add Attribute
@@ -369,7 +369,7 @@ export function ProductForm({
                                                 rows={2}
                                                 className="form_input"
                                                 placeholder="e.g. 100% Cotton"
-                                                {...register(`attributes.${index}.values`)}
+                                                {...register(`attributes.${index}.value`)}
                                             />
                                         </div>
                                     </div>

@@ -4,7 +4,7 @@ import { ProductResponseType, ProductStatusEnum } from "@/utils/Types";
 import { ProductFormInput, ProductFormOutput, ProductFormValuesType } from "@/utils/validation";
 interface Attribute {
     name: string;
-    values: string; // could be string[] if multiple values
+    value: string; // could be string[] if multiple values
 }
 
 interface ProductImage {
@@ -69,7 +69,7 @@ export default async function ProductFormPage({ params }: { params: Promise<{ ve
         productName: getExitingProduct?.product.name || '',
         description: getExitingProduct?.product.description || '',
         features: getExitingProduct?.product.features ? getExitingProduct?.product.features : [],
-        attributes: getExitingProduct?.attributes ? getExitingProduct?.attributes : [],
+        attributes: getExitingProduct?.attributes ? getExitingProduct?.attributes.map((attr) => ({ name: attr.name, value: attr.value })) : [],
         basePrice: getExitingProduct?.product.base_price || '',
         discountPercent: getExitingProduct?.product.discount_percent || '',
         stocks: String(getExitingProduct?.stock_quantity) || '',

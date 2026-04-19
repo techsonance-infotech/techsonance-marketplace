@@ -202,20 +202,27 @@ export const createProductVariant = async (variantData: FormData, vendorId: stri
         console.error("Error creating product variant:", error);
     }
 }
-export const updateProductVariant = async (variantData: FormData, vendorId: string, productId: string, variantId: string) => {
+export const updateProductVariant = async (
+    formData: FormData,
+    vendorId: string,
+    productId: string,
+    variantId: string
+) => {
     try {
         const response = await fetch(`${BASE_API_URL}product-variant/${variantId}`, {
             method: "PATCH",
-            body: variantData,
+            body: formData,
         });
-        if (!response.ok) throw new Error("Failed to create variant");
+
+        if (!response.ok) throw new Error(`Failed to update variant: ${response.statusText}`);
+
         const res = await response.json();
         revalidatePath(`/vendor/${vendorId}/products/${productId}/variants`);
-        return res;
+        return { status: 200, data: res };
     } catch (error) {
-        console.error("Error creating product variant:", error);
+        console.error("Error updating product variant:", error);
     }
-}
+};
 export const fetchProductVariants = async (productId: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}product-variant/${productId}`, {
