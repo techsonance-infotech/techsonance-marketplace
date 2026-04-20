@@ -6,12 +6,15 @@ import { AlertTriangle, Package, RefreshCw, XCircle, CheckCircle, Edit2, X } fro
 import { motion, AnimatePresence } from "motion/react";
 import { BASE_API_URL } from "@/constants";
 import { companyDomain } from "@/config";
+import { AddressType } from "@/utils/Types";
 
 interface InventoryLocation {
+
     inventory_id: string;
-    stock: number;
     warehouse_id: string;
-    warehouse_name: string;
+    warehouse_name: string | null;
+    stock: number;
+    address: AddressType | null;
 }
 
 
@@ -24,6 +27,7 @@ interface InventoryItem {
     total_stock: number;
     variant_id: string;
     variant_name: string;
+    variant_image: string;
 }
 interface LowStockAlert {
     inventoryId: string;
@@ -274,17 +278,17 @@ export default function InventoryPage() {
                                         {/* Product */}
                                         <td className="p-4">
                                             <div className="flex items-center gap-3">
-                                                {/* {item.variant.images[0] ? (
+                                                {item.variant_image ? (
                                                     <img
-                                                        src={item.variant.images[0].image_url}
-                                                        alt={item.variant.variant_name}
+                                                        src={item.variant_image}
+                                                        alt={item.variant_name}
                                                         className="w-10 h-10 object-cover rounded-lg border border-gray-200"
                                                     />
-                                                ) : ( */}
-                                                {/* <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
                                                         <Package size={16} className="text-gray-400" />
-                                                    </div> */}
-                                                {/* )} */}
+                                                    </div>
+                                                )}
                                                 <span className="font-medium text-gray-800 max-w-[200px] truncate">
                                                     {item.variant_name}
                                                 </span>
