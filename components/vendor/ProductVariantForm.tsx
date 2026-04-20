@@ -1,5 +1,5 @@
 ﻿'use client';
-import { FileOrImage, ProductImageType, ProductStatusEnum, VariantFormValuesType } from "@/utils/Types";
+import { FileOrImage, Product, ProductImageType, ProductStatusEnum, ProductType, VariantFormValuesType } from "@/utils/Types";
 import { useAppSelector } from "@/hooks/reduxHooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useCallback, useState } from "react";
@@ -11,6 +11,7 @@ import { PRODUCT_FORM_PRICING_FIELDS } from "@/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProductVariantFormValuesType, productVariantSchema } from "@/utils/validation";
 import { ArrowLeft } from "lucide-react";
+import { generateSKU } from "@/utils/generateSku";
 const FILE_UPLOAD_FIELD_LABELS = [
     { label: "Product Images / Thumbnail", fieldName: "variantMediaMain" as keyof VariantFormValuesType },
     { label: "Feature / Specification Media", fieldName: "variantMediaGallery" as keyof VariantFormValuesType },
@@ -21,11 +22,19 @@ const FILE_UPLOAD_FIELD_LABELS = [
 export const ProductVariantForm = ({
     vendorId,
     productId,
+    warehouseOptions,
+    productDetails,
     existVariant,
     variantId,
 }: {
     vendorId: string;
     productId?: string;
+    warehouseOptions?: { value: string; label: string }[];
+    productDetails?: {
+        id: string,
+        name: string,
+        category: { id: string, name: string };
+    };
     existVariant?: VariantFormValuesType;
     variantId?: string;
 }) => {
@@ -34,6 +43,7 @@ export const ProductVariantForm = ({
     const { user } = useAppSelector((state: any) => state.auth);
     const {
         control,
+        watch,
         register,
         handleSubmit,
         setValue,
@@ -51,6 +61,7 @@ export const ProductVariantForm = ({
             sku: "",
             variantMediaMain: [],
             variantMediaGallery: [],
+            warehouseId: '',
             status: ProductStatusEnum.INACTIVE,
         },
     });
@@ -60,7 +71,21 @@ export const ProductVariantForm = ({
     const [productFiles, setProductFiles] = useState<FileOrImage[]>([]);
     const [featureFiles, setFeatureFiles] = useState<FileOrImage[]>([]);
     const { getPreviewUrl, revokeAll, revokeOne } = usePreviewUrls();
+    const variantName = watch('variantName');
+    const attributes = watch('attributes');
+    const [isAutoGenerating, setIsAutoGenerating] = useState(true);
 
+    useEffect(() => {
+        if (isAutoGenerating && variantName) {
+            const newSku = generateSKU({
+                productName: variantName, // Passed from parent Product
+                categoryName: productDetails?.category.name,
+                attributes: attributes,
+            });
+
+            setValue('sku', newSku, { shouldValidate: true });
+        }
+    }, [variantName, attributes, variantName, productDetails?.category.name, isAutoGenerating, setValue]);
 
     // ── Populate form when editing ──
     useEffect(() => {
@@ -148,6 +173,7 @@ export const ProductVariantForm = ({
             discount_percent: data.discountPercent ?? 0,
             stock_quantity: String(data.stocks) ?? 0,
             sku: data.sku,
+            warehouse_id: data.warehouseId,
         };
 
         const formData = new FormData();
@@ -303,6 +329,20 @@ export const ProductVariantForm = ({
                                     </div>
                                 ))
                             }
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-1">
+                                    Warehouse
+                                </label>
+                                <select
+                                    className="form_input w-full border rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                    {...register("warehouseId" as keyof ProductVariantFormValuesType, { required: "Please select a warehouse" })}
+                                >
+                                    <option value="">Select warehouse</option>
+                                    {warehouseOptions?.map((option) => (
+                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
