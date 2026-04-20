@@ -279,7 +279,10 @@ export type ProductFeatureType = {
   title: string;
   description: string | boolean | number;
 };
-
+export type InventoryType = {
+  stock_quantity: number;
+  warehouse_id: string;
+}
 export type ProductType = {
   id: string;
   name: string;
@@ -629,6 +632,7 @@ export type VariantsType = {
   price: string;
   stock_quantity: number;
   images: ProductImageType[];
+  inventory: InventoryType;
 }
 //used
 export type ProductResponseType = {
