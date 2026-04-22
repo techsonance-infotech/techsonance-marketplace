@@ -1,5 +1,5 @@
 ﻿import { fetchGetUserAddresses } from "@/utils/customerApiClient";
-import { AddressType } from "@/utils/Types";
+import { Address } from "@/utils/Types";
 import { MapPin, Plus } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { motion } from "motion/react";
@@ -20,7 +20,7 @@ export function AddressSelector({
     selectedAddressId: string;
     onSelect: Dispatch<SetStateAction<string>>;
 }) {
-    const [addresses, setAddresses] = useState<AddressType[]>([]);
+    const [addresses, setAddresses] = useState<Address[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {

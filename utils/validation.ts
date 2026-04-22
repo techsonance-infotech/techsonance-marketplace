@@ -29,7 +29,7 @@ export const vendorRegisterSchema = z.object({
   message: "Passwords do not match",
   path: ["confirm_password"],
 });
-export type VendorRegisterSchemaType = z.infer<typeof vendorRegisterSchema>;
+export type VendorRegisterSchema = z.infer<typeof vendorRegisterSchema>;
 
 export const loginSchema = z.object({
   email: z.email({ message: "Invalid email address" }),

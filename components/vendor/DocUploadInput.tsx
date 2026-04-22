@@ -1,6 +1,6 @@
 ﻿"use client";
-import { type VendorDocumentTypes } from "@/constants";
-import { ComplianceFieldType, CountryComplianceType } from "@/utils/Types";
+import { VendorDocumentTypes } from "@/constants";
+import { ComplianceField, CountryCompliance } from "@/utils/Types";
 import { DynamicIcon } from "lucide-react/dynamic";
 import { useState, useCallback, useImperativeHandle, forwardRef, Dispatch, SetStateAction } from "react";
 
@@ -38,7 +38,7 @@ export const DocUploadInput = (
         fileMap: {
             file: File | null;
             type: string;
-        }[], typeList: ComplianceFieldType[] | typeof VendorDocumentTypes, title: string
+        }[], typeList: ComplianceField[] | typeof VendorDocumentTypes, title: string
     }) => {
         const [showField, setShowField] = useState(false);
         // Expose getPairs() to parent via ref

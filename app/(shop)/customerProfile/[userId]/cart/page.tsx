@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { formatCurrency } from "@/lib/utils";
 import { companyDomain } from "@/config";
 import { fetchGetCartList } from "@/utils/customerApiClient";
-import { BuyBtnMode, VariantsType } from "@/utils/Types";
+import { BuyBtnMode, Variant } from "@/utils/Types";
 import { setItemList } from "@/lib/features/Cart";
 
 
@@ -20,7 +20,7 @@ export interface CartItemListResponse {
     quantity: number;
     created_at: string;
     updated_at: string;
-    productVariant: VariantsType;
+    productVariant: Variant;
 }
 
 // ─── PriceTicker ──────────────────────────────────────────────────────────────

@@ -3,7 +3,7 @@ import { FormInput } from "../common/FormInput";
 import { useForm } from "react-hook-form";
 import { motion } from "motion/react";
 import { ADDRESS_FIELDS } from "@/constants/dynamicFields";
-import { AddressForEnum, AddressOperationEnum, AddressType, UserType } from "@/utils/Types";
+import { AddressForEnum, AddressOperationEnum, Address, User } from "@/utils/Types";
 import { fetchCreateUserAddress, fetchUpdateUserAddress } from "@/utils/customerApiClient";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -13,9 +13,9 @@ import { AddressSchema } from "@/utils/validation";
 
 
 export const AddressModal = ({ user, addressId, addressList, operation, onClose }: {
-    user: Partial<UserType>,
+    user: Partial<User>,
     addressId?: string,
-    addressList: AddressType[],
+    addressList: Address[],
     operation: AddressOperationEnum,
     onClose: () => void
 }) => {
