@@ -1,10 +1,10 @@
-﻿import { fetchVendorOneProducts, fetchVendorsProductsCategory } from "@/utils/vendorApiClient";
+﻿import { fetchVendorOneProducts, fetchVendorsProductsCategory, fetchVendorWarehouse } from "@/utils/vendorApiClient";
 import { ProductForm } from "@/components/vendor/ProductForm";
-import { ProductResponseType, ProductStatusEnum } from "@/utils/Types";
+import { InventoryType, ProductResponseType, ProductStatusEnum } from "@/utils/Types";
 import { ProductFormInput, ProductFormOutput, ProductFormValuesType } from "@/utils/validation";
 interface Attribute {
     name: string;
-    values: string; // could be string[] if multiple values
+    value: string; // could be string[] if multiple values
 }
 
 interface ProductImage {
@@ -51,9 +51,10 @@ interface ProductVariant {
     updated_at: string; // ISO date string
     product_id: string;
     product: Product;
+    inventory: InventoryType;
 }
 
-export default async function ProductFormPage({ params }: { params: Promise<{ vendorId: string, id: string }> }) {
+export default async function ProductUpdateFormPage({ params }: { params: Promise<{ vendorId: string, id: string }> }) {
 
     const { vendorId, id } = await params;
     const getExitingProduct: ProductVariant | null = id ? await fetchVendorOneProducts(id).then((res) => {
@@ -64,12 +65,17 @@ export default async function ProductFormPage({ params }: { params: Promise<{ ve
         return null;
     }) : null;
     // console.log(getExitingProduct)
-
+    const warehouseOptions = await fetchVendorWarehouse().then((res) => {
+        return res.data.map((w: any) => ({ value: w.id, label: w.warehouse_name }));
+    }).catch((error) => {
+        console.error("Error fetching warehouse options:", error);
+        return [];
+    });
     const exitingData: Partial<ProductFormInput | ProductFormOutput> = {
         productName: getExitingProduct?.product.name || '',
         description: getExitingProduct?.product.description || '',
         features: getExitingProduct?.product.features ? getExitingProduct?.product.features : [],
-        attributes: getExitingProduct?.attributes ? getExitingProduct?.attributes : [],
+        attributes: getExitingProduct?.attributes ? getExitingProduct?.attributes.map((attr) => ({ name: attr.name, value: attr.value })) : [],
         basePrice: getExitingProduct?.product.base_price || '',
         discountPercent: getExitingProduct?.product.discount_percent || '',
         stocks: String(getExitingProduct?.stock_quantity) || '',
@@ -78,8 +84,9 @@ export default async function ProductFormPage({ params }: { params: Promise<{ ve
         featureMedia: getExitingProduct?.product.images && getExitingProduct?.product.images?.filter((img) => img?.imgType === "gallery") || [],
         category: getExitingProduct?.product.category_id || '',
         status: getExitingProduct?.status as ProductStatusEnum || '',
-        taxProfile: '',
-        variantId: getExitingProduct?.id
+        variantId: getExitingProduct?.id || '',
+        warehouseId: getExitingProduct?.warehouse_id || ''
+
     }
     const categoryOptions = await fetchVendorsProductsCategory(vendorId).then((res) => {
         return res.data.map((c: any) => ({ value: c.id, label: c.name }));
@@ -92,7 +99,7 @@ export default async function ProductFormPage({ params }: { params: Promise<{ ve
     return (
         <main className="min-h-screen  py-8 w-full">
             <div className=" mx-auto">
-                <ProductForm categoryOptions={categoryOptions} vendorId={vendorId} existingData={exitingData} productId={id} />
+                <ProductForm categoryOptions={categoryOptions} warehouseOptions={warehouseOptions} vendorId={vendorId} existingData={exitingData} productId={id} />
             </div>
         </main>
     );

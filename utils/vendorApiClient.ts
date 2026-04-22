@@ -98,12 +98,30 @@ export const createProduct = async (productData: FormData, vendorId: string) => 
         });
         if (!response.ok) {
             console.error('Failed to create product');
+            return { status: response.status, statusText: response.statusText };
         }
         revalidatePath(`/vendor/${vendorId}/products`);
         return await response.json();
     } catch (error) {
         console.error('Error creating product:', error);
-        throw error;
+        return { status: 500, statusText: 'Internal Server Error' };
+    }
+}
+export const updateProduct = async (formData: FormData, vendorId: string, productId: string) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}products/${productId}`, {
+            method: "PATCH",
+            body: formData,
+        });
+        if (!response.ok) {
+            console.error('Failed to create product');
+            return { status: response.status, statusText: response.statusText };
+        }
+        revalidatePath(`/vendor/${vendorId}/products`);
+        return await response.json();
+    } catch (error) {
+        console.error('Error creating product:', error);
+        return { status: 500, statusText: 'Internal Server Error' + error };
     }
 }
 export const fetchVendorProducts = async (vendorId: string) => {
@@ -144,27 +162,7 @@ export const fetchVendorOneProducts = async (id: string) => {
         return await response.json();
     } catch (error) {
         console.error('Error fetching products:', error);
-        throw error;
-    }
-}
-export const updateProduct = async (productId: string, productData: FormData, vendorId: string) => {
-    try {
-        const response = await fetch(`${BASE_API_URL}products/update/${productId}`, {
-            method: 'PUT',
-            headers: {
-                'company-domain': companyDomain,
-                // Authorization: `Bearer ${await authToken()}`,
-            },
-            body: productData
-        });
-        if (!response.ok) {
-            console.error('Failed to update product');
-        }
-        revalidatePath(`/vendor/${vendorId}/products`);
-        return await response.json();
-    } catch (error) {
-        console.error('Error updating product:', error);
-
+        return { status: 500, statusText: 'Internal Server Error' + error };
     }
 }
 export const deleteProduct = async (productId: string, vendorId: string) => {
@@ -184,7 +182,7 @@ export const deleteProduct = async (productId: string, vendorId: string) => {
         return await response.json();
     } catch (error) {
         console.error('Error deleting product:', error);
-
+        return { status: 500, statusText: 'Internal Server Error' + error };
     }
 }
 
@@ -193,29 +191,56 @@ export const createProductVariant = async (variantData: FormData, vendorId: stri
         const response = await fetch(`${BASE_API_URL}product-variant`, {
             method: "POST",
             body: variantData,
+            headers: {
+                'company-domain': companyDomain,
+            }
         });
         if (!response.ok) throw new Error("Failed to create variant");
         const res = await response.json();
-        revalidatePath(`/vendor/${vendorId}/products/${productId}/variants`);
+        revalidatePath(`/vendor/${vendorId}/products/variants`);
+        revalidatePath(`/vendor/${vendorId}/products/${productId}/productVariants`);
+        revalidatePath(`/vendor/${vendorId}/products`);
         return res;
     } catch (error) {
         console.error("Error creating product variant:", error);
+        return { status: 500, statusText: 'Internal Server Error' + error };
     }
+
 }
-export const updateProductVariant = async (variantData: FormData, vendorId: string, productId: string, variantId: string) => {
+export const createInventoryRecord = async (
+    productVariantId: string,
+    warehouseId: string,
+    stockQuantity: number,
+    domain: string,
+) => {
+    const response = await fetch(`${BASE_API_URL}inventory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'company-domain': domain },
+        body: JSON.stringify({ productVariantId, warehouseId, stockQuantity }),
+    });
+    return response.json();
+};
+export const updateProductVariant = async (
+    formData: FormData,
+    vendorId: string,
+    productId: string,
+    variantId: string
+) => {
     try {
         const response = await fetch(`${BASE_API_URL}product-variant/${variantId}`, {
             method: "PATCH",
-            body: variantData,
+            body: formData,
         });
-        if (!response.ok) throw new Error("Failed to create variant");
+
+        if (!response.ok) throw new Error(`Failed to update variant: ${response.statusText}`);
+
         const res = await response.json();
         revalidatePath(`/vendor/${vendorId}/products/${productId}/variants`);
-        return res;
+        return { status: 200, data: res };
     } catch (error) {
-        console.error("Error creating product variant:", error);
+        console.error("Error updating product variant:", error);
     }
-}
+};
 export const fetchProductVariants = async (productId: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}product-variant/${productId}`, {
@@ -418,6 +443,22 @@ export const fetchVendorWarehouseLocations = async () => {
     try {
         const response = await fetch(`${BASE_API_URL}warehouse`, {
             method: 'GET',
+            headers: {
+                'company-domain': companyDomain,
+            }
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching warehouse locations:', error);
+        return { data: {}, message: 'Error fetching warehouse locations' };
+    }
+}
+export const fetchVendorWarehouse = async () => {
+    try {
+        const response = await fetch(`${BASE_API_URL}warehouse/options`, {
+            method: 'GET',
+            cache: 'force-cache',
+            next: { revalidate: 3600 },
             headers: {
                 'company-domain': companyDomain,
             }

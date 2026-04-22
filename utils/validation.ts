@@ -98,7 +98,7 @@ export const productSchema = z.object({
   attributes: z.array(
     z.object({
       name: z.string().min(1, { message: "Attribute name required" }).max(355, { message: "Attribute name is too long" }),
-      values: z.string().min(1, { message: "Attribute value required" }).max(355, { message: "Attribute value is too long" }),
+      value: z.string().min(1, { message: "Attribute value required" }).max(355, { message: "Attribute value is too long" }),
     })
   ),
   basePrice: z.string()
@@ -127,7 +127,7 @@ export const productSchema = z.object({
   status: z.enum(ProductStatusEnum, {
     error: () => ({ message: "Please select a status" }),
   }),
-  taxProfile: z.string().min(1, { message: "Tax profile is required" }),
+  warehouseId: z.string().min(1, { message: "Warehouse is required" }),
   productMedia: z.array(z.any()).min(0, { message: "At least one product image is required" }).max(1, { message: "You can upload up to 1 image" }),
   featureMedia: z.array(z.any()).min(0, { message: "At least one feature image is required" }).max(10, { message: "You can upload up to 10 images" }),
 });
@@ -139,6 +139,7 @@ export type ProductFormValuesType = z.infer<typeof productSchema>;
 export const productVariantSchema = z.object({
   productId: z.string().optional(),
   variantId: z.string().optional(),
+  warehouseId: z.string().optional(),
   variantName: z
     .string()
     .min(1, { message: "Variant name is required" })

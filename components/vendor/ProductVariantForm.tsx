@@ -1,5 +1,5 @@
 ﻿'use client';
-import { FileOrImage, ProductImageType, ProductStatusEnum, VariantFormValuesType } from "@/utils/Types";
+import { FileOrImage, Product, ProductImageType, ProductStatusEnum, ProductType, VariantFormValuesType } from "@/utils/Types";
 import { useAppSelector } from "@/hooks/reduxHooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useCallback, useState } from "react";
@@ -11,6 +11,7 @@ import { PRODUCT_FORM_PRICING_FIELDS } from "@/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProductVariantFormValuesType, productVariantSchema } from "@/utils/validation";
 import { ArrowLeft } from "lucide-react";
+import { generateSKU } from "@/utils/generateSku";
 const FILE_UPLOAD_FIELD_LABELS = [
     { label: "Product Images / Thumbnail", fieldName: "variantMediaMain" as keyof VariantFormValuesType },
     { label: "Feature / Specification Media", fieldName: "variantMediaGallery" as keyof VariantFormValuesType },
@@ -21,22 +22,32 @@ const FILE_UPLOAD_FIELD_LABELS = [
 export const ProductVariantForm = ({
     vendorId,
     productId,
+    warehouseOptions,
+    productDetails,
     existVariant,
-    variantId
+    variantId,
 }: {
     vendorId: string;
     productId?: string;
+    warehouseOptions?: { value: string; label: string }[];
+    productDetails?: {
+        id: string,
+        name: string,
+        category: { id: string, name: string };
+    };
     existVariant?: VariantFormValuesType;
-    variantId?: string
+    variantId?: string;
 }) => {
-    const { user } = useAppSelector((state) => state.auth);
+    const isEditMode = Boolean(variantId && existVariant);
     const router = useRouter();
-
+    const { user } = useAppSelector((state: any) => state.auth);
     const {
         control,
+        watch,
         register,
         handleSubmit,
         setValue,
+        reset,
         formState: { errors, isSubmitting },
     } = useForm({
         resolver: zodResolver(productVariantSchema),
@@ -44,26 +55,66 @@ export const ProductVariantForm = ({
         defaultValues: {
             variantName: "",
             attributes: [{ name: "", value: "" }],
-            basePrice: '',
-            discountPercent: '',
-            stocks: '',
+            basePrice: "",
+            discountPercent: "",
+            stocks: "",
             sku: "",
             variantMediaMain: [],
             variantMediaGallery: [],
+            warehouseId: '',
             status: ProductStatusEnum.INACTIVE,
         },
     });
-
     const { fields: attributeFields, append: appendAttribute, remove: removeAttribute } =
         useFieldArray({ control, name: "attributes" });
     const [deletedImgs, setDeletedImgs] = useState<string[]>([])
-    const [productFiles, setProductFiles] = useState<FileOrImage[]>(() =>
-        existVariant?.variantMediaMain ?? []
-    );
-    const [featureFiles, setFeatureFiles] = useState<FileOrImage[]>(() =>
-        existVariant?.variantMediaGallery ?? []
-    );
+    const [productFiles, setProductFiles] = useState<FileOrImage[]>([]);
+    const [featureFiles, setFeatureFiles] = useState<FileOrImage[]>([]);
     const { getPreviewUrl, revokeAll, revokeOne } = usePreviewUrls();
+    const variantName = watch('variantName');
+    const attributes = watch('attributes');
+    const [isAutoGenerating, setIsAutoGenerating] = useState(true);
+
+    useEffect(() => {
+        if (isAutoGenerating && variantName) {
+            const newSku = generateSKU({
+                productName: variantName, // Passed from parent Product
+                categoryName: productDetails?.category.name,
+                attributes: attributes,
+            });
+
+            setValue('sku', newSku, { shouldValidate: true });
+        }
+    }, [variantName, attributes, variantName, productDetails?.category.name, isAutoGenerating, setValue]);
+
+    // ── Populate form when editing ──
+    useEffect(() => {
+        if (!existVariant) return;
+        console.log("existVariant", existVariant)
+        reset({
+            variantName: existVariant.variantName,
+            attributes:
+                existVariant.attributes?.length
+                    ? existVariant.attributes.map((attr) => ({ name: attr.name, value: attr.value }))
+                    : [{ name: "", value: "" }],
+            basePrice: existVariant.basePrice,
+            discountPercent: existVariant.discountPercent,
+            stocks: existVariant.stocks,
+            sku: existVariant.sku,
+            variantMediaMain: existVariant.variantMediaMain ?? [],
+            variantMediaGallery: existVariant.variantMediaGallery ?? [],
+            warehouseId: existVariant.warehouseId || '',
+            status: (existVariant.status as ProductStatusEnum) ?? ProductStatusEnum.INACTIVE,
+        });
+
+        const initialProductFiles = (existVariant.variantMediaMain as FileOrImage[]) || [];
+        const initialFeatureFiles = (existVariant.variantMediaGallery as FileOrImage[]) || [];
+
+        setProductFiles(initialProductFiles);
+        setFeatureFiles(initialFeatureFiles);
+        setValue("variantMediaMain", initialProductFiles as any, { shouldDirty: false });
+        setValue("variantMediaGallery", initialFeatureFiles as any, { shouldDirty: false });
+    }, [existVariant, variantId]); // reset is stable, no need to add it
 
 
     useEffect(() => {
@@ -85,7 +136,7 @@ export const ProductVariantForm = ({
             if (!e.target.files) return;
             const updated = [...currentFiles, ...Array.from(e.target.files)];
             setFiles(updated);
-            setValue(fieldName as ProductVariantFormValuesType, updated as any, { shouldDirty: true });
+            setValue(fieldName as keyof ProductVariantFormValuesType, updated as any, { shouldDirty: true });
             e.target.value = "";
         },
         [setValue]
@@ -103,12 +154,13 @@ export const ProductVariantForm = ({
             revokeOne(removed); // free memory for this file only
             const updated = currentFiles.filter((_, i) => i !== index);
             setFiles(updated);
-            setValue(fieldName as ProductVariantFormValuesType, updated as any, { shouldDirty: true });
+            setValue(fieldName as keyof ProductVariantFormValuesType, updated as any, { shouldDirty: true });
             if (id) { setDeletedImgs((prev) => [...prev, id]) }
         },
         [setValue, revokeOne]
     );
 
+    console.log("deletedImgs", deletedImgs)
     // ── Submit ──
     const onSubmit = async (data: ProductVariantFormValuesType) => {
         if (user && 'vendor_id' in user && user.vendor_id && !user.company_id) return;
@@ -122,6 +174,7 @@ export const ProductVariantForm = ({
             discount_percent: data.discountPercent ?? 0,
             stock_quantity: String(data.stocks) ?? 0,
             sku: data.sku,
+            warehouse_id: data.warehouseId,
         };
 
         const formData = new FormData();
@@ -131,19 +184,22 @@ export const ProductVariantForm = ({
         if (deletedImgs.length > 0) {
             formData.append('imagesToDelete', JSON.stringify(deletedImgs))
         }
-        let response;
-        if (variantId && existVariant?.productId) {
-            console.log('updating')
-            response = await updateProductVariant(formData, vendorId, existVariant.productId, variantId)
-        } else {
-            console.log('creating')
-            if (!productId) {
-                console.error("Product ID is required to create a variant");
-                return;
+        const createOrUpdate = async () => {
+            if (variantId && existVariant?.productId) {
+                console.log('updating')
+                console.log("update ", (formData.getAll('variant_data')))
+                return await updateProductVariant(formData, vendorId, existVariant.productId, variantId)
+            } else {
+                console.log('creating')
+                if (!productId) {
+                    console.error("Product ID is required to create a variant");
+                    return;
+                }
+                return await createProductVariant(formData, vendorId, productId);
             }
-            response = await createProductVariant(formData, vendorId, productId);
         }
-        console.log("response", response)
+        const response = await createOrUpdate();
+        console.log("response", response);
         if (response?.status === 201) {
             router.push(`/vendor/${vendorId}/products`);
         }
@@ -161,9 +217,13 @@ export const ProductVariantForm = ({
                 {/* ── HEADER ── */}
                 <header className="flex flex-wrap justify-between items-center mb-8 gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Add Product Variant</h1>
+                        <h1 className="text-2xl font-bold text-slate-900">
+                            {isEditMode ? "Edit Product Variant" : "Add Product Variant"}
+                        </h1>
                         <p className="text-sm text-slate-500 mt-0.5">
-                            Creating a new variation for product #{productId}
+                            {isEditMode
+                                ? `Editing variant: ${existVariant?.variantName}`
+                                : `Creating a new variation for product #${productId}`}
                         </p>
                     </div>
                 </header>
@@ -270,6 +330,20 @@ export const ProductVariantForm = ({
                                     </div>
                                 ))
                             }
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-1">
+                                    Warehouse
+                                </label>
+                                <select
+                                    className="form_input w-full border rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                    {...register("warehouseId" as keyof ProductVariantFormValuesType, { required: "Please select a warehouse" })}
+                                >
+                                    <option value="">Select warehouse</option>
+                                    {warehouseOptions?.map((option) => (
+                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -283,7 +357,7 @@ export const ProductVariantForm = ({
                     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                         {FILE_UPLOAD_FIELD_LABELS.map(({ label, fieldName }) => {
                             const { files, setFiles } = fileStateMap[fieldName as keyof typeof fileStateMap];
-
+                            console.log("files", JSON.stringify(files))
                             return (
                                 <div key={fieldName} className="border border-slate-200 rounded-xl p-4 bg-slate-50">
                                     <h3 className="text-sm font-semibold text-slate-700 mb-3">{label}</h3>
@@ -362,10 +436,16 @@ export const ProductVariantForm = ({
                         disabled={isSubmitting}
                         className="flex items-center gap-2 bg-blue-600 text-white text-sm font-semibold py-2.5 px-8 rounded-xl hover:bg-blue-700 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                        {isSubmitting
-                            ? <>  <DynamicIcon fallback={() => <p></p>} name="loader-2" size={15} className="animate-spin" /> Saving…</>
-                            : "Save Variant"
-                        }
+                        {isSubmitting ? (
+                            <>
+                                <DynamicIcon name="loader-2" size={15} className="animate-spin" fallback={() => <p />} />
+                                Saving…
+                            </>
+                        ) : isEditMode ? (
+                            "Update Variant"
+                        ) : (
+                            "Save Variant"
+                        )}
                     </button>
                 </div>
             </form>
