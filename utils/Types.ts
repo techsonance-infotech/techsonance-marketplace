@@ -435,11 +435,32 @@ export interface Company {
   created_at: string;
   updated_at: string;
 }
+export interface VendorDocument {
+  id: string;
+  document_type: string;
+  document_url: string;
+  document_status: string;
+  created_at: string;
+  updated_at: string;
+  vendor_id: string;
+}
 
 export interface VendorApplication {
-  vendor: Vendor;
+  id: string;
+  store_owner_first_name: string;
+  store_owner_last_name: string;
+  store_name: string;
+  store_description: string;
+  category: string;
+  vendor_status: string;
+  is_verified: boolean;
+  created_at: string;
+  updated_at: string;
+  company_id: string;
+  user_id: string;
   user: User;
   company: Company;
+  documents: VendorDocument[];
 }
 export interface NavLinkType {
   [key: string]: string | null;
@@ -580,7 +601,7 @@ export interface VendorProduct {
 }
 
 
-export interface VendorOrder   {
+export interface VendorOrder {
   orderId: string;
   customerName: string;
   status: OrderStatusEnum,
@@ -597,7 +618,7 @@ export interface ComplianceField {
   helperText: string;
 }
 
-export interface CountryCompliance{
+export interface CountryCompliance {
   country_code: string;
   country_name: string;
   fields: ComplianceField[];

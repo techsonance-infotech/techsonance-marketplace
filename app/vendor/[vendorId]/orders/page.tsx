@@ -76,7 +76,7 @@ export default function OrdersPage() {
     return (
         <>
             {/* <Navbar title={"Orders"} /> */}
-            <main>
+            <main className="w-full">
                 <header className="flex justify-end items-center my-6">
                     <button className="font-medium text-xl bg-blue-500 text-white rounded-xl px-6 py-2">Export CSV</button>
                 </header>
@@ -133,7 +133,7 @@ export default function OrdersPage() {
                     <tbody className="text-center">
                         {orders.length === 0 ? (
                             <tr>
-                                <td colSpan={7} className="p-8 text-gray-500">No orders found.</td>
+                                <td colSpan={10} className="p-8 text-gray-500">No orders found.</td>
                             </tr>
                         ) : (
                             orders.map((item, index) => (
