@@ -9,8 +9,8 @@ import { fetchAddTrackingUrl, fetchUpdateOrderStatus, fetchVendorOrderDetails, }
 import { OrderStatusEnum } from "@/constants";
 import { DynamicIcon } from "lucide-react/dynamic";
 import { fetchCancelOrderItem } from "@/utils/customerApiClient";
-import { companyDomain } from "@/config";
-
+import { getCompanyDomain } from "@/lib/get-domain";
+ 
 const STATUS_CONFIG = {
     PENDING: { label: "Pending", className: "bg-amber-100  text-amber-800" },
     PROCESSING: { label: "Processing", className: "bg-blue-100   text-blue-800" },
@@ -126,6 +126,7 @@ export default function VendorOrderDetails() {
 
     const handleCancelItem = async (itemId: string) => {
         setIsSubmitting(true);
+        const companyDomain = await getCompanyDomain();
         const result = await fetchCancelOrderItem(
             itemId,
             cancelReason,

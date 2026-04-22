@@ -2,7 +2,7 @@
 import { ACCESS_TOKEN_KEY, BASE_API_URL } from "@/constants";
 import { authToken } from "./authToken";
 import { revalidatePath } from "next/cache";
-import { companyDomain } from "@/config";
+import { getCompanyDomain } from "@/lib/get-domain";
 export const fetchVendorsProductsCategory = async (vendorId: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}categories/${vendorId}`, {
@@ -19,17 +19,18 @@ export const fetchVendorsProductsCategory = async (vendorId: string) => {
         return { data: [], message: 'Error fetching product categories' };
     }
 };
-export const createVendorProductCategory = async (vendorId: string, categoryData: { name: string; description?: string }, companyId: string) => {
+export const createVendorProductCategory = async (vendorId: string, categoryData: { name: string; description?: string }) => {
     try {
-
+        const companyDomain = await getCompanyDomain();
         console.log(categoryData);
         const response = await fetch(`${BASE_API_URL}categories/${vendorId}`, {
             method: 'POST',
             headers: {
                 // Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
             },
-            body: JSON.stringify({ category: categoryData, companyId }),
+            body: JSON.stringify({ category: categoryData }),
         });
         if (response.status !== 201) {
             console.error('Failed to create product category');
@@ -44,11 +45,13 @@ export const createVendorProductCategory = async (vendorId: string, categoryData
 }
 export const updateVendorProductCategory = async (vendorId: string, categoryId: string, categoryData: { name: string; description?: string }) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}categories/${vendorId}/${categoryId}`, {
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${await authToken()}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
             },
             body: JSON.stringify({ category: categoryData }),
         });
@@ -88,6 +91,8 @@ export const deleteVendorProductCategory = async (vendorId: string, categoryId: 
 }
 export const createProduct = async (productData: FormData, vendorId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
+
         const response = await fetch(`${BASE_API_URL}products/${vendorId}`, {
             method: 'POST',
             headers: {
@@ -109,9 +114,13 @@ export const createProduct = async (productData: FormData, vendorId: string) => 
 }
 export const updateProduct = async (formData: FormData, vendorId: string, productId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}products/${productId}`, {
             method: "PATCH",
             body: formData,
+            headers: {
+                'company-domain': companyDomain,
+            },
         });
         if (!response.ok) {
             console.error('Failed to create product');
@@ -126,11 +135,11 @@ export const updateProduct = async (formData: FormData, vendorId: string, produc
 }
 export const fetchVendorProducts = async (vendorId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}products/all`, {
             method: 'GET',
             cache: 'force-cache',
             next: { revalidate: 3600 },
-
             headers: {
                 'company-domain': companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,
@@ -147,6 +156,7 @@ export const fetchVendorProducts = async (vendorId: string) => {
 }
 export const fetchVendorOneProducts = async (id: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}products/${id}`, {
             method: 'GET',
             cache: 'no-cache',
@@ -167,6 +177,7 @@ export const fetchVendorOneProducts = async (id: string) => {
 }
 export const deleteProduct = async (productId: string, vendorId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}products/${productId}`, {
             method: 'DELETE',
             headers: {
@@ -188,6 +199,8 @@ export const deleteProduct = async (productId: string, vendorId: string) => {
 
 export const createProductVariant = async (variantData: FormData, vendorId: string, productId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
+
         const response = await fetch(`${BASE_API_URL}product-variant`, {
             method: "POST",
             body: variantData,
@@ -211,11 +224,12 @@ export const createInventoryRecord = async (
     productVariantId: string,
     warehouseId: string,
     stockQuantity: number,
-    domain: string,
+
 ) => {
+    const companyDomain = await getCompanyDomain();
     const response = await fetch(`${BASE_API_URL}inventory`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'company-domain': domain },
+        headers: { 'Content-Type': 'application/json', 'company-domain': companyDomain },
         body: JSON.stringify({ productVariantId, warehouseId, stockQuantity }),
     });
     return response.json();
@@ -243,11 +257,13 @@ export const updateProductVariant = async (
 };
 export const fetchProductVariants = async (productId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}product-variant/${productId}`, {
             method: 'GET',
             cache: 'force-cache',
             next: { revalidate: 3600 },
             headers: {
+                'company-domain': companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,
             },
         });
@@ -265,9 +281,11 @@ export const fetchProductVariants = async (productId: string) => {
 }
 export const deleteProductVariant = async (productId: string, variantId: string, vendorId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}product-variant/${variantId}`, {
             method: 'DELETE',
             headers: {
+                'company-domain': companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,    
             },
         });
@@ -283,6 +301,7 @@ export const deleteProductVariant = async (productId: string, variantId: string,
 }
 export const fetchVariant = async (variantId: string,) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}product-variant/variant/${variantId}`, {
             method: 'GET',
             headers: {
@@ -303,6 +322,7 @@ export const fetchVariant = async (variantId: string,) => {
 }
 export const fetchVendorOrderList = async () => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}orders`, {
             method: 'GET',
             headers: {
@@ -323,6 +343,7 @@ export const fetchVendorOrderList = async () => {
 }
 export const fetchVendorOrderDetails = async (orderId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}orders/${orderId}`, {
             method: 'GET',
             headers: {
@@ -342,6 +363,7 @@ export const fetchVendorOrderDetails = async (orderId: string) => {
 }
 export const fetchUpdateOrderStatus = async (orderId: string, status: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}orders/${orderId}/status`, {
             method: 'PATCH',
             headers: {
@@ -363,6 +385,7 @@ export const fetchUpdateOrderStatus = async (orderId: string, status: string) =>
 export const fetchAddTrackingUrl = async (orderId: string, trackingUrl: string) => {
     console.log(orderId, trackingUrl)
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}shipping`, {
             method: 'POST',
             headers: {
@@ -384,6 +407,7 @@ export const fetchAddTrackingUrl = async (orderId: string, trackingUrl: string) 
 export const fetchUpdateTrackingUrl = async (orderId: string, trackingUrl: string) => {
     console.log(orderId, trackingUrl)
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}shipping/${orderId}`, {
             method: 'PATCH',
             headers: {
@@ -405,6 +429,7 @@ export const fetchUpdateTrackingUrl = async (orderId: string, trackingUrl: strin
 export const fetchCreateWarehouseLocation = async (warehouseAddress: any) => {
     console.log(warehouseAddress)
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}warehouse`, {
             method: 'POST',
             headers: {
@@ -422,6 +447,7 @@ export const fetchCreateWarehouseLocation = async (warehouseAddress: any) => {
 }
 export const fetchUpdateWarehouseLocation = async (locationId: string, warehouseData: any) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}warehouse/${locationId}`, {
             method: 'PATCH',
             headers: {
@@ -441,6 +467,7 @@ export const fetchUpdateWarehouseLocation = async (locationId: string, warehouse
 }
 export const fetchVendorWarehouseLocations = async () => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}warehouse`, {
             method: 'GET',
             headers: {
@@ -455,6 +482,7 @@ export const fetchVendorWarehouseLocations = async () => {
 }
 export const fetchVendorWarehouse = async () => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}warehouse/options`, {
             method: 'GET',
             cache: 'force-cache',
@@ -472,6 +500,7 @@ export const fetchVendorWarehouse = async () => {
 
 export const fetchDeleteWarehouseLocation = async (locationId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}warehouse/${locationId}`, {
             method: 'DELETE',
             headers: {

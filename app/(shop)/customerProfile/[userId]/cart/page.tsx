@@ -7,7 +7,6 @@ import { useParams, useRouter } from "next/navigation";
 import { ChevronLeftCircle } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { formatCurrency } from "@/lib/utils";
-import { companyDomain } from "@/config";
 import { fetchGetCartList } from "@/utils/customerApiClient";
 import { BuyBtnMode, Variant } from "@/utils/Types";
 import { setItemList } from "@/lib/features/Cart";
@@ -54,7 +53,7 @@ export default function CartList() {
     useEffect(() => {
         const fetchCartList = async () => {
             try {
-                const response = await fetchGetCartList(userId, companyDomain);
+                const response = await fetchGetCartList(userId);
 
                 if (!response?.data) {
                     console.warn("fetchGetCartList: unexpected response shape", response);

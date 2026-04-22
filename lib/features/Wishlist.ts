@@ -1,8 +1,8 @@
-import { companyDomain } from "@/config";
 import { USER_STORAGE_KEY, WISHLIST_KEY } from "@/constants/constants";
 import { fetchCustomerWishlist } from "@/utils/customerApiClient";
 import { Variant } from "@/utils/Types";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getCompanyDomain } from "../get-domain";
 
 
 export interface WishlistItem {
@@ -44,7 +44,7 @@ const saveWishlistToLocalStorage = (wishlistId: string, wishItems: WishlistItem[
 
 const loadWishlistFromLocalOrServer = async (): Promise<Omit<WishlistState, 'loading' | 'error'>> => {
     if (!isClient) return { wishlistId: '', wishItems: [] };
-
+    const companyDomain = await getCompanyDomain();
     let localFallback: Omit<WishlistState, 'loading' | 'error'> = { wishlistId: '', wishItems: [] };
 
     try {
@@ -62,7 +62,7 @@ const loadWishlistFromLocalOrServer = async (): Promise<Omit<WishlistState, 'loa
             : null;
 
         if (customerId && companyDomain) {
-            const response = await fetchCustomerWishlist(customerId, companyDomain);
+            const response = await fetchCustomerWishlist(customerId);
 
             if (response.ok && response.data) {
                 const serverData: WishlistServerResponse[] = response.data;
