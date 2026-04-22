@@ -383,3 +383,25 @@ export const fetchOrderDetails = async (orderId: string) => {
         console.log('Error fetching order details:', error);
     }
 }
+
+export const fetchCancelOrderItem = async (
+    itemId: string,
+    reason: string,
+    domain: string,
+) => {
+    const response = await fetch(
+        `${BASE_API_URL}orders/orderItems/${itemId}/cancel`,
+        {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': domain,
+            },
+            body: JSON.stringify({
+                reason,
+                cancelled_by: 'customer',
+            }),
+        },
+    );
+    return response.json();
+};

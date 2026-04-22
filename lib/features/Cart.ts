@@ -1,12 +1,12 @@
 import { CartItemListResponse } from "@/app/(shop)/customerProfile/[userId]/cart/page";
 import { companyDomain } from "@/config";
-import { CART_KEY, CartItemType, USER_STORAGE_KEY } from "@/constants";
+import { CART_KEY, CartItem, USER_STORAGE_KEY } from "@/constants";
 import { fetchGetCartList } from "@/utils/customerApiClient";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export interface CartState {
     cartId: string;
-    items: CartItemType[];
+    items: CartItem[];
     itemList: CartItemListResponse[];
     loading: boolean;
     error: string | null;
@@ -14,7 +14,7 @@ export interface CartState {
 
 const isClient = typeof window !== 'undefined';
 
-const saveCartToLocalStorage = (cartId: string, items: CartItemType[]) => {
+const saveCartToLocalStorage = (cartId: string, items: CartItem[]) => {
     if (!isClient) return;
     try {
         localStorage.setItem(CART_KEY, JSON.stringify({ cartId, items }));
@@ -35,7 +35,7 @@ const loadCartFromLocalOrServer = async (): Promise<Omit<CartState, 'loading' | 
             if (response.ok && Array.isArray(response.data)) {
                 const itemList: CartItemListResponse[] = response.data;
                 
-                const items: CartItemType[] = itemList.map((item) => ({
+                const items: CartItem[] = itemList.map((item) => ({
                     cartId: item.cart_id,
                     cartItemId: item.id,
                     quantity: item.quantity,
@@ -80,7 +80,7 @@ const CartSlice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
-        addToCart: (state, action: { payload: CartItemType }) => {
+        addToCart: (state, action: { payload: CartItem }) => {
             if (!state.cartId && action.payload.cartId) {
                 state.cartId = action.payload.cartId;
             }

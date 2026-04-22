@@ -6,23 +6,20 @@ import { AlertTriangle, Package, RefreshCw, XCircle, CheckCircle, Edit2, X } fro
 import { motion, AnimatePresence } from "motion/react";
 import { BASE_API_URL } from "@/constants";
 import { companyDomain } from "@/config";
-import { AddressType } from "@/utils/Types";
+import { Address } from "@/utils/Types";
 
 interface InventoryLocation {
-
     inventory_id: string;
     warehouse_id: string;
     warehouse_name: string | null;
     stock: number;
-    address: AddressType | null;
+    address: Address | null;
 }
-
-
 interface InventoryItem {
     isLowStock: boolean;
     isOutOfStock: boolean;
     locations: InventoryLocation[];
-    price: string; // consider number if parsed
+    price: string; 
     sku: string;
     total_stock: number;
     variant_id: string;
