@@ -3,7 +3,6 @@ import type { RootState } from "@/lib/store";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { OrderStatusEnum, UserOrder } from "@/utils/Types";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "react-responsive";
 import { ChevronLeftCircle } from "lucide-react";
@@ -20,7 +19,7 @@ export default function OrdersPage() {
   const ordersStatusMap = [OrderStatusEnum.DELIVERED, OrderStatusEnum.PENDING, OrderStatusEnum.CANCELLED];
   const statusLabels: Record<string, string> = {
     [OrderStatusEnum.PENDING]: "Not Shipped yet",
-    [OrderStatusEnum.DELIVERED]: "Delivered",
+    [OrderStatusEnum.DELIVERED ]: "Delivered",
     [OrderStatusEnum.CANCELLED]: "Cancelled",
   };
   return (

@@ -17,9 +17,11 @@ export interface ProductVariantType {
 }
 
 export interface OrderItemType {
+    id: string;
     quantity: number;
     price: string;
-    productVariant: ProductVariantType;
+    order_status: OrderStatusEnum;
+    variant: ProductVariantType;
 }
 
 
@@ -39,7 +41,7 @@ export interface PaymentType {
 export interface OrderType {
     id: string;
     user_id: string;
-    order_status: OrderStatusEnum;
+
     created_at: string;
     total_amount: string;
     items: OrderItemType[];
@@ -68,6 +70,7 @@ export function OrdersList({
                 const response = await fetchUserOrderHistory(customerId);
                 if (isMounted) {
                     setOrders(response?.data || []);
+                    console.log(response?.data);
                 }
             } catch (error) {
                 console.error("Failed to fetch orders:", error);
@@ -83,7 +86,8 @@ export function OrdersList({
             isMounted = false;
         };
     }, [customerId]);
-    const filteredOrders = !isMobile ? orders.filter(order => order.order_status === status) : orders;
+    console.log('order', orders)
+    const filteredOrders = !isMobile ? orders.filter(order => order.order_status !== status) : orders;
 
     return (
 
