@@ -98,7 +98,7 @@ export default function OrderDetailsPage() {
                 .then((data) => {
                     console.log("Order Details:", data);
                     setOrder(data.data);
-                    setOrderStatus(data.data.items[1].order_status);
+                    setOrderStatus(data.data.items[0].order_status);
                 })
                 .catch((error) => {
                     console.error("Error fetching order details:", error);
