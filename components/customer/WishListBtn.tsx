@@ -71,18 +71,16 @@ export function WishListBtn({ productVariantId
         }
 
         const item = response.data;
-
-        dispatch(addToWishlist({
+        console.log("wishlist btn item", item)
+        const wishItem = {
           id: item.id,
           wishlist_id: item.wishlist_id,
           product_variant_id: item.product_variant_id,
-          created_at: typeof item.created_at === 'string'
-            ? item.created_at
-            : new Date(item.created_at).toISOString(),
-          updated_at: typeof item.updated_at === 'string'
-            ? item.updated_at
-            : new Date(item.updated_at).toISOString(),
-        }));
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+        };
+        console.log("wishItem", wishItem)
+        dispatch(addToWishlist(wishItem));
       }
 
     } catch (err) {
@@ -108,7 +106,6 @@ export function WishListBtn({ productVariantId
             : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
           }
       `}
-      // aria-label={existingWishlistItem ? "Remove from wishlist" : "Add to wishlist"}
       >
         <AnimatePresence mode="wait">
           <motion.div

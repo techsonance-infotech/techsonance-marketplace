@@ -109,13 +109,14 @@ const WishlistSlice = createSlice({
     reducers: {
         addToWishlist: (state, action: PayloadAction<WishlistItem>) => {
             if (state.loading) return;
-
+            console.log("action.payload", action.payload)
             const existingItem = state.wishItems.find(
                 (item) => item.product_variant_id === action.payload.product_variant_id
             );
-
+            console.log("existingItem", existingItem)
             if (!existingItem) {
                 state.wishItems.push(action.payload);
+                console.log("state.wishItems", state.wishItems)
                 saveWishlistToLocalStorage(state.wishlistId, state.wishItems);
             }
         },
