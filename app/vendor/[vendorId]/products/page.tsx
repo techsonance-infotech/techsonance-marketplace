@@ -22,7 +22,7 @@ export default async function Products({ params }: { params: Promise<{ vendorId:
             return [];
         });
 
-    const getProducts = await fetchVendorProducts(vendorId)
+    const getProducts = await fetchVendorProducts()
         .then((res) => res?.data || [])
         .catch((error) => {
             console.error("Error fetching products:", error);
@@ -30,7 +30,7 @@ export default async function Products({ params }: { params: Promise<{ vendorId:
         });
 
     const productList: Product[] = getProducts || [];
-
+    console.log("productList[1].variants", productList[1].variants)
     let count = 1;
     const pageSize = 5;
     const totalPages = Math.ceil(productList.length / pageSize);
@@ -207,7 +207,7 @@ export default async function Products({ params }: { params: Promise<{ vendorId:
                                             ₹{Number(item.base_price).toLocaleString()}
                                         </TableCell>
 
-                                      
+
 
                                         {/* Actions */}
                                         <TableCell className="px-4 py-3">

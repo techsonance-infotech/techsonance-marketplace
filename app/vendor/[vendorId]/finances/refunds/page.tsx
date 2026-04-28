@@ -19,6 +19,34 @@ interface RefundRecord {
     order_id: string;
     order_items_id: string | null;
     payment_id: string;
+    payment: {
+        id: string,
+        payment_method: string,
+        payment_status: string,
+        transaction_ref: string,
+        amount: string,
+    },
+    order: {
+        id: string,
+        order_ref: string,
+        customer: {
+            id: string,
+            first_name: string,
+            last_name: string,
+        },
+
+    },
+    orderItem: {
+        cancelledRecord: {
+            cancelled_by: string,
+        },
+        return_request: {
+            reason: string,
+            type:string,
+            cancelled_by: string,
+        }
+    }
+
 }
 
 interface RefundDashboardData {
@@ -32,12 +60,13 @@ interface RefundDashboardData {
 export const RefundsTableHeader = [
     "Refund ID",
     "Order Ref",
-    "Scope",
-    "Amount",
+    "Customer",
+    "Payment Method ",
+    "Amount & Fulfillment",
+    "Refund Type",
     "Reason",
     "Status",
     "Date",
-    "Actions"
 ];
 
 export default function RefundsPage() {
@@ -228,61 +257,77 @@ export default function RefundsPage() {
                                 </td>
                             </tr>
                         ) : (
-                            dashboardData.refunds.map((item) => (
-                                <tr key={item.id} className="hover:bg-gray-50 transition-colors group">
-                                    <td className="p-4">
-                                        <input type="checkbox" className="rounded border-gray-300 text-orange-500 focus:ring-orange-500" />
-                                    </td>
+                            dashboardData.refunds.map((item) => {
+                                console.log("item", item)
+                                const isCancelled = item.orderItem && item.orderItem.cancelledRecord !== null
+                                const isReplacedAndReturnd = item.orderItem && item.orderItem.return_request !== null
+                                console.log("isReplacedAndReturnd", isReplacedAndReturnd)
+                                console.log("isCancelled", isCancelled)
+                                return (
+                                    <tr key={item.id} className="hover:bg-gray-50 transition-colors group">
+                                        <td className="p-4">
+                                            <input type="checkbox" className="rounded border-gray-300 text-orange-500 focus:ring-orange-500" />
+                                        </td>
 
-                                    {/* REFUND ID */}
-                                    <td className="p-4">
-                                        <span className="font-mono text-sm font-semibold text-gray-800">
-                                            REF-{item.id.split("-")[0].toUpperCase()}
-                                        </span>
-                                    </td>
+                                        {/* REFUND ID */}
+                                        <td className="p-4">
+                                            <span className="font-mono text-sm font-semibold text-gray-800">
+                                                REF-{item.id.split("-")[0].toUpperCase()}
+                                            </span>
+                                        </td>
 
-                                    {/* ORDER REF - Using direct order_id from response */}
-                                    <td className="p-4">
-                                        <Link href={`/vendor/${vendorId}/orders/${item.order_id}`} className="font-mono text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline">
-                                            ORD-{item.order_id.split("-")[0].toUpperCase()}
-                                        </Link>
-                                    </td>
+                                        {/* ORDER REF - Using direct order_id from response */}
+                                        <td className="p-4">
+                                            <Link href={`/vendor/${vendorId}/orders/${item.order_id}`} className="font-mono text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline">
+                                                ORD-{item.order_id.split("-")[0].toUpperCase()}
+                                            </Link>
+                                        </td>
 
-                                    {/* SCOPE */}
-                                    <td className="p-4">
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-md uppercase ${item.scope === 'order' ? 'bg-purple-50 text-purple-700' : 'bg-gray-100 text-gray-600'
-                                            }`}>
-                                            {item.scope}
-                                        </span>
-                                    </td>
+                                        {/* CUSTOMER */}
+                                        <td className="p-4">
+                                            <span className={`px-2 py-1 text-xs font-semibold rounded-md uppercase ${item.scope === 'order' ? 'bg-purple-50 text-purple-700' : 'bg-gray-100 text-gray-600'
+                                                }`}>
+                                                {item.order.customer && item.order.customer.first_name + " " + item.order.customer.last_name}
+                                            </span>
+                                        </td>
+                                        <td className="p-4">
+                                            <span className="font-bold text-gray-900">
+                                                {item.payment.payment_method}
+                                            </span>
+                                        </td>
 
-                                    {/* AMOUNT */}
-                                    <td className="p-4">
-                                        <span className="font-bold text-gray-900">
-                                            ₹{formatCurrency(item.refund_amount)}
-                                        </span>
-                                    </td>
+                                        {/* AMOUNT */}
+                                        <td className="p-4">
+                                            <span className="font-bold text-gray-900">
+                                                ₹{formatCurrency(item.refund_amount)} <span className="text-xs text-gray-500 ml-1">({item.payment.payment_status})</span>
+                                            </span>
+                                        </td>
 
-                                    {/* REASON */}
-                                    <td className="p-4 text-sm text-gray-600 max-w-[200px] truncate" title={item.refund_reason}>
-                                        {item.refund_reason || "N/A"}
-                                    </td>
+                                        {/* REASON */}
+                                        {/* {/* <td className="p-4 text-sm text-gray-600 max-w-[200px] truncate" >
+                                            {
+                                                isCancelled ? item.order.cancelledRecord.reason : isReplacedAndReturnd ? item.ordeItems.return_request.reason : "N/A"
+                                            }
+                                        </td> */}
+                                        <td className="p-4 text-sm text-gray-600 max-w-[200px] truncate" title={item.refund_reason}>
+                                            {isCancelled ? 'Order Cancelled' : isReplacedAndReturnd ? `Order ${item.orderItem.return_request.type}` : "N/A"}
+                                        </td>
 
-                                    {/* STATUS */}
-                                    <td className="p-4">
-                                        {getStatusBadge(item.refund_status)}
-                                    </td>
+                                        {/* STATUS */}
+                                        <td className="p-4">
+                                            {getStatusBadge(item.refund_status)}
+                                        </td>
 
-                                    {/* DATE */}
-                                    <td className="p-4 text-sm text-gray-500 whitespace-nowrap">
-                                        {new Date(item.created_at).toLocaleDateString("en-GB", {
-                                            day: 'numeric', month: 'short', year: 'numeric'
-                                        })}
-                                    </td>
+                                        {/* DATE */}
+                                        <td className="p-4 text-sm text-gray-500 whitespace-nowrap">
+                                            {new Date(item.created_at).toLocaleDateString("en-GB", {
+                                                day: 'numeric', month: 'short', year: 'numeric'
+                                            })}
+                                        </td>
 
-                                    {/* ACTIONS */}
-                                    <td className="p-4">
-                                        {/* Safely handle lowercase "pending" from backend */}
+                                        {/* ACTIONS */}
+                                        {/* <td className="p-4">
+                                   
                                         {item.refund_status.toLowerCase() === 'pending' ? (
                                             <button
                                                 onClick={() => handleProcessPayment(item.id)}
@@ -297,9 +342,10 @@ export default function RefundsPage() {
                                         ) : (
                                             <span className="text-xs text-gray-400 font-medium">No action needed</span>
                                         )}
-                                    </td>
-                                </tr>
-                            ))
+                                    </td> */}
+                                    </tr>
+                                )
+                            })
                         )}
                     </tbody>
                 </table>

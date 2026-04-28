@@ -26,7 +26,12 @@ export const OrderStatusEnum = {
   REFUNDED: "refunded",
   REPLACED: "replaced",
 }
-
+export enum ProductVariantStatus {
+    ACTIVE = 'active',
+    INACTIVE = 'inactive',
+    DISCONTINUED = 'discontinued',
+    DRAFT = 'draft',
+}
 export type OrderStatus = typeof OrderStatusEnum[keyof typeof OrderStatusEnum];
 export enum ReturnType {
   RETURN = 'return',

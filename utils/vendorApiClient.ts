@@ -135,15 +135,15 @@ export const updateProduct = async (formData: FormData, vendorId: string, produc
         return { status: 500, statusText: 'Internal Server Error' + error };
     }
 }
-export const updateProductVariantStatus = async (productVariantId: string, vendorId: string, status: string) => {
+export const updateProductVariantStatus = async (productVariantId: string, vendorId: string, nextStatus: string) => {
     try {
         const companyDomain = await getCompanyDomain();
-        const response = await fetch(`${BASE_API_URL}products-variant/update-status/${productVariantId}`, {
+        console.log("nextStatus", nextStatus);
+        const response = await fetch(`${BASE_API_URL}product-variant/update-status/${productVariantId}`, {
             method: "PATCH",
-            body: JSON.stringify({
-                status: status
-            }),
+            body: JSON.stringify({ status: nextStatus }),
             headers: {
+                'Content-Type': 'application/json',
                 'company-domain': companyDomain,
             },
         });
@@ -151,14 +151,17 @@ export const updateProductVariantStatus = async (productVariantId: string, vendo
             console.error('Failed to create product');
             return { status: response.status, statusText: response.statusText };
         }
+
         revalidatePath(`/vendor/${vendorId}/products`);
+        revalidatePath(`/vendor/${vendorId}/products/${productVariantId}/productVariants`);
+        console.log('Product variant status updated');
         return await response.json();
     } catch (error) {
         console.error('Error creating product:', error);
         return { status: 500, statusText: 'Internal Server Error' + error };
     }
 }
-export const fetchVendorProducts = async (vendorId: string) => {
+export const fetchVendorProducts = async () => {
     try {
         const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}products/all`, {
