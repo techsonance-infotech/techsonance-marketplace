@@ -6,9 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DeleteBtn } from "@/components/vendor/DeleteBtn";
 import { DynamicIcon } from "lucide-react/dynamic";
 import { Product } from "@/utils/Types";
-import { StatusToggle } from "@/components/common/StatusToggle";
 
-export const PRODUCT_TABLE_HEAD = ["PRODUCT", "VARIANT", "SKU", "STOCK", "PRICE", "STATUS", "ACTION"];
+export const PRODUCT_TABLE_HEAD = ["PRODUCT", "VARIANT", "SKU", "STOCK", "PRICE", "ACTION"];
 
 export default async function Products({ params }: { params: Promise<{ vendorId: string }> }) {
     const { vendorId } = await params;
@@ -208,14 +207,7 @@ export default async function Products({ params }: { params: Promise<{ vendorId:
                                             ₹{Number(item.base_price).toLocaleString()}
                                         </TableCell>
 
-                                        {/* Status */}
-                                        <TableCell className="px-4 py-3">
-                                            <StatusToggle
-                                                productId={item.id}
-                                                vendorId={vendorId}
-                                                initialStatus={status ?? "inactive"}
-                                            />
-                                        </TableCell>
+                                      
 
                                         {/* Actions */}
                                         <TableCell className="px-4 py-3">

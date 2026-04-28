@@ -135,10 +135,10 @@ export const updateProduct = async (formData: FormData, vendorId: string, produc
         return { status: 500, statusText: 'Internal Server Error' + error };
     }
 }
-export const updateProductStatus = async (productId: string, vendorId: string, status: string) => {
+export const updateProductVariantStatus = async (productVariantId: string, vendorId: string, status: string) => {
     try {
         const companyDomain = await getCompanyDomain();
-        const response = await fetch(`${BASE_API_URL}products/update-status/${productId}`, {
+        const response = await fetch(`${BASE_API_URL}products-variant/update-status/${productVariantId}`, {
             method: "PATCH",
             body: JSON.stringify({
                 status: status

@@ -14,7 +14,8 @@ import {
     CheckCircle2,
     XCircle,
     RefreshCcw,
-    ChevronLeft
+    ChevronLeft,
+    Clock
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -258,11 +259,43 @@ export default function OrderDetailsPage() {
                                             )}
 
                                             {/* Delivery Status Tag (Shows while in transit or processing) */}
-                                            {!isPastDelivery && !isCancelled && (
-                                                <p className="py-3 px-4 rounded-lg border border-gray-300 lg:text-md text-xs font-semibold text-center bg-gray-50 capitalize">
-                                                    Delivery is {item.order_status.replace(/_/g, ' ')}
-                                                </p>
-                                            )}
+                                            {!isPastDelivery && !isCancelled && (() => {
+                                                // 1. Dynamic Styling Map based on exact order status
+                                                const getStatusStyle = (status: string) => {
+                                                    switch (status.toLowerCase()) {
+                                                        case 'pending':
+                                                            return { wrapper: 'bg-amber-50 border-amber-200', iconColor: 'text-amber-500', titleColor: 'text-amber-900', subtitleColor: 'text-amber-700', icon: Clock, title: 'Order Pending', subtitle: 'Waiting for confirmation.' };
+                                                        case 'processing':
+                                                            return { wrapper: 'bg-blue-50 border-blue-200', iconColor: 'text-blue-500', titleColor: 'text-blue-900', subtitleColor: 'text-blue-700', icon: Package, title: 'Processing Order', subtitle: 'Preparing your item.' };
+                                                        case 'shipped':
+                                                            return { wrapper: 'bg-indigo-50 border-indigo-200', iconColor: 'text-indigo-500', titleColor: 'text-indigo-900', subtitleColor: 'text-indigo-700', icon: Truck, title: 'In Transit', subtitle: 'Your item is on the way.' };
+                                                        default:
+                                                            return { wrapper: 'bg-gray-50 border-gray-200', iconColor: 'text-gray-500', titleColor: 'text-gray-900', subtitleColor: 'text-gray-500', icon: Package, title: `Delivery is ${status.replace(/_/g, ' ')}`, subtitle: 'Updating tracking information.' };
+                                                    }
+                                                };
+
+                                                const statusInfo = getStatusStyle(item.order_status);
+                                                const StatusIcon = statusInfo.icon;
+
+                                                return (
+                                                    <div className={`flex items-center gap-3 py-2.5 px-4 rounded-xl border w-full sm:w-auto ${statusInfo.wrapper}`}>
+                                                        {/* Icon matching the image style */}
+                                                        <div className={statusInfo.iconColor}>
+                                                            <StatusIcon size={22} strokeWidth={2.5} />
+                                                        </div>
+
+                                                        {/* Stacked Text matching the image style */}
+                                                        <div className="flex flex-col">
+                                                            <span className={`text-sm font-bold capitalize ${statusInfo.titleColor}`}>
+                                                                {statusInfo.title}
+                                                            </span>
+                                                            <span className={`text-xs font-medium ${statusInfo.subtitleColor}`}>
+                                                                {statusInfo.subtitle}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })()}
 
                                             {/* Post-delivery actions (Only show Return/Replace if NO return request exists) */}
                                             {canInitiateReturn && (
@@ -286,51 +319,83 @@ export default function OrderDetailsPage() {
                                             )}
 
                                             {/* Active Return/Replace Tracking UI */}
-                                            {/* Active Return/Replace Tracking UI */}
-                                            {hasActiveReturnRequest && (
-                                                <div className="py-3 px-4 rounded-xl border border-orange-200 bg-orange-50 flex flex-col gap-2 w-full sm:w-auto">
-                                                    {/* Main Status */}
-                                                    <div>
-                                                        {isReturn && (
+                                            {hasActiveReturnRequest && (() => {
+                                                const req = item.return_request;
+                                                const isReturn = req && req.type.toUpperCase() === 'RETURN';
+                                                const isReplace = req && req.type.toUpperCase() === 'REPLACEMENT';
+                                                const status = req && req.status.toUpperCase();
+
+                                                // 1. Contextual Tracking Label
+                                                let trackingLabel = "Track Shipment ↗";
+                                                if (isReturn) trackingLabel = "Track Return Pickup ↗";
+                                                if (isReplace) trackingLabel = "Track New Replacement Item ↗";
+
+                                                // 2. Contextual Hint (Explains exactly what the current status means physically)
+                                                let statusHint = "";
+                                                if (status === 'APPROVED') {
+                                                    statusHint = isReturn
+                                                        ? "Waiting for courier to pick up your return."
+                                                        : "Waiting for vendor to dispatch the new item.";
+                                                } else if (status === 'IN_TRANSIT') {
+                                                    statusHint = isReturn
+                                                        ? "Your return is on its way back to the vendor."
+                                                        : "Your new replacement item is on the way!";
+                                                } else if (status === 'DELIVERED') {
+                                                    statusHint = "Item reached the vendor. Pending Quality Check.";
+                                                } else if (status === 'QC_PASSED') {
+                                                    statusHint = isReturn
+                                                        ? "Quality Check passed. Refund is being processed."
+                                                        : "Quality Check passed. Replacement cycle complete.";
+                                                }
+
+                                                return (
+                                                    <div className="py-3 px-4 rounded-xl border border-orange-200 bg-orange-50 flex flex-col gap-2 w-full sm:w-auto mt-2">
+                                                        {/* Main Status */}
+                                                        <div>
                                                             <p className="text-sm font-bold text-orange-800 uppercase tracking-wide">
-                                                                Return Status: {item.return_request && item.return_request.status.replace(/_/g, ' ')}
+                                                                {isReturn ? 'Return' : isReplace ? 'Replacement' : 'Refund'} Status:{' '}
+                                                                {status && status.replace(/_/g, ' ')}
                                                             </p>
+                                                            {/* Contextual Hint */}
+                                                            {statusHint && (
+                                                                <p className="text-xs font-medium text-orange-600 mt-0.5">
+                                                                    {statusHint}
+                                                                </p>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Tracking URL Logic */}
+                                                        {req && req.tracking_id ? (
+                                                            <div className="pt-1">
+                                                                <a
+                                                                    href={req.tracking_id}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-sm font-bold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 w-fit bg-blue-50 px-3 py-1.5 rounded-lg"
+                                                                >
+                                                                    <Truck size={14} /> {trackingLabel}
+                                                                </a>
+                                                            </div>
+                                                        ) : (
+                                                            /* Show "Available soon" if approved but tracking isn't uploaded yet */
+                                                            (status === 'APPROVED') && (
+                                                                <p className="text-sm font-medium text-orange-600">
+                                                                    Tracking Link: <span className="italic text-orange-500 opacity-80">Available once dispatched...</span>
+                                                                </p>
+                                                            )
                                                         )}
-                                                        {isReplace && (
-                                                            <p className="text-sm font-bold text-orange-800 uppercase tracking-wide">
-                                                                Replacement Status: {item.return_request && item.return_request.status.replace(/_/g, ' ')}
-                                                            </p>
+
+                                                        {/* Rejection / QC Failure Note */}
+                                                        {req && req.store_owner_note && ['REJECTED', 'QC_FAILED'].includes(status || '') && (
+                                                            <div className="mt-1 p-2.5 bg-red-50 border border-red-100 rounded-lg">
+                                                                <p className="text-xs text-red-700">
+                                                                    <span className="font-bold">Message from Seller:</span> {req.store_owner_note}
+                                                                </p>
+                                                            </div>
                                                         )}
                                                     </div>
-
-                                                    {item.return_request && item.return_request.tracking_id ? (
-                                                        <a
-                                                            href={item.return_request.tracking_id}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 w-fit"
-                                                        >
-                                                            Track 3PL Shipment ↗
-                                                        </a>
-                                                    ) : (
-                                                        /* Show "Available soon" if approved but tracking isn't uploaded yet */
-                                                        (item.return_request && item.return_request.status === 'APPROVED') && (
-                                                            <p className="text-sm font-medium text-orange-600">
-                                                                Tracking URL: <span className="italic text-orange-500 opacity-80">Available soon...</span>
-                                                            </p>
-                                                        )
-                                                    )}
-
-                                                    {/* Rejection / QC Failure Note (Bonus UI) */}
-                                                    {item.return_request && item.return_request.store_owner_note && ['REJECTED', 'QC_FAILED'].includes(item.return_request.status) && (
-                                                        <div className="mt-1 p-2 bg-red-50 border border-red-100 rounded-lg">
-                                                            <p className="text-xs text-red-700">
-                                                                <span className="font-bold">Reason:</span> {item.return_request.store_owner_note}
-                                                            </p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                 </div>

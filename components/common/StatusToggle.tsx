@@ -1,15 +1,15 @@
 ﻿'use client';
 
 import { useState } from "react";
-import { updateProductStatus } from "@/utils/vendorApiClient"; // adjust import to your actual API util
+import { updateProductStatus, updateProductVariantStatus } from "@/utils/vendorApiClient"; // adjust import to your actual API util
 
 interface StatusToggleProps {
-    productId: string;
+    productVariantId: string;
     vendorId: string;
     initialStatus: string;
 }
 
-export function StatusToggle({ productId, vendorId, initialStatus }: StatusToggleProps) {
+export function StatusToggle({ productVariantId, vendorId, initialStatus }: StatusToggleProps) {
     const [status, setStatus] = useState(initialStatus);
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -21,7 +21,7 @@ export function StatusToggle({ productId, vendorId, initialStatus }: StatusToggl
         setLoading(true);
         setShowModal(false);
         try {
-            await updateProductStatus(productId, vendorId, nextStatus);
+            await updateProductVariantStatus(productVariantId, vendorId, nextStatus);
             setStatus(nextStatus);
         } catch (err) {
             console.error("Failed to update status:", err);

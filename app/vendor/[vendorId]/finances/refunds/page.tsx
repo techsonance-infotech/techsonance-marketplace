@@ -59,6 +59,7 @@ export default function RefundsPage() {
         setLoading(true);
         try {
             const response = await fetchGetCompanyRefunds()
+            console.log("refunds", response.data)
             setDashboardData(response.data);
         } catch (err) {
             console.error("Error fetching refunds list:", err);
