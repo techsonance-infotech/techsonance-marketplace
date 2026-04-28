@@ -560,7 +560,7 @@ export const fetchUpdateOrderItem = async (itemId: string, formData: any) => {
     }
 }
 
-export const getVendorReturnRequests = async () => {
+export const fetchGetVendorReturnRequests = async () => {
     try {
         const domain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}returns/vendor`, {
@@ -574,8 +574,9 @@ export const getVendorReturnRequests = async () => {
         throw error;
     }
 };
-export const getVendorReturnById = async (returnId: string, domain: string) => {
+export const fetchGetVendorReturnById = async (returnId: string) => {
     try {
+        const domain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}returns/vendor/${returnId}`, {
             headers: {
                 'company-domain': domain,
@@ -587,14 +588,15 @@ export const getVendorReturnById = async (returnId: string, domain: string) => {
         throw error;
     }
 };
-export const updateReturnStatus = async (returnId: string, domain: string, updates: { status: ReturnStatus, store_owner_note?: string }) => {
+export const FetchUpdateReturnStatus = async (returnId: string, updates: { status: ReturnStatus, store_owner_note?: string, tracking_id?: string }) => {
     try {
-        const response = await fetch(`${BASE_API_URL}returns/vendor/${returnId}`, {
+        const domain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}returns/${returnId}/status`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'company-domain': domain,
-                // Authorization: `Bearer ${await authToken()}`,
+                // Authorization: `Bearer ${await authToken()}`,   
             },
             body: JSON.stringify(updates),
         });
@@ -604,6 +606,37 @@ export const updateReturnStatus = async (returnId: string, domain: string, updat
             throw new Error(errorData.message || 'Failed to update return status');
         }
 
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const fetchGetCompanyRefunds = async () => {
+    try {
+        const domain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}refunds`, {
+            headers: {
+                'company-domain': domain,
+                // Authorization: `Bearer ${await authToken()}`,    
+            }
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+export const fetchProcessRefund = async (refundId: string) => {
+    try {
+        const domain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}refunds/${refundId}/process`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': domain,
+                // Authorization: `Bearer ${await authToken()}`,   
+            },
+        });
         return await response.json();
     } catch (error) {
         throw error;

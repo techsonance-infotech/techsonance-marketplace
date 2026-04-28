@@ -24,7 +24,6 @@ import {
     fetchUpdateOrderStatus,
     fetchVendorOrderDetails,
 } from "@/utils/vendorApiClient";
-import { OrderStatusEnum } from "@/constants";
 import { fetchCancelOrderItem } from "@/utils/customerApiClient";
 import { getCompanyDomain } from "@/lib/get-domain";
 
@@ -373,7 +372,7 @@ export default function VendorOrderDetails() {
 
     // ── Order-level status save (single warehouse) ─────────────────────────────
     const handleOrderLevelStatusSave = async (newStatus: OrderStatus) => {
-        const res = await fetchUpdateOrderStatus(orderId, newStatus as OrderStatusEnum);
+        const res = await fetchUpdateOrderStatus(orderId, newStatus as OrderStatus);
         if (res.success) {
             setOrderStatus(newStatus);
             setOrder((prev) =>
