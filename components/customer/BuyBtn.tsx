@@ -1,5 +1,4 @@
 'use client';
-import Link from 'next/link'
 import type { RootState } from '@/lib/store';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
@@ -11,14 +10,16 @@ import { createCheckoutSession } from '@/hooks/UseCheckoutSession';
 
 export function BuyBtn({ id, styles, mode }: { id?: string, styles?: string, mode?: BuyBtnMode }) {
   const { user } = useAppSelector((state: RootState) => state.auth);
+  console.log(user)
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+  const isSmall = styles?.includes('small');
   useEffect(() => {
     setIsMounted(true);
   }, []);
   const userId = user?.id ? user.id : '';
   const handleBuyClick = async () => {
-
+    console.log(userId)
     if (!user || !userId) {
       return router.push('/auth/customerLogin');
     }
@@ -42,7 +43,7 @@ export function BuyBtn({ id, styles, mode }: { id?: string, styles?: string, mod
         <motion.button onClick={handleBuyClick}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.8 }}
-          transition={{ duration: 0.25 }} className={`bg-brand-primary-foreground text-primary px-6 py-3  rounded-lg hover:bg-brand-primary-dark transition-colors duration-300 gap-2 text-center   ${styles}`} >Buy </motion.button>
+          transition={{ duration: 0.25 }} className={`bg-brand-primary-foreground text-primary   rounded-lg hover:bg-brand-primary-dark transition-colors duration-300 gap-2 text-center${isSmall ? 'py-1 px-2' : 'px-6 py-2'}   ${styles}`} >Buy </motion.button>
       )
     }
 

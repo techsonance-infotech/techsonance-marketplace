@@ -1,5 +1,6 @@
 import type { Link } from "@/components/common/InnerSideBar";
 import { Coupon, CustomerTicket, GstInvoice, InventoryItem, InventoryProduct, NavLinkType, OrderDetail, UserReview, VendorOrder, VendorProduct, Warehouse } from "@/utils/Types";
+import { Section } from "lucide-react";
 
 //used
 export const VendorDocumentTypes: { label: string; value: string }[] = [
@@ -50,7 +51,7 @@ export const VENDOR_NAV_LINKS: NavLinkType[] = [
   { Dashboard: null, icon: 'layout-dashboard' },
   { Products: "products", icon: 'package' },
   { Orders: "orders", icon: 'shopping-cart' },
-  { Analytics: "finances", icon: 'chart-column-stacked' },
+  { Analytics: "analytics", icon: 'chart-column-stacked' },
   { Finances: "finances", icon: 'hand-coins' },
   { Marketing: "marketing", icon: 'megaphone' },
   { "Customer Care": "customerCare", icon: 'headset' },
@@ -98,9 +99,9 @@ export const getVendorInnerSidebarLinks = (vendorId: string, selectedMenu: strin
         section: "Sellings",
         list: [
           { title: "Orders", path: `/vendor/${vendorId}/orders`, icon: "shopping-cart" },
-          { title: "Back Orders", path: `/vendor/${vendorId}/back-orders`, icon: "rotate-ccw" },
-          { title: "Failed Orders", path: `/vendor/${vendorId}/failed-orders`, icon: "x-circle" },
-          { title: "Archived", path: `/vendor/${vendorId}/archived-orders`, icon: "archive" },
+          { title: "Back Orders", path: `/vendor/${vendorId}/orders/backOrders`, icon: "rotate-ccw" },
+          { title: "Failed Orders", path: `/vendor/${vendorId}/orders/failedOrders`, icon: "x-circle" },
+          { title: "Archived", path: `/vendor/${vendorId}/orders/archivedOrders`, icon: "archive" },
         ],
       },
       {
@@ -137,6 +138,25 @@ export const getVendorInnerSidebarLinks = (vendorId: string, selectedMenu: strin
       },
     ],
   },
+  {
+    menu: 'Finances',
+    sections: [
+      {
+        section: 'Overview',
+        list: [
+          { title: 'Earnings', path: `/vendor/${vendorId}/finances`, icon: 'trending-up' },
+          { title: 'Payouts', path: `/vendor/${vendorId}/finances/payouts`, icon: 'credit-card' },
+        ]
+      },
+      {
+        section: 'Ledger',
+        list: [
+          { title: 'Refunds', path: `/vendor/${vendorId}/finances/refunds`, icon: 'corner-down-left' },
+          { title: 'Invoices', path: `/vendor/${vendorId}/finances/invoices`, icon: 'receipt' },
+        ]
+      }
+    ]
+  }
 ].filter(section => section.menu.toLowerCase() === selectedMenu.toLowerCase());
 
 // ============================================================

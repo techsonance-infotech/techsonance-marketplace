@@ -24,17 +24,16 @@ const saveCartToLocalStorage = (cartId: string, items: CartItem[]) => {
 };
 const loadCartFromLocalOrServer = async (): Promise<Omit<CartState, 'loading' | 'error'>> => {
     if (!isClient) return { cartId: '', items: [], itemList: [] };
-
     try {
         const serializedCart = localStorage.getItem(CART_KEY);
         const customerId = localStorage.getItem(USER_STORAGE_KEY)
             ? JSON.parse(localStorage.getItem(USER_STORAGE_KEY) as string)?.id
             : null;
         if (customerId && companyDomain) {
-            const response = await fetchGetCartList(customerId, companyDomain);
-            if (response.ok && Array.isArray(response.data)) {
+            const response = await fetchGetCartList(customerId);
+            if (response && 'ok' in response && response.ok && response.data && Array.isArray(response.data)) {
                 const itemList: CartItemListResponse[] = response.data;
-                
+
                 const items: CartItem[] = itemList.map((item) => ({
                     cartId: item.cart_id,
                     cartItemId: item.id,

@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronLeftCircle } from "lucide-react";
+import { ChevronLeft, ChevronLeftCircle } from "lucide-react";
 // import { deleteAddress, setDefaultAddress } from "@/lib/features/auth/authSlice";
 
 import { useRouter } from "next/navigation";
@@ -9,8 +9,9 @@ import { AddressCard } from "@/components/customer/AddressCard";
 import { AddressModal } from "@/components/customer/AddressModel";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { RootState } from "@/lib/store";
-import { fetchDeleteUserAddress, fetchGetUserAddresses, fetchSetDefaultAddress } from "@/utils/customerApiClient";
+import { fetchGetUserAddresses, fetchSetDefaultAddress } from "@/utils/customerApiClient";
 import { AddressOperationEnum, Address } from "@/utils/Types";
+import { fetchDeleteUserAddress } from "@/utils/customerApiClient-SA";
 
 export default function Addresses() {
     const user = useAppSelector((state: RootState) => state.auth.user);
@@ -28,7 +29,7 @@ export default function Addresses() {
             }
         }
         fetchAddresses();
-    }, [user, addressList.length]);
+    }, [user, addressList.length, isModalOpen]);
     const router = useRouter()
     const openAdd = () => {
         setModalMode(AddressOperationEnum.ADD);
@@ -46,6 +47,7 @@ export default function Addresses() {
             await fetchDeleteUserAddress(userId, id);
             setAddressList(prev => prev.filter(addr => addr.id !== id));
         }
+        
     };
     const handleSetDefault = async (userId: string, id: string) => {
         await fetchSetDefaultAddress(userId, id);
@@ -53,7 +55,16 @@ export default function Addresses() {
     };
     return (
         <section className="w-full  mt-2 mx-auto mb-20">
-            <ChevronLeftCircle className="mb-4 block lg:hidden" size={36} onClick={() => router.back()} />
+            <div className="flex items-center gap-3 my-4 sm:hidden">
+                <button
+                    onClick={() => router.back()}
+                    className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                    aria-label="Go back"
+                >
+                    <ChevronLeft size={20} />
+                </button>
+                <h1 className="font-bold text-xl text-gray-900">My Addresses</h1>
+            </div>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">My Addresses</h1>

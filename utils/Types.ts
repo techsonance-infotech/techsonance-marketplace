@@ -17,15 +17,34 @@ export enum UserAddressTypeEnum {
   OTHER = 'other'
 }
 export const OrderStatusEnum = {
-  DELIVERED: 'delivered',
-  SHIPPING: 'shipping',
   PENDING: 'pending',
+  PROCESSING: 'processing',
   SHIPPED: 'shipped',
-  CANCELLED: 'cancelled'
-} as const;
-
-export type OrderStatusEnum = typeof OrderStatusEnum[keyof typeof OrderStatusEnum]
-
+  DELIVERED: 'delivered',
+  CANCELLED: 'cancelled',
+  RETURNED: 'returned',
+  REFUNDED: 'refunded',
+  REPLACED: 'replaced',
+}
+export enum ProductVariantStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  DISCONTINUED = 'discontinued',
+  DRAFT = 'draft',
+}
+export type OrderStatus = typeof OrderStatusEnum[ keyof typeof OrderStatusEnum ];
+export enum ReturnType {
+  RETURN = 'return',
+  REPLACEMENT = 'replacement',
+}
+export enum ReturnStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  QC_FAILED = 'qc_failed',
+  SHIPPED = 'shipped',
+  DELIVERED = 'delivered',
+}
 export enum PermissionEnum {
   READ = 'read',
   CREATE = 'create',
@@ -129,7 +148,7 @@ export interface Wishlist {
 
 export interface UserOrder {
   order_id: number;
-  order_status: OrderStatusEnum;
+  order_status: OrderStatus;
   delivered_at?: string;
   shippingTo: Address | string;
   products?: { product_id: string; quantity: number }[];
@@ -142,7 +161,7 @@ export interface UserOrder {
 export interface Order {
   orderId: string;
   customerName: string;
-  status: OrderStatusEnum;
+  status: OrderStatus;
   amount: number;
   action: 'Ship Now' | 'View';
 }
@@ -153,14 +172,14 @@ export interface RoleDefinition {
   can: PermissionEnum[];
 }
 export const role: Record<UserRole, RoleDefinition> = {
-  [UserRole.Admin]: {
-    can: [PermissionEnum.CREATE, PermissionEnum.READ, PermissionEnum.UPDATE, PermissionEnum.DELETE]
+  [ UserRole.Admin ]: {
+    can: [ PermissionEnum.CREATE, PermissionEnum.READ, PermissionEnum.UPDATE, PermissionEnum.DELETE ]
   },
-  [UserRole.Vendor]: {
-    can: [PermissionEnum.CREATE, PermissionEnum.READ, PermissionEnum.UPDATE, PermissionEnum.DELETE]
+  [ UserRole.Vendor ]: {
+    can: [ PermissionEnum.CREATE, PermissionEnum.READ, PermissionEnum.UPDATE, PermissionEnum.DELETE ]
   },
-  [UserRole.Customer]: {
-    can: [PermissionEnum.READ,]
+  [ UserRole.Customer ]: {
+    can: [ PermissionEnum.READ, ]
   }
 }
 
@@ -303,28 +322,6 @@ export interface Product {
   category_id: string;
   variants: Variant[];
 }
-//Deleted the old PRODUCT_LIST_TYPE and replaced it with ProductType which is more comprehensive and closely aligned with the expected product data structure in a marketplace application.
-// export interface PRODUCT_LIST_TYPE {
-//   id: string;
-//   title: string;
-//   price: number;
-//   discount: number;
-//   category: string;
-//   imgUrl: string;
-//   description: string;
-//   satisfaction: string;
-//   rating?: number;
-//   reviewCount?: number;
-//   productDetails?: {
-//     brand: string;
-//     model: string;
-//     specifications: {
-//       [key: string]: string;
-//     };
-//   };
-//   specificationsImgUrl?: string[];
-//   reviews?: ReviewType[];
-// }
 
 export interface Vendor {
   id: string;
@@ -435,14 +432,35 @@ export interface Company {
   created_at: string;
   updated_at: string;
 }
+export interface VendorDocument {
+  id: string;
+  document_type: string;
+  document_url: string;
+  document_status: string;
+  created_at: string;
+  updated_at: string;
+  vendor_id: string;
+}
 
 export interface VendorApplication {
-  vendor: Vendor;
+  id: string;
+  store_owner_first_name: string;
+  store_owner_last_name: string;
+  store_name: string;
+  store_description: string;
+  category: string;
+  vendor_status: string;
+  is_verified: boolean;
+  created_at: string;
+  updated_at: string;
+  company_id: string;
+  user_id: string;
   user: User;
   company: Company;
+  documents: VendorDocument[];
 }
 export interface NavLinkType {
-  [key: string]: string | null;
+  [ key: string ]: string | null;
 }
 
 export interface FooterLinkType {
@@ -459,7 +477,7 @@ export interface FooterSectionType {
 }
 
 export interface tabLinkType {
-  [key: string]: string | null;
+  [ key: string ]: string | null;
 }
 
 export type ProductFeature = { title: string; description: string };
@@ -555,7 +573,7 @@ export type OrderDetail = {
     name: string;
     location: string;
   };
-  status: OrderStatusEnum;
+  status: OrderStatus;
   total: number;
   paymentMethod: 'Paid (UPI)' | 'COD' | 'Refunded' | 'Card payment';
 };
@@ -580,10 +598,10 @@ export interface VendorProduct {
 }
 
 
-export interface VendorOrder   {
+export interface VendorOrder {
   orderId: string;
   customerName: string;
-  status: OrderStatusEnum,
+  status: OrderStatus,
   amount: number;
   action: "Ship Now" | "View";
   date?: string;
@@ -597,7 +615,7 @@ export interface ComplianceField {
   helperText: string;
 }
 
-export interface CountryCompliance{
+export interface CountryCompliance {
   country_code: string;
   country_name: string;
   fields: ComplianceField[];

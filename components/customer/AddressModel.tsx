@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { motion } from "motion/react";
 import { ADDRESS_FIELDS } from "@/constants/dynamicFields";
 import { AddressForEnum, AddressOperationEnum, Address, User } from "@/utils/Types";
-import { fetchCreateUserAddress, fetchUpdateUserAddress } from "@/utils/customerApiClient";
+import { fetchCreateUserAddress, fetchUpdateUserAddress } from "@/utils/customerApiClient-SA";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -169,14 +169,14 @@ export const AddressModal = ({ user, addressId, addressList, operation, onClose 
                                             )}
                                         </>
                                     ) : (
-                                        <div className="flex items-center gap-2 py-2">
+                                        <div className="flex items-center gap-2 py-2 border border-gray-300 mt-5 rounded-lg px-3">
                                             <input
                                                 type="checkbox"
                                                 id={field.id}
                                                 {...register(field.id as keyof typeof register)}
-                                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                                                className="h-5 w-5 rounded-full text-blue-600 focus:ring-blue-500 border-gray-300 cursor-pointer"
                                             />
-                                            <label htmlFor={field.id} className="text-sm font-semibold text-gray-600 cursor-pointer">
+                                            <label htmlFor={field.id} className="text-sm font-semibold text-gray-700 cursor-pointer">
                                                 {field.label}
                                             </label>
                                         </div>

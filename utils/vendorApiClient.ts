@@ -2,7 +2,8 @@
 import { ACCESS_TOKEN_KEY, BASE_API_URL } from "@/constants";
 import { authToken } from "./authToken";
 import { revalidatePath } from "next/cache";
-import { companyDomain } from "@/config";
+import { getCompanyDomain } from "@/lib/get-domain";
+import { OrderStatus, ReturnStatus } from "./Types";
 export const fetchVendorsProductsCategory = async (vendorId: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}categories/${vendorId}`, {
@@ -19,22 +20,24 @@ export const fetchVendorsProductsCategory = async (vendorId: string) => {
         return { data: [], message: 'Error fetching product categories' };
     }
 };
-export const createVendorProductCategory = async (vendorId: string, categoryData: { name: string; description?: string }, companyId: string) => {
+export const createVendorProductCategory = async (vendorId: string, categoryData: { name: string; description?: string }) => {
     try {
-
+        const companyDomain = await getCompanyDomain();
         console.log(categoryData);
         const response = await fetch(`${BASE_API_URL}categories/${vendorId}`, {
             method: 'POST',
             headers: {
                 // Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
             },
-            body: JSON.stringify({ category: categoryData, companyId }),
+            body: JSON.stringify({ category: categoryData }),
         });
         if (response.status !== 201) {
             console.error('Failed to create product category');
         }
-        revalidatePath(`/vendor/${vendorId}/categories`);
+        revalidatePath(`/vendor/${vendorId}`);
+        revalidatePath(`/vendor/${vendorId}/products/categories`);
         return await response.json();
     }
     catch (error) {
@@ -44,18 +47,20 @@ export const createVendorProductCategory = async (vendorId: string, categoryData
 }
 export const updateVendorProductCategory = async (vendorId: string, categoryId: string, categoryData: { name: string; description?: string }) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}categories/${vendorId}/${categoryId}`, {
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${await authToken()}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
             },
             body: JSON.stringify({ category: categoryData }),
         });
         if (response.status !== 200) {
             throw new Error('Failed to update product category');
         }
-        revalidatePath(`/vendor/${vendorId}/categories`);
+        revalidatePath(`/vendor/${vendorId}/products/categories`);
         return await response.json();
     }
     catch (error) {
@@ -78,7 +83,7 @@ export const deleteVendorProductCategory = async (vendorId: string, categoryId: 
             console.error('Failed to delete product category');
         }
         console.log('delete successful');
-        revalidatePath(`/vendor/${vendorId}/categories`);
+        revalidatePath(`/vendor/${vendorId}/products/categories`);
         return await response.json();
     }
     catch (error) {
@@ -88,6 +93,8 @@ export const deleteVendorProductCategory = async (vendorId: string, categoryId: 
 }
 export const createProduct = async (productData: FormData, vendorId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
+
         const response = await fetch(`${BASE_API_URL}products/${vendorId}`, {
             method: 'POST',
             headers: {
@@ -109,9 +116,13 @@ export const createProduct = async (productData: FormData, vendorId: string) => 
 }
 export const updateProduct = async (formData: FormData, vendorId: string, productId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}products/${productId}`, {
             method: "PATCH",
             body: formData,
+            headers: {
+                'company-domain': companyDomain,
+            },
         });
         if (!response.ok) {
             console.error('Failed to create product');
@@ -124,13 +135,60 @@ export const updateProduct = async (formData: FormData, vendorId: string, produc
         return { status: 500, statusText: 'Internal Server Error' + error };
     }
 }
-export const fetchVendorProducts = async (vendorId: string) => {
+export const updateProductVariantStatus = async (productVariantId: string, vendorId: string, nextStatus: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
+        console.log("nextStatus", nextStatus);
+        const response = await fetch(`${BASE_API_URL}product-variant/update-status/${productVariantId}`, {
+            method: "PATCH",
+            body: JSON.stringify({ status: nextStatus }),
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+            },
+        });
+        if (!response.ok) {
+            console.error('Failed to create product');
+            return { status: response.status, statusText: response.statusText };
+        }
+
+        revalidatePath(`/vendor/${vendorId}/products`);
+        revalidatePath(`/vendor/${vendorId}/products/${productVariantId}/productVariants`);
+        console.log('Product variant status updated');
+        return await response.json();
+    } catch (error) {
+        console.error('Error creating product:', error);
+        return { status: 500, statusText: 'Internal Server Error' + error };
+    }
+}
+export const fetchVendorProducts = async () => {
+    try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}products/all`, {
             method: 'GET',
             cache: 'force-cache',
             next: { revalidate: 3600 },
-
+            headers: {
+                'company-domain': companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+        });
+        if (response.status !== 200) {
+            console.error('Failed to fetch products');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        throw error;
+    }
+}
+export const fetchVendorActiveProducts = async () => {
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}products/active`, {
+            method: 'GET',
+            cache: 'force-cache',
+            next: { revalidate: 3600 },
             headers: {
                 'company-domain': companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,
@@ -147,7 +205,8 @@ export const fetchVendorProducts = async (vendorId: string) => {
 }
 export const fetchVendorOneProducts = async (id: string) => {
     try {
-        const response = await fetch(`${BASE_API_URL}products/${id}`, {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}products/${id}/details`, {
             method: 'GET',
             cache: 'no-cache',
             // next: { revalidate: 3600 },
@@ -167,6 +226,7 @@ export const fetchVendorOneProducts = async (id: string) => {
 }
 export const deleteProduct = async (productId: string, vendorId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}products/${productId}`, {
             method: 'DELETE',
             headers: {
@@ -188,6 +248,8 @@ export const deleteProduct = async (productId: string, vendorId: string) => {
 
 export const createProductVariant = async (variantData: FormData, vendorId: string, productId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
+
         const response = await fetch(`${BASE_API_URL}product-variant`, {
             method: "POST",
             body: variantData,
@@ -211,11 +273,12 @@ export const createInventoryRecord = async (
     productVariantId: string,
     warehouseId: string,
     stockQuantity: number,
-    domain: string,
+
 ) => {
+    const companyDomain = await getCompanyDomain();
     const response = await fetch(`${BASE_API_URL}inventory`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'company-domain': domain },
+        headers: { 'Content-Type': 'application/json', 'company-domain': companyDomain },
         body: JSON.stringify({ productVariantId, warehouseId, stockQuantity }),
     });
     return response.json();
@@ -243,11 +306,13 @@ export const updateProductVariant = async (
 };
 export const fetchProductVariants = async (productId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}product-variant/${productId}`, {
             method: 'GET',
             cache: 'force-cache',
             next: { revalidate: 3600 },
             headers: {
+                'company-domain': companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,
             },
         });
@@ -265,9 +330,11 @@ export const fetchProductVariants = async (productId: string) => {
 }
 export const deleteProductVariant = async (productId: string, variantId: string, vendorId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}product-variant/${variantId}`, {
             method: 'DELETE',
             headers: {
+                'company-domain': companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,    
             },
         });
@@ -283,6 +350,7 @@ export const deleteProductVariant = async (productId: string, variantId: string,
 }
 export const fetchVariant = async (variantId: string,) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}product-variant/variant/${variantId}`, {
             method: 'GET',
             headers: {
@@ -301,13 +369,35 @@ export const fetchVariant = async (variantId: string,) => {
         console.error('Error fetching variant data:', error);
     }
 }
-export const fetchVendorOrderList = async () => {
+export const fetchVendorPendingOrders = async () => {
     try {
-        const response = await fetch(`${BASE_API_URL}orders`, {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}orders/pending`, {
             method: 'GET',
             headers: {
                 'company-domain': companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,
+            },
+        });
+        if (response.status !== 200) {
+            console.error('Failed to fetch pending orders');
+            return [];
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching pending orders:', error);
+        return [];
+    }
+}
+export const fetchVendorOrderList = async (offset: number = 0, limit: number = 10, status?: OrderStatus | undefined, sortBy?: string) => {
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}orders?offset=${offset}&limit=${limit}&status=${status || undefined}&sortBy=${sortBy || undefined}`, {
+            method: 'GET',
+            cache: 'no-cache',
+            headers: {
+                'company-domain': companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,    
             },
         });
         if (response.status !== 200) {
@@ -323,15 +413,17 @@ export const fetchVendorOrderList = async () => {
 }
 export const fetchVendorOrderDetails = async (orderId: string) => {
     try {
-        const response = await fetch(`${BASE_API_URL}orders/${orderId}`, {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}orders/${orderId}/details`, {
             method: 'GET',
+            cache: 'no-cache',
             headers: {
                 'company-domain': companyDomain,
                 // Authorization: `Bearer ${await authToken()}`,
             },
         });
         if (response.status !== 200) {
-            console.error('Failed to fetch order details');
+            console.error('Failed to fetch order details', response);
             return {};
         }
         return await response.json();
@@ -342,6 +434,7 @@ export const fetchVendorOrderDetails = async (orderId: string) => {
 }
 export const fetchUpdateOrderStatus = async (orderId: string, status: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}orders/${orderId}/status`, {
             method: 'PATCH',
             headers: {
@@ -363,6 +456,7 @@ export const fetchUpdateOrderStatus = async (orderId: string, status: string) =>
 export const fetchAddTrackingUrl = async (orderId: string, trackingUrl: string) => {
     console.log(orderId, trackingUrl)
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}shipping`, {
             method: 'POST',
             headers: {
@@ -384,6 +478,7 @@ export const fetchAddTrackingUrl = async (orderId: string, trackingUrl: string) 
 export const fetchUpdateTrackingUrl = async (orderId: string, trackingUrl: string) => {
     console.log(orderId, trackingUrl)
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}shipping/${orderId}`, {
             method: 'PATCH',
             headers: {
@@ -405,6 +500,7 @@ export const fetchUpdateTrackingUrl = async (orderId: string, trackingUrl: strin
 export const fetchCreateWarehouseLocation = async (warehouseAddress: any) => {
     console.log(warehouseAddress)
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}warehouse`, {
             method: 'POST',
             headers: {
@@ -414,6 +510,7 @@ export const fetchCreateWarehouseLocation = async (warehouseAddress: any) => {
             },
             body: JSON.stringify(warehouseAddress)
         });
+        revalidatePath(`/vendor`);
         return await response.json();
     } catch (error) {
         console.error('Error creating warehouse location:', error);
@@ -422,6 +519,7 @@ export const fetchCreateWarehouseLocation = async (warehouseAddress: any) => {
 }
 export const fetchUpdateWarehouseLocation = async (locationId: string, warehouseData: any) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}warehouse/${locationId}`, {
             method: 'PATCH',
             headers: {
@@ -441,6 +539,7 @@ export const fetchUpdateWarehouseLocation = async (locationId: string, warehouse
 }
 export const fetchVendorWarehouseLocations = async () => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}warehouse`, {
             method: 'GET',
             headers: {
@@ -455,6 +554,7 @@ export const fetchVendorWarehouseLocations = async () => {
 }
 export const fetchVendorWarehouse = async () => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}warehouse/options`, {
             method: 'GET',
             cache: 'force-cache',
@@ -472,6 +572,7 @@ export const fetchVendorWarehouse = async () => {
 
 export const fetchDeleteWarehouseLocation = async (locationId: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}warehouse/${locationId}`, {
             method: 'DELETE',
             headers: {
@@ -484,3 +585,106 @@ export const fetchDeleteWarehouseLocation = async (locationId: string) => {
         return { message: 'Error deleting warehouse location', success: false };
     }
 }
+
+export const fetchUpdateOrderItem = async (itemId: string, formData: any) => {
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}order-items/${itemId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+            },
+            body: JSON.stringify(formData)
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error updating order item:', error);
+        return { message: 'Error updating order item', success: false };
+    }
+}
+
+export const fetchGetVendorReturnRequests = async () => {
+    try {
+        const domain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}returns/vendor`, {
+            method: 'GET',
+            cache: 'no-store',
+            headers: {
+                'company-domain': domain,
+                // Authorization: `Bearer ${await authToken()}`,    
+            }
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+export const fetchGetVendorReturnById = async (returnId: string) => {
+    try {
+        const domain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}returns/vendor/${returnId}`, {
+            headers: {
+                'company-domain': domain,
+                // Authorization: `Bearer ${await authToken()}`,    
+            }
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+export const FetchUpdateReturnStatus = async (returnId: string, updates: { status: ReturnStatus, store_owner_note?: string, tracking_id?: string }) => {
+    try {
+        const domain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}returns/${returnId}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': domain,
+                // Authorization: `Bearer ${await authToken()}`,   
+            },
+            body: JSON.stringify(updates),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to update return status');
+        }
+
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const fetchGetCompanyRefunds = async () => {
+    try {
+        const domain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}refunds`, {
+            headers: {
+                'company-domain': domain,
+                // Authorization: `Bearer ${await authToken()}`,    
+            }
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+export const fetchProcessRefund = async (refundId: string) => {
+    try {
+        const domain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}refunds/${refundId}/process`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': domain,
+                // Authorization: `Bearer ${await authToken()}`,   
+            },
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};

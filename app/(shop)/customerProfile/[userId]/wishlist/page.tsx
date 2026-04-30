@@ -2,13 +2,12 @@
 import type { RootState } from "@/lib/store";
 import { ChevronLeftCircle, X } from "lucide-react";
 import { AddToCart } from "@/components/customer/AddToCart";
-import { removeFromWishlist } from "@/lib/features/Wishlist";
+import { addToWishlist, removeFromWishlist } from "@/lib/features/Wishlist";
 import { useParams, useRouter } from "next/navigation";
 import { useMediaQuery } from "react-responsive";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { useEffect, useState } from "react";
 import { fetchCustomerWishlist, fetchDeleteWishList } from "@/utils/customerApiClient";
-import { companyDomain } from "@/config";
 import Link from "next/link";
 interface WishlistItemType {
     created_at: string;
@@ -41,12 +40,12 @@ export default function WishlistPage() {
     console.log("userId", userId)
     const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>([]);
     useEffect(() => {
-        const getWishlistProducts = () => {
+        const getWishlistProducts = async () => {
             if (!userId && typeof userId !== 'string') {
                 console.error("User ID is missing");
                 return;
             }
-            fetchCustomerWishlist(userId, companyDomain).then((response) => {
+            fetchCustomerWishlist(userId).then((response) => {
                 console.log(response)
                 setWishlistItems(response?.data[0].items || []);
             }).catch((error) => {
@@ -65,8 +64,23 @@ export default function WishlistPage() {
             console.error('User ID is missing');
             return;
         }
+        const item = wishlistItems.find(
+            i => i.productVariant.id === productVariantId
+        );
+        if (!item) return;
         dispatch(removeFromWishlist(productVariantId));
-        await fetchDeleteWishList(productVariantId, user.id, companyDomain);
+
+        const response = await fetchDeleteWishList(productVariantId, user.id);
+        if (!response?.success) {
+            console.error('Failed to remove item from wishlist:', response?.message);
+            dispatch(addToWishlist({
+                id: item.id,
+                wishlist_id: item.wishlist_id,
+                product_variant_id: item.productVariant.id,
+                created_at: item.created_at,
+                updated_at: item.updated_at,
+            }));
+        }
         console.log(`Removing product ${productVariantId} from wishlist`);
     }
     return (

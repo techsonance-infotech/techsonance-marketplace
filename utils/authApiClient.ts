@@ -77,7 +77,7 @@ export const adminLogin = async (data: { admin_id: string, password: string }) =
             return { status: false, message: errorMessage };
         }
         const payload: { user: User, token: string, role: UserRole } = {
-            user: result.data,
+            user: result.data.user,
             token: result.data.token,
             role: result.data.user_role as UserRole
         };
@@ -111,9 +111,10 @@ export const CustomerLogin = async (data: { email: string, password: string }) =
             console.log(errorMessage);
             return { status: false, message: errorMessage, data: result };
         }
-        const payload: { user: User, role: UserRole } = {
-            user: result.data,
-            role: result.data.role as UserRole
+        const payload: { user: User, role: UserRole, token: string } = {
+            user: result.data.user,
+            role: result.data.role as UserRole.Customer,
+            token: result.data.token
         };
         console.log(payload);
         return { status: true, message: "Login successful", data: payload };

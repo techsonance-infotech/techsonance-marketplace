@@ -1,8 +1,8 @@
-import { companyDomain } from "@/config";
 import { USER_STORAGE_KEY, WISHLIST_KEY } from "@/constants/constants";
 import { fetchCustomerWishlist } from "@/utils/customerApiClient";
 import { Variant } from "@/utils/Types";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { getCompanyDomain } from "../get-domain";
 
 
 export interface WishlistItem {
@@ -44,7 +44,7 @@ const saveWishlistToLocalStorage = (wishlistId: string, wishItems: WishlistItem[
 
 const loadWishlistFromLocalOrServer = async (): Promise<Omit<WishlistState, 'loading' | 'error'>> => {
     if (!isClient) return { wishlistId: '', wishItems: [] };
-
+    const companyDomain = await getCompanyDomain();
     let localFallback: Omit<WishlistState, 'loading' | 'error'> = { wishlistId: '', wishItems: [] };
 
     try {
@@ -62,9 +62,9 @@ const loadWishlistFromLocalOrServer = async (): Promise<Omit<WishlistState, 'loa
             : null;
 
         if (customerId && companyDomain) {
-            const response = await fetchCustomerWishlist(customerId, companyDomain);
+            const response = await fetchCustomerWishlist(customerId);
 
-            if (response.ok && response.data) {
+            if (response && 'ok' in response && response.ok && response.data) {
                 const serverData: WishlistServerResponse[] = response.data;
 
                 if (serverData.length > 0) {
@@ -79,7 +79,7 @@ const loadWishlistFromLocalOrServer = async (): Promise<Omit<WishlistState, 'loa
                     saveWishlistToLocalStorage(wishlistId, wishItems);
                     return { wishlistId, wishItems };
                 }
- 
+
             }
         }
     } catch (e) {
@@ -107,28 +107,30 @@ const WishlistSlice = createSlice({
     name: 'wishlist',
     initialState,
     reducers: {
-        addToWishlist: (state, action: { payload: WishlistItem }) => {
+        addToWishlist: (state, action: PayloadAction<WishlistItem>) => {
             if (state.loading) return;
-
+            console.log("action.payload", action.payload)
             const existingItem = state.wishItems.find(
                 (item) => item.product_variant_id === action.payload.product_variant_id
             );
-
+            console.log("existingItem", existingItem)
             if (!existingItem) {
                 state.wishItems.push(action.payload);
+                console.log("state.wishItems", state.wishItems)
                 saveWishlistToLocalStorage(state.wishlistId, state.wishItems);
             }
         },
 
-        removeFromWishlist: (state, action: { payload: string }) => {
+        removeFromWishlist: (state, action: PayloadAction<string>) => {
             state.wishItems = state.wishItems.filter(
-                (item) => item.id !== action.payload
+                (item) => item.id !== action.payload &&
+                    item.product_variant_id !== action.payload
             );
 
             saveWishlistToLocalStorage(state.wishlistId, state.wishItems);
         },
 
-        setWishlistId: (state, action: { payload: string }) => {
+        setWishlistId: (state, action: PayloadAction<string>) => {
             state.wishlistId = action.payload;
         },
 
