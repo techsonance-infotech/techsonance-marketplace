@@ -3,7 +3,7 @@ import { ACCESS_TOKEN_KEY, BASE_API_URL } from "@/constants";
 import { authToken } from "./authToken";
 import { revalidatePath } from "next/cache";
 import { getCompanyDomain } from "@/lib/get-domain";
-import { ReturnStatus } from "./Types";
+import { OrderStatus, ReturnStatus } from "./Types";
 export const fetchVendorsProductsCategory = async (vendorId: string) => {
     try {
         const response = await fetch(`${BASE_API_URL}categories/${vendorId}`, {
@@ -165,6 +165,27 @@ export const fetchVendorProducts = async () => {
     try {
         const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}products/all`, {
+            method: 'GET',
+            cache: 'force-cache',
+            next: { revalidate: 3600 },
+            headers: {
+                'company-domain': companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+        });
+        if (response.status !== 200) {
+            console.error('Failed to fetch products');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        throw error;
+    }
+}
+export const fetchVendorActiveProducts = async () => {
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}products/active`, {
             method: 'GET',
             cache: 'force-cache',
             next: { revalidate: 3600 },
@@ -348,15 +369,35 @@ export const fetchVariant = async (variantId: string,) => {
         console.error('Error fetching variant data:', error);
     }
 }
-export const fetchVendorOrderList = async () => {
+export const fetchVendorPendingOrders = async () => {
     try {
         const companyDomain = await getCompanyDomain();
-        const response = await fetch(`${BASE_API_URL}orders`, {
+        const response = await fetch(`${BASE_API_URL}orders/pending`, {
+            method: 'GET',
+            headers: {
+                'company-domain': companyDomain,
+                // Authorization: `Bearer ${await authToken()}`,
+            },
+        });
+        if (response.status !== 200) {
+            console.error('Failed to fetch pending orders');
+            return [];
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching pending orders:', error);
+        return [];
+    }
+}
+export const fetchVendorOrderList = async (offset: number = 0, limit: number = 10, status?: OrderStatus | undefined, sortBy?: string) => {
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}orders?offset=${offset}&limit=${limit}&status=${status || undefined}&sortBy=${sortBy || undefined}`, {
             method: 'GET',
             cache: 'no-cache',
             headers: {
                 'company-domain': companyDomain,
-                // Authorization: `Bearer ${await authToken()}`,
+                // Authorization: `Bearer ${await authToken()}`,    
             },
         });
         if (response.status !== 200) {
@@ -567,6 +608,8 @@ export const fetchGetVendorReturnRequests = async () => {
     try {
         const domain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}returns/vendor`, {
+            method: 'GET',
+            cache: 'no-store',
             headers: {
                 'company-domain': domain,
                 // Authorization: `Bearer ${await authToken()}`,    

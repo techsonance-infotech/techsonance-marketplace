@@ -42,7 +42,7 @@ interface RefundRecord {
         },
         return_request: {
             reason: string,
-            type:string,
+            type: string,
             cancelled_by: string,
         }
     }
@@ -65,7 +65,7 @@ export const RefundsTableHeader = [
     "Amount & Fulfillment",
     "Refund Type",
     "Reason",
-    "Status",
+    // "Status",
     "Date",
 ];
 
@@ -73,11 +73,11 @@ export default function RefundsPage() {
     const params = useParams();
     const vendorId = params.vendorId as string;
 
-    const [date, setDate] = useState<Date | undefined>(new Date());
-    const [isOpen, setIsOpen] = useState(false);
-    const [dashboardData, setDashboardData] = useState<RefundDashboardData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [processingId, setProcessingId] = useState<string | null>(null);
+    const [ date, setDate ] = useState<Date | undefined>(new Date());
+    const [ isOpen, setIsOpen ] = useState(false);
+    const [ dashboardData, setDashboardData ] = useState<RefundDashboardData | null>(null);
+    const [ loading, setLoading ] = useState(true);
+    const [ processingId, setProcessingId ] = useState<string | null>(null);
 
     const handleDateChange = (selectedDate: Date | undefined) => {
         setDate(selectedDate);
@@ -101,26 +101,6 @@ export default function RefundsPage() {
     useEffect(() => {
         fetchRefunds();
     }, []);
-
-    const handleProcessPayment = async (refundId: string) => {
-        const confirmProcess = window.confirm(
-            "Have you successfully transferred this amount back to the customer's original payment method? This action cannot be undone."
-        );
-
-        if (!confirmProcess) return;
-
-        try {
-            setProcessingId(refundId);
-            await fetchProcessRefund(refundId);
-            await fetchRefunds();
-        } catch (err: any) {
-            console.error("Failed to process refund", err);
-            alert(err.response?.data?.message || "An error occurred while processing the refund.");
-        } finally {
-            setProcessingId(null);
-        }
-    };
-
     const getStatusBadge = (status: string) => {
         const s = status?.toUpperCase(); // Handle backend lowercase status safely
         if (s === "PENDING")
@@ -272,14 +252,14 @@ export default function RefundsPage() {
                                         {/* REFUND ID */}
                                         <td className="p-4">
                                             <span className="font-mono text-sm font-semibold text-gray-800">
-                                                REF-{item.id.split("-")[0].toUpperCase()}
+                                                REF-{item.id.split("-")[ 0 ].toUpperCase()}
                                             </span>
                                         </td>
 
                                         {/* ORDER REF - Using direct order_id from response */}
                                         <td className="p-4">
                                             <Link href={`/vendor/${vendorId}/orders/${item.order_id}`} className="font-mono text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline">
-                                                ORD-{item.order_id.split("-")[0].toUpperCase()}
+                                                ORD-{item.order_id.split("-")[ 0 ].toUpperCase()}
                                             </Link>
                                         </td>
 
@@ -290,10 +270,10 @@ export default function RefundsPage() {
                                                 {item.order.customer && item.order.customer.first_name + " " + item.order.customer.last_name}
                                             </span>
                                         </td>
-                                        <td className="p-4">
-                                            <span className="font-bold text-gray-900">
-                                                {item.payment.payment_method}
-                                            </span>
+                                        <td className="p-4 ">
+
+                                            {item.payment.payment_method}
+
                                         </td>
 
                                         {/* AMOUNT */}
@@ -303,46 +283,19 @@ export default function RefundsPage() {
                                             </span>
                                         </td>
 
-                                        {/* REASON */}
-                                        {/* {/* <td className="p-4 text-sm text-gray-600 max-w-[200px] truncate" >
-                                            {
-                                                isCancelled ? item.order.cancelledRecord.reason : isReplacedAndReturnd ? item.ordeItems.return_request.reason : "N/A"
-                                            }
-                                        </td> */}
+
                                         <td className="p-4 text-sm text-gray-600 max-w-[200px] truncate" title={item.refund_reason}>
                                             {isCancelled ? 'Order Cancelled' : isReplacedAndReturnd ? `Order ${item.orderItem.return_request.type}` : "N/A"}
                                         </td>
-
-                                        {/* STATUS */}
-                                        <td className="p-4">
-                                            {getStatusBadge(item.refund_status)}
+                                        <td className="p-4 text-sm text-gray-500 max-w-[200px] truncate">
+                                            {item.refund_reason}
                                         </td>
-
                                         {/* DATE */}
                                         <td className="p-4 text-sm text-gray-500 whitespace-nowrap">
                                             {new Date(item.created_at).toLocaleDateString("en-GB", {
                                                 day: 'numeric', month: 'short', year: 'numeric'
                                             })}
                                         </td>
-
-                                        {/* ACTIONS */}
-                                        {/* <td className="p-4">
-                                   
-                                        {item.refund_status.toLowerCase() === 'pending' ? (
-                                            <button
-                                                onClick={() => handleProcessPayment(item.id)}
-                                                disabled={processingId === item.id}
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white text-xs font-semibold rounded-lg hover:bg-orange-600 disabled:bg-orange-300 transition-colors"
-                                            >
-                                                {processingId === item.id ? (
-                                                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                ) : null}
-                                                Process Payment
-                                            </button>
-                                        ) : (
-                                            <span className="text-xs text-gray-400 font-medium">No action needed</span>
-                                        )}
-                                    </td> */}
                                     </tr>
                                 )
                             })

@@ -99,9 +99,9 @@ export const getVendorInnerSidebarLinks = (vendorId: string, selectedMenu: strin
         section: "Sellings",
         list: [
           { title: "Orders", path: `/vendor/${vendorId}/orders`, icon: "shopping-cart" },
-          { title: "Back Orders", path: `/vendor/${vendorId}/orders/backOrder`, icon: "rotate-ccw" },
-          { title: "Failed Orders", path: `/vendor/${vendorId}/orders/failedOrder`, icon: "x-circle" },
-          { title: "Archived", path: `/vendor/${vendorId}/orders/archivedOrder`, icon: "archive" },
+          { title: "Back Orders", path: `/vendor/${vendorId}/orders/backOrders`, icon: "rotate-ccw" },
+          { title: "Failed Orders", path: `/vendor/${vendorId}/orders/failedOrders`, icon: "x-circle" },
+          { title: "Archived", path: `/vendor/${vendorId}/orders/archivedOrders`, icon: "archive" },
         ],
       },
       {
