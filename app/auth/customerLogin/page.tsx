@@ -85,7 +85,7 @@ export default function CustomerLoginPage() {
                     <div className="flex flex-col text-[.8rem] gap-1.5">
                         <div className="flex justify-between items-center">
                             <label htmlFor="password" className="font-semibold text-gray-700">Password</label>
-                            <Link href="/forgot-password" className="text-blue-600 hover:underline text-[.7rem]">
+                            <Link href="/auth/forgotPassword" className="text-blue-600 hover:underline text-[.7rem]">
                                 Forgot Password?
                             </Link>
                         </div>
