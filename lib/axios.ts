@@ -18,7 +18,7 @@ AxiosAPI.interceptors.request.use(
         // Only access localStorage if we are on the client side (browser)
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem(ACCESS_TOKEN_KEY);
-
+            
             // If a token exists, attach it to the Authorization header
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
