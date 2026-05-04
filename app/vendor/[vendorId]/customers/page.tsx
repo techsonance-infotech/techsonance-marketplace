@@ -21,18 +21,15 @@ interface CustomerType {
     id: string;
     first_name: string;
     last_name: string;
-    email: string;
-    access_status: string;
-    registered_at: string;
+    role: string;
+    created_at: string;
+    user_status: string;
 }
-
 export const customerTableHeader = [
     "Customer ID",
     "Name",
-    "Email",
     "Status",
     "Joined Date",
-    "Actions"
 ]
 
 const getCustomerStatusBadge = (status: string) => {
@@ -186,7 +183,7 @@ export default function VendorCustomersPage() {
                                 </td>
                             </tr>
                         ) : (
-                            customers.map((customer) => (
+                            customers && customers.map((customer) => (
                                 <tr key={customer.id} className="hover:bg-gray-50 transition-colors group">
                                     <td className="p-4">
                                         <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
@@ -211,30 +208,14 @@ export default function VendorCustomersPage() {
                                         </div>
                                     </td>
 
-                                    {/* EMAIL */}
-                                    <td className="p-4 text-gray-600 text-sm">
-                                        {customer.email}
-                                    </td>
                                     {/* STATUS */}
                                     <td className="p-4 whitespace-nowrap">
-                                        {getCustomerStatusBadge(customer.access_status)}
+                                        {getCustomerStatusBadge(customer.user_status)}
                                     </td>
 
                                     {/* JOINED DATE */}
                                     <td className="p-4 text-sm text-gray-500 whitespace-nowrap">
-                                        {new Date(customer.registered_at).toLocaleDateString("en-GB")}
-                                    </td>
-
-                                    {/* ACTIONS */}
-                                    <td className="p-4">
-                                        <div className="flex items-center gap-2">
-                                            <Link
-                                                href={`customers/${customer.id}`}
-                                                className="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
-                                            >
-                                                Manage →
-                                            </Link>
-                                        </div>
+                                        {new Date(customer.created_at).toLocaleDateString("en-GB")}
                                     </td>
                                 </tr>
                             ))

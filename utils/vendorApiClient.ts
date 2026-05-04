@@ -675,6 +675,8 @@ export const fetchCompanyCustomers = async (offset: number, limit: number, statu
     try {
         const domain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}/v1/company/customers?offset=${offset}&limit=${limit}&status=${status}&sortBy=${sortBy}`, {
+            cache: 'no-store',
+            // next: { revalidate: 3600 },
             headers: {
                 'company-domain': domain,
                 Authorization: `Bearer ${token}`,
