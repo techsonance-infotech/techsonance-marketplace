@@ -1,11 +1,13 @@
 import axios from 'axios';
 import { ACCESS_TOKEN_KEY, USER_STORAGE_KEY, IS_AUTHENTICATED_KEY, CART_KEY, BASE_API_URL } from '@/constants';
+import { getCompanyDomain } from './get-domain';
 
 // Create a base Axios instance
 const AxiosAPI = axios.create({
     baseURL: BASE_API_URL,
     headers: {
         'Content-Type': 'application/json',
+        'company-domain': await getCompanyDomain()
     },
     withCredentials: true
 });
