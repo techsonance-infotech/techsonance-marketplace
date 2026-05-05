@@ -1,4 +1,4 @@
-import { USER_STORAGE_KEY, WISHLIST_KEY } from "@/constants/constants";
+import { IS_AUTHENTICATED_KEY, USER_STORAGE_KEY, WISHLIST_KEY } from "@/constants/constants";
 import { fetchCustomerWishlist } from "@/utils/customerApiClient";
 import { Variant } from "@/utils/Types";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
@@ -50,17 +50,24 @@ const loadWishlistFromLocalOrServer = async (): Promise<Omit<WishlistState, 'loa
     try {
         const serializedWishlist = localStorage.getItem(WISHLIST_KEY);
 
-        if (serializedWishlist) {
+        if (serializedWishlist && serializedWishlist !== 'undefined' && serializedWishlist !== 'null') {
             const parsed = JSON.parse(serializedWishlist);
             if (parsed && Array.isArray(parsed.wishItems)) {
                 localFallback = { ...parsed, wishItems: parsed.wishItems as WishlistItem[] };
             }
         }
 
-        const customerId = localStorage.getItem(USER_STORAGE_KEY)
-            ? JSON.parse(localStorage.getItem(USER_STORAGE_KEY) as string)?.id
-            : null;
-
+        let customerId = localStorage.getItem(USER_STORAGE_KEY)
+        const isCusomter: {
+            isAuthenticated: boolean;
+            role: string;
+        } | null = JSON.parse(localStorage.getItem(IS_AUTHENTICATED_KEY) || '{}')
+        if (isCusomter?.role === 'admin' || isCusomter?.role === 'vendor') {
+            return { wishlistId: '', wishItems: [] };
+        }
+        if (customerId && customerId !== 'undefined' && customerId !== 'null') {
+            customerId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) as string)?.id
+        }
         if (customerId && companyDomain) {
             const response = await fetchCustomerWishlist(customerId);
 
