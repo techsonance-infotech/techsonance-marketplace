@@ -5,16 +5,15 @@ export const fetchProduct = async (productId: string) => {
     const companyDomain = await getCompanyDomain();
     console.log('company domain  in product by id', companyDomain)
     try {
-        const response = await fetch(`${BASE_API_URL}/api/v1/products/${productId}`, {
+        const response = await fetch(`${BASE_API_URL}/v1/products/${productId}`, {
             method: 'GET',
-            // cache: "force-cache",
+            cache: "force-cache",
             next: { revalidate: 60 },
             headers: {
                 'Content-Type': 'application/json',
                 'company-domain': companyDomain,
             },
-            // Authorization: `Bearer ${authToken()}`,
-        });
+});
         console.log(response)
         if (response.status !== 200) {
             console.log('Failed to fetch product', response);
@@ -29,7 +28,7 @@ export const fetchProduct = async (productId: string) => {
 export const fetchProductVariantDetails = async (id: string) => {
     try {
         const companyDomain = await getCompanyDomain();
-        const response = await fetch(`${BASE_API_URL}/api/v1/product-variant/details/${id}`, {
+        const response = await fetch(`${BASE_API_URL}/v1/product-variant/details/${id}`, {
             method: 'GET',
             cache: 'no-cache',
             headers: {
@@ -57,14 +56,13 @@ export const fetchProductVariantDetails = async (id: string) => {
 export const fetchProductVendorProducts = async () => {
     const companyDomain = await getCompanyDomain();
     try {
-        const response = await fetch(`${BASE_API_URL}/api/v1/products/all`, {
+        const response = await fetch(`${BASE_API_URL}/v1/products/all`, {
             method: 'GET',
             cache: "force-cache",
             next: { revalidate: 3600 },
             headers: {
                 'Content-Type': 'application/json',
                 'company-domain': companyDomain,
-                // Authorization: `Bearer ${authToken()}`,
             },
 
         });
