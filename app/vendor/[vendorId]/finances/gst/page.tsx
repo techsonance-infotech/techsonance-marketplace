@@ -7,6 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import Link from "next/link";
 import { redirect, useParams } from "next/navigation";
 import { authToken } from "@/utils/authToken";
+import { fetchGstRecords } from "@/utils/vendorApiClient";
 
 
 interface GstRecordType {
@@ -54,20 +55,18 @@ export default function GstListingPage() {
             redirect("/auth/vendorLogin");
         }
         
-        const fetchGstRecords = async () => {
+        const getGstRecords = async () => {
             setLoading(true);
             try {
-                // const res = await vendorApiClient.get('/finances/taxes/gst', {
-                //     headers: { Authorization: `Bearer ${token}` }
-                // });
-                // setGstRecords(res.data?.data || []);
+                const res = await fetchGstRecords(statusFilter, sortBy, token!);
+                setGstRecords(res.data?.data || []);
             } catch (err) {
                 console.log("Error fetching GST records:", err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchGstRecords();
+        getGstRecords();
     }, [statusFilter, sortBy, token]);
 
     return (
