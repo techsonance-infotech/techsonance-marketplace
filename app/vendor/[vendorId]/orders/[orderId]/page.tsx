@@ -620,7 +620,7 @@ export default function VendorOrderDetails() {
                                                         />
                                                     </div>
                                                     {/* Tracking URL */}
-                                                    {(displayStatus.toLowerCase() === OrderStatusEnum.SHIPPED.toLowerCase() || displayStatus.toLowerCase() === OrderStatusEnum.DELIVERED.toLowerCase()) ? <div className="bg-slate-50 rounded-xl p-3 space-y-1.5">
+                                                    {/* {(displayStatus.toLowerCase() === OrderStatusEnum.SHIPPED.toLowerCase() || displayStatus.toLowerCase() === OrderStatusEnum.DELIVERED.toLowerCase()) ? <div className="bg-slate-50 rounded-xl p-3 space-y-1.5">
                                                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
                                                             Tracking URL
                                                         </p>
@@ -634,7 +634,16 @@ export default function VendorOrderDetails() {
                                                                 Tracking URL    (Only after shipping)
                                                             </p>
                                                         </div>)
-                                                    }
+                                                    } */}
+{order.invoice && (
+                        <button
+                        onClick={() => handleDownload(order.invoice.invoice_url, `${order.invoice.invoice_number}.pdf`)}
+                            className="bg-white border border-slate-200 rounded-xl px-3 py-2 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors group cursor-pointer"
+                        >
+                            <FileText size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+                            View Invoice
+                        </button>
+                    )}
                                                 </div>
                                             )}
 
