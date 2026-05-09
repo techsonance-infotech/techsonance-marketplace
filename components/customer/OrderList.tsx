@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Address, OrderStatus, OrderStatusEnum } from "@/utils/Types";
 import { OrderCard } from "./OrderCard";
 import { fetchUserOrderHistory } from "@/utils/customerApiClient";
+import { authToken } from "@/utils/authToken";
 
 export interface ProductImageType {
     image_url: string;
@@ -41,7 +42,11 @@ export interface PaymentType {
 export interface ShippingType {
     tracking_url?: string;
 }
-
+export interface Invoice {
+    company_id:string;
+order_id:string;
+invoice_url: string;
+}
 export interface OrderType {
     id: string;
     user_id: string;
@@ -50,6 +55,7 @@ export interface OrderType {
     items: OrderItemType[];
     address: Address;
     payment: PaymentType;
+    invoice: Invoice;
     shipping: ShippingType | null;
 }
 
@@ -62,14 +68,14 @@ export function OrdersList({
 }) {
     const [orders, setOrders] = useState<OrderType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-
+    const token = authToken();
     useEffect(() => {
-        if (!customerId) return;
+        if (!customerId || !token) return;
         let isMounted = true;
         const fetchOrders = async () => {
             setIsLoading(true);
             try {
-                const response = await fetchUserOrderHistory(customerId);
+                const response = await fetchUserOrderHistory(customerId, token);
                 if (isMounted) setOrders(response?.data || []);
             } catch (error) {
                 console.error("Failed to fetch orders:", error);
@@ -79,7 +85,7 @@ export function OrdersList({
         };
         fetchOrders();
         return () => { isMounted = false; };
-    }, [customerId]);
+    }, [customerId, token]);
 
     const filteredOrders =
         status === null

@@ -2,14 +2,19 @@
 
 export const getCompanyDomain = async (): Promise<string> => {
     const isDev = process.env.NODE_ENV === 'development';
-    const isProd = process.env.NODE_ENV === 'production';
-    // Check if we are on the server
+    let rawHost = '';
     if (typeof window === 'undefined') {
         const { headers } = await import('next/headers');
         const headersList = await headers();
-        return headersList.get('host')?.split(':')[0] || isDev ? companyDomain : '';
+        rawHost = headersList.get('host')?.split(':')[0] || '';
+    } else {
+        rawHost = window.location.hostname;
     }
-
-    // If we are in the browser
-    return isDev ? companyDomain : window.location.hostname;
+    if (!rawHost) {
+        return isDev ? companyDomain : '';
+    }
+    if (isDev && rawHost === 'localhost') {
+        return companyDomain;
+    }
+    return rawHost
 };
