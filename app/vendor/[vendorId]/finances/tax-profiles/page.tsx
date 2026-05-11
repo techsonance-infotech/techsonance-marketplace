@@ -62,12 +62,11 @@ export default function TaxProfilesPage() {
     const handleRoute=(id:string|null) => {
         if(id) {
             redirect(`/vendor/${vendorId}/finances/tax-profiles/${id}`);
-            return;
         }
         redirect(`/vendor/${vendorId}/finances/tax-profiles/new`);
     }
     return (
-        <main className="w-full px-1">
+        <section className="w-full px-1">
             <header className="flex justify-between items-center my-6">
                 <div className="flex items-center gap-2 text-gray-700">
                     <Layers size={22} className="text-blue-500" />
@@ -164,6 +163,6 @@ export default function TaxProfilesPage() {
                     </tbody>
                 </table>
             </div>
-        </main>
+        </section>
     );
 }

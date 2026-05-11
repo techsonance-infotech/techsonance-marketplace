@@ -213,9 +213,9 @@ export default function GstListingPage() {
                                     </td>
 
                                     <td className="p-4">
-                                        <button className="text-xs font-semibold text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">
+                                        <Link href={`gst/${item.id}`} className="text-xs font-semibold text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">
                                             Edit →
-                                        </button>
+                                        </Link>
                                     </td>
                                 </tr>
                             ))

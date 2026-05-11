@@ -7,7 +7,6 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { authToken } from "@/utils/authToken";
 import { fetchCreateGstRecord, fetchSingleGstRecord, fetchUpdateGstRecord, } from "@/utils/vendorApiClient";
-import { u } from "framer-motion/client";
 
 // --- DYNAMIC FIELD CONFIGURATION TYPE ---
 type FieldConfig = {
@@ -32,7 +31,7 @@ export default function GstFormPage() {
     const [loading, setLoading] = useState(isEditMode); // Only load if editing
     const token = authToken();
     
-    // 2. INITIALIZE USEFORM
+    // 2. INITIALIZE USE FORM
     const { 
         register, 
         handleSubmit, 

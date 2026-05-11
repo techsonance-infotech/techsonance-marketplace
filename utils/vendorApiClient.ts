@@ -843,6 +843,29 @@ export const fetchAssignProductTax = async (data: { product_id: string, tax_rate
         throw error;
     }
 }
+export const fetchBulkAssignProductTax = async (data: { product_ids: string[], tax_rate_id: string }, vendorId: string, token: string) => {
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}/v1/finances/product-tax-bulk-mappings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) throw new Error("Failed to assign tax rate");
+        
+        
+        revalidatePath(`/vendor/${vendorId}/finances/product-taxes`);
+        return await response.json();
+    } catch (error) {
+        console.error('Error assigning product tax:', error);
+        throw error;
+    }
+}
 export const fetchProductTaxMappings = async (offSet: number, sortBy: string, statusFilter: string, token: string) => {
     try {
         const companyDomain = await getCompanyDomain();
@@ -856,10 +879,10 @@ export const fetchProductTaxMappings = async (offSet: number, sortBy: string, st
     }
 }
 
-export const fetchGstInvoices = async (token: string) => {
+export const fetchGstInvoices = async (sortBy: string, date: Date | undefined, token: string) => {
     try {
         const companyDomain = await getCompanyDomain();
-        const response = await fetch(`${BASE_API_URL}/v1/finances/gst-invoices`, {
+        const response = await fetch(`${BASE_API_URL}/v1/finances/gst-invoices?sort_by=${sortBy}${date ? `&date=${date.toISOString()}` : ''}`, {
             method: 'GET',
             headers: { 'company-domain': companyDomain, Authorization: `Bearer ${token}` },
         });

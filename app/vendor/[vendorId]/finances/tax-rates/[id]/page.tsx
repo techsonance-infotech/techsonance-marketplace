@@ -17,7 +17,7 @@ export default function UnifiedTaxRateFormPage() {
     const isEditMode = rateId !== 'new';
 
     const [loading, setLoading] = useState(isEditMode);
-    const [profiles, setProfiles] = useState<any[]>([]);
+    const [profiles, setProfiles] = useState<{id: string,profile_type: string}[]>([]);
     const token = authToken();
     
     const { 
@@ -35,8 +35,8 @@ export default function UnifiedTaxRateFormPage() {
             try {
                 // 1. Fetch available profiles for the Select dropdown
                 const profilesRes = await fetchTaxProfiles('', undefined, token);
-                setProfiles(profilesRes?.data || []);
-
+                setProfiles(profilesRes?.data.data || []);
+console.log("Fetched Profiles for Rate Form:", profilesRes?.data.data);
                 // 2. Fetch existing rate data if editing
                 if (isEditMode) {
                     const res = await fetchSingleTaxRate(rateId, token!);
@@ -75,7 +75,7 @@ export default function UnifiedTaxRateFormPage() {
     if (loading) return <div className="p-10 text-center text-gray-500">Loading form data...</div>;
 
     return (
-        <main className="w-full max-w-4xl px-1">
+        <section className="w-full  px-1">
             <header className="flex justify-between items-center my-6">
                 <div className="flex items-center gap-2 text-gray-700">
                     <Percent size={22} className="text-blue-500" />
@@ -99,7 +99,7 @@ export default function UnifiedTaxRateFormPage() {
                             className="w-full border border-gray-200 bg-gray-50 rounded-xl px-4 py-2.5 focus:border-blue-400 focus:bg-white focus:outline-none transition-colors"
                         >
                             <option value="">Select a Tax Profile...</option>
-                            {profiles.map(p => (
+                            {Array.isArray(profiles) &&  profiles.map(p => (
                                 <option key={p.id} value={p.id}>{p.profile_type}</option>
                             ))}
                         </select>
@@ -171,6 +171,6 @@ export default function UnifiedTaxRateFormPage() {
                     </div>
                 </form>
             </div>
-        </main>
+        </section>
     );
 }

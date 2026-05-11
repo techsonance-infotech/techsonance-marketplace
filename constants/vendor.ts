@@ -161,7 +161,7 @@ export const getVendorInnerSidebarLinks = (vendorId: string, selectedMenu: strin
       section: 'GST & Compliance',
       list: [
         { title: 'GST Registrations', path: `/vendor/${vendorId}/finances/gst`, icon: 'shield-check' },
-        { title: 'Add GST Number', path: `/vendor/${vendorId}/finances/gst/new`, icon: 'plus-circle' },
+        // { title: 'Add GST Number', path: `/vendor/${vendorId}/finances/gst/new`, icon: 'plus-circle' },
       ]
     },
     {

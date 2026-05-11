@@ -74,7 +74,7 @@ export default function TaxRatesPage() {
         redirect(`/vendor/${vendorId}/finances/tax-rates/new`);
     }
     return (
-        <main className="w-full px-1">
+        <section className="w-full px-1">
             {/* Header */}
             <header className="flex justify-between items-center my-6">
                 <div className="flex items-center gap-2 text-gray-700">
@@ -223,6 +223,6 @@ export default function TaxRatesPage() {
                     </tbody>
                 </table>
             </div>
-        </main>
+        </section>
     );
 }

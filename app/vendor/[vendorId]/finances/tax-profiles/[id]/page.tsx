@@ -79,7 +79,7 @@ export default function UnifiedTaxProfileFormPage() {
     if (loading) return <div className="p-10 text-center text-gray-500">Loading form data...</div>;
 
     return (
-        <main className="w-full   px-1">
+        <section className="w-full  px-1">
             <header className="flex justify-between items-center my-6">
                 <div className="flex items-center gap-2 text-gray-700">
                     <Layers size={22} className="text-blue-500" />
@@ -155,6 +155,6 @@ export default function UnifiedTaxProfileFormPage() {
                     </div>
                 </form>
             </div>
-        </main>
+        </section>
     );
 }
