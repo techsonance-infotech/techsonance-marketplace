@@ -618,6 +618,63 @@ export const fetchDeleteWarehouseLocation = async (locationId: string, token: st
     }
 }
 
+
+export const fetchCreateCompanyLocation = async (addressData: any, token: string) => {
+    console.log(addressData)
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}/v1/address/company`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(addressData)
+        });
+        revalidatePath(`/vendor`);
+        return await response.json();
+    } catch (error) {
+        console.error('Error creating company location:', error);
+        return { message: 'Error creating company location', success: false };
+    }
+}
+export const fetchUpdateCompanyLocation = async (locationId: string, addressData: any, token: string) => {
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}/v1/address/company/${locationId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(addressData)
+        });
+
+        return await response.json();
+    }
+    catch (error) {
+        console.error('Error updating company location:', error);
+        return { message: 'Error updating company location', success: false };
+    }
+}
+export const fetchGetCompanyLocations = async (token: string) => {
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}/v1/address/company`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'company-domain': companyDomain,
+            }
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching company locations:', error);
+        return { data: {}, message: 'Error fetching company locations' };
+    }
+}
 export const fetchUpdateOrderItem = async (itemId: string, formData: any, token: string) => {
     try {
         const companyDomain = await getCompanyDomain();
@@ -1081,7 +1138,8 @@ export const fetchCompanyBranding = async (token: string) => {
   const domain = await getCompanyDomain();
   try {
   const res = await fetch(`${BASE_API_URL}/v1/company-identity/branding`, {
-    cache: 'no-store',
+    method: 'GET',
+    cache: 'force-cache',
     headers: { 'company-domain': domain, Authorization: `Bearer ${token}` },
   });
   if (!res.ok) return { data: null };
@@ -1098,7 +1156,7 @@ export const upsertCompanyBranding = async (payload: FormData, token: string) =>
   const res = await fetch(`${BASE_API_URL}/v1/company-identity/branding`, {
     method: 'POST',
     headers: { 'company-domain': domain, Authorization: `Bearer ${token}` },
-    body: payload, // multipart for logo uploads
+    body: payload,  
   });
   revalidatePath('/vendor');
   return res.json();
@@ -1114,7 +1172,8 @@ export const fetchCompanyLegalProfile = async (token: string) => {
   const domain = await getCompanyDomain();
   try {
   const res = await fetch(`${BASE_API_URL}/v1/company-identity/legal-profile`, {
-    cache: 'no-store',
+    cache: 'force-cache',
+    //  revalidate: 3600,
     headers: { 'company-domain': domain, Authorization: `Bearer ${token}` },
   });
   if (!res.ok) return { data: null };
@@ -1213,8 +1272,10 @@ export const deleteCompanyComplianceField = async (fieldId: string, token: strin
 export const fetchCompanyDocumentConfig = async (token: string) => {
   const domain = await getCompanyDomain();
   try {
-    const res = await fetch(`${BASE_API_URL}/v1/company-identity/document-config`, {
-      cache: 'no-store',
+    const res = await fetch(`${BASE_API_URL}/v1/company-identity/document-config`, {    
+
+    //   cache: 'force-cache',
+    //   revalidate: 3600,
       headers: { 'company-domain': domain, Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return { data: null };
@@ -1225,17 +1286,16 @@ export const fetchCompanyDocumentConfig = async (token: string) => {
   }
 };
 
-export const upsertCompanyDocumentConfig = async (payload: any, token: string) => {
+export const upsertCompanyDocumentConfig = async (payload: FormData, token: string) => {
   const domain = await getCompanyDomain();
   try {
   const res = await fetch(`${BASE_API_URL}/v1/company-identity/document-config`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       'company-domain': domain,
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(payload),
+    body: payload,
   });
   revalidatePath('/vendor');
   return res.json();

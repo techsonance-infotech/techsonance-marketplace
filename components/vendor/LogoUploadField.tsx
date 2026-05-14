@@ -9,24 +9,30 @@ export function LogoUploadField({ label, value, fieldName, onFileSelect, hint }:
   onFileSelect: (name: string, file: File) => void; hint: string;
 }) {
   const ref = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string>(value || '');
+  
+  // 1. Only store the locally uploaded file preview in state (if any)
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setPreview(URL.createObjectURL(file));
+    setLocalPreview(URL.createObjectURL(file));
     onFileSelect(fieldName, file);
   };
+
+  // 2. Derive what to display: Local file takes priority, fallback to API value
+  const displayUrl = localPreview || value;
 
   return (
     <Field label={label} hint={hint}>
       <div
         onClick={() => ref.current?.click()}
-        className="relative flex flex-col items-center justify-center gap-2 h-28 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-all group"
+        className="relative flex flex-col items-center justify-center gap-2 h-28 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-all group overflow-hidden"
       >
-        {preview ? (
+        {/* 3. Use the derived displayUrl here */}
+        {displayUrl ? (
           <>
-            <img src={preview} alt={label} className="h-16 object-contain" />
+            <img src={displayUrl} alt={label} className="h-16 object-contain" />
             <span className="text-xs text-gray-400 group-hover:text-gray-600">Click to replace</span>
           </>
         ) : (

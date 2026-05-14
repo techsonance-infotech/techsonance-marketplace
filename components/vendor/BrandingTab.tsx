@@ -24,8 +24,9 @@ export function BrandingTab({ token }: { token: string }) {
 
   useEffect(() => {
     fetchCompanyBranding(token).then((res) => {
-      if (res?.data) {
-        const d = res.data;
+      console.log(res.data)
+      if (res?.data.data) {
+        const d = res.data.data;
         setValue('primary_color', d.primary_color || '#000000');
         setValue('secondary_color', d.secondary_color || '');
         setValue('accent_color', d.accent_color || '');
@@ -43,7 +44,11 @@ export function BrandingTab({ token }: { token: string }) {
       const fd = new FormData();
       Object.entries(data).forEach(([k, v]) => v && fd.append(k, v as string));
       Object.entries(files).forEach(([k, v]) => fd.append(k, v));
-      await upsertCompanyBranding(fd, token);
+      const res = await upsertCompanyBranding(fd, token);
+      console.log("res upsertCompanyBranding",res)
+      if (res?.status === 200) {
+
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     });

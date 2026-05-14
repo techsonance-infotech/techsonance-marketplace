@@ -448,9 +448,10 @@ export const legalSchema = z.object({
   legal_name: z.string().min(2, 'Required'),
   trade_name: z.string().optional(),
   country_code: z.string().length(2, 'Must be 2-letter ISO code'),
-  support_email: z.string().email('Invalid email').optional().or(z.literal('')),
+  registered_address_id: z.string(),
+  support_email: z.email('Invalid email').optional().or(z.literal('')),
   support_phone: z.string().optional(),
-  website_url: z.string().url('Invalid URL').optional().or(z.literal('')),
+  website_url: z.url('Invalid URL').optional().or(z.literal('')),
 });
 
 export const docConfigSchema = z.object({

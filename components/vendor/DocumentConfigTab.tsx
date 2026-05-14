@@ -2,62 +2,97 @@
 import { docConfigSchema } from "@/utils/validation";
 import { fetchCompanyDocumentConfig, upsertCompanyDocumentConfig } from "@/utils/vendorApiClient";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Field } from "./Field";
 import { Input } from "./Input";
 import { Select } from "./Select";
-import { Hash, LinkIcon } from "lucide-react";
+import { Hash } from "lucide-react";
 import { Textarea } from "./TextArea";
 import { SaveButton } from "./SaveButton";
+import { SignatureUpload } from "./SignatureUpload";
 import { z } from "zod";
+import { SequenceResetSelect } from "./SequenceResetSelect";
 
 export function DocumentConfigTab({ token }: { token: string }) {
   const [isPending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
-  const [previewNumber, setPreviewNumber] = useState('');
+  // Holds the existing signature URL loaded from the server
+  const [existingSignatureUrl, setExistingSignatureUrl] = useState<string | undefined>(undefined);
+  // Holds a newly picked File (null = user cleared it, undefined = untouched)
+  const [signatureFile, setSignatureFile] = useState<File | null | undefined>(undefined);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } =
     useForm({
       resolver: zodResolver(docConfigSchema),
       defaultValues: {
-        invoice_number_prefix: 'INV',
-        invoice_number_format: '{PREFIX}-{YYYY}-{SEQ8}',
-        invoice_sequence_reset: 'APRIL',
-        default_currency: 'INR',
-        default_timezone: 'Asia/Kolkata',
-        date_format: 'DD/MM/YYYY',
+          invoice_number_prefix:    'INV',
+      invoice_number_format:    '{PREFIX}-{YYYY}-{SEQ8}',
+      invoice_sequence_reset:   'APRIL',
+      default_currency:         'INR',
+      default_timezone:         'Asia/Kolkata',
+      date_format:              'DD/MM/YYYY',
       },
     });
 
   useEffect(() => {
     fetchCompanyDocumentConfig(token).then((res) => {
+      console.log(res.data)
       if (res?.data) {
         const d = res.data;
+         if (d.signatory_signature_url) {
+              setExistingSignatureUrl(d.signatory_signature_url);
+            }
         Object.entries(d).forEach(([k, v]) => {
-          if (v !== null && v !== undefined) setValue(k as any, v as any);
+          if (v !== null && v !== undefined) {
+           
+            setValue(k as any, v as any);
+          }
         });
       }
     });
   }, [token]);
-
-  // Live invoice number preview
-  const prefix = watch('invoice_number_prefix');
-  const format = watch('invoice_number_format');
-  useEffect(() => {
-    const now = new Date();
-    const preview = (format || '')
-      .replace('{PREFIX}', prefix || 'INV')
-      .replace('{YYYY}', String(now.getFullYear()))
-      .replace('{MM}', String(now.getMonth() + 1).padStart(2, '0'))
-      .replace('{SEQ8}', '00000001')
-      .replace('{SEQ6}', '000001');
-    setPreviewNumber(preview);
-  }, [prefix, format]);
+ const prefix = watch('invoice_number_prefix');
+const format = watch('invoice_number_format');
+ 
+const previewNumber = useMemo(() => {
+  const now = new Date();
+  return (format || '')
+    .replace('{PREFIX}', prefix || 'INV')
+    .replace('{YYYY}', String(now.getFullYear()))
+    .replace('{YY}',   String(now.getFullYear()).slice(-2))          // bonus token
+    .replace('{MM}',   String(now.getMonth() + 1).padStart(2, '0'))
+    .replace('{DD}',   String(now.getDate()).padStart(2, '0'))        // bonus token
+    .replace('{SEQ8}', '00000001')
+    .replace('{SEQ6}', '000001')
+    .toUpperCase();
+}, [prefix, format]);
+ 
 
   const onSubmit = (data: z.infer<typeof docConfigSchema>) => {
     startTransition(async () => {
-      await upsertCompanyDocumentConfig(data, token);
+      const payload = new FormData();
+      Object.entries(data).forEach(([k, v]) => {
+        if (v !== null && v !== undefined) payload.append(k, String(v));
+      });
+
+      if (signatureFile instanceof File) {
+        
+        payload.append('signatory_signature_file', signatureFile);
+      } else if (signatureFile === null) {
+        
+        payload.append('signatory_signature_url', '');
+      } else if (existingSignatureUrl) {
+        payload.append('signatory_signature_url', existingSignatureUrl);
+      }
+      console.log('data',data)
+      console.log('payload entries', Array.from(payload.entries()));
+      
+       Object.entries(data).forEach(([k, v]) => {
+       console.log(payload.getAll(k))
+      });
+      const res= await upsertCompanyDocumentConfig(payload, token);
+      console.log('Upsert result:', res );
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     });
@@ -80,19 +115,26 @@ export function DocumentConfigTab({ token }: { token: string }) {
             hint="e.g. INV, TAX-INV, SINV">
             <Input {...register('invoice_number_prefix')} placeholder="INV" className="font-mono uppercase" />
           </Field>
-          <Field label="Format String" error={errors.invoice_number_format?.message}
-            hint="Tokens: {PREFIX} {YYYY} {MM} {SEQ8} {SEQ6}">
-            <Input {...register('invoice_number_format')} placeholder="{PREFIX}-{YYYY}-{SEQ8}" className="font-mono" />
-          </Field>
-          <Field label="Sequence Reset">
-            <Select {...register('invoice_sequence_reset')}>
-              <option value="APRIL">Indian Financial Year (April 1)</option>
-              <option value="CALENDAR">Calendar Year (January 1)</option>
-            </Select>
-          </Field>
+  <Field
+  label="Format String"
+  error={errors.invoice_number_format?.message}
+  hint="Tokens: {PREFIX} {YYYY} {YY} {MM} {DD} {SEQ8} {SEQ6}"
+>
+  <Input
+    {...register('invoice_number_format')}
+    placeholder="{PREFIX}-{YYYY}-{SEQ8}"
+    className="font-mono"
+  />
+</Field>
+<Field label="Sequence Reset" hint="Auto-detected from your timezone">
+  <SequenceResetSelect
+    name="invoice_sequence_reset"
+    value={watch('invoice_sequence_reset')}
+    onChange={(val) => setValue('invoice_sequence_reset',val as 'APRIL' | 'CALENDAR', { shouldDirty: true })}
+  />
+</Field>
         </div>
 
-        {/* Live preview */}
         {previewNumber && (
           <div className="mt-3 flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
             <Hash size={13} className="text-gray-400 shrink-0" />
@@ -117,12 +159,19 @@ export function DocumentConfigTab({ token }: { token: string }) {
           <Field label="Designation">
             <Input {...register('signatory_designation')} placeholder="e.g. Managing Director" />
           </Field>
-          <Field label="Signature Image URL" hint="PNG with transparent background, hosted on S3/CDN">
-            <div className="relative">
-              <LinkIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" />
-              <Input {...register('signatory_signature_url')} placeholder="https://cdn.example.com/sig.png" className="pl-8" />
-            </div>
-          </Field>
+
+          {/* Replaced: old <Input type="file" /> → new SignatureUpload */}
+          <div className="sm:col-span-2">
+            <Field
+              label="Signature Image"
+              hint="PNG with transparent background recommended"
+            >
+              <SignatureUpload
+                existingUrl={existingSignatureUrl}
+                onChange={(file) => setSignatureFile(file)}
+              />
+            </Field>
+          </div>
         </div>
       </section>
 

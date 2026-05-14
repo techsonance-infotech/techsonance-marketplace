@@ -1,6 +1,6 @@
 ﻿'use client';
 import { legalSchema } from "@/utils/validation";
-import { fetchCompanyLegalProfile, upsertCompanyLegalProfile } from "@/utils/vendorApiClient";
+import { fetchCompanyLegalProfile, fetchGetCompanyLocations, upsertCompanyLegalProfile } from "@/utils/vendorApiClient";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -15,22 +15,31 @@ import { SaveButton } from "./SaveButton";
 export function LegalProfileTab({ token }: { token: string }) {
   const [isPending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
-
+  const [companyLocations, setCompanyLocations] = useState<{ id: string; address_line_1: string }[]>([]);
   const { register, handleSubmit, setValue, formState: { errors } } =
     useForm<z.infer<typeof legalSchema>>({ resolver: zodResolver(legalSchema) });
 
   useEffect(() => {
-    fetchCompanyLegalProfile(token).then((res) => {
+    const loadData = async () => {
+         const res =
+    await fetchGetCompanyLocations(token)
+    if(res?.data)      setCompanyLocations(res.data || []);
+  
+    await fetchCompanyLegalProfile(token).then((res) => {
       if (res?.data) {
         const d = res.data;
         setValue('legal_name', d.legal_name || '');
         setValue('trade_name', d.trade_name || '');
         setValue('country_code', d.country_code || 'IN');
+        setValue('registered_address_id', d.registered_address_id || '');
         setValue('support_email', d.support_email || '');
         setValue('support_phone', d.support_phone || '');
         setValue('website_url', d.website_url || '');
       }
     });
+
+    }
+    loadData();
   }, [token]);
 
   const onSubmit = (data: z.infer<typeof legalSchema>) => {
@@ -62,6 +71,15 @@ export function LegalProfileTab({ token }: { token: string }) {
               {COUNTRIES.map(c => (
                 <option key={c.country_code} value={c.country_code}>
                   {c.country_name} ({c.country_code})
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="Company Locations" error={errors.registered_address_id?.message}>
+            <Select {...register('registered_address_id')}>
+              {companyLocations.map((location) => (
+                <option key={location.id} value={location.id}>
+                  {location.address_line_1}
                 </option>
               ))}
             </Select>
