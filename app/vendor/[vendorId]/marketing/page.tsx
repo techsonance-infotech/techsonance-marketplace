@@ -19,10 +19,14 @@ export const fetchConversionMetrics = async (token: string) => {
     });
 };
 export const exportAnalyticsCsv = async (token: string) => {
-    return await AxiosAPI.get(`/v1/orders/analytics/export`, {
-        headers: { Authorization: `Bearer ${token}` },
-        responseType: 'blob', // Critical for file downloads
-    });
+  return await AxiosAPI.get(`/v1/orders/analytics/export`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // Tell the server we want CSV, not the JSON-wrapped default.
+      Accept: 'text/csv',
+    },
+    responseType: 'blob',
+  });
 };
 // --- Interfaces ---
 interface OverallMetrics {
@@ -137,7 +141,7 @@ const handleExport = async () => {
         link.href = url;
         
         // Dynamically name the file with the current date
-        const dateStr = new Date().toISOString().split('T')[0];
+        const dateStr = new Date().getTime().toString();
         link.setAttribute('download', `store_analytics_${dateStr}.csv`);
         
         // 4. Append, click, and cleanup
@@ -311,12 +315,12 @@ const handleExport = async () => {
                                     <tr>
                                         <td colSpan={5} className="p-8 text-center text-gray-400 text-sm">Loading analytics data...</td>
                                     </tr>
-                                ) : productConversions.length === 0 ? (
+                                ) :(productConversions  &&  productConversions.length === 0) ? (
                                     <tr>
                                         <td colSpan={5} className="p-8 text-center text-gray-400 text-sm">No conversion data available yet.</td>
                                     </tr>
                                 ) : (
-                                    productConversions.map((product) => (
+                                 productConversions &&   productConversions.map((product) => (
                                         <tr key={product.variantId} className="hover:bg-gray-50 transition-colors">
                                             <td className="p-4 font-semibold text-sm text-gray-800">
                                                 {product.variantName}
