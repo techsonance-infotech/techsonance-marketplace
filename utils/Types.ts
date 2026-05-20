@@ -72,6 +72,13 @@ export enum BuyBtnMode {
   CART = 'cart',
   QUICK_BUY = 'quick-buy',
 }
+
+export enum CouponDiscountTypeEum {
+  PERCENTAGE = "percentage",
+  FIXED_CART = "fixed_cart",
+  FIXED_PRODUCT = "fixed_product",
+  FREE_SHIPPING = "free_shipping",
+}
 export interface VendorUser {
   company_id: string;
   vendor_id: string | null;
@@ -406,10 +413,7 @@ export enum VendorApplicationStatusEnum {
   REJECTED = 'rejected',
   ACCEPTED = 'accepted'
 }
-export enum CouponDiscountTypeEum {
-  PERCENTAGE = 'percentage',
-  FLAT_AMOUNT = 'flat amount'
-}
+ 
 export enum CouponStatusEnum {
   ACTIVE = 'active', EXPIRED = 'expired', INACTIVE = 'inactive'
 }

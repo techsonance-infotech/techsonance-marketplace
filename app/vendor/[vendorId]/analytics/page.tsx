@@ -1,7 +1,4 @@
-// app/vendor/[vendorId]/analysis/page.tsx
-
-import VendorDashboard from '@/components/vendor/AnalysisBoard';
-import { getDomain } from '@/lib/get-domain'; 
+import AnalysisBoard from '@/components/vendor/AnalysisBoard';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -16,7 +13,6 @@ export default async function VendorAnalysisPage({
 }) {  
   return (
     <div className="flex-1 w-full h-full bg-muted/10">
-      {/* Pass the domain to the client component we built previously */}
       <AnalysisBoard  />
     </div>
   );

@@ -303,26 +303,42 @@ export const ticketSchema = z.object({
 });
 
 export type TicketFormData = z.infer<typeof ticketSchema>;
+ 
 
 export const couponSchema = z.object({
-  type: z.enum(CouponDiscountTypeEum, {
-    error: () => ({ message: "Please select a valid discount type" }),
-  }),
+  // --- NEW FIELDS ---
+  description: z
+    .string()
+    .min(3, { message: "Description must be at least 3 characters" })
+    .max(100, { message: "Description cannot exceed 100 characters" }),
+
+  // Note: z.nativeEnum is the correct way to validate against a TypeScript enum
+  discount_type: z.enum(CouponDiscountTypeEum, 
+     "Please select a valid discount type" ),
+
+  valid_from: z
+    .string()
+    .min(1, { message: "Start date is required" }),
+    
+  valid_to: z
+    .string()
+    .min(1, { message: "End date is required" }),
+
+  // --- EXISTING FIELDS ---
   code: z
     .string()
-    .min(3, { message: "Code must be at least 3 characters" }).max(20, { message: "Code cannot exceed 20 characters" })
+    .min(3, { message: "Code must be at least 3 characters" })
+    .max(20, { message: "Code cannot exceed 20 characters" })
     .regex(/^[A-Z0-9]+$/, { message: "Code must be uppercase alphanumeric" }),
+
   value: z
-    .number({ message: "Value is required and must be a number" })
-    // Prevents negative numbers and 0
+    .number( "Value is required and must be a number" )
     .positive({ message: "Discount value must be strictly greater than zero" })
-    // Prevents absurdly high numbers that might break your database
-    .max(1000000, { message: "Discount value is unusually high" }),
+    .max(1000000, { message: "Discount value is unusually high" }), // Max cap for fixed amounts
 
   rules: z
     .array(
       z.object({
-        // Prevents empty strings and limits length
         rule_type: z
           .string()
           .min(1, { message: "Rule type is required" })
@@ -336,6 +352,26 @@ export const couponSchema = z.object({
     )
     .max(10, { message: "You can only add a maximum of 10 rules" })
     .optional()
+})// --- ADVANCED CROSS-FIELD VALIDATION ---
+.superRefine((data, ctx) => {
+  
+  // 1. Prevent > 100% discounts if the type is percentage
+  if (data.discount_type === CouponDiscountTypeEum.PERCENTAGE && data.value > 100) {
+    ctx.addIssue({
+      code: "custom", // <--- Updated to raw string literal
+      message: "Percentage discounts cannot exceed 100%",
+      path: ["value"], 
+    });
+  }
+
+  // 2. Prevent End Date from being before Start Date
+  if (new Date(data.valid_to) < new Date(data.valid_from)) {
+    ctx.addIssue({
+      code: "custom", // <--- Updated to raw string literal
+      message: "End date cannot be earlier than the start date",
+      path: ["valid_to"], 
+    });
+  }
 });
 
 export type CouponFormData = z.infer<typeof couponSchema>;

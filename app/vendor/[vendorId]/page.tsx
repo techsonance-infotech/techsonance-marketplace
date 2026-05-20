@@ -14,7 +14,7 @@ import { authToken } from '@/utils/authToken';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { fetchRevenueAnalytics } from '@/utils/vendorApiClient';
 import AxiosAPI from '@/lib/axios';
-import { generatePDFReport } from '@/lib/exportPdf';
+import { exportDashboardToPDF } from '@/lib/exportPdf';
 
 interface OrderAddressType {
     name: string;
@@ -300,12 +300,12 @@ const [isExportingPdf, setIsExportingPdf] = useState(false);
     const handlePdfExport = async () => {
         setIsExportingPdf(true);
         // Pass the ID of the div we want to capture
-        const success = await generatePDFReport('analytics-report-container', `Store_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+        const success = await exportDashboardToPDF('analytics-report-container', `Store_Report_${new Date().toISOString().split('T')[0]}.pdf`);
         setIsExportingPdf(false);
     };
     return (
         <>
-            <Navbar title="Dashboard" />
+            {/* <Navbar title="Dashboard" /> */}
             <main className="px-1">
 <div className='w-full flex '>
     <button
