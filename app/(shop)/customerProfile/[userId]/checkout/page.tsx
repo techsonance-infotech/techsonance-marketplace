@@ -130,7 +130,7 @@ console.log("  variant details in quick buy row", variant);
     >
       {variant?.images && (
         <div className="shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-50">
-          <img src={variant.images}
+          <img src={typeof variant.images === 'string' && variant.images  ? variant.images : 'https://imgs.search.brave.com/pnBIeHCYZeyfGKnruwbCQdsNxNOBpZP893nGmlSNntk/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9wbGFj/ZWhvbGQubmV0L3By/b2R1Y3QtZGlhbG9n/LnBuZw'} 
             alt={variant.variant_name}
             className="w-full h-full object-cover"
           />
@@ -743,7 +743,7 @@ export default function CheckoutPage() {
 
               <button
                 onClick={handlePayment}
-                disabled={isProcessing || isTaxLoading}
+                disabled={isProcessing || isTaxLoading ||(couponApplied && couponDiscount === 0)? true : false}
                 className="w-full bg-blue-600 text-white font-semibold lg:py-3.5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:bg-blue-400 text-sm lg:text-base"
               >
                 {isProcessing ? (
