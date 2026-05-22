@@ -51,6 +51,7 @@ export const VENDOR_NAV_LINKS: NavLinkType[] = [
   { Dashboard: null, icon: 'layout-dashboard' },
   { Products: "products", icon: 'package' },
   { Orders: "orders", icon: 'shopping-cart' },
+  {'Config Documents': "configDocuments", icon: 'file-text'},
   { Analytics: "analytics", icon: 'chart-column-stacked' },
   { Finances: "finances", icon: 'hand-coins' },
   { Marketing: "marketing", icon: 'megaphone' },
@@ -161,7 +162,7 @@ export const getVendorInnerSidebarLinks = (vendorId: string, selectedMenu: strin
       section: 'GST & Compliance',
       list: [
         { title: 'GST Registrations', path: `/vendor/${vendorId}/finances/gst`, icon: 'shield-check' },
-        { title: 'Add GST Number', path: `/vendor/${vendorId}/finances/gst/new`, icon: 'plus-circle' },
+        // { title: 'Add GST Number', path: `/vendor/${vendorId}/finances/gst/new`, icon: 'plus-circle' },
       ]
     },
     {
@@ -175,13 +176,68 @@ export const getVendorInnerSidebarLinks = (vendorId: string, selectedMenu: strin
   ]
 },
 {
+  menu: "Config Documents",
+  sections: [
+    {
+      section: "Policy Management",
+      list: [
+        { 
+          title: "Product Policies", 
+          path: `/vendor/${vendorId}/configDocuments`, 
+          icon: "shield-check" 
+        },
+        { 
+          title: "Assign Policies", 
+          path: `/vendor/${vendorId}/configDocuments/assign`, 
+          icon: "link" 
+        },
+        { 
+          title: "Coverage Policies", 
+          path: `/vendor/${vendorId}/configDocuments/coverage`, 
+          icon: "layers" 
+        },
+      ],
+    },
+    // {
+    //   section: "Legal & Compliance",
+    //   list: [
+    //     { 
+    //       title: "Vendor Agreements", 
+    //       path: `/vendor/${vendorId}/settings/companyIdentity`, // Maps to existing legal/identity page
+    //       icon: "file-signature" 
+    //     },
+    //     { 
+    //       title: "Tax Profiles", 
+    //       path: `/vendor/${vendorId}/finances/tax-profiles`, 
+    //       icon: "file-text" 
+    //     },
+    //   ],
+    // },
+    {
+      section: "Financial Documents",
+      list: [
+        { 
+          title: "Invoices", 
+          path: `/vendor/${vendorId}/finances/invoices`, 
+          icon: "receipt" 
+        },
+        { 
+          title: "GST Reports", 
+          path: `/vendor/${vendorId}/finances/gst`, 
+          icon: "file-digit" 
+        },
+      ],
+    }
+  ],
+},
+{
   menu: 'Settings',
   sections: [
     {
       section: 'General',
       list: [
         { title: 'Store Profile', path: `/vendor/${vendorId}/settings`, icon: 'store' },
-        { title: 'Locations & Warehouses', path: `/vendor/${vendorId}/settings/locations`, icon: 'map-pin' },
+        { title: 'Locations/Headquarters', path: `/vendor/${vendorId}/settings/locations`, icon: 'map-pin' },
         { title: 'Business Hours', path: `/vendor/${vendorId}/settings/business-hours`, icon: 'clock' },
       ]
     },
@@ -190,7 +246,7 @@ export const getVendorInnerSidebarLinks = (vendorId: string, selectedMenu: strin
       list: [
         { title: 'Billing & Banking', path: `/vendor/${vendorId}/settings/billing`, icon: 'landmark' },
         { title: 'Tax & Compliance', path: `/vendor/${vendorId}/settings/compliance`, icon: 'file-check' },
-        { title: 'Documents', path: `/vendor/${vendorId}/settings/documents`, icon: 'folder-open' },
+        { title: 'Company Identity Configuration', path: `/vendor/${vendorId}/settings/companyIdentity`, icon: 'folder-open' },
       ]
     },
     {
@@ -207,46 +263,11 @@ export const getVendorInnerSidebarLinks = (vendorId: string, selectedMenu: strin
 
 ].filter(section => section.menu.toLowerCase() === selectedMenu.toLowerCase());
 
-// ============================================================
-// VENDOR SETTINGS LINKS
-// ============================================================
-//used
-export const VENDOR_SETTINGS_LINKS: Link[] = [
-  {
-    section: "general",
-    list: [
-      { title: "Store Profile", path: null, icon: "profile" },
-      { title: "Locations & Warehouses", path: "locations", icon: "locations" },
-    ],
-  },
-  {
-    section: "organization",
-    list: [
-      { title: "Billing & Banking", path: "billing", icon: "billing" },
-    ],
-  },
-  {
-    section: "account",
-    list: [{ title: "Business Profile", path: "businessProfile", icon: "businessProfile" },
-    { title: "Security & Password", path: "security", icon: "usersRoles" },
-    ],
-  },
-];
 
 // ============================================================
 // VENDOR DASHBOARD — MOCK DATA
 // ============================================================
-
-export const VENDOR_DASHBOARD_STATS = {
-  totalRevenue: 120000,
-  revenueGrowth: 10,
-  pendingOrder: 15,
-  lowStock: 5,
-  activeOrders: 320,
-  totalProducts: 156,
-  completedOrders: 280,
-  averageOrderValue: 3750,
-};
+ 
 
 // ============================================================
 // VENDOR — RECENT ORDERS MOCK DATA

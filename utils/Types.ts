@@ -72,6 +72,33 @@ export enum BuyBtnMode {
   CART = 'cart',
   QUICK_BUY = 'quick-buy',
 }
+
+export enum CouponDiscountTypeEum {
+  PERCENTAGE = "percentage",
+  FIXED_CART = "fixed_cart",
+  FIXED_PRODUCT = "fixed_product",
+  FREE_SHIPPING = "free_shipping",
+}
+export interface Coupon {
+  id: string;
+  company_id: string;
+  code: string;  
+  description: string;
+  discount_type: CouponDiscountTypeEum;
+  discount_value: string; // stored as string, e.g. "100.00"
+  min_order_amount: string;
+  max_discount_amount: string;
+  max_uses: number;
+  max_uses_per_user: number;
+  total_used: number;
+  is_auto_applied: boolean;
+  is_active: boolean;
+  valid_from: string;   // ISO date string
+  valid_to: string;     // ISO date string
+  created_at: string;   // ISO timestamp
+  updated_at: string;   // ISO timestamp
+}
+
 export interface VendorUser {
   company_id: string;
   vendor_id: string | null;
@@ -307,6 +334,16 @@ export interface Review {
   product_variant_id: string;
   user_id: string;
 }
+export interface Category{
+  id:  string;
+    name:  string;
+    description:  string;
+    parent_id: string | null;
+    created_at: string;
+    updated_at: string;
+    company_id: string;
+  
+}
 // used in vendor product list and product details page
 export interface Product {
   id: string;
@@ -321,6 +358,7 @@ export interface Product {
   vendor_id: string;
   category_id: string;
   variants: Variant[];
+  category: Category;
 }
 
 export interface Vendor {
@@ -395,10 +433,7 @@ export enum VendorApplicationStatusEnum {
   REJECTED = 'rejected',
   ACCEPTED = 'accepted'
 }
-export enum CouponDiscountTypeEum {
-  PERCENTAGE = 'percentage',
-  FLAT_AMOUNT = 'flat amount'
-}
+ 
 export enum CouponStatusEnum {
   ACTIVE = 'active', EXPIRED = 'expired', INACTIVE = 'inactive'
 }
@@ -490,8 +525,8 @@ export type ProductFeature = { title: string; description: string };
 //   discountPercent: string;
 //   stocks: string;
 //   sku: string;
-//   productMedia: FileOrImage[];
-//   featureMedia: FileOrImage[];
+//   productMedia: FileOrProductImage[];
+//   featureMedia: FileOrProductImage[];
 //   category: string;
 //   status: string;
 //   taxProfile: string;
@@ -622,7 +657,7 @@ export interface CountryCompliance {
 }
 
 
-export type FileOrImage = File | ProductImage;
+export type FileOrProductImage = File | ProductImage;
 
 export type VariantFormValues = {
   variantName: string;
@@ -631,8 +666,8 @@ export type VariantFormValues = {
   discountPercent: string;
   stocks: string;
   sku: string;
-  variantMediaMain: FileOrImage[];
-  variantMediaGallery: FileOrImage[];
+  variantMediaMain: FileOrProductImage[];
+  variantMediaGallery: FileOrProductImage[];
   status: string;
   productId: string;
   warehouseId?: string;

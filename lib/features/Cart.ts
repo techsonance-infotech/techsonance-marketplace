@@ -40,8 +40,9 @@ const loadCartFromLocalOrServer = async (): Promise<Omit<CartState, 'loading' | 
             customerId = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) as string)?.id
         }
         if (customerId && companyDomain && token) {
+            console.log("Fetching cart from server for customerId:", customerId);
             const response = await fetchGetCartList(customerId, token);
-            if (response && 'ok' in response && response.ok && response.data && Array.isArray(response.data)) {
+           if (response && response.success && response.data && response.data.length > 0) {
                 const itemList: CartItemListResponse[] = response.data;
 
                 const items: CartItem[] = itemList.map((item) => ({

@@ -5,7 +5,7 @@ import { useAppSelector } from "@/hooks/reduxHooks";
 import { usePreviewUrls } from "@/lib/clientUtils";
 import { authToken } from "@/utils/authToken";
 import { generateSKU } from "@/utils/generateSku";
-import { FileOrImage, ProductImage, ProductStatusEnum, VendorUser } from "@/utils/Types";
+import { FileOrProductImage, ProductImage, ProductStatusEnum, VendorUser } from "@/utils/Types";
 import { ProductFormInput, ProductFormOutput, ProductFormValuesType, productSchema } from "@/utils/validation";
 import { createInventoryRecord, createProduct, fetchVendorWarehouse, fetchVendorWarehouseLocations, updateProduct } from "@/utils/vendorApiClient";
 import { zodResolver } from "@hookform/resolvers/zod/dist/zod.js";
@@ -41,12 +41,14 @@ const PRODUCT_UPDATE_FORM_PAGE_LABELS = {
 export function ProductForm({
     categoryOptions,
     warehouseOptions,
+    taxRatesOptions,
     vendorId,
     existingData,
     productId,
 }: {
     categoryOptions: { value: string; label: string }[];
     warehouseOptions?: { value: string; label: string }[];
+    taxRatesOptions: { value: string; label: string }[];
     vendorId: string;
     existingData?: Partial<ProductFormInput | ProductFormOutput>;
     productId?: string;
@@ -78,6 +80,7 @@ export function ProductForm({
             category: "",
             status: ProductStatusEnum.INACTIVE,
             warehouseId: "",
+                taxRateId: "", 
         },
     });
     const productName = watch('productName');
@@ -104,8 +107,8 @@ export function ProductForm({
     const { user } = useAppSelector((state) => state.auth);
     const router = useRouter();
 
-    const [productFiles, setProductFiles] = useState<FileOrImage[]>([]);
-    const [featureFiles, setFeatureFiles] = useState<FileOrImage[]>([]);
+    const [productFiles, setProductFiles] = useState<FileOrProductImage[]>([]);
+    const [featureFiles, setFeatureFiles] = useState<FileOrProductImage[]>([]);
     const [deletedImgs, setDeletedImgs] = useState<string[]>([]);
 
     const { getPreviewUrl, revokeAll, revokeOne } = usePreviewUrls();
@@ -144,8 +147,8 @@ export function ProductForm({
             warehouseId: existingData.warehouseId || "",
         });
 
-        const initialProductFiles = (existingData.productMedia as FileOrImage[]) || [];
-        const initialFeatureFiles = (existingData.featureMedia as FileOrImage[]) || [];
+        const initialProductFiles = (existingData.productMedia as FileOrProductImage[]) || [];
+        const initialFeatureFiles = (existingData.featureMedia as FileOrProductImage[]) || [];
 
         setProductFiles(initialProductFiles);
         setFeatureFiles(initialFeatureFiles);
@@ -160,8 +163,8 @@ export function ProductForm({
     const handleFileSelect = useCallback(
         (
             e: React.ChangeEvent<HTMLInputElement>,
-            currentFiles: FileOrImage[],
-            setFiles: React.Dispatch<React.SetStateAction<FileOrImage[]>>,
+            currentFiles: FileOrProductImage[],
+            setFiles: React.Dispatch<React.SetStateAction<FileOrProductImage[]>>,
             fieldName: keyof ProductFormValuesType
         ) => {
             if (!e.target.files) return;
@@ -176,8 +179,8 @@ export function ProductForm({
     const handleFileRemove = useCallback(
         (
             index: number,
-            currentFiles: FileOrImage[],
-            setFiles: React.Dispatch<React.SetStateAction<FileOrImage[]>>,
+            currentFiles: FileOrProductImage[],
+            setFiles: React.Dispatch<React.SetStateAction<FileOrProductImage[]>>,
             fieldName: keyof ProductFormValuesType,
             imgId?: string
         ) => {
@@ -461,7 +464,7 @@ export function ProductForm({
                                                 handleFileSelect(
                                                     e,
                                                     files,
-                                                    setFiles as React.Dispatch<React.SetStateAction<FileOrImage[]>>,
+                                                    setFiles as React.Dispatch<React.SetStateAction<FileOrProductImage[]>>,
                                                     fieldName
                                                 )
                                             }
@@ -474,7 +477,7 @@ export function ProductForm({
                                     {/* Preview list */}
                                     {files.length > 0 && (
                                         <ul className="flex flex-wrap gap-3 mt-4">
-                                            {files.map((file: FileOrImage, i: number) => (
+                                            {files.map((file: FileOrProductImage, i: number) => (
                                                 <li
                                                     key={i}
                                                     className="relative bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm w-20 h-20"
@@ -490,7 +493,7 @@ export function ProductForm({
                                                             handleFileRemove(
                                                                 i,
                                                                 files,
-                                                                setFiles as React.Dispatch<React.SetStateAction<FileOrImage[]>>,
+                                                                setFiles as React.Dispatch<React.SetStateAction<FileOrProductImage[]>>,
                                                                 fieldName,
                                                                 (file as { id?: string }).id ?? undefined
                                                             )
@@ -516,7 +519,7 @@ export function ProductForm({
                         <DynamicIcon fallback={() => <p></p>} name="building-2" size={18} className="text-blue-500" />
                         <h2 className="text-base font-semibold text-slate-800">Product Category & Taxation (GST)</h2>
                     </div>
-                    <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
 
                         {/* Category */}
                         <div>
@@ -534,6 +537,24 @@ export function ProductForm({
                                 <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                                     <DynamicIcon fallback={() => <p></p>} name="alert-circle" size={12} />
                                     {errors.category.message}
+                                </p>
+                            )}
+                        </div>
+                        <div>
+                            <label className="form_label">Tax Rate <span className="text-red-400">*</span></label>
+                            <div className="relative">
+                                <select {...register("taxRateId")} className="form_input appearance-none pr-9">
+                                    <option value="" disabled>Select Tax Rate</option>
+                                    {taxRatesOptions.map((t, idx) => (
+                                        <option key={idx} value={t.value}>{t.label}</option>
+                                    ))}
+                                </select>
+                                <DynamicIcon fallback={() => <p></p>} name="chevron-down" size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                            </div>
+                            {errors.taxRateId && (
+                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                    <DynamicIcon fallback={() => <p></p>} name="alert-circle" size={12} />
+                                    {errors.taxRateId.message}
                                 </p>
                             )}
                         </div>

@@ -1,10 +1,11 @@
 ﻿"use client"
 import { getVendorInnerSidebarLinks } from "@/constants"
+import { AnimatePresence } from "framer-motion";
 import { DynamicIcon, IconName } from "lucide-react/dynamic"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-
+import { motion } from "framer-motion"
 export const InnerSideBar = ({
     vendorId,
     selectedMenu,
@@ -14,7 +15,11 @@ export const InnerSideBar = ({
 }) => {
     const path = usePathname()
     const [isClosed, setIsClosed] = useState(false)
-
+    const [isMounted, setIsMounted] = useState(false)
+    useEffect(() => {
+        setIsMounted(true)
+    }, [])
+    
     const links = getVendorInnerSidebarLinks(vendorId, selectedMenu)
     useEffect(() => {
         const allPaths = links.flatMap((s) =>
@@ -23,8 +28,15 @@ export const InnerSideBar = ({
         const isMatch = allPaths.some((p) => p === path)
         if (!isMatch) setIsClosed(true)
     }, [path, links])
-
+    if (!isMounted) return (
+        <div className="w-20 animate-pulse space-y-4 p-4">
+            <div className="h-6 bg-gray-300 rounded w-3/4 mx-auto"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/2 mx-auto"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/3 mx-auto"></div>
+        </div>
+    )
     return (
+         <AnimatePresence mode="wait">
         <div
             className={`
         relative flex flex-col bg-white border-r border-gray-200 h-screen
@@ -48,6 +60,10 @@ export const InnerSideBar = ({
                 </button>
             </div>
 
+         
+           
+          
+        
             <aside className="flex-1 py-3 space-y-6 w-full">
                 {links.map((section) => (
                     <div key={section.menu}>
@@ -62,7 +78,9 @@ export const InnerSideBar = ({
                                     {group.list?.map((item) => {
                                         const isActive = path === item.path
                                         return (
-                                            <li key={item.title}>
+                                             <motion.li            
+                                             key={item.title}
+                                             transition={{ duration: 0.18 }} initial={{ opacity: 0, y: 8 }}            animate={{ opacity: 1, y: 0 }}            exit={{ opacity: 0, y: -8 }}            >
                                                 <Link
                                                     href={item.path ?? "#"}
                                                     title={isClosed ? item.title : undefined}
@@ -86,7 +104,7 @@ export const InnerSideBar = ({
 
                                                     {/* Label — hidden when collapsed */}
                                                     {!isClosed && (
-                                                        <span className="truncate transition-opacity duration-200 ease-in-out">
+                                                        <span className="text-wrap transition-opacity duration-200 ease-in-out">
                                                             {item.title}
                                                         </span>
                                                     )}
@@ -103,7 +121,7 @@ export const InnerSideBar = ({
                                                         </span>
                                                     )}
                                                 </Link>
-                                            </li>
+                                            </motion.li>
                                         )
                                     })}
                                 </ul>
@@ -113,5 +131,6 @@ export const InnerSideBar = ({
                 ))}
             </aside>
         </div>
+            </AnimatePresence>
     )
 }

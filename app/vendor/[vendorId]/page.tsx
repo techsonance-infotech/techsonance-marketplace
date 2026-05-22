@@ -3,16 +3,18 @@
 import './index.css';
 import Navbar from "@/components/vendor/Navbar";
 import { Pagination } from "@/components/common/Pagination";
-import { VENDOR_DASHBOARD_STATS } from "@/constants/vendor";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatCurrency, formatNumber } from "@/lib/utils";
-import { TrendingUp, Clock, Package, ArrowUpRight } from "lucide-react";
-import { fetchVendorActiveProducts, fetchVendorOrderList, fetchVendorPendingOrders } from '@/utils/vendorApiClient';
+import { TrendingUp, Clock, Package, ArrowUpRight, Printer, FileText } from "lucide-react";
+import { fetchBulkInvoiceUrls, fetchLowStockAlerts, fetchTopProducts, fetchVendorActiveProducts, fetchVendorOrderList, fetchVendorPendingOrders } from '@/utils/vendorApiClient';
 import { OrderStatus as OrderStatusType, OrderStatusEnum } from '@/utils/Types';
 import { redirect, useParams, useRouter } from 'next/navigation';
 import { authToken } from '@/utils/authToken';
-
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { fetchRevenueAnalytics } from '@/utils/vendorApiClient';
+import AxiosAPI from '@/lib/axios';
+import { exportDashboardToPDF } from '@/lib/exportPdf';
 
 interface OrderAddressType {
     name: string;
@@ -102,54 +104,93 @@ const getPaymentBadge = (method: string, status: string) => {
         </span>
     );
 };
-
+export const exportAnalyticsCsv = async (token: string) => {
+    return await AxiosAPI.get(`/v1/orders/analytics/export`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob', // Critical for file downloads
+    });
+};
 
 export default function DashboardPage() {
     const [count, setCount] = useState(1);
     const { vendorId } = useParams<{ vendorId: string }>();
     const [recentOrders, setRecentOrders] = useState<OrderType[]>([]);
-    const [totalRevenue, setTotalRevenue] = useState(VENDOR_DASHBOARD_STATS.totalRevenue)
+    const [totalRevenue, setTotalRevenue] = useState(0);
     const [pendingOrders, setPendingOrders] = useState(0)
     const [activeProducts, setActiveProducts] = useState(0)
-    const [lowStock, setLowStock] = useState(VENDOR_DASHBOARD_STATS.lowStock)
-    const [revenueGrowth, setRevenueGrowth] = useState(VENDOR_DASHBOARD_STATS.revenueGrowth)
+    const [isExporting, setIsExporting] = useState(false);
+    const [lowStock, setLowStock] = useState(0)
+    const [topProducts, setTopProducts] = useState<any[]>([]);
+    const [chartData, setChartData] = useState([]);
+    const [revenueGrowth, setRevenueGrowth] = useState(0)
     const router = useRouter()
+        const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+    const [isDownloading, setIsDownloading] = useState(false);
     const pageSize = 5;
     const [totalPages, setTotalPages] = useState(0);
     const startIndex = (count - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     const token = authToken();
 
-    useEffect(() => {
-        if (!token) {
-            redirect("/auth/vendorLogin")
-        }
-        const loadData = async () => {
-            await fetchVendorOrderList(0, pageSize, OrderStatusEnum.PROCESSING)
-                .then((res) => {
-                    setRecentOrders(res.data);
-                })
-                .catch((err) => {
-                    console.error("Error fetching vendor orders list:", err);
-                });
-            await fetchVendorPendingOrders(token)
-                .then((res) => {
-                    setPendingOrders(res.data ? res.data.length : 0);
-                })
-                .catch((err) => {
-                    console.error("Error fetching vendor pending orders:", err);
-                });
-            await fetchVendorActiveProducts(token)
-                .then((res) => {
-                    setActiveProducts(res.data.length)
-                })
-                .catch((err) => {
-                    console.error("Error fetching vendor active products:", err);
-                });
-        };
-        loadData();
-    }, []);
+useEffect(() => {
+    if (!token) {
+        redirect("/auth/vendorLogin")
+    }
+    const loadData = async () => {
+        // FIX: token is the 3rd arg, status is 4th
+        await fetchVendorOrderList(0, pageSize, token, OrderStatusEnum.PROCESSING)
+            .then((res) => {
+                
+                setRecentOrders(res.data);
+            })
+            .catch((err) => {
+                console.error("Error fetching vendor orders list:", err);
+            });
 
+        await fetchVendorPendingOrders(token)
+            .then((res) => {
+                setPendingOrders(res.data ? res.data.length : 0);
+            })
+            .catch((err) => {
+                console.error("Error fetching vendor pending orders:", err);
+            });
+
+        await fetchVendorActiveProducts(token)
+            .then((res) => {
+                setActiveProducts(res.data ? res.data.length : 0);
+            })
+            .catch((err) => {
+                console.error("Error fetching vendor active products:", err);
+            });
+
+        await fetchLowStockAlerts(token)
+            .then((res) => {
+                console.log('res low stock',res)
+                setLowStock(res && res.data.length ? res.data.length : 0);
+            })
+            .catch((err) => {
+                console.error("Error fetching vendor low stock alerts:", err);
+            });
+
+        await fetchRevenueAnalytics(token, 30)
+            .then((res) => {
+                console.log("res chart data", res);
+                setChartData(res.data.chartData ?? []);
+                setTotalRevenue(res.data.totalRevenue ?? 0);
+            })
+            .catch((err) => console.error("Error fetching analytics:", err));
+
+        await fetchTopProducts(token)
+            .then((res) => {
+                setTopProducts(res.data ?? []);
+            })
+            .catch((err) => {
+                console.error("Error fetching top products:", err);
+            });
+            
+    };
+    loadData();
+}, []);
     const handleOrderFilter = async (orderStatus: OrderStatusType) => {
         if (token) {
 
@@ -163,13 +204,120 @@ export default function DashboardPage() {
         }
     }
 
+const toggleOrderSelection = (orderId: string) => {
+        setSelectedOrders(prev => 
+            prev.includes(orderId) ? prev.filter(id => id !== orderId) : [...prev, orderId]
+        );
+    };
 
+    const toggleAllOrders = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked && recentOrders) {
+            setSelectedOrders(recentOrders.map(o => o.id));
+        } else {
+            setSelectedOrders([]);
+        }
+    };
 
+  // --- THE DOWNLOAD LOOP ---
+    const handleBulkDownload = async () => {
+        if (selectedOrders.length === 0) return;
+        setIsDownloading(true);
+        
+        try {
+            // 1. Get the Cloudinary URLs from Backend
+            const res = await fetchBulkInvoiceUrls(selectedOrders, token as string);
+            console.log("Bulk Invoice URLs:", res);            const invoices = res.data;
+
+            if (!invoices || invoices.length === 0) {
+                alert("No generated invoices found for these orders yet.");
+                return;
+            }
+
+            // 2. Loop through the URLs and force download
+            for (const invoice of invoices) {
+                if (invoice.invoice_url) {
+                    // Fetching the blob forces a direct download rather than opening in a new tab
+                    const response = await fetch(invoice.invoice_url);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Invoice_${invoice.invoice_number}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    
+                    // Small delay to prevent browser from blocking multiple rapid downloads
+                    await new Promise(resolve => setTimeout(resolve, 300)); 
+                }
+            }
+            
+            setSelectedOrders([]); // Clear selection on success
+        } catch (error) {
+            console.error("Error downloading invoices", error);
+            alert("Failed to download invoices.");
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+    const handleExport = async () => {
+    if (!token) return;
+    setIsExporting(true);
+    
+    try {
+        const response = await exportAnalyticsCsv(token as string);
+        
+        // 1. Create a blob from the response
+        const blob = new Blob([response.data], { type: 'text/csv' });
+        
+        // 2. Create a temporary URL for the blob
+        const url = window.URL.createObjectURL(blob);
+        
+        // 3. Create a temporary <a> tag to trigger the download
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // Dynamically name the file with the current date
+        const dateStr = new Date().toISOString().split('T')[0];
+        link.setAttribute('download', `store_analytics_${dateStr}.csv`);
+        
+        // 4. Append, click, and cleanup
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode?.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+    } catch (error) {
+        console.error("Failed to export analytics:", error);
+        // Optional: Trigger a toast notification here to inform the user
+    } finally {
+        setIsExporting(false);
+    }
+};
+const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+    const handlePdfExport = async () => {
+        setIsExportingPdf(true);
+        // Pass the ID of the div we want to capture
+        const success = await exportDashboardToPDF('analytics-report-container', `Store_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+        setIsExportingPdf(false);
+    };
     return (
         <>
-            <Navbar title="Dashboard" />
+            {/* <Navbar title="Dashboard" /> */}
             <main className="px-1">
-
+<div className='w-full flex '>
+    <button
+                            onClick={handlePdfExport}
+                            disabled={isExportingPdf}
+                            className="py-2.5 px-4 bg-red-50 border border-red-100 text-red-600 font-semibold rounded-xl shadow-sm hover:bg-red-100 transition-all flex items-center gap-2 disabled:opacity-50"
+                        >
+                            <FileText size={18} /> 
+                            {isExportingPdf ? "Generating..." : "Export PDF"}
+                        </button>
+</div>
+<span id='analytics-report-container'>
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
 
@@ -185,9 +333,9 @@ export default function DashboardPage() {
                                 {revenueGrowth}% vs last month
                             </span>
                         </div>
-                        <span className="bg-emerald-50 p-3 rounded-xl">
+                        {/* <span className="bg-emerald-50 p-3 rounded-xl">
                             <TrendingUp size={20} className="text-emerald-500" />
-                        </span>
+                        </span> */}
                     </div>
 
                     {/* Pending Orders */}
@@ -220,12 +368,105 @@ export default function DashboardPage() {
                         </span>
                     </div>
                 </div>
-
+{/* Revenue Chart Section */}
+<div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 my-6">
+    <div className="flex justify-between items-center mb-6">
+        <div>
+            <h2 className="font-bold text-lg text-gray-800">Revenue Overview</h2>
+            <p className="text-xs text-gray-500">Last 30 Days</p>
+        </div>
+    </div>
+    <div className="h-[300px] w-full">
+        { chartData && chartData.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <defs>
+                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                    <XAxis 
+                        dataKey="date" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{fontSize: 12, fill: '#9ca3af'}} 
+                        dy={10}
+                    />
+                    <YAxis 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{fontSize: 12, fill: '#9ca3af'}}
+                        tickFormatter={(value) => `₹${value}`}
+                    />
+                    <Tooltip 
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        formatter={(value: number) => [`₹${value}`, 'Revenue']}
+                    />
+                    <Area 
+                        type="monotone" 
+                        dataKey="revenue" 
+                        stroke="#8b5cf6" 
+                        strokeWidth={3}
+                        fillOpacity={1} 
+                        fill="url(#colorRevenue)" 
+                    />
+                </AreaChart>
+            </ResponsiveContainer>
+        ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                Not enough data to display chart.
+            </div>
+        )}
+    </div>
+</div>
+{/* Top Selling Products Section */}
+<div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 my-6">
+    <div className="flex justify-between items-center mb-6">
+        <h2 className="font-bold text-lg text-gray-800">Top Performing Products</h2>
+    </div>
+    
+    <div className="space-y-4">
+        {topProducts && topProducts.length > 0 ? topProducts.map((product, idx) => (
+            <div key={product.variant_id} className="flex items-center justify-between p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
+                <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-sm">
+                        #{idx + 1}
+                    </div>
+                    <div>
+                        <p className="font-semibold text-gray-800 text-sm">{product.variant_name}</p>
+                        <p className="text-xs text-gray-500">SKU: {product.sku}</p>
+                    </div>
+                </div>
+                <div className="text-right">
+                    <p className="font-bold text-gray-800">₹{product.revenue.toLocaleString()}</p>
+                    <p className="text-xs text-emerald-600 font-medium">{product.total_sold} units sold</p>
+                </div>
+            </div>
+        )) : (
+            <div className="text-center py-6 text-gray-400 text-sm">
+                No sales data available yet.
+            </div>
+        )}
+    </div>
+</div>
                 {/* Recent Orders Table */}
                 <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden my-6">
                     <div className="flex justify-between items-center px-5 py-4 border-b border-gray-100">
                         <h2 className="font-bold text-lg text-gray-800">Recent Orders</h2>
                         <span className='flex gap-4 items-center justify-between'>
+                                    
+                    {selectedOrders.length > 0 && (
+                        <button 
+                            onClick={handleBulkDownload}
+                            disabled={isDownloading}
+                            className="flex items-center gap-2 font-semibold text-sm bg-purple-500 hover:bg-purple-600 text-white rounded-xl px-5 py-2.5 transition-colors shadow-sm disabled:opacity-50"
+                        >
+                            <Printer size={16} />
+                            {isDownloading ? "Downloading..." : `Print Invoices (${selectedOrders.length})`}
+                        </button>
+                    )}
                             <select name="" className='text-sm border border-gray-200 bg-gray-50 rounded-xl px-3 py-2 text-gray-600 outline-none focus:border-blue-400 cursor-pointer transition-colors' id="" onChange={(e) => handleOrderFilter(e.target.value as OrderStatusType)}>
                                 <option value="">Select Status</option>
                                 {
@@ -248,7 +489,12 @@ export default function DashboardPage() {
                             <thead>
                                 <tr className="bg-gray-50 border-b border-gray-200 text-left">
                                     <th className="p-4 w-10">
-                                        <input type="checkbox" className="rounded" />
+                                        <input 
+                                    type="checkbox" 
+                                    className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 cursor-pointer" 
+                                    checked={recentOrders?.length > 0 && selectedOrders.length === recentOrders.length}
+                                    onChange={toggleAllOrders}
+                                />
                                     </th>
                                     {orderTableHeader.map((header) => (
                                         <th key={header} className="p-4 text-xs Rent-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">{header}</th>
@@ -267,7 +513,12 @@ export default function DashboardPage() {
                                     recentOrders && recentOrders.map((item) => (
                                         <tr key={item.id} className="hover:bg-gray-50 transition-colors group">
                                             <td className="p-4">
-                                                <input type="checkbox" className="rounded" />
+                                              <input 
+                                        type="checkbox" 
+                                        className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 cursor-pointer" 
+                                        checked={selectedOrders.includes(item.id)}
+                                        onChange={() => toggleOrderSelection(item.id)}
+                                    />
                                             </td>
 
                                             {/* ORDER ID */}
@@ -338,6 +589,7 @@ export default function DashboardPage() {
                 {/* Pagination */}
                 <span className="flex justify-end mt-2 mb-6">
                     <Pagination setCount={setCount} count={count} totalPages={totalPages} style="relative right-0 w-54" />
+                </span>
                 </span>
             </main>
         </>
