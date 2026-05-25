@@ -83,14 +83,16 @@ export enum PromotionType {
 }
 
 export enum PromotionStatus {
-  DRAFT = 'DRAFT',
-  PENDING_REVIEW = 'PENDING_REVIEW',
-  ACTIVE = 'ACTIVE',
-  PAUSED = 'PAUSED',
-  SCHEDULED = 'SCHEDULED',
-  REJECTED = 'REJECTED',
-  EXPIRED = 'EXPIRED',
+  DRAFT = 'draft',
+  PENDING_REVIEW = 'pending_review',
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PAUSED = 'paused',
+  SCHEDULED = 'scheduled',
+  REJECTED = 'rejected',
+  EXPIRED = 'expired',
 }
+
 
 export enum PromotionTargetType {
   ALL_PRODUCTS = 'all_products',
@@ -210,6 +212,7 @@ export interface PromotionRuleFormRow {
 export interface VendorUser {
   company_id: string;
   vendor_id: string | null;
+  user_id: string;
   id: string;
   role: string;
   email: string;
