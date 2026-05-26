@@ -187,8 +187,8 @@ export const getVendorInnerSidebarLinks = (vendorId: string, selectedMenu: strin
     {
       section: 'Promotions',
       list: [
-        { title: 'Campaigns', path: `/vendor/${vendorId}/marketing/campaigns`, icon: 'megaphone' },
         { title: 'Coupons', path: `/vendor/${vendorId}/marketing/coupons`, icon: 'tag' },
+        { title: 'Campaigns', path: `/vendor/${vendorId}/marketing/campaigns`, icon: 'megaphone' },
       ]
     },
     {

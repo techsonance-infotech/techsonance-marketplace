@@ -71,7 +71,7 @@ export default function BannersPage() {
           <p className="text-sm text-gray-500 mt-1">Manage storefront display banners across placement slots.</p>
         </div>
         <Button
-          onClick={() => router.push(`/vendor/${vendorId}/marketing/banners/new`)}
+          onClick={() => router.push(`/vendor/${vendorId}/marketing/banners/form`)}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5"
         >
           <Plus size={18} /> Create Banner

@@ -1,5 +1,4 @@
-﻿// app/vendor/[vendorId]/marketing/campaigns/page.tsx
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Plus, Search, Tag, Calendar, Activity, TrendingUp, Zap } from "lucide-react";

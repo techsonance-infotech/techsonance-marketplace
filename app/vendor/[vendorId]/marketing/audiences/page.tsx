@@ -36,7 +36,9 @@ export default function AudiencesPage() {
       const res = await AxiosAPI.get("/v1/audiences", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setSegments(res.data.data ?? []);
+      console.log("segments",res.data)
     } catch { toast.error("Failed to load audiences"); }
     finally { setLoading(false); }
   };
@@ -66,7 +68,7 @@ export default function AudiencesPage() {
           </p>
         </div>
         <Button
-          onClick={() => router.push(`/vendor/${vendorId}/marketing/audiences/new`)}
+          onClick={() => router.push(`/vendor/${vendorId}/marketing/audiences/form`)}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5"
         >
           <Plus size={18} /> Create Segment
@@ -92,7 +94,7 @@ export default function AudiencesPage() {
           {Array.isArray(segments) && segments.map((seg) => (
             <div
               key={seg.id}
-              onClick={() => router.push(`/vendor/${vendorId}/marketing/audiences/${seg.id}`)}
+              onClick={() => router.push(`/vendor/${vendorId}/marketing/audiences/form?segmentId=${seg.id}`)}
               className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer flex items-center justify-between gap-4"
             >
               <div className="flex items-center gap-4 min-w-0">
@@ -139,7 +141,7 @@ export default function AudiencesPage() {
                 Create a segment to group customers by spend, order history, or registration date.
               </p>
               <Button
-                onClick={() => router.push(`/vendor/${vendorId}/marketing/audiences/new`)}
+                onClick={() => router.push(`/vendor/${vendorId}/marketing/audiences/form`)}
                 className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5"
               >
                 <Plus size={16} className="mr-2" /> Create First Segment

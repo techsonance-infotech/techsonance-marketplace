@@ -1,5 +1,5 @@
 ﻿"use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Plus, Trash2, Target, Users } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -28,22 +28,53 @@ const OPERATOR_OPTIONS = [
 ];
 
 interface Criterion { field: string; operator: string; value: string; }
+const fetchSegmentData = async (segmentId: string | undefined,token: string) => {
+  if (!segmentId) return;
+  try {
+    const response = await AxiosAPI.get(`/v1/audiences/${segmentId}`, { headers: { Authorization: `Bearer ${token}` } });
+    return response.data;
+  } catch (err) {
+    toast.error("Failed to fetch segment data");
+  }
+};
 
-export default function SegmentForm({ existingData }: { existingData?: any }) {
+export default function SegmentForm({segmentId}: {segmentId: string|null}) {
   const { vendorId } = useParams<{ vendorId: string }>();
   const router = useRouter();
   const token = authToken();
-  const isEdit = !!existingData?.id;
-
-  const [name, setName] = useState(existingData?.name ?? "");
-  const [description, setDescription] = useState(existingData?.description ?? "");
-  const [operator, setOperator] = useState<"AND" | "OR">(existingData?.criteria_operator ?? "AND");
+  console.log("segmentId",segmentId)
+  const isEdit =  segmentId!==null;
+  const [existingData, setExistingData] = useState<any>(null);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [operator, setOperator] = useState<"AND" | "OR">("AND");
   const [criteria, setCriteria] = useState<Criterion[]>(
     existingData?.criteria?.map((c: any) => ({ ...c, value: String(c.value) })) ?? [
       { field: "total_orders", operator: "gte", value: "" },
     ]
   );
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (isEdit ) {
+      console.log("Fetching segment data for ID:", segmentId);
+      console.log(isEdit)
+      const loadData=async () => {
+        const data = await fetchSegmentData(segmentId, token!).then((data) => {
+        console.log("data existing",data)
+        if (data) {
+          setExistingData(data.data);
+          setName(data.data.name);
+          setDescription(data.data.description || "");
+          setOperator(data.data.criteria_operator);
+          setCriteria(data.data.criteria.map((c: any) => ({ ...c, value: String(c.value) })));
+        }
+      })};  
+      loadData();
+    };
+
+
+  }, [segmentId, token]);  
+
 
   const addCriterion = () =>
     setCriteria((p) => [...p, { field: "total_orders", operator: "gte", value: "" }]);

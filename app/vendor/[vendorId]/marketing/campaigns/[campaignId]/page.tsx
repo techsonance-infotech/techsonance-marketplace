@@ -1,5 +1,4 @@
-﻿// app/vendor/[vendorId]/marketing/campaigns/campaignForm/[campaignId]/page.tsx
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import CampaignForm, { ExistingPromotion } from "@/components/vendor/CampaignForm";
