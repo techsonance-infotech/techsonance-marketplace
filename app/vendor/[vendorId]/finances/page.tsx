@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { searchImgDark } from "@/constants/common";
 import { ChevronDown, ChevronUp, Download, Wallet, IndianRupee } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import { TableRowSkeleton } from "@/components/common/skeletons";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -94,10 +95,10 @@ export default function EarningsPage() {
                         </span>
                     )}
                 </div>
-                <button className="flex items-center gap-2 font-semibold text-sm bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded-xl px-5 py-2.5 transition-colors shadow-sm">
+                {/* <button className="flex items-center gap-2 font-semibold text-sm bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded-xl px-5 py-2.5 transition-colors shadow-sm">
                     <Download size={16} />
                     Export CSV
-                </button>
+                </button> */}
             </header>
 
             {/* Filter Bar */}
@@ -176,12 +177,7 @@ export default function EarningsPage() {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {loading ? (
-                            <tr>
-                                <td colSpan={10} className="py-16 text-center text-gray-400">
-                                    <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                                    <p className="text-sm">Loading earnings...</p>
-                                </td>
-                            </tr>
+                            <TableRowSkeleton columns={8} rows={5} />
                         ) : earnings.length === 0 ? (
                             <tr>
                                 <td colSpan={10} className="py-16 text-center text-gray-400 text-sm">

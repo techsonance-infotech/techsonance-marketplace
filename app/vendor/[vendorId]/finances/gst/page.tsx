@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { searchImgDark } from "@/constants/common";
 import { ChevronDown, ChevronUp, Download, ReceiptText, Plus } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import { TableRowSkeleton } from "@/components/common/skeletons";
 import Link from "next/link";
 import { redirect, useParams } from "next/navigation";
 import { authToken } from "@/utils/authToken";
@@ -83,10 +84,10 @@ export default function GstListingPage() {
                     )}
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 font-semibold text-sm bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl px-5 py-2.5 transition-colors shadow-sm">
+                    {/* <button className="flex items-center gap-2 font-semibold text-sm bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl px-5 py-2.5 transition-colors shadow-sm">
                         <Download size={16} />
                         Export CSV
-                    </button>
+                    </button> */}
                     <Link href={`/vendor/${vendorId}/finances/gst/new`} className="flex items-center gap-2 font-semibold text-sm bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded-xl px-5 py-2.5 transition-colors shadow-sm">
                         <Plus size={16} />
                         Add GST Number
@@ -166,11 +167,7 @@ export default function GstListingPage() {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {loading ? (
-                             <tr>
-                                 <td colSpan={10} className="py-16 text-center text-gray-400 text-sm">
-                                     Loading GST records...
-                                 </td>
-                             </tr>
+                            <TableRowSkeleton columns={7} rows={5} />
                         ) : gstRecords && gstRecords?.length === 0 ? (
                             <tr>
                                 <td colSpan={10} className="py-16 text-center text-gray-400 text-sm">

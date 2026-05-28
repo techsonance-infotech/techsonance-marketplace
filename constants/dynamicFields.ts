@@ -17,8 +17,6 @@ export const ORGANIZATION_DETAIL_FIELDS = [
 ];
 
 export const BUSINESS_ADMIN_ACCOUNT_FIELDS = [
-    { id: "first_name", label: "Admin First Name", placeholder: "Enter your first name", type: "text" },
-    { id: "last_name", label: "Admin Last Name", placeholder: "Enter your last name", type: "text" },
     { id: "email", label: "Admin Email", placeholder: "Enter your email", type: "email" },
     { id: "password", label: "Password", placeholder: "Enter your password", type: "password" },
     { id: "confirm_password", label: "Confirm Password", placeholder: "Confirm your password", type: "password" },

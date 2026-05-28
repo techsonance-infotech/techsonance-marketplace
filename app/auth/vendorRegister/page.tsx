@@ -22,13 +22,13 @@ const STEP_FIELDS: Record<number, (keyof VendorRegisterSchema)[]> = {
     1: ["company_domain"],
     2: [],
     3: [],
-    4: ["first_name", "last_name", "email", "password", "confirm_password"],
+    4: ["email", "password", "confirm_password"],
 };
 
 export default function VendorRegisterPage() {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [globalError, setGlobalError] = useState<string | null>(null);
-    const [formStep, setFormStep] = useState(2);
+    const [formStep, setFormStep] = useState(1);
     const totalSteps = Object.keys(RegistrationStages).length;
 
     const [countryCode, setCountryCode] = useState("");
@@ -51,8 +51,6 @@ export default function VendorRegisterPage() {
         mode: "onChange",
         resolver: zodResolver(vendorRegisterSchema),
         defaultValues: {
-            first_name: "",
-            last_name: "",
             phone_number: "",
             company_name: "",
             store_owner_first_name: "",
@@ -111,9 +109,7 @@ export default function VendorRegisterPage() {
 
     return (
         <>
-
-
-            <main className="py-20 m-auto max-w-4xl px-6 font-[inter] mb-2 flex flex-col items-center">
+            <main className="mx-auto max-w-4xl w-full px-6 font-[inter] absolute top-2 my-2 flex flex-col items-center ">
                 <div className="w-full mb-6">
                     <h1 className="font-bold text-2xl mb-1">Business Registration</h1>
                     <p className="text-sm text-gray-500 text-balance">
