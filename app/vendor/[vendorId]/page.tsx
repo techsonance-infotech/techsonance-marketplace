@@ -119,7 +119,10 @@ export default function DashboardPage() {
     const [recentOrders, setRecentOrders] = useState<OrderType[]>([]);
     const [loadingRecentOrders, setLoadingRecentOrders] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
-    const [offset, setOffset] = useState(0);
+     const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const offset = (currentPage - 1) * itemsPerPage;
     const [totalRecentOrders, setTotalRecentOrders] = useState(0);
     const [totalRevenue, setTotalRevenue] = useState(0);
     const [pendingOrders, setPendingOrders] = useState(0)
@@ -132,10 +135,7 @@ export default function DashboardPage() {
     const router = useRouter()
         const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
     const [isDownloading, setIsDownloading] = useState(false);
-    const pageSize = 5;
-    const [totalPages, setTotalPages] = useState(0);
-    const startIndex = (count - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
+
     const token = authToken();
 // Granular Loading States
     const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
@@ -144,10 +144,11 @@ export default function DashboardPage() {
     const [isLoadingRecentOrders, setIsLoadingRecentOrders] = useState(true);
     const loadData = async (token:string) => {
         setLoadingRecentOrders(true);
-        await fetchVendorOrderList(0, pageSize, token, OrderStatusEnum.PROCESSING)
+        await fetchVendorOrderList(offset, itemsPerPage, token, OrderStatusEnum.PROCESSING)
             .then((res) => {
                 setRecentOrders(res.data.orders);
                 setTotalRecentOrders(res.data.totalCount);
+                setTotalPages(Math.ceil(res.data.totalCount / itemsPerPage));
                 setLoadingRecentOrders(false);
             })
             .catch((err) => {
@@ -189,7 +190,7 @@ useEffect(() => {
     const handleOrderFilter = async (orderStatus: OrderStatusType) => {
         if (token) {
 
-            await fetchVendorOrderList(0, pageSize, token, orderStatus)
+            await fetchVendorOrderList(offset, itemsPerPage, token, orderStatus)
                 .then((res) => {
                     setRecentOrders(res.data.orders);
                     setTotalRecentOrders(res.data.totalCount);
@@ -563,7 +564,7 @@ const toggleOrderSelection = (orderId: string) => {
 
                 {/* Pagination */}
                 <span className="flex justify-end mt-2 mb-6">
-                    <Pagination setCount={setOffset} count={offset} totalPages={totalRecentOrders} style="relative right-0 w-54" />
+                    <Pagination setCount={setCurrentPage} count={currentPage} totalPages={totalPages} style="relative right-0 w-54" />
                 </span>
                 </span>
             </main>

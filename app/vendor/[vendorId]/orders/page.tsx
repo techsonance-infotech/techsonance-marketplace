@@ -109,8 +109,10 @@ export default function OrdersPage() {
     const [sortBy, setSortBy] = useState<string>("desc");
     const [orders, setOrders] = useState<OrderType[]>([]);
 const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
-const [offset, setOffset] = useState(0);
-const [totalPages, setTotalPages] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const offset = (currentPage - 1) * itemsPerPage;
     const [isDownloading, setIsDownloading] = useState(false);
     const handleDateChange = (selectedDate: Date | undefined) => {
         setDate(selectedDate);
@@ -123,11 +125,11 @@ const [totalPages, setTotalPages] = useState<number>(0);
         }
         const getOrderList = async () => {
             setLoading(true);
-            await fetchVendorOrderList(offset, 10, token, orderStatus, sortBy)
+            await fetchVendorOrderList(offset, itemsPerPage, token, orderStatus, sortBy)
                 .then((res) => {
                     console.log("Vendor Orders List:", res);
                     setOrders(res.data.orders || []);
-                    setTotalPages(res.data.totalCount || 0);
+                    setTotalPages(res.data.totalCount / itemsPerPage || 1);
                 })
                 .catch((err) => {
                     console.log("Error fetching vendor orders list:", err);
@@ -390,7 +392,7 @@ const toggleOrderSelection = (orderId: string) => {
                 </table>
             </div>
             <span className="flex justify-end mt-4">
-                <Pagination setCount={setOffset} count={offset+1} totalPages={(totalPages ?? 0)} style="relative right-0 w-54" />
+                <Pagination setCount={setCurrentPage} count={currentPage} totalPages={totalPages} style="relative right-0 w-54" />
             </span>
         </main>
     );

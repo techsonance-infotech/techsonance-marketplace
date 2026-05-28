@@ -9,6 +9,7 @@ import Link from "next/link";
 import { redirect, useParams } from "next/navigation";
 import { authToken } from "@/utils/authToken";
 import { fetchGstRecords } from "@/utils/vendorApiClient";
+import { Pagination } from "@/components/common/Pagination";
 
 
 interface GstRecordType {
@@ -42,6 +43,10 @@ export default function GstListingPage() {
     const [statusFilter, setStatusFilter] = useState<string>('');
     const [sortBy, setSortBy] = useState<string>("desc");
     const [gstRecords, setGstRecords] = useState<GstRecordType[]>([]);
+      const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const offset = (currentPage - 1) * itemsPerPage;
     const [loading, setLoading] = useState(true);
 
     const handleDateChange = (selectedDate: Date | undefined) => {
@@ -61,6 +66,9 @@ export default function GstListingPage() {
             try {
                 const res = await fetchGstRecords(statusFilter, sortBy, token!);
                 setGstRecords(res.data?.data || []);
+                if (res.data) {
+                    setTotalPages(Math.ceil(res.data.totalCount / itemsPerPage));
+                }
             } catch (err) {
                 console.log("Error fetching GST records:", err);
             } finally {
@@ -221,7 +229,7 @@ export default function GstListingPage() {
                 </table>
             </div>
             <span className="flex justify-end mt-4">
-                {/* <Pagination setCount={setCount} count={count} totalPages={totalPages ?? 0} style="relative right-0 w-54" /> */}
+                <Pagination setCount={setCurrentPage} count={currentPage} totalPages={totalPages ?? 0} style="relative right-0 w-54" />
             </span>
         </main>
     );

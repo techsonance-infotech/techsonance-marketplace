@@ -11,7 +11,14 @@ import { Product } from "@/utils/Types";
 import { authToken } from "@/utils/authToken";
 import { redirect, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { set } from "zod";
+
+interface ProductsPageProps {
+    setIsLoadingProducts: (loading: boolean) => void;
+    setProducts: (products:Product[]) => void;
+     setTotalPages: (total: number) => void;
+     itemsPerPage: number;
+      token: string;
+}
 
 export const PRODUCT_TABLE_HEAD = ["PRODUCT", "CATEGORY", "VARIANT", "SKU", "STOCK", "PRICE", "ACTION"];
  const getCategoryOptions=async(setIsLoadingCategory: (loading: boolean) => void,setCategoryOptions: (options: { value: string; label: string }[]) => void, vendorId: string, token: string) =>{
@@ -29,19 +36,6 @@ export const PRODUCT_TABLE_HEAD = ["PRODUCT", "CATEGORY", "VARIANT", "SKU", "STO
             setIsLoadingCategory(false);
         });
     };
-    const getProducts =async(setIsLoadingProducts: (loading: boolean) => void,setProducts: (products: Product[]) => void, token: string) =>{ 
-        setIsLoadingProducts(true);
-        await fetchVendorProducts(token ?? '')
-        .then((res) => { console.log('res', res); setProducts(res?.data.data || []);  
-            setIsLoadingProducts(false);
-        })
-        .catch((error) => {
-            console.error("Error fetching products:", error);
-            setProducts([]);
-            setIsLoadingProducts(false);
-            return [];
-        });
-    };
 export default  function Products() {
     const { vendorId } = useParams<{ vendorId: string }>();
 
@@ -50,10 +44,31 @@ export default  function Products() {
     const [productList, setProductList] = useState<Product[]>([]);
     const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([]);
 // Granular Loading States
- 
+const [totalProducts, setTotalProducts] = useState(0);
+   const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const offset = (currentPage - 1) * itemsPerPage;
     const [isLoadingProducts, setIsLoadingProducts] = useState(true);
  
     const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+    const loadProduct=async ()=>    {
+            setIsLoadingProducts(true);
+      const response=  await fetchVendorProducts(offset,itemsPerPage,token ?? '');
+      if (response.status !== 200) {
+        console.error("Error fetching products:", response.statusText);
+        setProductList([]);
+        setTotalProducts(0);
+        setTotalPages(1);
+        setIsLoadingProducts(false);
+        return;
+    }
+      const products=response?.data.data || [];
+      setProductList(products);
+      setTotalProducts(response?.data.total_products || 0);
+      setTotalPages(Math.ceil((response?.data.total_products || 0) / itemsPerPage));
+      setIsLoadingProducts(false);
+    }
     useEffect(() => {   
          setTimeout(() => {
         if (!token) {
@@ -61,14 +76,13 @@ export default  function Products() {
         }
     }, 1500)
  
-      //@ts-ignore
-            getProducts(setIsLoadingProducts, setProductList, token);
+        loadProduct();
       //@ts-ignore
             getCategoryOptions(setIsLoadingCategories, setCategoryOptions, vendorId, token);
   
     }, [token]);
  
-    // const currentData: typeof productList = productList.slice(startIndex, endIndex);
+ 
 
     return (
         <main className="w-full px-1">
@@ -278,7 +292,7 @@ export default  function Products() {
 
             {/* Pagination */}
             <span className="flex justify-end mt-4 mb-6">
-                {/* <Pagination setCount={setCount} count={count} totalPages={totalPages} style="relative right-0 w-54" /> */}
+                <Pagination setCount={setCurrentPage} count={currentPage} totalPages={totalPages} style="relative right-0 w-54" />
             </span>
         </main>
     );

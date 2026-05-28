@@ -1,45 +1,59 @@
 import type { Link } from "@/components/common/InnerSideBar";
 import { Coupon, CustomerTicket, GstInvoice, InventoryItem, InventoryProduct, NavLinkType, OrderDetail, UserReview, VendorOrder, VendorProduct, Warehouse } from "@/utils/Types";
-import { Section } from "lucide-react";
+ 
 
 //used
-export const VendorDocumentTypes: { label: string; value: string }[] = [
+export const VendorDocumentTypes: { label: string; value: string , required: boolean}[] = [
   {
     label: 'Business Registration',
-    value: 'business_registration'
+    value: 'business_registration',
+    required: true
   },
   {
     label: 'Financial Statements',
-    value: 'financial_statements'
+    value: 'financial_statements',
+    required: true
+
   },
   {
     label: 'Insurance Coverage',
-    value: 'insurance_coverage'
+    value: 'insurance_coverage',
+    required: true
+
   }
   ,
   {
     label: 'Compliance Certifications',
-    value: 'compliance_certifications'
+    value: 'compliance_certifications',
+    required: true
+
   }
   ,
   {
     label: 'Security Documentation',
-    value: 'security_documentation'
+    value: 'security_documentation',
+    required: true
+
   }
   ,
   {
     label: 'Contract Agreements',
-    value: 'contract_agreements'
+    value: 'contract_agreements',
+    required: true
+
   }
   ,
   {
     label: 'Vendor Information',
-    value: 'vendor_information'
+    value: 'vendor_information',
+    required: true
+
   }
   ,
   {
     label: 'Business Continuity Plan',
-    value: 'business_continuity_plan'
+    value: 'business_continuity_plan',
+    required: true
   }
 
 ]
