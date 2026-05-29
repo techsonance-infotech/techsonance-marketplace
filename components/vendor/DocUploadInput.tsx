@@ -76,6 +76,7 @@ export function DocUploadInput({
     return fileMap.find((entry) => entry.index === fi)?.file !== null;
   }).length;
 
+  console.log("fileMap",fileMap)
   return (
     <div className="mt-6 border border-gray-200 rounded-2xl overflow-hidden bg-white shadow-sm">
       {/* Header */}
