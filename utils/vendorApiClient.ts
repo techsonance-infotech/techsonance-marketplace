@@ -1251,7 +1251,7 @@ catch (error) {
 export const fetchCompanyCompliance = async (token: string) => {
   const domain = await getCompanyDomain();
   try {
-  const res = await fetch(`${BASE_API_URL}/v1/company-identity/compliance`, {
+  const res = await fetch(`${BASE_API_URL}/v1/compliance`, {
     cache: 'no-store',
     headers: { 'company-domain': domain, Authorization: `Bearer ${token}` },
   });
