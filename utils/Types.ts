@@ -175,7 +175,16 @@ export interface Coupon {
   }>;
 }
 
-
+export interface AppliedPromotion {
+   id: string;
+        promotion_id: string;
+        code: string;
+        discount_type: PromotionType;
+        discount_value: number;
+        max_discount_amount: Object | null;
+        isGlobal: boolean;
+        applicableProducts: string[] | null;
+}
 export interface RuleConfig_MinCartValue   { amount: number }
 export interface RuleConfig_MinQty         { qty: number }
 export interface RuleConfig_CustomerSegment{ segment_id: string }
@@ -603,9 +612,11 @@ export interface VendorApplication {
   documents: VendorDocument[];
 }
 export interface NavLinkType {
-  [ key: string ]: string | null;
+  [label: string]: string | null | boolean | undefined;
+  icon?: string;
+  section?: string;
+  divider?: boolean;
 }
-
 export interface FooterLinkType {
   title: string;
   url: string;

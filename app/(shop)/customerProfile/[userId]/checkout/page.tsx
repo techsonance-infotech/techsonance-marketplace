@@ -19,7 +19,7 @@ import { fetchInitCheckout, fetchVerifyPayment } from "@/utils/customerApiClient
 import { authToken } from "@/utils/authToken";
 import { TaxBreakdown, TaxBreakdownPanel, TaxLoadingSkeleton } from "@/components/customer/TaxBreakdownPanel";
 import { clearCart } from "@/lib/features/Cart";
-import { AddressOperationEnum, Coupon, Variant } from "@/utils/Types";
+import { AddressOperationEnum, AppliedPromotion, Coupon, Variant } from "@/utils/Types";
 import AxiosAPI from "@/lib/axios";
 import { motion, AnimatePresence } from "motion/react";
 import toast, { Toaster } from "react-hot-toast";
@@ -263,7 +263,7 @@ export default function CheckoutPage() {
 
   // ── Coupon State ──────────────────────────────────────────────────────────
   const [couponCode, setCouponCode] = useState<string>('');
-  const [couponApplied, setCouponApplied] = useState<Coupon | null>(null);
+  const [couponApplied, setCouponApplied] = useState<AppliedPromotion | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [isCouponValidating, setIsCouponValidating] = useState(false);
 
@@ -434,7 +434,7 @@ export default function CheckoutPage() {
         if (minOrder > 0 && subtotal < minOrder) {
           setCouponError(`Add ₹${formatCurrency(minOrder - subtotal)} more to use this coupon.`);
         } else {
-          setCouponApplied(data as Coupon);
+          setCouponApplied(data as AppliedPromotion);
           setCouponCode('');
           toast.success("Coupon applied!");
         }
@@ -471,7 +471,8 @@ export default function CheckoutPage() {
       const initPayload = {
         paymentMethod: selectedPaymentMethodState,
         addressId: selectedAddressId,
-        ...(isQuickBuy ? { productVariantId: id } : { cartId: id }),
+        promotionId: couponApplied?.promotion_id,
+        ...(isQuickBuy ? { productVariantId: id ,qty:quickBuyQty} : { cartId: id }),
       };
 
       const initData = await fetchInitCheckout(user?.id || '', initPayload, token);
@@ -491,7 +492,7 @@ export default function CheckoutPage() {
 
       const result = await fetchVerifyPayment(user?.id || '', {
         discountApplied: couponDiscount,
-        promotionId: couponApplied?.id,
+        promotionId: couponApplied?.promotion_id,
         orderId: initData.data.orderId,
         isSuccess: userClickedSuccess,
         ...(isQuickBuy ? { productVariantId: id } : { cartId: id }),
