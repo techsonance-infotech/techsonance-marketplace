@@ -1663,4 +1663,42 @@ export const uploadComplianceProofDocument = async (
     return { success: false, message: "Failed to upload document" };
   }
 };
- 
+
+export const fetchStockManagerVariants = async (token: string) => {
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}/v1/product-variant/stock-manager`, {
+            method: 'GET',
+            headers: {
+                'company-domain': companyDomain,
+                Authorization: `Bearer ${token}`,
+            }
+        });
+        if (!response.ok) throw new Error("Failed to fetch stock manager data");
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        return { data: [] };
+    }
+}
+export const quickUpdateStock = async (productVariantId: string, quantity: number, vendorId: string, token: string) => {
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}/v1/inventory/${productVariantId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ quantity }) // The backend expects 'quantity'
+        });
+        
+        if (!response.ok) throw new Error("Failed to update stock");
+        
+        revalidatePath(`/vendor/${vendorId}/products`);
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
