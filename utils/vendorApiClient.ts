@@ -1,5 +1,5 @@
 ﻿"use server"
-import { BASE_API_URL } from "@/constants";
+import { BASE_API_URL} from "@/constants";
 import { revalidatePath } from "next/cache";
 import { getCompanyDomain } from "@/lib/get-domain";
 import { CompanyComplianceField, ComplianceDocument, ComplianceField, ComplianceFieldPayload, OrderStatus, ReturnStatus } from "./Types";
@@ -347,18 +347,27 @@ export const updateProductVariant = async (
     variantId: string
     , token: string) => {
     try {
+        const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}/v1/product-variant/${variantId}`, {
             method: "PATCH",
             body: formData,
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'company-domain': companyDomain,
+            }
         });
 
-        if (!response.ok) throw new Error(`Failed to update variant: ${response.statusText}`);
+        if (!response.ok){
+            console.error('Failed to update product variant');
+        }
 
         const res = await response.json();
+        console.log(`[updateProducrtVarint] reponse`,res)
         revalidatePath(`/vendor/${vendorId}/products/${productId}/variants`);
-        return { status: 200, data: res };
+        return res;
     } catch (error) {
         console.error("Error updating product variant:", error);
+        return { status: 500, data: { error: "Failed to update product variant" } };
     }
 };
 export const fetchProductVariants = async (productId: string, token: string) => {

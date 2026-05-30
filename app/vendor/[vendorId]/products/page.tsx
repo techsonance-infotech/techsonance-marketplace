@@ -43,7 +43,7 @@ export default  function Products() {
    
     const [productList, setProductList] = useState<Product[]>([]);
     const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([]);
- 
+    const [totalProducts, setTotalProducts] = useState(0);
    const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);

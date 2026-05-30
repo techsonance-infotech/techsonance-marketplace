@@ -54,7 +54,7 @@ export default function StockManagerPage() {
 
   // 2. Status Toggle Handler
   const handleStatusToggle = async (variantId: string, currentStatus: string) => {
-    const nextStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    const nextStatus = currentStatus === 'active' ? 'inactive' : 'active';
     setVariants(prev => prev.map(v => v.variantId === variantId ? { ...v, status: nextStatus } : v));
     try {
       await updateProductVariantStatus(variantId, vendorId, nextStatus, token as string);
@@ -98,7 +98,7 @@ export default function StockManagerPage() {
   // Derived stats
   const totalVariants = variants.length;
   const lowStockCount = variants.filter(v => v.stock <= 5).length;
-  const activeCount   = variants.filter(v => v.status === 'ACTIVE').length;
+  const activeCount   = variants.filter(v => v.status === 'active').length;
   const outOfStock    = variants.filter(v => v.stock === 0).length;
 
   return (
@@ -169,8 +169,8 @@ export default function StockManagerPage() {
             className="pl-8 pr-3 py-2 text-sm bg-white border border-stone-200 rounded-xl shadow-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all cursor-pointer appearance-none"
           >
             <option value="">All statuses</option>
-            <option value="ACTIVE">Active</option>
-            <option value="INACTIVE">Hidden</option>
+            <option value="active">Active</option>
+            <option value="inactive">Hidden</option>
           </select>
         </div>
 
