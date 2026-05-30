@@ -1249,7 +1249,8 @@ catch (error) {
 // ─── Company Compliance ───────────────────────────────────────────────────────
 
 export const fetchCompanyCompliance = async (token: string) => {
-  const domain = await getCompanyDomain();
+//   const domain = await getCompanyDomain();
+const domain ='2775df85-bc70-4167-b817-00264122c4dc'
   try {
   const res = await fetch(`${BASE_API_URL}/v1/compliance`, {
     cache: 'no-store',
