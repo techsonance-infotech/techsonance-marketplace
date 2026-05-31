@@ -48,13 +48,28 @@ export default function GstListingPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const offset = (currentPage - 1) * itemsPerPage;
     const [loading, setLoading] = useState(true);
-
+    const [search, setSearch] = useState<string>("");
+    const [debouncedSearch, setDebouncedSearch] = useState<string>("");
     const handleDateChange = (selectedDate: Date | undefined) => {
         setDate(selectedDate);
         setIsOpen(false);
     };
-    
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value);
+    };
+
     const token = authToken();
+
+    // Debounce effect
+    useEffect(() => {
+        const debounceTimer = setTimeout(() => {
+            setDebouncedSearch(search);
+            setCurrentPage(1); // Reset to first page on new search
+        }, 500);
+
+        return () => clearTimeout(debounceTimer);
+    }, [search]);
     
     useEffect(() => {
         if (!token) {
@@ -64,7 +79,7 @@ export default function GstListingPage() {
         const getGstRecords = async () => {
             setLoading(true);
             try {
-                const res = await fetchGstRecords(statusFilter, sortBy, token!);
+                const res = await fetchGstRecords(offset, itemsPerPage, debouncedSearch, statusFilter, sortBy, token!);
                 setGstRecords(res.data?.data || []);
                 if (res.data) {
                     setTotalPages(Math.ceil(res.data.totalCount / itemsPerPage));
@@ -76,7 +91,8 @@ export default function GstListingPage() {
             }
         };
         getGstRecords();
-    }, [statusFilter, sortBy, token]);
+        }, [statusFilter, sortBy, token, debouncedSearch, offset, itemsPerPage
+    ]);
 
     return (
         <main className="w-full px-1">
@@ -110,6 +126,8 @@ export default function GstListingPage() {
                     <img className="w-5 h-5 opacity-50 shrink-0" src={searchImgDark} alt="search icon" />
                     <input
                         type="text"
+                        value={search}
+                        onChange={handleSearch}
                         className="text-sm bg-transparent w-full outline-none text-gray-700 placeholder:text-gray-400"
                         placeholder="Search by GSTIN or Legal Name"
                     />
@@ -229,7 +247,13 @@ export default function GstListingPage() {
                 </table>
             </div>
             <span className="flex justify-end mt-4">
+               {/* Pagination here */}
+               <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className=" flex ">  
+                            showing {itemsPerPage} of {totalPages * itemsPerPage }
+                        </span>
                 <Pagination setCount={setCurrentPage} count={currentPage} totalPages={totalPages ?? 0} style="relative right-0 w-54" />
+                </div>
             </span>
         </main>
     );
