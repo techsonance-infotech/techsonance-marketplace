@@ -500,7 +500,7 @@ export default function VendorFormPage() {
                                 missingDocs={missingLegalDocs}
                             />
 
-                            <NavRow onPrev={prevStep} onNext={nextStep} />
+                            <FormNavRow onPrev={prevStep} onNext={nextStep} />
                         </Section>
                     )}
 
