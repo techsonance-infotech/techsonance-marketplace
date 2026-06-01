@@ -41,14 +41,14 @@ const PRODUCT_UPDATE_FORM_PAGE_LABELS = {
 export function ProductForm({
     categoryOptions,
     warehouseOptions,
-    taxRatesOptions,
+    taxSlabsOptions,
     vendorId,
     existingData,
     productId,
 }: {
     categoryOptions: { value: string; label: string }[];
     warehouseOptions?: { value: string; label: string }[];
-    taxRatesOptions: { value: string; label: string }[];
+    taxSlabsOptions: { value: string; label: string }[];
     vendorId: string;
     existingData?: Partial<ProductFormInput | ProductFormOutput>;
     productId?: string;
@@ -80,7 +80,7 @@ export function ProductForm({
             category: "",
             status: ProductStatusEnum.INACTIVE,
             warehouseId: "",
-                taxRateId: "", 
+                taxSlabId: "", 
         },
     });
     const productName = watch('productName');
@@ -145,6 +145,7 @@ export function ProductForm({
             category: existingData.category || "",
             status: (existingData.status as ProductStatusEnum) || ProductStatusEnum.INACTIVE,
             warehouseId: existingData.warehouseId || "",
+            taxSlabId: existingData.taxSlabId || "",
         });
 
         const initialProductFiles = (existingData.productMedia as FileOrProductImage[]) || [];
@@ -543,18 +544,18 @@ export function ProductForm({
                         <div>
                             <label className="form_label">Tax Rate <span className="text-red-400">*</span></label>
                             <div className="relative">
-                                <select {...register("taxRateId")} className="form_input appearance-none pr-9">
+                                <select {...register("taxSlabId")} className="form_input appearance-none pr-9">
                                     <option value="" disabled>Select Tax Rate</option>
-                                    {taxRatesOptions.map((t, idx) => (
+                                    {taxSlabsOptions.map((t, idx) => (
                                         <option key={idx} value={t.value}>{t.label}</option>
                                     ))}
                                 </select>
                                 <DynamicIcon fallback={() => <p></p>} name="chevron-down" size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                             </div>
-                            {errors.taxRateId && (
+                            {errors.taxSlabId && (
                                 <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                                     <DynamicIcon fallback={() => <p></p>} name="alert-circle" size={12} />
-                                    {errors.taxRateId.message}
+                                    {errors.taxSlabId.message}
                                 </p>
                             )}
                         </div>

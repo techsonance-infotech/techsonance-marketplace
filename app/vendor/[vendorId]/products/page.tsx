@@ -43,6 +43,10 @@ export default  function Products() {
    
     const [productList, setProductList] = useState<Product[]>([]);
     const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+    const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [totalProducts, setTotalProducts] = useState(0);
    const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemPerPage] = useState(10);
@@ -53,7 +57,7 @@ export default  function Products() {
     const [isLoadingCategories, setIsLoadingCategories] = useState(false);
     const loadProduct=async ()=>    {
             setIsLoadingProducts(true);
-      const response=  await fetchVendorProducts(offset,itemsPerPage,token ?? '');
+      const response=  await fetchVendorProducts(offset,itemsPerPage,selectedStatus,debouncedSearchTerm,selectedCategory,token ?? '');
       if (response.status !== 200) {
         console.error("Error fetching products:", response.statusText);
         setProductList([]);
@@ -77,10 +81,19 @@ export default  function Products() {
  
         loadProduct();
       //@ts-ignore
-            getCategoryOptions(setIsLoadingCategories, setCategoryOptions, vendorId, token);
+          
   
+    }, [token,debouncedSearchTerm,selectedStatus,selectedCategory,currentPage]);
+        useEffect(() => {   
+        getCategoryOptions(setIsLoadingCategories,setCategoryOptions, vendorId, token ?? '');
     }, [token]);
- 
+ useEffect(() => {
+        const debounceTimer = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm); 
+        }, 500); // Adjust the debounce delay as needed 
+        return () => clearTimeout(debounceTimer);
+    }, [searchTerm]);
+
  
 
     return (
@@ -120,6 +133,7 @@ export default  function Products() {
                         type="text"
                         className="text-sm bg-transparent w-full outline-none text-gray-700 placeholder:text-gray-400"
                         placeholder="Search by name, email or domain"
+                        onChange={(e)=>setSearchTerm(e.target.value)}
                     />
                 </span>
 
@@ -128,6 +142,7 @@ export default  function Products() {
                     <select
                         className="text-sm border border-gray-200 bg-gray-50 rounded-xl px-3 py-2 text-gray-600 outline-none focus:border-blue-400 cursor-pointer transition-colors"
                         name="status"
+                        onChange={(e)=>setSelectedStatus(e.target.value)}
                     >
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
@@ -137,6 +152,8 @@ export default  function Products() {
                     <select
                         className="text-sm border border-gray-200 bg-gray-50 rounded-xl px-3 py-2 text-gray-600 outline-none focus:border-blue-400 cursor-pointer transition-colors"
                         name="category"
+                        value={selectedCategory??''}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
                     >
                         <option value="">All Categories</option>
                         {categoryOptions.map((option) => (

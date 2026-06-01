@@ -443,7 +443,7 @@ function DerivedInsights({
   const aov           = summary.totalOrders > 0 ? summary.grossRevenue / summary.totalOrders : 0;
   const revenuePerDay = summary.grossRevenue / days;
   const topCategory   = [...categoryPerformance].sort((a, b) => b.value - a.value)[0];
-  const taxRate       = summary.grossRevenue > 0
+  const taxSlab       = summary.grossRevenue > 0
     ? ((summary.taxCollected / summary.grossRevenue) * 100).toFixed(1)
     : '0';
 
@@ -477,7 +477,7 @@ function DerivedInsights({
         <InsightRow
           icon={<Percent className="h-3.5 w-3.5 text-amber-600" />}
           label="Effective tax rate"
-          value={`${taxRate}%`}
+          value={`${taxSlab}%`}
           color="bg-amber-50 light:bg-amber-950"
         />
         {topCategory && (

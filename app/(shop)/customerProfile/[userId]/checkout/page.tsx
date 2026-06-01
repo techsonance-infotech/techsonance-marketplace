@@ -7,7 +7,6 @@ import { calculateCouponDiscount, formatCurrency, getMinOrderAmount } from "@/li
 import { SelectedPaymentMethod } from "@/components/customer/SelectedPaymentMethod";
 import { PAYMENT_METHODS_FIELDS } from "@/constants";
 import { checkAddressExistence, fetchGetCartList } from "@/utils/customerApiClient";
-import { AddToCart } from "@/components/customer/AddToCart";
 import {
   CreditCard, Loader2, Tag, CheckCircle2, X, AlertCircle,
  
@@ -179,8 +178,8 @@ export default function CheckoutPage() {
         customerAddressId: addressId,
         cartItems: cartItemsForTax,
       }, { headers: { Authorization: `Bearer ${token}` } });
-
-      const data = res.data?.data ?? res.data;
+      console.log("Tax API response:", res.data);
+      const data = res.data?.data;
       setTaxBreakdown({
         subtotal: Number(data.subTotal ?? data.subtotal ?? subtotal),
         totalCgst: Number(data.totalCgst ?? 0),

@@ -1,5 +1,5 @@
 ﻿"use client"
-import { fetchTaxRateOptions, fetchVendorOneProducts, fetchVendorsProductsCategory, fetchVendorWarehouse } from "@/utils/vendorApiClient";
+import { fetchTaxSlabOptions, fetchVendorOneProducts, fetchVendorsProductsCategory, fetchVendorWarehouse } from "@/utils/vendorApiClient";
 import { ProductForm } from "@/components/vendor/ProductForm";
 import { Inventory, ProductResponseType, ProductStatusEnum } from "@/utils/Types";
 import { ProductFormInput, ProductFormOutput, ProductFormValuesType } from "@/utils/validation";
@@ -85,9 +85,9 @@ const getWarehouseOptions = async (setWarehouseOptions: (warehouseOptions: { val
         return [];
     });
 }
-const getTaxRatesOptions=async(token: string, setTaxRatesOptions: any) => {
-    fetchTaxRateOptions(token).then((res) => {
-        setTaxRatesOptions(res.data.map((t: any) => ({ value: t.id, label: t.tax_rate_name })));
+const getTaxSlabsOptions=async(token: string, setTaxSlabsOptions: any) => {
+    fetchTaxSlabOptions(token).then((res) => {
+        setTaxSlabsOptions(res.data.map((t: any) => ({ value: t.id, label: t.tax_slab_name })));
     }).catch((error) => {
         console.error("Error fetching tax rates options:", error);
     });
@@ -96,7 +96,7 @@ export default function ProductUpdateFormPage() {
     const { vendorId, id } = useParams<{ vendorId: string, id: string }>();
     const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string; }[]>([]);
     const [warehouseOptions, setWarehouseOptions] = useState<{ value: string; label: string; }[]>([]);
-    const [taxRatesOptions, setTaxRatesOptions] = useState<{ value: string; label: string; }[]>([]);
+    const [taxSlabsOptions, setTaxSlabsOptions] = useState<{ value: string; label: string; }[]>([]);
     const [exitingProduct, setGetExitingProduct] = useState<ProductVariant | null>(null);
     const token = authToken();
     if (!token) {
@@ -106,7 +106,7 @@ export default function ProductUpdateFormPage() {
         getExitingProduct(setGetExitingProduct, id, token);
         getCategoryOptions(setCategoryOptions, token);
         getWarehouseOptions(setWarehouseOptions, token);
-        getTaxRatesOptions(token, setTaxRatesOptions);
+        getTaxSlabsOptions(token, setTaxSlabsOptions);
     }, [token, id]);
     console.log("exitingProduct",exitingProduct)
     const exitingData: Partial<ProductFormInput | ProductFormOutput | {}> = exitingProduct ? {
@@ -144,7 +144,7 @@ export default function ProductUpdateFormPage() {
     return (
         <main className="min-h-screen  py-8 w-full">
             <div className=" mx-auto">
-                <ProductForm  categoryOptions={categoryOptions} warehouseOptions={warehouseOptions} taxRatesOptions={taxRatesOptions} vendorId={vendorId} existingData={exitingData} productId={id} />
+                <ProductForm  categoryOptions={categoryOptions} warehouseOptions={warehouseOptions} taxSlabsOptions={taxSlabsOptions} vendorId={vendorId} existingData={exitingData} productId={id} />
             </div>
         </main>
     );
