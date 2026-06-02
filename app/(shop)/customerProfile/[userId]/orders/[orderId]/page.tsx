@@ -26,6 +26,7 @@ import { OrderStatus } from "@/utils/Types";
 import { authToken } from "@/utils/authToken";
 import { BASE_API_URL } from "@/constants";
 import toast, { Toaster } from "react-hot-toast";
+import { useInvoiceDownload } from "@/hooks/useInvoiceDownload";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -450,6 +451,7 @@ function SingleItemTracker({ status }: { status: string }) {
 
 export default function OrderDetailsPage() {
     const { orderId } = useParams<{ orderId: string }>();
+    const { downloadInvoice, isGenerating } = useInvoiceDownload();
     const [order, setOrder] = useState<OrderDetailType | null>(null);
     const router = useRouter();
     const token=authToken(); 
@@ -681,17 +683,34 @@ const handleDownload = async (url: string, filename: string) => {
                             )}
 
                             <div className="flex flex-col gap-2">
-                                {order?.invoice?.invoice_url && (
-                                     <button 
-      onClick={() => handleDownload(
-        order.invoice.invoice_url,
-        order.invoice.invoice_number ?? "invoice.pdf"
-      )}
-                                        className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer"
-                                    >
-                                        <Download size={16} /> Download Invoice
-                                    </button>
-                                )}
+         {order?.id && (
+ <button
+  onClick={async () => {
+    try {
+      await downloadInvoice(order.id, token!);
+      toast.success('Invoice downloaded!');
+    } catch {
+      toast.error('Failed to generate invoice. Please try again.');
+    }
+  }}
+  disabled={isGenerating}
+  className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+>
+  {isGenerating ? (
+    <>
+      <svg className="animate-spin h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+      </svg>
+      Generating PDF...
+    </>
+  ) : (
+    <>
+      <Download size={16} /> Download Invoice
+    </>
+  )}
+</button>
+)}
                                 <button onClick={()=>handleOrderWarrantiesDownload(orderId)} className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer">
                                     <FileText size={16} /> Request Warranty Slip
                                 </button>

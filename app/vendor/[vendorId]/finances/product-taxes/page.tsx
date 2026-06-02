@@ -13,7 +13,7 @@ interface ProductTaxMappingType {
     id: string;
     product_name: string;
     sku: string;
-    tax_slab_name: string;
+    tax_slabs: string;
     tax_rate: string;
     is_mapped: boolean;
     updated_at: string;
@@ -250,12 +250,13 @@ const handleDateChange = (selectedDate: Date) => {
                                     <td className="p-4 text-gray-500 text-sm font-mono">{item.sku}</td>
                                     
                                     <td className="p-4 text-gray-700 text-sm font-medium">
-                                        {item.tax_rate_name || "—"}
+                                        {item.tax_slabs
+ || "—"}
                                     </td>
                                     
                                     <td className="p-4">
                                         <span className="font-bold text-gray-900 bg-gray-100 px-2 py-1 rounded-lg">
-                                            {item.tax_value ? `${Number(item.tax_value).toFixed(2)}%` : "0.00%"}
+                                            {item.tax_rate ? `${Number(item.tax_rate).toFixed(2)}%` : "0.00%"}
                                         </span>
                                     </td>
                                     

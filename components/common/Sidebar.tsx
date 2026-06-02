@@ -177,18 +177,29 @@ export function Sidebar({ basePath = "", NAV_LINKS}: SidebarProps) {
 
   // Hover state — sidebar expands while hovered OR while pinned open
   const [hovered, setHovered]     = useState(false);
+  const enterTimer                = useRef<ReturnType<typeof setTimeout> | null>(null);
   const leaveTimer                = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const expanded = isSidebarOpen || hovered;
 
   const handleMouseEnter = useCallback(() => {
+    // 1. Clear any pending leave actions so it doesn't accidentally close
     if (leaveTimer.current) clearTimeout(leaveTimer.current);
-    setHovered(true);
+    
+    // 2. Wait 500ms before triggering the hover state
+    enterTimer.current = setTimeout(() => {
+      setHovered(true);
+    }, 500);
   }, []);
 
   const handleMouseLeave = useCallback(() => {
-    // Small delay so accidental quick mouse-outs don't flicker
-    leaveTimer.current = setTimeout(() => setHovered(false), 120);
+    // 1. If the mouse leaves before 500ms, cancel the expansion entirely
+    if (enterTimer.current) clearTimeout(enterTimer.current);
+    
+    // 2. Keep your existing small delay so accidental quick mouse-outs don't flicker
+    leaveTimer.current = setTimeout(() => {
+      setHovered(false);
+    }, 120);
   }, []);
 
   // ── Build render list with section headers inserted ──────────────────────

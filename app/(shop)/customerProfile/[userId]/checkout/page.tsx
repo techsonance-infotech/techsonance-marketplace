@@ -224,7 +224,7 @@ export default function CheckoutPage() {
         userId: user?.id,
         code,
         cartTotal: subtotal,
-        productIdsInCart: productIds,
+        productIds: productIds,
       });
       const data = res.data?.data ?? res.data;
       if (data?.code) {
@@ -560,7 +560,7 @@ export default function CheckoutPage() {
 
               <button
                 onClick={handlePayment}
-                disabled={selectedAddressId === null || isProcessing || isTaxLoading || (couponApplied && couponDiscount === 0) ? true : false}
+                disabled={selectedAddressId === null || isProcessing || isTaxLoading}
                 className="w-full bg-blue-600 text-white font-semibold lg:py-3.5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:bg-blue-400 text-sm lg:text-base"
               >
                 {isProcessing ? (

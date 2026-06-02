@@ -1,6 +1,6 @@
 'use client';
 import Link from "next/link";
-import { Edit, Plus, Download, Package } from "lucide-react";
+import { Edit, Plus, Download, Package, Eye } from "lucide-react";
 import { Pagination } from "@/components/common/Pagination";
 import { fetchVendorProducts, fetchVendorsProductsCategory } from "@/utils/vendorApiClient";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,7 +9,7 @@ import { DynamicIcon } from "lucide-react/dynamic";
 import { TableRowSkeleton } from "@/components/common/skeletons";
 import { Product } from "@/utils/Types";
 import { authToken } from "@/utils/authToken";
-import { redirect, useParams } from "next/navigation";
+import { redirect, useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface ProductsPageProps {
@@ -38,7 +38,7 @@ export const PRODUCT_TABLE_HEAD = ["PRODUCT", "CATEGORY", "VARIANT", "SKU", "STO
     };
 export default  function Products() {
     const { vendorId } = useParams<{ vendorId: string }>();
-
+const router=useRouter();
     const token = authToken();
    
     const [productList, setProductList] = useState<Product[]>([]);
@@ -170,9 +170,9 @@ export default  function Products() {
                 <Table className="w-full table-auto min-w-[800px]">
                     <TableHeader>
                         <TableRow className="bg-gray-50 border-b border-gray-100 hover:bg-gray-50">
-                            <TableHead className="p-4 w-10">
+                            {/* <TableHead className="p-4 w-10">
                                 <input className="w-4 h-4" type="checkbox" />
-                            </TableHead>
+                            </TableHead> */}
                             {PRODUCT_TABLE_HEAD.map((head, index) => (
                                 <TableHead
                                     key={index}
@@ -196,12 +196,7 @@ export default  function Products() {
                                 const status = firstVariant?.status;
 
                                 return (
-                                    <TableRow key={item.id ?? index} className="hover:bg-gray-50 transition-colors">
-                                        {/* Checkbox */}
-                                        <TableCell className="p-4">
-                                            <input type="checkbox" className="w-4 h-4" />
-                                        </TableCell>
-
+                                    <TableRow key={item.id ?? index} className="hover:bg-gray-50 transition-colors" onClick={()=>router.push(`/vendor/${vendorId}/products/${item.id}/productVariants`)}>
                                         {/* Product Image + Name */}
                                         <TableCell className="px-4 py-3">
                                             <div className="flex items-center gap-3 min-w-[220px] max-w-[320px]">
@@ -225,16 +220,16 @@ export default  function Products() {
                                         {/* Variant */}
                                         <TableCell className="px-4 py-3">
                                             {item.variants && item.variants.length > 0 ? (
-                                                <Link
-                                                    href={`/vendor/${vendorId}/products/${item.id}/productVariants`}
-                                                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 py-1.5 px-3 rounded-full transition-colors whitespace-nowrap"
+                                             
+                                                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 py-1.5 px-3 rounded-full transition-colors whitespace-nowrap"
                                                     title="View Variants"
                                                 >
                                                     <DynamicIcon name="tag" size={13} />
                                                     {item.variants.length} Variant{item.variants.length > 1 ? "s" : ""}
-                                                </Link>
+                                               </span>
                                             ) : (
                                                 <Link
+                                                onClick={(e)=>e.stopPropagation()}
                                                     href={`/vendor/${vendorId}/products/variantForm/${item.id}`}
                                                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 py-1.5 px-3 rounded-full transition-colors whitespace-nowrap"
                                                     title="Add Variant"
@@ -274,23 +269,14 @@ export default  function Products() {
 
 
                                         {/* Actions */}
-                                        <TableCell className="px-4 py-3">
-                                            <div className="flex gap-2 items-center whitespace-nowrap">
-                                                <Link
-                                                    href={`/vendor/${vendorId}/products/productUpdateForm/${firstVariant?.id ?? item.id}`}
+                                        <TableCell className="px-4 py-3" onClick={(e)=>e.stopPropagation()}>
+                                            <span className={`flex items-center gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity`}>
                                                     className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 py-1.5 px-3 rounded-lg transition-colors"
                                                     title="Edit Product"
-                                                >
-                                                    <Edit size={16} />
-                                                    Edit
-                                                </Link>
-                                                <DeleteBtn
-                                                    id={item.id}
-                                                    vendorId={vendorId}
-                                                    toDelete="PRODUCT"
-                                                    style="flex items-center gap-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 py-1 px-3 rounded-lg transition-colors"
-                                                />
-                                            </div>
+                                          
+                                                <Eye />
+                                                    View Variant
+                                         </span>
                                         </TableCell>
                                     </TableRow>
                                 );

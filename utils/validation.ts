@@ -353,10 +353,7 @@ export const couponSchema = z.object({
   discount_type: z.enum(PromotionType, {
     message: "Please select a valid discount type" }),
 
-  value: z
-    .number({ error: "Value is required and must be a number" })
-    .positive({ error: "Value must be greater than zero" })
-    .max(1000000, { message: "Value is unusually high" }),
+value: z.number('Enter a valid amount' ).min(0.01, 'Value must be greater than 0'),
 
   valid_from: z.string().min(1, { message: "Start date is required" }),
   valid_to: z.string().min(1, { message: "End date is required" }),

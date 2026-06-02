@@ -371,8 +371,8 @@ export const fetchProductVariants = async (productId: string, token: string) => 
         const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}/v1/product-variant/${productId}`, {
             method: 'GET',
-            cache: 'force-cache',
-            next: { revalidate: 3600 },
+            cache: 'no-cache',
+            // next: { revalidate: 3600 },
             headers: {
                 'company-domain': companyDomain,
                 Authorization: `Bearer ${token}`,
@@ -925,7 +925,7 @@ export const fetchTaxProfiles = async (sortBy: string, date: Date | undefined, t
 export const fetchTaxSlabOptions= async ( token: string) => {
     try {
         const companyDomain = await getCompanyDomain();
-        const response = await fetch(`${BASE_API_URL}/v1/finances/tax-rate-options`, {
+        const response = await fetch(`${BASE_API_URL}/v1/finances/tax-slab-options`, {
             method: 'GET',
             headers: { 'company-domain': companyDomain, Authorization: `Bearer ${token}` },
         });
@@ -977,6 +977,7 @@ export const fetchProductTaxMappings = async (offSet: number, sortBy: string, st
     try {
         const companyDomain = await getCompanyDomain();
         const response = await fetch(`${BASE_API_URL}/v1/finances/product-tax-mappings?offset=${offSet}&sort_by=${sortBy}&status=${statusFilter}`, {
+            cache: 'no-store',
             method: 'GET',
             headers: { 'company-domain': companyDomain, Authorization: `Bearer ${token}` },
         });
@@ -1728,6 +1729,7 @@ export const fetchTaxSlabs = async (sortBy: string, token: string) => {
     const response = await fetch(
       `${BASE_API_URL}/v1/finances/tax-slabs?sort_by=${sortBy??'desc'}`,
       {
+        cache: 'no-store',
         method: 'GET',
         headers: { 'company-domain': companyDomain, Authorization: `Bearer ${token}` },
       },

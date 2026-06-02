@@ -19,20 +19,28 @@ export const InnerSideBar = ({
     useEffect(() => {
         setIsMounted(true)
     }, [])
-     const [hovered, setHovered]     = useState(false);
+const [hovered, setHovered]     = useState(false);
+  const enterTimer                = useRef<ReturnType<typeof setTimeout> | null>(null);
   const leaveTimer                = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const expanded = isClosed
-   || hovered;
+  const expanded = isClosed || hovered;
 
   const handleMouseEnter = useCallback(() => {
+   
     if (leaveTimer.current) clearTimeout(leaveTimer.current);
-    setHovered(true);
+    enterTimer.current = setTimeout(() => {
+      setHovered(true);
+    }, 500);
   }, []);
 
   const handleMouseLeave = useCallback(() => {
-    // Small delay so accidental quick mouse-outs don't flicker
-    leaveTimer.current = setTimeout(() => setHovered(false), 120);
+    // 1. If the mouse leaves before 500ms, cancel the expansion entirely
+    if (enterTimer.current) clearTimeout(enterTimer.current);
+    
+    // 2. Keep your existing small delay so accidental quick mouse-outs don't flicker
+    leaveTimer.current = setTimeout(() => {
+      setHovered(false);
+    }, 120);
   }, []);
   
     const links = getVendorInnerSidebarLinks(vendorId, selectedMenu)
@@ -53,12 +61,10 @@ export const InnerSideBar = ({
     return (
          <AnimatePresence mode="wait">
         <div
-              
+              style={{left:60}}
             className={`
-        relative flex flex-col bg-white border-r border-gray-200 h-screen
-        overflow-y-auto overflow-x-hidden
-        transition-all duration-300 ease-in-out
-        ${!expanded ? "w-20" : "min-w-44 w-64"}
+        fixed left-0 top-0 z-30 flex h-full flex-col  bg-white  transition-[width] duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden px-[10px] py-4 border-r border-gray-200 
+        ${!expanded ? "w-20" : "min-w-44 w-64 rounded-r-2xl"}
       `}
         >
             <div className="sticky top-0 z-10 flex items-center justify-end bg-white border-b border-gray-100 px-3 py-3 w-full">

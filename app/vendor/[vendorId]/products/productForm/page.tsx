@@ -22,7 +22,10 @@ const getCategoryOptions = async (token: string, vendorId: string, setCategoryOp
 
 const getTaxSlabsOptions=async(token: string, setTaxSlabsOptions: any) => {
     fetchTaxSlabOptions(token).then((res) => {
-        setTaxSlabsOptions(res.data.map((t: any) => ({ value: t.id, label: t.tax_rate_name })));
+        console.log("Tax slab options response:", res.data);
+        setTaxSlabsOptions(res.data.map((t: any) => ({ value: t.id, label: t.
+slab_name
+  })));
     }).catch((error) => {
         console.error("Error fetching tax rates options:", error);
     });

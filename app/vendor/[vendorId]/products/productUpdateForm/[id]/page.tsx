@@ -39,6 +39,7 @@ interface Product {
     company_id: string;
     vendor_id: string;
     category_id: string;
+    tax_slab_id: string;
 
 }
 
@@ -87,7 +88,7 @@ const getWarehouseOptions = async (setWarehouseOptions: (warehouseOptions: { val
 }
 const getTaxSlabsOptions=async(token: string, setTaxSlabsOptions: any) => {
     fetchTaxSlabOptions(token).then((res) => {
-        setTaxSlabsOptions(res.data.map((t: any) => ({ value: t.id, label: t.tax_slab_name })));
+        setTaxSlabsOptions(res.data.map((t: any) => ({ value: t.id, label: t.slab_name })));
     }).catch((error) => {
         console.error("Error fetching tax rates options:", error);
     });
@@ -132,7 +133,7 @@ export default function ProductUpdateFormPage() {
 
         // Note: 'category_id' isn't in the provided JSON, but kept here if your schema expects it
         category: exitingProduct?.product?.category_id || '',
-
+        taxSlabId: exitingProduct?.product?.tax_slab_id || '',
         status: exitingProduct?.status as ProductStatusEnum || '',
         variantId: exitingProduct?.id || '',
 
