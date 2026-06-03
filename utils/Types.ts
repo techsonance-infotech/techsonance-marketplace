@@ -1,4 +1,4 @@
-﻿
+
 import { VendorRegisterSchema } from "./validation";
 export enum UserStatusEnum {
   ACTIVE = 'active',
@@ -277,12 +277,13 @@ export interface VendorUser {
   // user_status: 'active' | 'suspended' | 'pending';
   first_name: string;
   last_name: string;
-  country_code: string
-  phone_number: string
-  store_name: string
-  category: string
-  vendor_status: string
+  country_code: string;
+  phone_number: string;
+  store_name: string;
+  category: string;
+  vendor_status: string;
   joined_at: Date;
+  password_change_required?: boolean;
 }
 
 export interface User {
@@ -299,6 +300,7 @@ export interface User {
   updated_at: Date;
   company_id: string | null;
   role_id: string | null;
+  password_change_required?: boolean;
 }
 // Supporting Interfaces based on your schema
 // used in multiple places

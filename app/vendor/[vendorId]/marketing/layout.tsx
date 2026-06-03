@@ -9,10 +9,11 @@ const InnerSideBar = dynamic(() => import('@/components/vendor/InnerSideBar').th
 export default  function MarketingLayout({ children }: { children: React.ReactNode }) {
     const {vendorId} = useParams<{ vendorId: string }>();
     return (
-        <div className='pl-[120px]'>
+          <main className='flex w-full'>
+
 
             <InnerSideBar vendorId={vendorId} selectedMenu="Marketing" />
             {children}
-        </div>
+        </main>
     )
 }

@@ -13,8 +13,12 @@ import { RootState } from "@/lib/store";
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 
 
+import { useNavbarData } from "@/hooks/useNavbarData";
+
 // @ts-ignore
-export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks = NAV_LINKS }: { styles?: string, logoUrl?: string, menuLinks?: { [key: string]: string | null }[] }) {
+export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks: propMenuLinks }: { styles?: string, logoUrl?: string, menuLinks?: { [key: string]: string | null }[] }) {
+    const { menuLinks: dynamicLinks } = useNavbarData();
+    const menuLinks = propMenuLinks || dynamicLinks;
     const searchImg = false ? searchImgLight : searchImgDark;
     const { items } = useAppSelector((state: RootState) => state.cart);
     const { wishItems } = useAppSelector((state: RootState) => state.wishlist);
