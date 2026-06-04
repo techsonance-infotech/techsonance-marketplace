@@ -32,23 +32,17 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
     const router = useRouter();
     const token = authToken();
 
-     
     const syncingRef = useRef(false);
-     
     const rollbackRef = useRef<{ quantity: number; cartItemId?: string; cartId?: string } | null>(null);
 
     useEffect(() => {
         if (items.length === 0) {
             dispatch(loadCart());
         }
-    }, [dispatch]);
+    }, [dispatch, items.length]);
 
     const cartItem = items?.find((item) => item.productVariantId === productVariantId);
     const quantity = cartItem?.quantity ?? 0;
-
-    const isSmall = styles?.includes("small");
-    const containerBase = `flex items-center justify-center bg-brand-primary text-white rounded-lg shadow-md overflow-hidden transition-all duration-200`;
-    const heightClass = isSmall ? "h-6" : "h-11";
 
     const handleIncrement = async () => {
         if (!user?.id || !token) {
@@ -60,9 +54,8 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
         const prevQuantity = quantity;
         const prevCartItemId = cartItem?.cartItemId;
         const prevCartId = cartItem?.cartId;
-
-        // ── 1. Optimistic update — instant UI ────────────────────
         const optimisticQuantity = prevQuantity + 1;
+
         dispatch(addToCart({
             cartId: cartItem?.cartId ?? '',
             cartItemId: cartItem?.cartItemId ?? '',
@@ -70,22 +63,17 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
             quantity: optimisticQuantity,
         }));
 
-        // Open sidebar immediately (no waiting for server)
         if (!path.includes("cart") && !path.includes("wishlist")) {
             dispatch(toggleCartSidebar('open'));
         }
 
-        // ── 2. Sync with server in background ────────────────────
         syncingRef.current = true;
         rollbackRef.current = { quantity: prevQuantity, cartItemId: prevCartItemId, cartId: prevCartId };
 
         try {
             const response = await fetchAddToCart(productVariantId, optimisticQuantity, user.id, token);
             const cartResponse: CartItemResponse = response?.data;
-
             if (!cartResponse?.cart_id) throw new Error('Invalid server response');
-
-            // Reconcile with real server data (cart IDs may be new for first add)
             dispatch(addToCart({
                 cartId: cartResponse.cart_id,
                 cartItemId: cartResponse.cart_item_id,
@@ -94,7 +82,6 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
             }));
         } catch (error) {
             console.error("Error adding to cart:", error);
-            // ── 3. Rollback to pre-click state ────────────────────
             if (prevQuantity === 0) {
                 dispatch(removeFromCart({ productVariantId, quantity: 0 }));
             } else {
@@ -119,14 +106,12 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
         const prevCartItemId = cartItem.cartItemId;
         const prevCartId = cartItem.cartId;
 
-        // ── 1. Optimistic update — instant UI ────────────────────
         if (prevQuantity <= 1) {
             dispatch(removeFromCart({ productVariantId, quantity: 0 }));
         } else {
             dispatch(removeFromCart({ productVariantId, quantity: prevQuantity - 1 }));
         }
 
-        // ── 2. Sync with server in background ────────────────────
         syncingRef.current = true;
         rollbackRef.current = { quantity: prevQuantity, cartItemId: prevCartItemId, cartId: prevCartId };
 
@@ -138,10 +123,7 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
                 token
             );
             const cartResponse: CartItemResponse = response?.data;
-
             if (!cartResponse) throw new Error('Invalid server response');
-
-            // Reconcile: server is source of truth on final quantity
             if (cartResponse.success && !cartResponse.quantity) {
                 dispatch(removeFromCart({ productVariantId, quantity: 0 }));
             } else {
@@ -149,7 +131,6 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
             }
         } catch (error) {
             console.error("Error removing from cart:", error);
-            // ── 3. Rollback ───────────────────────────────────────
             dispatch(addToCart({
                 cartId: prevCartId,
                 cartItemId: prevCartItemId,
@@ -163,60 +144,70 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
     };
 
     return (
-        <motion.div
-            whileHover={{ scale: 1.1 }}
-            className={`${containerBase} ${heightClass} ${styles}`}
-        >
+        // The outer wrapper gets the caller's styles (border, radius, bg, height).
+        // overflow-hidden ensures the animated children are clipped to that shape.
+        <div className={`relative flex items-center justify-center overflow-hidden select-none transition-all duration-200 ${styles ?? ''}`}>
             <AnimatePresence mode="wait">
                 {quantity === 0 ? (
+                    /* ── Empty state: "Add to Cart" button ─────────────────── */
                     <motion.button
                         key="add-btn"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        onClick={handleIncrement}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.95 }}
                         transition={{ duration: 0.15 }}
-                        className="flex h-full w-full items-center justify-center gap-2 whitespace-nowrap"
+                        onClick={handleIncrement}
+                        whileTap={{ scale: 0.97 }}
+                        className="flex h-full w-full items-center justify-center gap-2 px-4"
                     >
-                        <ShoppingCart size={isSmall ? 18 : 22} />
+                        <ShoppingCart size={16} />
+                        <span className="text-[13px] font-semibold tracking-wide">Add to Cart</span>
                     </motion.button>
                 ) : (
+                    /* ── Counter state ──────────────────────────────────────── */
+                    // bg-blue-600 fills the entire outer wrapper (which already has rounded corners
+                    // from the caller's styles + overflow-hidden), so no separate rounded needed here.
                     <motion.div
                         key="counter-ui"
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -5 }}
-                        className="flex h-full w-full items-center justify-evenly"
+                        initial={{ opacity: 0, scale: 0.96 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.96 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute inset-0 flex items-center justify-between bg-blue-600 text-white px-2"
                     >
                         <motion.button
-                            whileTap={{ scale: 0.8 }}
+                            whileTap={{ scale: 0.82 }}
                             onClick={handleDecrement}
-                            className="h-full flex items-center justify-center flex-1 hover:bg-black/10 transition-colors"
+                            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/20 transition-colors shrink-0"
+                            aria-label="Remove one"
                         >
-                            <Minus size={16} />
+                            <Minus size={15} strokeWidth={2.5} />
                         </motion.button>
 
-                        <motion.span
-                            key={quantity}
-                            initial={{ scale: 1.2, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className="font-bold flex-1 text-xs text-center"
-                        >
-                            {quantity}
-                        </motion.span>
+                        <AnimatePresence mode="wait">
+                            <motion.span
+                                key={quantity}
+                                initial={{ y: -8, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: 8, opacity: 0 }}
+                                transition={{ duration: 0.12 }}
+                                className="font-bold text-sm min-w-[24px] text-center tabular-nums"
+                            >
+                                {quantity}
+                            </motion.span>
+                        </AnimatePresence>
 
                         <motion.button
-                            whileTap={{ scale: 0.8 }}
+                            whileTap={{ scale: 0.82 }}
                             onClick={handleIncrement}
-                            className="h-full flex items-center justify-center flex-1 hover:bg-black/10 transition-colors"
+                            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/20 transition-colors shrink-0"
+                            aria-label="Add one more"
                         >
-                            <Plus size={16} />
+                            <Plus size={15} strokeWidth={2.5} />
                         </motion.button>
                     </motion.div>
                 )}
             </AnimatePresence>
-        </motion.div>
+        </div>
     );
 }

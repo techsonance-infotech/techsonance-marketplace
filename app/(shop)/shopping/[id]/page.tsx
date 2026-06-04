@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { motion, AnimatePresence, Variants } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { DynamicIcon, IconName } from 'lucide-react/dynamic';
 import { WishListBtn } from '@/components/customer/WishListBtn';
 import { AddToCart } from '@/components/customer/AddToCart';
@@ -11,7 +11,11 @@ import { ProductSpecifications } from '@/components/customer/ProductSpec';
 import { BuyBtnMode, Coupon, Product, ProductImage, Variant } from '@/utils/Types';
 import { formatCurrency } from '@/lib/utils';
 import { fetchProduct } from '@/utils/commonAPiClient';
-import { CheckCircle2, ChevronLeft, ChevronRight, Star, Tag, X } from 'lucide-react';
+import {
+    CheckCircle2, ChevronLeft, ChevronRight, Star, Tag, X,
+    Share2, Heart, Shield, Truck, RotateCcw, Banknote, FileSpreadsheet,
+    Package, AlertCircle, Clock, Loader2, MessageSquareQuote, ChevronDown
+} from 'lucide-react';
 import { AvailableCouponsModal } from '@/components/customer/AvailableCouponsModal';
 import { useMediaQuery } from 'react-responsive';
 import AxiosAPI from '@/lib/axios';
@@ -20,427 +24,609 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { RootState } from '@/lib/store';
 import { AxiosError, AxiosResponse } from 'axios';
-const brandOffer = [
-    { id: '1', title: '1 year warranty', icon: 'shopping-bag' },
-    { id: '2', title: 'Free delivery', icon: 'truck' },
-    { id: '3', title: '7 days return', icon: 'undo-2' },
-    { id: '4', title: 'Cash on delivery', icon: 'banknote' },
-    { id: '5', title: 'GST Billing', icon: 'file-spreadsheet' }
+
+// ─── Trust Badges ────────────────────────────────────────────────────────────
+const trustBadges = [
+    { icon: Truck, label: 'Free Delivery' },
+    { icon: RotateCcw, label: '7-Day Returns' },
+    { icon: Shield, label: '1 Year Warranty' },
+    { icon: Banknote, label: 'Cash on Delivery' },
+    { icon: FileSpreadsheet, label: 'GST Billing' },
 ];
+
+// ─── Skeleton Components ──────────────────────────────────────────────────────
+const SkeletonBox = ({ className }: { className?: string }) => (
+    <div className={`animate-pulse bg-gray-200 rounded-xl ${className ?? ''}`} />
+);
+
+const ProductPageSkeleton = () => (
+    <main className="min-h-screen bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <SkeletonBox className="h-4 w-48 mb-8" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                {/* Image skeleton */}
+                <div className="flex gap-4">
+                    <div className="hidden lg:flex flex-col gap-3">
+                        {[...Array(4)].map((_, i) => <SkeletonBox key={i} className="w-[72px] h-[72px]" />)}
+                    </div>
+                    <SkeletonBox className="flex-1 aspect-square rounded-3xl" />
+                </div>
+                {/* Info skeleton */}
+                <div className="flex flex-col gap-5">
+                    <SkeletonBox className="h-5 w-28" />
+                    <SkeletonBox className="h-8 w-3/4" />
+                    <SkeletonBox className="h-4 w-full" />
+                    <SkeletonBox className="h-4 w-2/3" />
+                    <SkeletonBox className="h-12 w-40 mt-2" />
+                    <div className="flex gap-3 mt-2">
+                        {[...Array(3)].map((_, i) => <SkeletonBox key={i} className="w-9 h-9 rounded-full" />)}
+                    </div>
+                    <div className="flex gap-3">
+                        {[...Array(3)].map((_, i) => <SkeletonBox key={i} className="w-20 h-10 rounded-xl" />)}
+                    </div>
+                    <div className="flex gap-3 mt-4">
+                        <SkeletonBox className="flex-1 h-12 rounded-2xl" />
+                        <SkeletonBox className="flex-1 h-12 rounded-2xl" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+);
+
+// ─── Star Row ─────────────────────────────────────────────────────────────────
+const StarRow = ({ rating, size = 14 }: { rating: number; size?: number }) => (
+    <span className="flex items-center gap-0.5">
+        {Array.from({ length: 5 }, (_, i) => (
+            <Star
+                key={i}
+                size={size}
+                fill={i < rating ? '#F59E0B' : 'none'}
+                className={i < rating ? 'text-amber-400' : 'text-gray-300'}
+            />
+        ))}
+    </span>
+);
+
+// ─── Tab types ────────────────────────────────────────────────────────────────
+type Tab = 'description' | 'specs' | 'reviews';
 
 export default function ProductPage() {
     const params = useParams();
     const id = params?.id as string;
+    const router = useRouter();
+    const token = authToken();
+    const { user } = useAppSelector((state: RootState) => state.auth);
+    const isMobile = useMediaQuery({ maxWidth: '1024px' });
+
+    // ── State ─────────────────────────────────────────────────────────────────
     const [isMounted, setIsMounted] = useState(false);
-    const [activeImage, setActiveImage] = useState<string | undefined>();
-    const [productImages, setProductImages] = useState<ProductImage[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [product, setProduct] = useState<Product | undefined>();
     const [activeVariant, setActiveVariant] = useState<Variant | undefined>();
-    const [product, setProduct] = useState<Product | undefined>(undefined);
+    const [productImages, setProductImages] = useState<ProductImage[]>([]);
+    const [activeImage, setActiveImage] = useState<string | undefined>();
+    const [activeIndex, setActiveIndex] = useState(0);
     const [isCouponModalOpen, setCouponModalOpen] = useState(false);
     const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
-    const isMobile = useMediaQuery({ maxWidth: '1024px' });
-    const { user } = useAppSelector((state: RootState) => state.auth);
-    const route = useRouter();
-    const token = authToken();
-    console.log("product id", id)
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
+    const [activeTab, setActiveTab] = useState<Tab>('description');
+
+    // ── Lifecycle ─────────────────────────────────────────────────────────────
+    useEffect(() => { setIsMounted(true); }, []);
+
     useEffect(() => {
         const getProduct = async () => {
-            const response = await fetchProduct(id);
-            console.log("product response", response.data);
-            const productData = response.data as Product;
-            setProduct(productData);
-            if (productData?.variants && productData.variants.length > 0) {
-                setActiveVariant(productData.variants[0]);
-                setProductImages(productData.variants[0].images);
-                setActiveImage(productData.variants[0].images[0]?.image_url);
+            setIsLoading(true);
+            try {
+                const response = await fetchProduct(id);
+                const productData = response.data as Product;
+                setProduct(productData);
+                if (productData?.variants?.length > 0) {
+                    setActiveVariant(productData.variants[0]);
+                    setProductImages(productData.variants[0].images);
+                    setActiveImage(productData.variants[0].images[0]?.image_url);
+                }
+            } finally {
+                setIsLoading(false);
             }
-        }
+        };
         getProduct();
+    }, [id]);
 
-    }, [])
-    console.log("product response", product)
-    console.log("activeVariant", activeVariant)
-    console.log("activeImage", activeImage)
-    const containerStagger = { visible: { transition: { staggerChildren: 0.1 } } };
-    const fadeInUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 50 } } };
-    const handleActiveVariantChange = (variant: Variant) => {
-        setActiveVariant(variant);
-        setProductImages(variant.images);
-        setActiveImage(variant.images[0]?.image_url);
-    }
-    const reviewsList = activeVariant?.reviews || [];
-    const totalReviews = reviewsList.length;
-
-    // Calculate average: Sum all ratings, divide by total, and round to nearest whole star
-    const averageRating = totalReviews > 0
-        ? Math.round(reviewsList.reduce((sum, review) => sum + review.rating, 0) / totalReviews)
-        : 0;
-
-    const handleCouponSelect = async (coupon: Coupon) => {
-
-
-        await AxiosAPI.post('/v1/coupon/validate', {
-            userId: user?.id,
-            code: coupon.code,
-            cartTotal: basePrice,
-            productIdsInCart: [product?.id]
-        }, {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then((res: AxiosResponse) => {
-            console.log("Coupon validation response:", res.data);
-            if (res.data.success !== true || res.status !== 201) {
-                console.log("Coupon validation failed:", res.data);
-                toast.error(res.data.message || "Failed to validate coupon");
-                setTimeout(() => {
-                    setCouponModalOpen(false);
-                }, 1500);
-            } else {
-                toast.success("Coupon applied successfully");
-                setSelectedCoupon(coupon);
-                setCouponModalOpen(false);
-            }
-        }).catch((err: AxiosError) => {
-            // @ts-ignore   
-            toast.error(err.response?.data.error || "Failed to validate coupon");
-            console.log("Coupon validation error:", err.response?.data);
-        })
-    }
-    const basePrice = Number(activeVariant?.price) || 0;
-    const productDiscountPercent = Number(product?.discount_percent) || 0;
-    const originalMRP = productDiscountPercent > 0
-        ? Math.floor(basePrice / (1 - productDiscountPercent / 100))
-        : basePrice;
-
-    // Calculate additional coupon discount
-    let couponDiscountAmount = 0;
-    if (selectedCoupon) {
-        if (selectedCoupon.discount_type === 'percentage') {
-            couponDiscountAmount = Math.floor(basePrice * (Number(selectedCoupon.discount_value) / 100));
-            // Apply max cap if the coupon has one
-            if (selectedCoupon.max_discount_amount && couponDiscountAmount > Number(selectedCoupon.max_discount_amount)) {
-                couponDiscountAmount = Number(selectedCoupon.max_discount_amount);
-            }
-        } else { // 'fixed_cart' or 'fixed_product'
-            couponDiscountAmount = Number(selectedCoupon.discount_value);
-        }
-    }
-    const [activeIndex, setActiveIndex] = useState(0);
-
-    // Sync activeIndex with activeImage
     useEffect(() => {
         const idx = productImages.findIndex(img => img.image_url === activeImage);
         if (idx !== -1) setActiveIndex(idx);
     }, [activeImage, productImages]);
-    // Final calculated values to display
-    const finalPayablePrice = Math.max(0, basePrice - couponDiscountAmount);
-    const totalSavings = originalMRP - finalPayablePrice;
 
+    // ── Variant helpers ───────────────────────────────────────────────────────
+    const handleVariantChange = (variant: Variant) => {
+        setActiveVariant(variant);
+        setProductImages(variant.images);
+        setActiveImage(variant.images[0]?.image_url);
+        setSelectedCoupon(null);
+    };
 
+    // ── Pricing ───────────────────────────────────────────────────────────────
+    const basePrice = Number(activeVariant?.price) || 0;
+    const discountPct = Number(product?.discount_percent) || 0;
+    const originalMRP = discountPct > 0 ? Math.floor(basePrice / (1 - discountPct / 100)) : basePrice;
 
-
-    const handleCouponModalOpen = () => {
-        if (!token) {
-            route.push('/auth/customerLogin');
+    let couponDiscount = 0;
+    if (selectedCoupon) {
+        if (selectedCoupon.discount_type === 'percentage') {
+            couponDiscount = Math.floor(basePrice * (Number(selectedCoupon.discount_value) / 100));
+            if (selectedCoupon.max_discount_amount && couponDiscount > Number(selectedCoupon.max_discount_amount)) {
+                couponDiscount = Number(selectedCoupon.max_discount_amount);
+            }
         } else {
-            setCouponModalOpen(true);
+            couponDiscount = Number(selectedCoupon.discount_value);
         }
     }
+    const finalPrice = Math.max(0, basePrice - couponDiscount);
+    const totalSavings = originalMRP - finalPrice;
+    const hasDiscount = discountPct > 0 || couponDiscount > 0;
+
+    // ── Reviews ───────────────────────────────────────────────────────────────
+    const reviewsList = activeVariant?.reviews || [];
+    const totalReviews = reviewsList.length;
+    const avgRating = totalReviews > 0
+        ? Math.round(reviewsList.reduce((s, r) => s + r.rating, 0) / totalReviews)
+        : 0;
+
+    // ── Coupon ────────────────────────────────────────────────────────────────
+    const handleCouponSelect = async (coupon: Coupon) => {
+        await AxiosAPI.post('/v1/coupon/validate', {
+            userId: user?.id,
+            code: coupon.code,
+            cartTotal: basePrice,
+            productIdsInCart: [product?.id],
+        }, { headers: { Authorization: `Bearer ${token}` } })
+            .then((res: AxiosResponse) => {
+                if (res.data.success !== true || res.status !== 201) {
+                    toast.error(res.data.message || 'Failed to validate coupon');
+                    setTimeout(() => setCouponModalOpen(false), 1500);
+                } else {
+                    toast.success('Coupon applied successfully');
+                    setSelectedCoupon(coupon);
+                    setCouponModalOpen(false);
+                }
+            })
+            .catch((err: AxiosError) => {
+                // @ts-ignore
+                toast.error(err.response?.data?.error || 'Failed to validate coupon');
+            });
+    };
+
+    const handleCouponModalOpen = () => {
+        if (!token) router.push('/auth/customerLogin');
+        else setCouponModalOpen(true);
+    };
+
+    // ── Stock ─────────────────────────────────────────────────────────────────
+    const inStock = (activeVariant?.inventory?.stock_quantity ?? 0) > 0;
+
+    // ── Loading state ─────────────────────────────────────────────────────────
+    if (isLoading) return <ProductPageSkeleton />;
+
+    // ─────────────────────────────────────────────────────────────────────────
     return (
-        <main className='xl:pt-10 pb-8 xl:px-32 lg:px-8 md:px-4 px-2 py-1 overflow-x-hidden'>
-            <Toaster />
-            <section className="flex flex-col lg:flex-row justify-evenly gap-12">
-                <div className='flex flex-col-reverse lg:flex-row gap-4 w-full lg:w-1/2'>
+        <main className="min-h-screen bg-white">
+            <Toaster position="top-center" />
 
-                    {/* THUMBNAIL — desktop only */}
-                    {!isMobile && (
-                        <div className='flex lg:flex-col gap-4 lg:overflow-y-auto lg:h-0 lg:min-h-full lg:w-24 shrink-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden scroll-smooth p-1'>
-                            {productImages.map((img, idx) => (
-                                <motion.img
-                                    key={idx}
-                                    src={img.image_url}
-                                    onClick={() => setActiveImage(img.image_url)}
-                                    whileHover={{ scale: 1.05, borderColor: "#3b82f6" }}
-                                    whileTap={{ scale: 0.95 }}
-                                    alt={`Thumbnail ${idx + 1}`}
-                                    className={`shrink-0 aspect-square w-20 h-20 object-cover rounded-xl cursor-pointer border-2 transition-all ${activeImage === img.image_url
-                                        ? 'border-blue-500 ring-2 ring-blue-300'
-                                        : 'border-transparent'
-                                        }`}
+            {/* ── Breadcrumb ─────────────────────────────────────────────── */}
+            <nav className="hidden lg:flex items-center gap-2 max-w-7xl mx-auto px-8 pt-6 pb-2 text-xs text-gray-400 font-medium">
+                <span className="hover:text-gray-700 cursor-pointer transition-colors">Home</span>
+                <ChevronRight size={12} />
+                <span className="hover:text-gray-700 cursor-pointer transition-colors capitalize">{product?.category?.name || 'Products'}</span>
+                <ChevronRight size={12} />
+                <span className="text-gray-800 font-semibold">{product?.name}</span>
+            </nav>
+
+            {/* ── Hero Section ───────────────────────────────────────────── */}
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 lg:py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+
+                    {/* ── Gallery ──────────────────────────────────────────── */}
+                    <div className="flex gap-4">
+
+                        {/* Thumbnail strip — desktop only */}
+                        {!isMobile && productImages.length > 1 && (
+                            <div className="flex flex-col gap-3 lg:overflow-y-auto lg:h-0 lg:min-h-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                                {productImages.map((img, idx) => (
+                                    <motion.button
+                                        key={idx}
+                                        onClick={() => { setActiveImage(img.image_url); setActiveIndex(idx); }}
+                                        whileHover={{ scale: 1.04 }}
+                                        whileTap={{ scale: 0.96 }}
+                                        className={`shrink-0 w-[72px] h-[72px] rounded-xl overflow-hidden border-2 transition-all duration-200 ${activeImage === img.image_url
+                                            ? 'border-gray-900 shadow-md'
+                                            : 'border-gray-200 hover:border-gray-400'
+                                            }`}
+                                    >
+                                        <img src={img.image_url} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
+                                    </motion.button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Main image */}
+                        <div className="relative flex-1 bg-gray-50 rounded-3xl overflow-hidden">
+                            {/* Top actions */}
+                            <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+                                <WishListBtn
+                                    productVariantId={activeVariant?.id}
+                                    styles=""
+                                    iconSize={20}
                                 />
-                            ))}
-                        </div>
-                    )}
+                            </div>
 
-                    {/* MAIN IMAGE CONTAINER */}
-                    <div className='relative flex-1 aspect-square bg-gray-50 rounded-3xl overflow-hidden'>
-                        <WishListBtn
-                            productVariantId={activeVariant?.id}
-                            styles="absolute lg:top-0 lg:right-4 right-8 z-20"
-                            iconSize={32}
-                        />
+                            {isMobile ? (
+                                /* Mobile carousel */
+                                <>
+                                    <AnimatePresence mode="wait">
+                                        <motion.img
+                                            key={activeIndex}
+                                            initial={{ opacity: 0, x: 30 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -30 }}
+                                            transition={{ duration: 0.22 }}
+                                            src={productImages[activeIndex]?.image_url}
+                                            alt={product?.name}
+                                            className="w-full aspect-square object-contain"
+                                            drag="x"
+                                            dragConstraints={{ left: 0, right: 0 }}
+                                            dragElastic={0.15}
+                                            onDragEnd={(_, info) => {
+                                                if (info.offset.x < -50 && activeIndex < productImages.length - 1) {
+                                                    const n = activeIndex + 1;
+                                                    setActiveIndex(n);
+                                                    setActiveImage(productImages[n].image_url);
+                                                } else if (info.offset.x > 50 && activeIndex > 0) {
+                                                    const p = activeIndex - 1;
+                                                    setActiveIndex(p);
+                                                    setActiveImage(productImages[p].image_url);
+                                                }
+                                            }}
+                                        />
+                                    </AnimatePresence>
 
-                        {isMobile ? (
-                            /* ── MOBILE CAROUSEL ── */
-                            <>
+                                    {/* Dot indicators */}
+                                    {productImages.length > 1 && (
+                                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                                            {productImages.map((_, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => { setActiveIndex(idx); setActiveImage(productImages[idx].image_url); }}
+                                                    className={`rounded-full transition-all duration-300 ${idx === activeIndex ? 'w-5 h-2 bg-gray-900' : 'w-2 h-2 bg-gray-300'}`}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {activeIndex > 0 && (
+                                        <button onClick={() => { const p = activeIndex - 1; setActiveIndex(p); setActiveImage(productImages[p].image_url); }}
+                                            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm border border-gray-100">
+                                            <ChevronLeft size={18} className="text-gray-700" />
+                                        </button>
+                                    )}
+                                    {activeIndex < productImages.length - 1 && (
+                                        <button onClick={() => { const n = activeIndex + 1; setActiveIndex(n); setActiveImage(productImages[n].image_url); }}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm border border-gray-100">
+                                            <ChevronRight size={18} className="text-gray-700" />
+                                        </button>
+                                    )}
+                                </>
+                            ) : (
+                                /* Desktop main image */
                                 <AnimatePresence mode="wait">
                                     <motion.img
-                                        key={activeIndex}
-                                        initial={{ opacity: 0, x: 40 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -40 }}
-                                        transition={{ duration: 0.25 }}
-                                        src={productImages[activeIndex]?.image_url}
+                                        key={activeImage}
+                                        initial={{ opacity: 0, scale: 1.03 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.28 }}
+                                        src={activeImage}
                                         alt={product?.name}
-                                        className='aspect-square w-full h-full object-contain rounded-2xl'
-                                        drag="x"
-                                        dragConstraints={{ left: 0, right: 0 }}
-                                        dragElastic={0.2}
-                                        onDragEnd={(_, info) => {
-                                            if (info.offset.x < -50 && activeIndex < productImages.length - 1) {
-                                                const next = activeIndex + 1;
-                                                setActiveIndex(next);
-                                                setActiveImage(productImages[next].image_url);
-                                            } else if (info.offset.x > 50 && activeIndex > 0) {
-                                                const prev = activeIndex - 1;
-                                                setActiveIndex(prev);
-                                                setActiveImage(productImages[prev].image_url);
-                                            }
-                                        }}
+                                        className="w-full aspect-square object-contain"
                                     />
                                 </AnimatePresence>
-
-                                {/* Dot indicators */}
-                                <div className='absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10'>
-                                    {productImages.map((_, idx) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => {
-                                                setActiveIndex(idx);
-                                                setActiveImage(productImages[idx].image_url);
-                                            }}
-                                            className={`rounded-full transition-all duration-300 ${idx === activeIndex
-                                                ? 'w-4 h-2 bg-blue-500'
-                                                : 'w-2 h-2 bg-gray-300'
-                                                }`}
-                                        />
-                                    ))}
-                                </div>
-
-                                {/* Prev / Next arrows */}
-                                {activeIndex > 0 && (
-                                    <button
-                                        onClick={() => {
-                                            const prev = activeIndex - 1;
-                                            setActiveIndex(prev);
-                                            setActiveImage(productImages[prev].image_url);
-                                        }}
-                                        className='absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 backdrop-blur rounded-full p-1 shadow'
-                                    >
-                                        <ChevronLeft size={20} className='text-gray-700' />
-                                    </button>
-                                )}
-                                {activeIndex < productImages.length - 1 && (
-                                    <button
-                                        onClick={() => {
-                                            const next = activeIndex + 1;
-                                            setActiveIndex(next);
-                                            setActiveImage(productImages[next].image_url);
-                                        }}
-                                        className='absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 backdrop-blur rounded-full p-1 shadow'
-                                    >
-                                        <ChevronRight size={20} className='text-gray-700' />
-                                    </button>
-                                )}
-                            </>
-                        ) : (
-                            /* ── DESKTOP MAIN IMAGE ── */
-                            <AnimatePresence mode="wait">
-                                <motion.img
-                                    key={activeImage}
-                                    initial={{ opacity: 0, scale: 1.05 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                    src={activeImage}
-                                    alt={product?.name}
-                                    className='aspect-square w-full h-full object-contain rounded-2xl'
-                                />
-                            </AnimatePresence>
-                        )}
+                            )}
+                        </div>
                     </div>
-                </div>
-                <motion.div variants={containerStagger} initial="hidden" animate="visible" className='flex flex-col gap-6 w-full lg:w-1/2'>
-                    <motion.div variants={fadeInUp} className="flex items-center gap-2">
-                        <span className='flex bg-yellow-50 px-2 py-1 rounded-md border border-yellow-100'>
-                            {Array.from({ length: 5 }, (_, i) => (
-                                <Star
-                                    key={i}
-                                    size={16}
-                                    fill={i < averageRating ? "#eab308" : "none"}
-                                    className={i < averageRating ? 'text-yellow-500' : 'text-gray-300'}
-                                />
-                            ))}
-                        </span>
-                        <span className="text-sm text-gray-500 font-medium">
-                            ({totalReviews} {totalReviews === 1 ? 'Review' : 'Reviews'})
-                        </span>
-                    </motion.div>
-                    <motion.div variants={fadeInUp}>
-                        <h1 className='text-sm lg:text-xl font-bold text-gray-900 mb-1 capitalize'>{activeVariant?.variant_name}</h1>
 
-                    </motion.div>
-
-                    <div>
-                        <motion.p variants={fadeInUp} className='text-sm text-gray-500 font-medium'>
-                            {activeVariant?.attributes[0]?.name && activeVariant?.attributes[0]?.name.charAt(0).toUpperCase() + activeVariant?.attributes[0]?.name.slice(1)}: <span className='font-semibold text-gray-700'>
-                                {activeVariant?.attributes[0]?.value && activeVariant?.attributes[0]?.value.charAt(0).toUpperCase() + activeVariant?.attributes[0]?.value.slice(1)}
+                    {/* ── Product Info ──────────────────────────────────────── */}
+                    <motion.div
+                        initial="hidden"
+                        animate="visible"
+                        variants={{ visible: { transition: { staggerChildren: 0.07 } } }}
+                        className="flex flex-col gap-5 lg:pt-2"
+                    >
+                        {/* Category badge + Rating */}
+                        <motion.div
+                            variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+                            className="flex items-center justify-between"
+                        >
+                            <span className="inline-flex items-center gap-1.5 bg-gray-900 text-white text-[11px] font-semibold tracking-widest uppercase px-3 py-1 rounded-full">
+                                {product?.category?.name || 'Product'}
                             </span>
-                        </motion.p>
-                        <motion.div variants={fadeInUp} className='flex  gap-4 items-center h-28'>
-                            {
-                                product?.variants?.map((variant) => (
-                                    <button key={variant.id} onClick={() => handleActiveVariantChange(variant)} className={`px-3 lg:px-4 pt-2 lg:py-2 rounded-lg border ${activeVariant?.id === variant.id ? 'border-blue-500 bg-blue-50' : 'border-gray-300'} text-gray-700 font-medium hover:bg-gray-50 transition-colors`}>
-                                        <motion.img src={variant.images[0]?.image_url} alt={variant.variant_name} className="h-12  object-cover" />
-                                        <p>₹{formatCurrency(Number(variant.price) || 0)} </p>
-                                    </button>
-                                ))
-                            }
+                            {totalReviews > 0 && (
+                                <button
+                                    onClick={() => setActiveTab('reviews')}
+                                    className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                                >
+                                    <StarRow rating={avgRating} />
+                                    <span className="font-semibold text-gray-800">{(reviewsList.reduce((s, r) => s + r.rating, 0) / totalReviews).toFixed(1)}</span>
+                                    <span className="text-gray-400">({totalReviews})</span>
+                                </button>
+                            )}
                         </motion.div>
-                    </div>
 
-                    <motion.div variants={fadeInUp} className="flex flex-col lg:flex-row justify-between gap-4 lg:px-5 px-3 lg:py-4 py-2 bg-gray-50 rounded-2xl border border-gray-100">
+                        {/* Product name */}
+                        <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}>
+                            <h1 className="text-xl lg:text-2xl font-bold text-gray-900 leading-tight capitalize tracking-tight">
+                                {product?.name}
+                            </h1>
+                            {product?.description && (
+                                <p className="mt-2 text-sm text-gray-500 leading-relaxed line-clamp-2">
+                                    {product.description.split('\n')[0]}
+                                </p>
+                            )}
+                        </motion.div>
 
-                        {/* Left Side: Pricing Details */}
-                        <div className="flex flex-col justify-center">
-                            <div className="flex items-end gap-3 flex-wrap">
-                                <span className='lg:text-3xl text-lg font-black text-gray-900'>
-                                    ₹{formatCurrency(finalPayablePrice)}
+                        {/* Divider */}
+                        <div className="h-px bg-gray-100" />
+
+                        {/* Pricing */}
+                        <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}>
+                            <div className="flex items-baseline gap-3 flex-wrap">
+                                <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tight">
+                                    ₹{formatCurrency(finalPrice)}
                                 </span>
-
-                                {/* Original MRP */}
-                                {(productDiscountPercent > 0 || couponDiscountAmount > 0) && (
-                                    <span className='lg:text-lg text-md  line-through text-gray-400 mb-0.5'>
-                                        ₹{formatCurrency(originalMRP)}
-                                    </span>
-                                )}
-
-                                {/* Total Savings Badge */}
-                                {(productDiscountPercent > 0 || couponDiscountAmount > 0) && (
-                                    <span className='lg:text-sm text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md mb-1'>
-                                        Save ₹{formatCurrency(totalSavings)}
-                                    </span>
+                                {hasDiscount && (
+                                    <>
+                                        <span className="text-lg text-gray-400 line-through font-medium">
+                                            ₹{formatCurrency(originalMRP)}
+                                        </span>
+                                        <span className="text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full">
+                                            {discountPct > 0 ? `${discountPct}% OFF` : `Save ₹${formatCurrency(totalSavings)}`}
+                                        </span>
+                                    </>
                                 )}
                             </div>
-                            <p className='text-xs text-gray-500 mt-1.5 font-medium uppercase tracking-wide'>
-                                Inclusive of all taxes
-                            </p>
-                        </div>
+                            <p className="text-xs text-gray-400 mt-1 font-medium uppercase tracking-wider">Inclusive of all taxes</p>
 
-                        {/* Right Side: Coupon Interaction */}
-                        <div className="lg:min-w-[280px]">
+                            {/* Stock indicator */}
+                            <div className="flex items-center gap-2 mt-3">
+                                <span className={`w-2 h-2 rounded-full ${inStock ? 'bg-emerald-500' : 'bg-red-400'}`} />
+                                <span className={`text-sm font-semibold ${inStock ? 'text-emerald-700' : 'text-red-500'}`}>
+                                    {inStock ? 'In Stock · Ready to ship' : 'Out of Stock'}
+                                </span>
+                            </div>
+                        </motion.div>
+
+                        {/* Variant selector */}
+                        {product?.variants && product.variants.length > 0 && (
+                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}>
+                                {/* Attribute label */}
+                                {activeVariant?.attributes?.[0] && (
+                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
+                                        {activeVariant.attributes[0].name}:{' '}
+                                        <span className="text-gray-900 normal-case tracking-normal font-bold capitalize">
+                                            {activeVariant.attributes[0].value}
+                                        </span>
+                                    </p>
+                                )}
+                                <div className="flex flex-wrap gap-3">
+                                    {product.variants.map((variant) => (
+                                        <button
+                                            key={variant.id}
+                                            onClick={() => handleVariantChange(variant)}
+                                            className={`group relative flex flex-col items-center rounded-xl border-2 overflow-hidden transition-all duration-200 px-2 pt-2 pb-1.5 min-w-[72px]
+                                                ${activeVariant?.id === variant.id
+                                                    ? 'border-gray-900 shadow-md'
+                                                    : 'border-gray-200 hover:border-gray-400'
+                                                }`}
+                                        >
+                                            {variant.images?.[0] && (
+                                                <img src={variant.images[0].image_url} alt={variant.variant_name} className="w-12 h-12 object-contain" />
+                                            )}
+                                            <span className="text-[11px] font-semibold text-gray-700 mt-1">
+                                                ₹{formatCurrency(Number(variant.price) || 0)}
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Coupon strip */}
+                        <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}>
                             {selectedCoupon ? (
-                                // --- APPLIED STATE ---
-                                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl lg:px-4 px-2 lg:py-3 py-1.5 h-full">
+                                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3">
                                     <div className="flex items-center gap-3">
-                                        <div className="bg-emerald-100 p-1.5 rounded-full text-emerald-600">
-                                            <CheckCircle2 size={18} />
+                                        <div className="bg-emerald-100 p-1.5 rounded-full">
+                                            <CheckCircle2 size={16} className="text-emerald-600" />
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-bold text-emerald-800 tracking-wide uppercase">
-                                                {selectedCoupon.code} Applied
-                                            </span>
-                                            <span className="text-xs text-emerald-600 font-medium">
-                                                Extra ₹{formatCurrency(couponDiscountAmount)} savings!
-                                            </span>
+                                        <div>
+                                            <p className="text-sm font-bold text-emerald-800 uppercase tracking-wide">{selectedCoupon.code} Applied</p>
+                                            <p className="text-xs text-emerald-600">Extra ₹{formatCurrency(couponDiscount)} savings!</p>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => setSelectedCoupon(null)}
-                                        className="p-1.5 text-emerald-500 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                                        title="Remove Coupon"
-                                    >
-                                        <X size={16} />
+                                    <button onClick={() => setSelectedCoupon(null)} className="p-1.5 hover:bg-red-50 rounded-lg transition-colors text-emerald-500 hover:text-red-500">
+                                        <X size={15} />
                                     </button>
                                 </div>
                             ) : (
-                                // --- UNAPPLIED STATE ---
                                 <button
-                                    onClick={() => handleCouponModalOpen()}
-                                    className="w-full flex items-center justify-between bg-blue-50/60 hover:bg-blue-50 border border-blue-200 border-dashed rounded-xl lg:px-4 lg:py-3 py-1.5 transition-all group h-full"
+                                    onClick={handleCouponModalOpen}
+                                    className="w-full flex items-center justify-between border border-dashed border-blue-200 bg-blue-50/40 hover:bg-blue-50 rounded-2xl px-4 py-3 transition-all group"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600 shadow-sm">
-                                            <Tag size={16} />
+                                        <div className="bg-blue-100 p-1.5 rounded-lg">
+                                            <Tag size={15} className="text-blue-600" />
                                         </div>
-                                        <div className="flex flex-col items-start text-left">
-                                            <span className="text-sm font-bold text-blue-800">Available Offers</span>
-                                            <span className="text-xs text-blue-600/80 font-medium">
-                                                Click to view coupons
-                                            </span>
+                                        <div className="text-left">
+                                            <p className="text-sm font-bold text-blue-800">Available Offers</p>
+                                            <p className="text-xs text-blue-500">Tap to view & apply coupons</p>
                                         </div>
                                     </div>
-                                    <ChevronRight
-                                        size={18}
-                                        className="text-blue-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all"
-                                    />
+                                    <ChevronRight size={16} className="text-blue-400 group-hover:translate-x-0.5 transition-transform" />
                                 </button>
                             )}
-                        </div>
-                    </motion.div>
-                    <motion.div variants={fadeInUp} className='flex gap-4 items-center'>
-                        <motion.div variants={fadeInUp} className='flex gap-4 items-center'>
-                            {isMounted && activeVariant && (
-                                <>
-                                    <AddToCart productVariantId={activeVariant.id} styles="text-xl py-1 w-32 lg:w-40" />
-                                    {activeVariant.inventory.stock_quantity <= 0 ? (
-                                        <span className="lg:text-md text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-lg w-full text-center flex justify-center items-center">Out of Stock</span>
-                                    )
-                                        : <BuyBtn id={activeVariant.id} mode={BuyBtnMode.QUICK_BUY} styles="px-6" selectedCoupon={selectedCoupon} />
-                                    }
-                                </>
-                            )}
                         </motion.div>
+
+                        {/* CTA — desktop */}
+                        {isMounted && activeVariant && !isMobile && (
+                            <motion.div
+                                variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+                                className="flex gap-3 h-12"
+                            >
+                                {/* AddToCart owns its own quantity counter via Redux */}
+                                <AddToCart
+                                    productVariantId={activeVariant.id}
+                                    styles="flex-1 h-12 rounded-2xl border-2 border-gray-900 bg-white text-gray-900 hover:bg-gray-900 hover:text-white font-bold text-sm transition-all duration-200"
+                                />
+                                {inStock ? (
+                                    <BuyBtn
+                                        id={activeVariant.id}
+                                        mode={BuyBtnMode.QUICK_BUY}
+                                        styles="flex-1 h-12 rounded-2xl bg-gray-900 text-white hover:bg-black font-bold text-sm transition-all duration-200"
+                                        selectedCoupon={selectedCoupon}
+                                    />
+                                ) : (
+                                    <span className="flex-1 h-12 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 font-bold text-sm">
+                                        Out of Stock
+                                    </span>
+                                )}
+                            </motion.div>
+                        )}
+
+                        {/* Trust badges — desktop */}
+                        {!isMobile && (
+                            <motion.div
+                                variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+                                className="grid grid-cols-5 gap-2 pt-2 border-t border-gray-100"
+                            >
+                                {trustBadges.map(({ icon: Icon, label }) => (
+                                    <div key={label} className="flex flex-col items-center gap-1.5 text-center">
+                                        <div className="p-2 bg-gray-50 rounded-xl">
+                                            <Icon size={16} className="text-gray-600" />
+                                        </div>
+                                        <span className="text-[10px] font-semibold text-gray-500 leading-tight">{label}</span>
+                                    </div>
+                                ))}
+                            </motion.div>
+                        )}
                     </motion.div>
-
-
-                </motion.div>
+                </div>
             </section>
-            <motion.div variants={fadeInUp} className='mt-2 w-full flex justify-end'>
-                <div className='flex gap-4 overflow-x-auto pb-4 hide-scrollbar'>
-                    {brandOffer.map((offer, idx) => (
-                        <motion.div key={offer.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.1 }} className='flex flex-col items-center justify-center gap-2 min-w-[100px] p-3 text-center'>
-                            <div className="p-2 bg-brand-primary/10 rounded-full text-brand-primary">  <DynamicIcon fallback={() => <p></p>} name={offer.icon as IconName} size={20} /></div>
-                            <span className='text-xs font-semibold text-gray-700 leading-tight'>{offer.title}</span>
-                        </motion.div>
+
+            {/* ── Tabbed Details Section ──────────────────────────────────── */}
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 lg:mt-10 pb-24 lg:pb-16">
+                {/* Tab navigation */}
+                <div className="flex border-b border-gray-200 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    {(
+                        [
+                            { key: 'description', label: 'Product Description' },
+                            { key: 'specs', label: 'Technical Specifications' },
+                            { key: 'reviews', label: `Customer Reviews${totalReviews > 0 ? ` (${totalReviews})` : ''}` },
+                        ] as { key: Tab; label: string }[]
+                    ).map(tab => (
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={`shrink-0 px-5 py-3.5 text-sm font-semibold border-b-2 transition-all duration-200 whitespace-nowrap
+                                ${activeTab === tab.key
+                                    ? 'border-gray-900 text-gray-900'
+                                    : 'border-transparent text-gray-400 hover:text-gray-700 hover:border-gray-300'
+                                }`}
+                        >
+                            {tab.label}
+                        </button>
                     ))}
                 </div>
-            </motion.div>
-            <section className='flex flex-col lg:flex-row gap-12 mt-10'>
-                <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className='lg:w-1/2'>
-                    <h2 className='text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2'><span className="w-1 h-8 bg-brand-primary rounded-full"></span>Product Description</h2>
-                    <div className="prose prose-gray max-w-none text-gray-600 space-y-3">{product?.description && product.description.split('\n').map((line, idx) => (<p key={idx}>{line}</p>))}</div>
-                </motion.div>
-                <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className='lg:w-1/2'>
-                    {product?.features &&
-                        <ProductSpecifications product={product?.features} />
-                    }
-                </motion.div>
-            </section>
-            <section className='mt-20'>
-                <h2 className='text-2xl font-bold text-gray-900 mb-8'>Customer Reviews</h2>
-                {product && product.id &&
-                    <ProductReview productId={product.id} />
-                }
-            </section>
-            <section className='mt-20'>
-                <h2 className='text-2xl font-bold text-gray-900 mb-8'>You might also like</h2>
-                {/* <ProductList products={product?.variants || []} /> */}
-            </section>
-            <AvailableCouponsModal isOpen={isCouponModalOpen} onClose={() => setCouponModalOpen(false)} onSelect={handleCouponSelect} productId={product?.id} />
 
-        </main >
+                {/* Tab content */}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="pt-8"
+                    >
+                        {activeTab === 'description' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                                <div className="prose prose-gray max-w-none text-gray-600 leading-relaxed text-sm space-y-3">
+                                    {product?.description
+                                        ? product.description.split('\n').map((line, i) => <p key={i}>{line}</p>)
+                                        : <p className="text-gray-400 italic">No description available.</p>
+                                    }
+                                </div>
+                                {/* Feature highlights */}
+                                {product?.features && product.features.length > 0 && (
+                                    <div className="space-y-3">
+                                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-4">Key Features</h3>
+                                        {product.features.map((f, i) => (
+                                            <div key={i} className="flex items-start gap-3">
+                                                <div className="mt-0.5 w-5 h-5 rounded-full bg-gray-900 flex items-center justify-center shrink-0">
+                                                    <CheckCircle2 size={12} className="text-white" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-semibold text-gray-900">{f.title}</p>
+                                                    <p className="text-xs text-gray-500 mt-0.5">{f.description}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'specs' && (
+                            product?.features
+                                ? <ProductSpecifications product={product.features} />
+                                : <p className="text-gray-400 italic text-sm">No specifications available.</p>
+                        )}
+
+                        {activeTab === 'reviews' && product?.id && (
+                            <ProductReview productId={product.id} />
+                        )}
+                    </motion.div>
+                </AnimatePresence>
+            </section>
+
+            {/* ── Mobile: Sticky bottom CTA ──────────────────────────────── */}
+            {isMounted && isMobile && activeVariant && (
+                <div className="fixed bottom-8 left-0 right-0 z-50 bg-white border-t border-gray-100 shadow-xl px-4 py-3">
+                    <div className="flex gap-3 max-w-lg mx-auto h-12">
+                        <AddToCart
+                            productVariantId={activeVariant.id}
+                            styles="flex-1 h-12 rounded-2xl border-2 border-gray-900 bg-white text-gray-900 font-bold text-sm transition-all"
+                        />
+                        {inStock ? (
+                            <BuyBtn
+                                id={activeVariant.id}
+                                mode={BuyBtnMode.QUICK_BUY}
+                                styles="flex-1 h-12 rounded-2xl bg-gray-900 text-white font-bold text-sm transition-all"
+                                selectedCoupon={selectedCoupon}
+                            />
+                        ) : (
+                            <span className="flex-1 h-12 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 font-bold text-sm">
+                                Out of Stock
+                            </span>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            <AvailableCouponsModal
+                isOpen={isCouponModalOpen}
+                onClose={() => setCouponModalOpen(false)}
+                onSelect={handleCouponSelect}
+                productId={product?.id}
+            />
+        </main>
     );
 }
