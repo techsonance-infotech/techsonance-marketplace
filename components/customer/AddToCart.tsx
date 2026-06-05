@@ -80,6 +80,9 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
                 productVariantId: cartResponse.product_variant_id,
                 quantity: cartResponse.quantity,
             }));
+            if (prevQuantity === 0) {
+                dispatch(loadCart());
+            }
         } catch (error) {
             console.error("Error adding to cart:", error);
             if (prevQuantity === 0) {
@@ -144,12 +147,9 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
     };
 
     return (
-        // The outer wrapper gets the caller's styles (border, radius, bg, height).
-        // overflow-hidden ensures the animated children are clipped to that shape.
         <div className={`relative flex items-center justify-center overflow-hidden select-none transition-all duration-200 ${styles ?? ''}`}>
             <AnimatePresence mode="wait">
                 {quantity === 0 ? (
-                    /* ── Empty state: "Add to Cart" button ─────────────────── */
                     <motion.button
                         key="add-btn"
                         initial={{ opacity: 0 }}
@@ -158,27 +158,25 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
                         transition={{ duration: 0.15 }}
                         onClick={handleIncrement}
                         whileTap={{ scale: 0.97 }}
-                        className="flex h-full w-full items-center justify-center gap-2 px-4"
+                        className="flex h-full w-full items-center justify-center gap-2 px-2"
                     >
-                        <ShoppingCart size={16} />
-                        <span className="text-[13px] font-semibold tracking-wide">Add to Cart</span>
+                        <ShoppingCart className="w-4 h-4 shrink-0" />
+                        <span className="text-[12px] sm:text-[13px] font-semibold tracking-wide whitespace-nowrap">Add</span>
                     </motion.button>
                 ) : (
-                    /* ── Counter state ──────────────────────────────────────── */
-                    // bg-blue-600 fills the entire outer wrapper (which already has rounded corners
-                    // from the caller's styles + overflow-hidden), so no separate rounded needed here.
                     <motion.div
                         key="counter-ui"
                         initial={{ opacity: 0, scale: 0.96 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.96 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute inset-0 flex items-center justify-between bg-blue-600 text-white px-2"
+                        className="absolute inset-0 flex items-center justify-between bg-blue-600 text-white px-1 py-1 w-full h-full"
                     >
+                        {/* Using h-full aspect-square ensures it never overflows the container's height */}
                         <motion.button
                             whileTap={{ scale: 0.82 }}
                             onClick={handleDecrement}
-                            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/20 transition-colors shrink-0"
+                            className="h-full aspect-square flex items-center justify-center rounded-md hover:bg-white/20 transition-colors "
                             aria-label="Remove one"
                         >
                             <Minus size={15} strokeWidth={2.5} />
@@ -191,7 +189,7 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
                                 animate={{ y: 0, opacity: 1 }}
                                 exit={{ y: 8, opacity: 0 }}
                                 transition={{ duration: 0.12 }}
-                                className="font-bold text-sm min-w-[24px] text-center tabular-nums"
+                                className="font-bold text-xs sm:text-sm min-w-[20px] text-center tabular-nums grow"
                             >
                                 {quantity}
                             </motion.span>
@@ -200,7 +198,7 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
                         <motion.button
                             whileTap={{ scale: 0.82 }}
                             onClick={handleIncrement}
-                            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/20 transition-colors shrink-0"
+                            className="h-full aspect-square flex items-center justify-center rounded-md hover:bg-white/20 transition-colors "
                             aria-label="Add one more"
                         >
                             <Plus size={15} strokeWidth={2.5} />

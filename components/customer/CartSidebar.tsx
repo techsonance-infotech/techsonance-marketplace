@@ -12,7 +12,9 @@ import { fetchGetCartList } from "@/utils/customerApiClient";
 import { BuyBtnMode } from "@/utils/Types";
 import { authToken } from "@/utils/authToken";
 import { X, ShoppingBag, ArrowRight, Package, Tag, ChevronRight } from "lucide-react";
-import { CartItemListResponse } from "@/app/(shop)/customerProfile/[userId]/cart/page";
+ 
+import { loadCart } from "@/lib/features/Cart";
+import { CartItemListResponse } from "@/app/(shop)/customer/cart/CartClient";
 
 // ─── Skeleton for cart items while loading ────────────────────────────────────
 const CartItemSkeleton = () => (
@@ -87,30 +89,16 @@ export function CartSidebar() {
     const { isCartOpen } = useAppSelector((state: RootState) => state.cartSidebar);
     const isMobile = useMediaQuery({ maxWidth: 768 });
     const { user } = useAppSelector((state: RootState) => state.auth);
-    const { items, cartId } = useAppSelector((state: RootState) => state.cart);
+    const { itemList, loading: isLoading, cartId } = useAppSelector((state: RootState) => state.cart);
     const dispatch = useAppDispatch();
     const token = authToken();
 
-    const [cartList, setCartList] = useState<CartItemListResponse[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-
-    // Fetch cart list whenever sidebar opens or items change
+    // Fetch cart list whenever sidebar opens
     useEffect(() => {
-        const fetchCartList = async () => {
-            if (user?.id && token) {
-                setIsLoading(true);
-                try {
-                    const response = await fetchGetCartList(user.id, token);
-                    setCartList(response.data || []);
-                } catch (error) {
-                    console.error("Error fetching cart list:", error);
-                } finally {
-                    setIsLoading(false);
-                }
-            }
-        };
-        fetchCartList();
-    }, [isCartOpen, items]);
+        if (isCartOpen && user?.id && token) {
+            dispatch(loadCart());
+        }
+    }, [isCartOpen, user?.id, dispatch]);
 
     // Auto-dismiss mobile toast after 2.5 s
     useEffect(() => {
@@ -130,14 +118,13 @@ export function CartSidebar() {
     }, [isCartOpen, dispatch]);
 
     // ── Computed values ───────────────────────────────────────────────────────
-    const subtotal = cartList.reduce((sum, item) => {
+    const subtotal = itemList.reduce((sum, item) => {
         const price = Number(item.productVariant?.price ?? 0);
-        const qty = items.find(i => i.productVariantId === item.product_variant_id)?.quantity ?? item.quantity ?? 1;
-        return sum + price * qty;
+        return sum + price * item.quantity;
     }, 0);
 
-    const itemCount = items.reduce((sum, i) => sum + (i.quantity ?? 0), 0);
-    const lastAddedItem = cartList[cartList.length - 1];
+    const itemCount = itemList.reduce((sum, i) => sum + (i.quantity ?? 0), 0);
+    const lastAddedItem = itemList[itemList.length - 1];
 
     // ── Mobile: pill toast ────────────────────────────────────────────────────
     if (isMobile) {
@@ -199,18 +186,17 @@ export function CartSidebar() {
 
                         {/* ── Item list ──────────────────────────────────────── */}
                         <div className="flex-1 overflow-y-auto px-6 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                            {isLoading ? (
+                            {isLoading && itemList.length === 0 ? (
                                 <div className="space-y-5">
                                     {[...Array(3)].map((_, i) => <CartItemSkeleton key={i} />)}
                                 </div>
-                            ) : cartList.length === 0 ? (
+                            ) : itemList.length === 0 ? (
                                 <EmptyCart />
                             ) : (
                                 <ul className="space-y-1">
                                     <AnimatePresence mode="popLayout">
-                                        {cartList.map((item, idx) => {
-                                            const qty = items.find(i => i.productVariantId === item.product_variant_id)?.quantity ?? item.quantity ?? 1;
-                                            const lineTotal = Number(item.productVariant?.price ?? 0) * qty;
+                                        {itemList.map((item, idx) => {
+                                            const lineTotal = Number(item.productVariant?.price ?? 0) * item.quantity;
 
                                             return (
                                                 <motion.li
@@ -240,9 +226,9 @@ export function CartSidebar() {
                                                             <span className="text-sm font-bold text-gray-900">
                                                                 ₹{Number(item.productVariant?.price ?? 0).toLocaleString('en-IN')}
                                                             </span>
-                                                            {qty > 1 && (
+                                                            {item.quantity > 1 && (
                                                                 <span className="text-xs text-gray-400">
-                                                                    × {qty} = ₹{lineTotal.toLocaleString('en-IN')}
+                                                                    × {item.quantity} = ₹{lineTotal.toLocaleString('en-IN')}
                                                                 </span>
                                                             )}
                                                         </div>
@@ -263,7 +249,7 @@ export function CartSidebar() {
                         </div>
 
                         {/* ── Footer: Summary + CTAs ─────────────────────────── */}
-                        {!isLoading && cartList.length > 0 && (
+                        {!isLoading && itemList.length > 0 && (
                             <div className="shrink-0 border-t border-gray-100 bg-white px-6 pt-4 pb-6 space-y-4">
 
                                 {/* Order summary */}
@@ -295,7 +281,7 @@ export function CartSidebar() {
 
                                 {/* View full cart link */}
                                 <Link
-                                    href={`/customerProfile/${user?.id}/cart`}
+                                    href={`/customer/${user?.id}/cart`}
                                     onClick={() => dispatch(toggleCartSidebar('close'))}
                                     className="flex items-center justify-between w-full px-4 py-3 rounded-2xl border border-gray-200 hover:border-gray-400 hover:bg-gray-50 transition-all group"
                                 >
@@ -323,7 +309,7 @@ export function CartSidebar() {
                         )}
 
                         {/* Empty cart CTA */}
-                        {!isLoading && cartList.length === 0 && (
+                        {!isLoading && itemList.length === 0 && (
                             <div className="shrink-0 px-6 pb-6 pt-4">
                                 <Link
                                     href="/"
