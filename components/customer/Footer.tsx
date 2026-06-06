@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { FOOTER_BOTTOM_TEXT, FOOTER_CONTENT } from "@/constants/customer";
 import { DynamicIcon, IconName } from "lucide-react/dynamic";
 import { useFooterData } from "@/hooks/useFooterData";
 
@@ -55,7 +54,7 @@ export function Footer({ styles }: { styles?: string }) {
                             variants={columnVariants}
                             className="flex flex-col lg:gap-4 gap-1  "
                         >
-                            <li className="font-bold lg:text-lg text-md text-primary lg:mb-2">
+                            <li className="font-bold lg:text-lg text-md text-primary-foreground lg:mb-2">
                                 {section.header}
                             </li>
                             <div className="lg:block grid grid-cols-2 gap-0">
@@ -65,7 +64,7 @@ export function Footer({ styles }: { styles?: string }) {
                                     <motion.li
                                         key={linkIndex}
                                         whileHover={{ x: 5 }}
-                                        className="lg:text-sm text-xs text-primary hover:text-brand-primary transition-colors"
+                                        className="lg:text-sm text-xs text-primary-foreground hover:text-primary-foreground/80 transition-colors"
                                     >
                                         <Link
                                             href={link.url}
@@ -101,7 +100,7 @@ export function Footer({ styles }: { styles?: string }) {
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
-                    className="font-light text-center text-gray-100 text-sm  leading-relaxed lg:mb-0 mb-12 "
+                    className="font-light text-center text-primary-foreground/70 text-sm  leading-relaxed lg:mb-0 mb-12 "
                 >
                     {footerBottomText}
                 </motion.p>
