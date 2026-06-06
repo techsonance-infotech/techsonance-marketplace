@@ -164,10 +164,10 @@ export function FilterSidebar({ categories, filters, onFiltersChange, sortBy, on
             </aside>
 
             {/* Mobile Filter Button (Top Right of product grid) */}
-            <div className="lg:hidden absolute top-16 right-0 z-10   pr-4">
+            <div className="lg:hidden absolute top-13 right-0 z-10   pr-4">
                <button
                     onClick={() => setIsOpen(true)}
-                    className="bg-[#0A0A0B] text-white px-5 py-2.5 rounded-full flex items-center gap-2 shadow-md hover:bg-black transition-colors"
+                    className="bg-[#0A0A0B] text-white px-4 py-1.5 rounded-full flex items-center gap-2 shadow-md hover:bg-black transition-colors"
                 >
                     <SlidersHorizontal size={14} />
                     <span className="font-semibold text-sm">Filter</span>

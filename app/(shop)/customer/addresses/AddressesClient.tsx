@@ -131,15 +131,6 @@ export default function AddressesClient() {
 
     return (
         <section className="w-full max-w-[1200px] mx-auto py-4 md:py-8 lg:px-8 px-4 pb-24 font-sans">
-            
-            {/* Mobile Back Button & Header */}
-            <div className="flex items-center gap-3 mb-6 sm:hidden">
-                <Button variant="outline" size="icon" onClick={() => router.back()} className="rounded-full w-10 h-10 border-border">
-                    <ChevronLeft size={20} />
-                </Button>
-                <h1 className="font-bold text-xl text-foreground">Saved Addresses</h1>
-            </div>
-
             {/* Desktop Header */}
             <div className="hidden sm:block mb-8">
                 <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Saved Addresses</h1>

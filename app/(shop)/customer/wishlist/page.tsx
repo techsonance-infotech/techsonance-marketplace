@@ -1,15 +1,16 @@
 'use client';
 import type { RootState } from "@/lib/store";
-import { ChevronLeftCircle, X } from "lucide-react";
+import { ArrowLeft, Trash2, X, HeartCrack } from "lucide-react";
 import { AddToCart } from "@/components/customer/AddToCart";
 import { addToWishlist, removeFromWishlist } from "@/lib/features/Wishlist";
 import { useParams, useRouter } from "next/navigation";
-import { useMediaQuery } from "react-responsive";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { useEffect, useState } from "react";
 import { fetchCustomerWishlist, fetchDeleteWishList } from "@/utils/customerApiClient";
 import Link from "next/link";
 import { authToken } from "@/utils/authToken";
+import { formatCurrency } from "@/lib/utils";
+
 interface WishlistItemType {
     created_at: string;
     id: string;
@@ -32,27 +33,29 @@ interface WishlistItemType {
     }
     [key: string]: unknown;
 };
+
 export default function WishlistPage() {
     const router = useRouter();
     const wishItems = useAppSelector((state: RootState) => state.wishlist);
     const user = useAppSelector((state: RootState) => state.auth.user);
     const dispatch = useAppDispatch();
+    
     const [wishlistItems, setWishlistItems] = useState<WishlistItemType[]>([]);
     const token = authToken();
+
     useEffect(() => {
         const getWishlistProducts = async () => {
             if (!user?.id) {
                 console.error("User ID is missing");
                 return;
             }
-            const token = authToken();
             if (!token) {
                 console.error("Authentication token is missing");
                 return;
             }
+            
             fetchCustomerWishlist(user.id, token).then((response) => {
-                console.log(response)
-                setWishlistItems(response?.data[0].items || []);
+                setWishlistItems(response?.data[0]?.items || []);
             }).catch((error) => {
                 console.error("Error fetching wishlist products:", error);
             });
@@ -60,10 +63,10 @@ export default function WishlistPage() {
         if (user?.id) {
             getWishlistProducts();
         }
-    }, [wishItems, user]);
-    console.log("wishlistItems", wishlistItems)
-    const isMobileOrTablet = useMediaQuery({ minWidth: 340, maxWidth: 1024 });
-    const isEmpty = Array.isArray(wishlistItems) ? wishlistItems.length === 0 : [];
+    }, [wishItems, user, token]);
+
+    const isEmpty = wishlistItems.length === 0;
+
     const deleteItemFromWishlist = async (productVariantId: string) => {
         if (!user?.id || !token) {
             console.error('User ID or token is missing');
@@ -73,11 +76,14 @@ export default function WishlistPage() {
             i => i.productVariant.id === productVariantId
         );
         if (!item) return;
+        
+        // Optimistic UI Update
         dispatch(removeFromWishlist(productVariantId));
 
-        const response = await fetchDeleteWishList(productVariantId, user.id,token);
+        const response = await fetchDeleteWishList(productVariantId, user.id, token);
         if (!response?.success) {
             console.error('Failed to remove item from wishlist:', response?.message);
+            // Rollback on failure
             dispatch(addToWishlist({
                 id: item.id,
                 wishlist_id: item.wishlist_id,
@@ -86,42 +92,110 @@ export default function WishlistPage() {
                 updated_at: item.updated_at,
             }));
         }
-        console.log(`Removing product ${productVariantId} from wishlist`);
     }
+
     return (
-        <>
-            <ChevronLeftCircle className="my-4 block lg:hidden" size={36} onClick={() => router.back()} />
-            <section className="w-full mb-[20vh] lg:ml-6">
-                <h1 className="text-2xl font-bold">WishList</h1>
+        <div className="min-h-screen bg-[#f8fafc] py-6 sm:py-12">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                {/* Header */}
+                <div className="flex items-center gap-4 mb-6 sm:mb-8">
+                    <button 
+                        onClick={() => router.back()} 
+                        className="p-2 sm:p-2.5 bg-white border border-gray-200 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-all shadow-sm"
+                    >
+                        <ArrowLeft size={20} />
+                    </button>
+                    <div>
+                        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Your Wishlist</h1>
+                        <p className="text-sm font-medium text-gray-500 mt-1">Review your saved items.</p>
+                    </div>
+                </div>
+
+                {/* Content */}
                 <div>
                     {isEmpty ? (
-                        <p className="text-gray-500 my-2">Your wishlist is empty.</p>
+                        <div className="flex flex-col items-center justify-center py-20 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                                <HeartCrack className="w-8 h-8 text-gray-400" />
+                            </div>
+                            <h2 className="text-lg font-bold text-gray-900">Your wishlist is empty</h2>
+                            <p className="text-sm text-gray-500 mt-1 mb-6">Looks like you haven't saved any items yet.</p>
+                            <Link 
+                                href="/" 
+                                className="px-6 py-3 bg-[#0f172a] text-white text-sm font-bold rounded-xl hover:bg-black transition-colors"
+                            >
+                                Start Shopping
+                            </Link>
+                        </div>
                     ) : (
-                        <ul className="mt-2 mb-6">
-                            {wishlistItems.map((item, idx) => (
-                                <li key={idx} className="flex justify-between lg:px-6 px-2 lg:py-4 py-2 lg:my-4 my-2 lg:gap-6 gap-2 border-2 border-gray-200 rounded-2xl">
-                                    <span className="flex lg:gap-4 gap-2 items-start">
-                                        <button onClick={() => deleteItemFromWishlist(item.productVariant.id)} className="text-red-500  h-full flex items-center justify-center cursor-pointer hover:text-red-600 hover:scale-140 transition-transform">
-                                            <X />
-                                        </button>
+                        <div className="space-y-4">
+                            {wishlistItems.map((item) => (
+                                <div 
+                                    key={item.id} 
+                                    className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 relative transition-all shadow-sm hover:shadow-md"
+                                >
+                                    {/* Mobile Remove Button (Absolute) */}
+                                    <button 
+                                        onClick={() => deleteItemFromWishlist(item.productVariant.id)} 
+                                        className="absolute top-3 right-3 sm:hidden p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    >
+                                        <X size={18} />
+                                    </button>
 
-                                        <Link href={`/shopping/${item?.productVariant?.product_id}`} className="block lg:w-28 w-20 h-20 lg:h-28 aspect-square rounded-lg">
-                                            <img src={item?.productVariant?.images?.[0]?.image_url} alt={item?.productVariant?.variant_name.slice(0, 30) + '...'} className="lg:w-28 w-20 aspect-square object-cover rounded-2xl border-2 border-gray-100" />
-                                        </Link>
-                                        <div className="flex flex-col gap-2">
-                                            <p className="font-semibold lg:text-xl text-xs line-clamp-2">{item?.productVariant?.variant_name}</p>
-                                            <p className="lg:text-lg text-sm font-medium">₹ {item?.productVariant?.price}</p>
+                                    {/* Product Image */}
+                                    <Link 
+                                        href={`/shopping/${item.productVariant.product_id}`} 
+                                        className="shrink-0 w-24 h-24 sm:w-32 sm:h-32 bg-gray-50 rounded-xl border border-gray-100 overflow-hidden block"
+                                    >
+                                        <img 
+                                            src={item.productVariant.images?.[0]?.image_url || 'https://placehold.co/400x400/f8fafc/94a3b8?text=Product'} 
+                                            alt={item.productVariant.variant_name} 
+                                            className="w-full h-full object-cover mix-blend-multiply" 
+                                        />
+                                    </Link>
+
+                                    {/* Product Details & Actions */}
+                                    <div className="flex-1 flex flex-col justify-between py-1">
+                                        <div className="flex justify-between items-start gap-4 pr-6 sm:pr-0">
+                                            <div>
+                                                <Link href={`/shopping/${item.productVariant.product_id}`}>
+                                                    <h3 className="font-bold text-gray-900 text-base sm:text-lg line-clamp-2 leading-snug hover:text-indigo-600 transition-colors">
+                                                        {item.productVariant.variant_name}
+                                                    </h3>
+                                                </Link>
+                                                <p className="font-extrabold text-gray-900 text-lg sm:text-xl mt-1.5">
+                                                    ₹{formatCurrency(Number(item.productVariant.price))}
+                                                </p>
+                                            </div>
+
+                                            {/* Desktop Remove Button */}
+                                            <button 
+                                                onClick={() => deleteItemFromWishlist(item.productVariant.id)} 
+                                                className="hidden sm:flex items-center gap-1.5 text-sm font-bold text-red-500 hover:text-red-600 transition-colors shrink-0"
+                                            >
+                                                <Trash2 size={16} />
+                                                Remove
+                                            </button>
                                         </div>
-                                    </span>
-                                    <div className="flex justify-end items-center">
-                                        <AddToCart productVariantId={item.id} styles={`lg:w-24 w-16 ${isMobileOrTablet ? 'small' : ''}`} />
+
+                                        <div className="mt-4 sm:mt-0 pt-4 sm:pt-0">
+                                            {/* AddToCart component needs to handle its own button styling, 
+                                                passing standard width constraint to fit nicely */}
+                                            <div className="w-full sm:w-40">
+                                                <AddToCart 
+                                                    productVariantId={item.productVariant.id} 
+                                                    styles="w-full h-11 text-sm font-bold rounded-xl" 
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
-                                </li>
+                                </div>
                             ))}
-                        </ul>
+                        </div>
                     )}
                 </div>
-            </section>
-        </>
-    )
+            </div>
+        </div>
+    );
 }

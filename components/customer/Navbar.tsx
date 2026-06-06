@@ -77,7 +77,7 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks: propMenuLinks 
         <nav className={`bg-white text-gray-900 flex justify-between items-center xl:px-16 lg:px-8 md:px-4 py-3 border-b border-gray-200 shadow-sm ${styles}`}>
             <div className="flex-1">
                 <Link href="/">
-                    <img src={logoUrl} alt="brand logo" className="h-8 font-black object-contain" />
+                    <img src={logoUrl} alt="brand logo" className="h-14 font-black object-contain" />
                 </Link>
             </div>
 
