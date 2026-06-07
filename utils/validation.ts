@@ -1,61 +1,122 @@
 ﻿import * as z from 'zod'
-import { CouponDiscountTypeEum, ProductStatusEnum } from './Types';
+import { BannerPlacement, ProductStatusEnum, PromotionType } from './Types';
+import { COMPLIANCE_REGEX } from '@/app/auth/vendorRegister/page';
 export const passwordValidation = new RegExp(
-  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/
+  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*\-+]).{8,}$/
 );
 export const passwordValidationSchema = z.string().regex(passwordValidation, "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character");
-const company_complianceSchema = z.array(
-    z.object({
-      field_key: z.string( "Field key is required" )
-        .trim()
-        .min(1, "Field key cannot be empty")
-        .max(100, "Field key is too long"),
 
-      field_value: z.string("Field value is required" )
-        .trim()
-        .min(1, "Field value cannot be empty")
-        .max(1000, "Field value is too long"),
-
-      is_active: z.boolean()
-        .optional()
-        .default(false),
-
-      valid_until: z.string()
-        .trim()
-        // Optional: Validates it's an actual date format. Remove if it's just a free-text string.
-        .datetime({ error: "Must be a valid ISO date string (e.g., 2026-12-31T23:59:59Z)" }) 
-        .optional()
-        .nullable()
-        .or(z.literal('')) // Allows an empty string "" to pass validation without failing
-    })
-  )
-
+// ─── Single compliance entry ──────────────────────────────────────────────────
+const complianceEntrySchema = z.object({
+  field_key: z.string().min(1),
+  field_value: z.string(), // validated at step level, not schema level (dynamic)
+  is_active: z.boolean().optional().default(true),
+  valid_until: z.string().optional(),
+});
+ 
+const maxDigits = 3; // Change this number to your limit
+// ─── Main schema ─────────────────────────────────────────────────────────────
 export const vendorRegisterSchema = z.object({
-  company_name: z.string().min(2, "Company name is required"),
-  store_owner_first_name: z.string().min(2, "Owner first name is required"),
-  store_owner_last_name: z.string().min(2, "Owner last name is required"),
-  country_code: z.string().min(1, "Country code is required"),
+  // Step 0 — Organization
+  company_name: z
+    .string()
+    .min(2, "Company name must be at least 2 characters")
+    .max(100, "Company name too long")
+    .regex(/^[a-zA-Z0-9\s]+$/, "Only letters, numbers, and spaces are allowed")
+    .refine(
+      (val) => {
+        const digitCount = (val.match(/\d/g) || []).length;
+        return digitCount <= maxDigits;
+      },
+      {
+        message: `Company name can contain at most ${maxDigits} numbers`,
+      }
+    ),
+  store_owner_first_name: z
+    .string()
+    .min(2, "First name must be at least 2 characters")
+    .max(50, "First name too long")
+    .regex(/^[A-Za-z\s'-]+$/, "First name can only contain letters"),
+  store_owner_last_name: z
+    .string()
+    .min(2, "Last name must be at least 2 characters")
+    .max(50, "Last name too long")
+    .regex(/^[A-Za-z\s'-]+$/, "Last name can only contain letters"),
+  email: z
+    .email("Enter a valid email address")
+    .max(254, "Email too long"),
+  country_code: z.string().min(1, "Please select a country code"),
   phone_number: z
     .string()
-    .min(1, "Phone number is required")
-    .regex(/^[0-9\-]+$/, "Please use format 123-456-7890"),
-  category: z.string().min(1, "Category is required"),
-  company_structure: z.string().min(1, "Company structure is required"),
+    .min(7, "Phone number too short")
+    .max(15, "Phone number too long")
+    .regex(
+      /^[0-9\-\s\+\(\)]+$/,
+      "Enter a valid phone number (digits, spaces, hyphens, +, parentheses)",
+    ),
+  category: z.string().min(1, "Please select a business category"),
+  company_structure: z.string().min(1, "Please select a company structure"),
+ 
+  // Step 1 — Domain
   company_domain: z
     .string()
-    .min(3, "Domain is too short")
-    .regex(/^[a-z0-9-]+$/, "Domain can only contain lowercase letters, numbers, and hyphens"),
-  first_name: z.string().min(2, "First name is required"),
-  last_name: z.string().min(2, "Last name is required"),
-  email: z.email("Enter a valid email address"),
-  company_compliance: company_complianceSchema,
-  password: z.string().regex(passwordValidation, "Password must contain at least one letter and one number and be at least 8 characters long"),
-  confirm_password: z.string().regex(passwordValidation, "Password must contain at least one letter and one number and be at least 8 characters long"),
-}).refine((data) => data.password === data.confirm_password, {
-  error: "Passwords do not match",
-  path: ["confirm_password"],
+    .min(3, "Domain must be at least 3 characters")
+    .max(63, "Domain too long (max 63 chars)")
+    .regex(
+      /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/,
+      "Domain: lowercase letters and numbers only, no leading/trailing hyphens",
+    ),
+ 
+  // Step 2 — Compliance (array; individual field_value regex validated at step level)
+  company_compliance: z.array(complianceEntrySchema).default([]),
 });
+ 
 export type VendorRegisterSchema = z.infer<typeof vendorRegisterSchema>;
+ 
+// ─── Step-level compliance validator (called in nextStep for step 2) ──────────
+// Returns a map of field_key → error message string (empty = valid)
+export function validateComplianceFields(
+  fields: { value: string; label: string; required: boolean }[],
+  complianceValues: Record<string, string>, // { gstin: "27AAP...", pan: "ABCDE..." }
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+ 
+  for (const field of fields) {
+    const val = (complianceValues[field.value] ?? "").trim();
+ 
+    if (field.required && !val) {
+      errors[field.value] = `${field.label} is required`;
+      continue;
+    }
+ 
+    if (val && COMPLIANCE_REGEX[field.value]) {
+      const { pattern, message } = COMPLIANCE_REGEX[field.value];
+      if (!pattern.test(val)) {
+        errors[field.value] = message;
+      }
+    }
+  }
+ 
+  return errors;
+}
+ 
+// ─── Document upload validator (called in nextStep for step 2 & step 3) ───────
+// Returns list of missing required document labels
+export function validateRequiredDocuments(
+  fields: { value: string; label: string; required: boolean }[],
+  fileMap: { file: File | null; type: string; index: number }[],
+): string[] {
+  const missing: string[] = [];
+  fields.forEach((field, index) => {
+    if (!field.required) return;
+    const entry = fileMap.find((f) => f.index === index);
+    if (!entry?.file) {
+      missing.push(field.label);
+    }
+  });
+  return missing;
+}
+ 
 
 export const loginSchema = z.object({
   email: z.email({ error: "Invalid email address" }),
@@ -152,7 +213,7 @@ export const productSchema = z.object({
 
   status: z.enum(ProductStatusEnum, { error: "Please select a status" }),
   warehouseId: z.string().min(1, { error: "Warehouse is required" }),
-  taxRateId: z.string().min(1, { error: "Tax rate is required" }),
+  taxSlabId: z.string().min(1, { error: "Tax slab is required" }),
   productMedia: z.array(z.any()).min(0, { error: "At least one product image is required" }).max(1, { error: "You can upload up to 1 image" }),
   featureMedia: z.array(z.any()).min(0, { error: "At least one feature image is required" }).max(10, { error: "You can upload up to 10 images" }),
 });
@@ -289,13 +350,10 @@ export const couponSchema = z.object({
     .min(3, { message: "Description must be at least 3 characters" })
     .max(100, { message: "Description cannot exceed 100 characters" }),
 
-  discount_type: z.enum(CouponDiscountTypeEum, {
+  discount_type: z.enum(PromotionType, {
     message: "Please select a valid discount type" }),
 
-  value: z
-    .number({ error: "Value is required and must be a number" })
-    .positive({ error: "Value must be greater than zero" })
-    .max(1000000, { message: "Value is unusually high" }),
+value: z.number('Enter a valid amount' ).min(0.01, 'Value must be greater than 0'),
 
   valid_from: z.string().min(1, { message: "Start date is required" }),
   valid_to: z.string().min(1, { message: "End date is required" }),
@@ -312,7 +370,7 @@ export const couponSchema = z.object({
   applicable_product_ids: z.array(z.string()).optional(),
 })
 .superRefine((data, ctx) => {
-  if (data.discount_type === CouponDiscountTypeEum.PERCENTAGE && data.value > 100) {
+  if (data.discount_type === PromotionType.PERCENTAGE && data.value > 100) {
     ctx.addIssue({
       code: "custom",
       message: "Percentage discounts cannot exceed 100%",
@@ -480,9 +538,7 @@ export const policyFormSchema = z.object({
   service_provider: z.string().trim().max(100, "Cannot exceed 100 characters").optional(),
   
   
-  claim_contact_email: z.literal('')
-    .or(z.string().trim().email("Please enter a valid email address"))
-    .optional(), 
+  claim_contact_email: z.email("Please enter a valid email address").optional(), 
 
   claim_contact_phone: z.literal('')
     .or(z.string().trim().regex(/^\+?[1-9]\d{1,14}$/, "Valid format: +1234567890"))
@@ -513,3 +569,28 @@ export const ticketSchema = z.object({
 });
 
 export type TicketFormData = z.infer<typeof ticketSchema>;
+
+
+export const bannerSchema = z.object({
+  placement: z.enum(BannerPlacement, { message: "Please select a valid placement" }),
+  
+  image_alt_text: z.string().max(200).optional().or(z.literal("")),
+  headline: z.string().min(3).max(150).optional().or(z.literal("")),
+  sub_headline: z.string().max(250).optional().or(z.literal("")),
+  cta_label: z.string().min(2).max(50).optional().or(z.literal("")),
+  cta_url: z.string().optional().or(z.literal("")),  
+valid_from: z.string().optional().or(z.literal("")),
+  valid_to: z.string().optional().or(z.literal("")),
+   
+  display_order: z.coerce.number().int().min(0).optional(),
+  
+  promotion_id: z.string().optional().or(z.literal("")),
+  is_active: z.boolean().default(true),
+ 
+  image_url: z.any().optional(),
+  image_url_mobile: z.any().optional(),
+  remove_image_url: z.any().optional(),
+  remove_image_url_mobile: z.any().optional(),
+});
+
+export type BannerFormValues = z.infer<typeof bannerSchema>;

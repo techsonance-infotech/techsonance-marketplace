@@ -1,10 +1,61 @@
-﻿import { id, pl } from "date-fns/locale";
+﻿
+import { Building2, FileArchive, Globe2, ShieldCheck } from "lucide-react";
 import { BusinessStructure, categoryOptions, COUNTRY_CODES } from "./common";
+import { VendorRegisterSchema } from "@/utils/validation";
+export const STEPS = [
+  { id: 0, label: "Organization", icon: Building2 },
+  { id: 1, label: "Domain", icon: Globe2 },
+  { id: 2, label: "Compliance", icon: ShieldCheck },
+  { id: 3, label: "Documents", icon: FileArchive },
+];
 
+// Fields validated per step by react-hook-form
+export const STEP_RHF_FIELDS: Record<number, (keyof VendorRegisterSchema)[]> = {
+  0: [
+    "company_name",
+    "store_owner_first_name",
+    "store_owner_last_name",
+    "email",
+    "country_code",
+    "phone_number",
+    "category",
+    "company_structure",
+  ],
+  1: ["company_domain"],
+  2: [],
+  3: [],
+};
+export const BUSINESS_CATEGORIES = [
+  "Fashion & Apparel",
+  "Electronics & Gadgets",
+  "Food & Beverages",
+  "Health & Wellness",
+  "Home & Living",
+  "Beauty & Personal Care",
+  "Sports & Outdoors",
+  "Books & Stationery",
+  "Toys & Games",
+  "Automotive",
+  "Industrial & B2B",
+  "Other",
+];
+
+export const COMPANY_STRUCTURES = [
+  "Sole Proprietorship",
+  "Partnership Firm",
+  "Limited Liability Partnership (LLP)",
+  "Private Limited Company (Pvt. Ltd.)",
+  "Public Limited Company",
+  "One Person Company (OPC)",
+  "NGO / Non-Profit",
+  "Other",
+];
 export const ORGANIZATION_DETAIL_FIELDS = [
     { id: "company_name", label: "Company Name", placeholder: "Enter your company name", type: "text" },
     { id: "store_owner_first_name", label: "First Name", placeholder: "Enter your first name", type: "text" },
     { id: "store_owner_last_name", label: "Last Name", placeholder: "Enter your last name", type: "text" },
+    { id: "email", label: "Email", placeholder: "Enter your email", type: "email" },
+
     {
         id: "phone_number", label: "Business Phone Number", groupField: [
             { id: "country_code", type: "select", options: COUNTRY_CODES, styles: "rounded-r-none" },
@@ -17,21 +68,48 @@ export const ORGANIZATION_DETAIL_FIELDS = [
 ];
 
 export const BUSINESS_ADMIN_ACCOUNT_FIELDS = [
-    { id: "first_name", label: "Admin First Name", placeholder: "Enter your first name", type: "text" },
-    { id: "last_name", label: "Admin Last Name", placeholder: "Enter your last name", type: "text" },
     { id: "email", label: "Admin Email", placeholder: "Enter your email", type: "email" },
     { id: "password", label: "Password", placeholder: "Enter your password", type: "password" },
     { id: "confirm_password", label: "Confirm Password", placeholder: "Confirm your password", type: "password" },
 ];
 
+// export enum RegistrationStages {
+//     Organization = "organization",
+//     Instance = "instance",
+//     Compliance = "compliance",
+//     AdminAccount = "admin_account",
+//     Documents = "documents",
+// }
 export enum RegistrationStages {
-    Organization = "organization",
-    Instance = "instance",
-    Compliance = "compliance",
-    AdminAccount = "admin_account",
-    Documents = "documents",
+  Organization  = "organization",
+  Instance      = "instance",
+  Compliance    = "compliance",
+  Documents     = "documents",
 }
 
+export const PLAN_FEATURES: Record<string, { label: string; included: boolean }[]> = {
+  starter: [
+    { label: "50 products",          included: true  },
+    { label: "200 orders / month",   included: true  },
+    { label: "Basic promotions",     included: true  },
+    { label: "Custom domain",        included: false },
+    { label: "Priority support",     included: false },
+  ],
+  pro: [
+    { label: "5,000 products",       included: true  },
+    { label: "Unlimited orders",     included: true  },
+    { label: "Full promotions",      included: true  },
+    { label: "Custom domain",        included: true  },
+    { label: "Priority support",     included: false },
+  ],
+  enterprise: [
+    { label: "Unlimited products",   included: true  },
+    { label: "Unlimited orders",     included: true  },
+    { label: "Full promotions",      included: true  },
+    { label: "Custom domain",        included: true  },
+    { label: "Priority support",     included: true  },
+  ],
+};
 export const CUSTOMER_REGISTRATION_FIELDS = [
     { id: "first_name", label: "First name", type: "text", placeholder: "Enter your first name", required: true },
     { id: "last_name", label: "Last name", type: "text", placeholder: "Enter your last name", required: true },
@@ -65,23 +143,24 @@ export const ADDRESS_FIELDS: {
     type: string;
     placeholder?: string;
     required?: boolean;
-    options?: string[];
+    options?: any[];
 }[] = [
     { id: "address_for", label: "Address Type", type: "select", options: ["home", "work", "other"], placeholder: "Select address type", required: true },
     { id: 'name', label: 'Recipient Name', type: 'text', placeholder: "Enter recipient's name", required: true },
     { id: "phone", label: "Phone", type: "text", placeholder: "Enter contact number for this address", required: true },
     { id: "address_line_1", label: "Address Line 1", type: "text", placeholder: "Enter street address", required: true },
     { id: "address_line_2", label: "Address Line 2", type: "text", placeholder: "Enter apartment, suite, etc.", required: false },
-
     { id: "street", label: "Street", type: "text", placeholder: "Enter street name", required: true },
-    { id: "city", label: "City", type: "text", placeholder: "Enter city", required: true },
-    { id: "state", label: "State", type: "text", placeholder: "Enter state", required: true },
-    { id: "postal_code", label: "Postal Code", type: "text", placeholder: "Enter postal code", required: true },
-    { id: "country", label: "Country", type: "text", placeholder: "Enter country", required: true },
+    { id: "country", label: "Country", type: "select", options: [], placeholder: "Enter country", required: true },
+    { id: "state", label: "State", type: "select", options: [], placeholder: "Enter state", required: true },
+    { id: "city", label: "City", type: "select", options: [], placeholder: "Enter city", required: true },
+    { id: "postal_code", label: "Postal Code", type: "text", placeholder: "Enter postal code", required: true }, // Changed to text
     { id: "landmark", label: "Landmark", type: "text", placeholder: "Enter nearby landmark", required: true },
     { id: "is_default", label: "Set as default address", type: "checkbox" }
-
 ] as const;
+
+
+
 export const WAREHOUSE_ADDRESS_FIELDS: {
     id: string;
     label: string;
@@ -95,16 +174,15 @@ export const WAREHOUSE_ADDRESS_FIELDS: {
     { id: "phone", label: "Contact Number", type: "text", placeholder: "Enter contact number for this warehouse", required: true },
     { id: "address_line_1", label: "Address Line 1", type: "text", placeholder: "Enter street address", required: true },
     { id: "address_line_2", label: "Address Line 2", type: "text", placeholder: "Enter apartment, suite, etc.", required: false },
-
     { id: "street", label: "Street", type: "text", placeholder: "Enter street name", required: true },
-    { id: "city", label: "City", type: "text", placeholder: "Enter city", required: true },
-    { id: "state", label: "State", type: "text", placeholder: "Enter state", required: true },
+    { id: "country", label: "Country", type: "select", options: [], placeholder: "Enter country", required: true },
+    { id: "state", label: "State", type: "select", options: [], placeholder: "Enter state", required: true },
+    { id: "city", label: "City", type: "select", options: [], placeholder: "Enter city", required: true },
     { id: "postal_code", label: "Postal Code", type: "text", placeholder: "Enter postal code", required: true },
-    { id: "country", label: "Country", type: "text", placeholder: "Enter country", required: true },
     { id: "landmark", label: "Landmark", type: "text", placeholder: "Enter nearby landmark", required: true },
     { id: "is_default", label: "Set as default warehouse", type: "checkbox" }
-
 ] as const;
+
 export const PAYMENT_METHODS_FIELDS = [
     { id: 'UPI', label: 'UPI', placeholder: 'Enter your UPI ID', type: 'text', description: 'We will redirect you to your UPI app to complete the payment.' },
     { id: 'CreditCard', label: 'Credit or Debit Card', placeholder: 'Card Number', type: 'text', description: 'We accept all major credit and debit cards. Your card details are processed securely.' },

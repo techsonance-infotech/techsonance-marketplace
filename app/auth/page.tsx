@@ -1,70 +1,59 @@
 ﻿import Link from 'next/link';
-import { ShieldCheck, Store, User } from 'lucide-react';
+import { ShieldCheck, Store, User, ShieldHalf } from 'lucide-react';
 
 export default function AuthCenter() {
     return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
-            {/* Header Section */}
-            <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold text-foreground mb-2">Auth Center</h1>
-                <p className="text-muted-foreground">Select your portal to continue with Techsonance MarketPlace </p>
-            </div>
+            <div className="w-full ">
 
-            {/* Portal Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
+                {/* Header */}
+                <div className="mb-8">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground bg-muted border border-border rounded-full px-3 py-1 mb-4">
+                        <ShieldHalf size={12} />
+                        Auth center
+                    </span>
+                    <h1 className="text-2xl font-semibold text-foreground mb-1.5">
+                        Welcome to Techsonance
+                    </h1>
+                    {/* <p className="text-sm text-muted-foreground">
+                        Select your portal to sign in or get started.
+                    </p> */}
+                 </div>
 
-                {/* Vendor Portal Card */}
-                <div className="group p-8 bg-card border border-border rounded-2xl hover:border-brand-primary transition-all duration-300 shadow-sm hover:shadow-md">
-                    <div className="w-14 h-14 bg-brand-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-primary/20 transition-colors">
-                        <Store className="text-brand-primary w-8 h-8" />
+        
+
+                    {/* Vendor */}
+                   <div className="group bg-card border border-border hover:border-border/80 rounded-2xl p-6 flex flex-col transition-colors duration-150">
+                        <div className="w-10 h-10 rounded-xl bg-green-50 border border-green-200 flex items-center justify-center mb-5 text-green-700">
+                            <Store size={20} />
+                        </div>
+                        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+                            Seller
+                        </p>
+                        <h2 className="text-base font-semibold text-foreground mb-2">
+                            Vendor portal
+                        </h2>
+                        <p className="text-sm text-muted-foreground leading-relaxed mb-5 flex-1">
+                            Manage your listings, inventory, orders, and track your store's performance.
+                        </p>
+                        <div className="flex flex-col gap-2">
+                            <Link
+                                href="/auth/vendorLogin"
+                                className="w-full py-2 px-4 bg-blue-700 hover:bg-blue-800 text-blue-50 text-sm font-medium text-center rounded-lg transition-colors"
+                            >
+                                Sign in as vendor
+                            </Link>
+                            <Link
+                                href="/auth/vendorRegister"
+                                className="w-full py-2 px-4 border border-border hover:bg-muted text-muted-foreground hover:text-foreground text-sm font-medium text-center rounded-lg transition-colors"
+                            >
+                                Become a vendor →
+                            </Link>
+                        </div>
                     </div>
-                    <h2 className="text-2xl font-semibold mb-3">Vendor Portal</h2>
-                    <p className="text-muted-foreground mb-8">
-                        Manage your marketplace, inventory, and track your shop's performance.
-                    </p>
-                    <div className="flex flex-col gap-3">
-                        <Link
-                            href="/auth/vendorLogin"
-                            className="w-full py-3 px-6 bg-brand-primary text-white text-center rounded-lg font-medium hover:opacity-90 transition-opacity"
-                        >
-                            Vendor Login
-                        </Link>
-                        <Link
-                            href="/auth/vendorRegister"
-                            className="w-full py-3 px-6 border border-brand-primary text-brand-primary text-center rounded-lg font-medium hover:bg-brand-primary/5 transition-colors"
-                        >
-                            Become a Vendor
-                        </Link>
-                    </div>
-                </div>
 
-                {/* Admin Portal Card */}
-                <div className="group p-8 bg-card border border-border rounded-2xl hover:border-brand-secondary transition-all duration-300 shadow-sm hover:shadow-md">
-                    <div className="w-14 h-14 bg-brand-secondary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-secondary/20 transition-colors">
-                        <ShieldCheck className="text-brand-secondary w-8 h-8" />
-                    </div>
-                    <h2 className="text-2xl font-semibold mb-3">Admin Panel</h2>
-                    <p className="text-muted-foreground mb-8">
-                        Access platform-wide settings, manage vendors, and oversee marketplace health.
-                    </p>
-                    <Link
-                        href="/auth/adminLogin"
-                        className="block w-full py-3 px-6 bg-brand-secondary text-brand-secondary-foreground text-center rounded-lg font-medium hover:opacity-90 transition-opacity"
-                    >
-                        Administrator Login
-                    </Link>
-                </div>
 
-            </div>
-
-            {/* Footer / Customer Link */}
-            <div className="mt-12 text-center">
-                <p className="text-muted-foreground">
-                    Are you a customer?{' '}
-                    <Link href="/auth/customerLogin" className="text-brand-primary font-medium hover:underline">
-                        Go to Shopping Login
-                    </Link>
-                </p>
+ 
             </div>
         </div>
     );

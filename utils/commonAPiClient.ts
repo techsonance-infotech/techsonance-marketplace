@@ -1,4 +1,4 @@
-﻿import { BASE_API_URL } from "@/constants";
+import { BASE_API_URL } from "@/constants";
 import { getCompanyDomain } from "@/lib/get-domain";
 
 export const fetchProduct = async (productId: string) => {
@@ -13,7 +13,7 @@ export const fetchProduct = async (productId: string) => {
                 'Content-Type': 'application/json',
                 'company-domain': companyDomain,
             },
-});
+        });
         console.log(response)
         if (response.status !== 200) {
             console.log('Failed to fetch product', response);
@@ -64,7 +64,7 @@ export interface ProductQueryParams {
     offset?: number;
     limit?: number;
 }
- 
+
 export interface ProductsResponse {
     data: any[];
     total: number;
@@ -76,23 +76,23 @@ export const fetchProductVendorProducts = async (
     params: ProductQueryParams = {}
 ): Promise<ProductsResponse> => {
     const companyDomain = await getCompanyDomain();
- 
+
     const searchParams = new URLSearchParams();
-    if (params.search)        searchParams.set('search', params.search);
-    if (params.category_id)   searchParams.set('category_id', params.category_id);
+    if (params.search) searchParams.set('search', params.search);
+    if (params.category_id) searchParams.set('category_id', params.category_id);
     if (params.min_price !== undefined) searchParams.set('min_price', String(params.min_price));
     if (params.max_price !== undefined) searchParams.set('max_price', String(params.max_price));
-    if (params.sort_by)       searchParams.set('sort_by', params.sort_by);
-    if (params.offset !== undefined)    searchParams.set('offset', String(params.offset));
-    if (params.limit !== undefined)     searchParams.set('limit', String(params.limit));
- 
+    if (params.sort_by) searchParams.set('sort_by', params.sort_by);
+    if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
+    if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
+
     const qs = searchParams.toString();
-    const url = `${BASE_API_URL}/v1/products/all${qs ? `?${qs}` : ''}`;
- 
+    const url = `${BASE_API_URL}/v1/products/vendor-products${qs ? `?${qs}` : ''}`;
+
     try {
         const response = await fetch(url, {
             method: 'GET',
-         
+
             cache: 'no-store',
             headers: {
                 'Content-Type': 'application/json',
@@ -105,33 +105,111 @@ export const fetchProductVendorProducts = async (
         }
         const json = await response.json();
         const payload = json?.data ?? json;
-        
+
         if (Array.isArray(payload)) {
             return { data: payload, total: payload.length, offset: 0, limit: payload.length, totalPages: 1 };
         }
-        return payload ;
+        return payload;
+    } catch (error) {
+        console.log('Error fetching vendor products:', error);
+        return { data: [], total: 0, offset: 0, limit: 12, totalPages: 0 };
+    }
+};
+export const fetchProductProducts = async (
+    params: ProductQueryParams = {}
+): Promise<ProductsResponse> => {
+    const companyDomain = await getCompanyDomain();
+
+    const searchParams = new URLSearchParams();
+    if (params.search) searchParams.set('search', params.search);
+    if (params.category_id) searchParams.set('category_id', params.category_id);
+    if (params.min_price !== undefined) searchParams.set('min_price', String(params.min_price));
+    if (params.max_price !== undefined) searchParams.set('max_price', String(params.max_price));
+    if (params.sort_by) searchParams.set('sort_by', params.sort_by);
+    if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
+    if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
+
+    const qs = searchParams.toString();
+    const url = `${BASE_API_URL}/v1/products/all${qs ? `?${qs}` : ''}`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+
+            cache: 'no-store',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+            },
+        });
+        if (response.status !== 200) {
+            console.log('Failed to fetch vendor products');
+            return { data: [], total: 0, offset: 0, limit: 12, totalPages: 0 };
+        }
+        const json = await response.json();
+        const payload = json?.data ?? json;
+
+        if (Array.isArray(payload)) {
+            return { data: payload, total: payload.length, offset: 0, limit: payload.length, totalPages: 1 };
+        }
+        return payload;
     } catch (error) {
         console.log('Error fetching vendor products:', error);
         return { data: [], total: 0, offset: 0, limit: 12, totalPages: 0 };
     }
 };
 
+export const fetchProductOptions = async (): Promise<{ id: string; name: string }[]> => {
+    try {
+        const companyDomain = await getCompanyDomain();
+        const response = await fetch(`${BASE_API_URL}/v1/products/options`, {
+            method: 'GET',
+            cache: 'no-store',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+            },
+        });
+        if (response.status !== 200) {
+            return [];
+        }
+        const json = await response.json();
+        return json?.data ?? json ?? [];
+    } catch (error) {
+        console.error('Error fetching product options:', error);
+        return [];
+    }
+};
+
 export const fetchProductSuggestions = async (search: string): Promise<{ id: string; name: string }[]> => {
     if (!search || search.trim().length < 2) return [];
-    const companyDomain = await getCompanyDomain();
     try {
-        const response = await fetch(
-            `${BASE_API_URL}/v1/products/suggestions?search=${encodeURIComponent(search.trim())}`,
-            {
-                method: 'GET',
-                cache: 'no-store',
-                headers: { 'Content-Type': 'application/json', 'company-domain': companyDomain },
-            }
-        );
-        if (!response.ok) return [];
-        const json = await response.json();
-        return json?.data ?? [];
+        const options = await fetchProductOptions();
+        const term = search.trim().toLowerCase();
+        return options.filter(opt => opt.name.toLowerCase().includes(term)).slice(0, 8);
     } catch {
         return [];
     }
 };
+
+export const fetchHomepageProducts = async (limit: number = 8): Promise<{ data: any[] }> => {
+    const companyDomain = await getCompanyDomain();
+    try {
+        const response = await fetch(`${BASE_API_URL}/v1/products/homepage?limit=${limit}`, {
+            method: 'GET',
+            cache: 'no-store',
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+            },
+        });
+        if (response.status !== 200) {
+            return { data: [] };
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching homepage products:', error);
+        return { data: [] };
+    }
+};
+

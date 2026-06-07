@@ -1,4 +1,4 @@
-﻿
+
 import { VendorRegisterSchema } from "./validation";
 export enum UserStatusEnum {
   ACTIVE = 'active',
@@ -72,36 +72,203 @@ export enum BuyBtnMode {
   CART = 'cart',
   QUICK_BUY = 'quick-buy',
 }
-
-export enum CouponDiscountTypeEum {
-  PERCENTAGE = "percentage",
-  FIXED_CART = "fixed_cart",
-  FIXED_PRODUCT = "fixed_product",
-  FREE_SHIPPING = "free_shipping",
+export enum PromotionType {
+  PERCENTAGE = 'percentage',
+  FIXED_AMOUNT = 'fixed_amount',
+  BUY_X_GET_Y = 'buy_x_get_y',
+  BOGO = 'bogo',
+  FREE_SHIPPING = 'free_shipping',
+  TIERED_DISCOUNT = 'tiered_discount',
+  BUNDLE_DEAL = 'bundle_deal',
 }
+
+export enum PromotionStatus {
+  DRAFT = 'draft',
+  PENDING_REVIEW = 'pending_review',
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PAUSED = 'paused',
+  SCHEDULED = 'scheduled',
+  REJECTED = 'rejected',
+  EXPIRED = 'expired',
+}
+
+
+export enum PromotionTargetType {
+  ALL_PRODUCTS = 'all_products',
+  CATEGORY = 'category',
+  PRODUCT = 'product',
+  VENDOR = 'vendor',
+  PRODUCT_VARIANT = 'product_variant',
+}
+
+export enum PromotionRuleType {
+  MIN_CART_VALUE = 'min_cart_value',
+  MIN_QTY = 'min_qty',
+  CUSTOMER_SEGMENT = 'customer_segment',
+  FIRST_ORDER_ONLY = 'first_order_only',
+  PRODUCT_IN_CART = 'product_in_cart',
+  NEW_CUSTOMER = 'new_customer',
+  DATE_RANGE = 'date_range',
+  MAX_USES_PER_USER = 'max_uses_per_user',
+}
+
+export enum BannerPlacement {
+  HOMEPAGE_HERO = 'homepage_hero',
+  HOMEPAGE_SECONDARY = 'homepage_secondary',
+  CATEGORY_TOP = 'category_top',
+  PRODUCT_PAGE = 'product_page',
+  CART_SIDEBAR = 'cart_sidebar',
+  CHECKOUT_TOP = 'checkout_top',
+  MY_OFFERS_PAGE = 'my_offers_page',
+}
+
+export enum PromoEventType {
+  VIEWED = 'viewed',
+  CLICKED = 'clicked',
+  APPLIED = 'applied',
+  REDEEMED = 'redeemed',
+  REMOVED = 'removed',
+  DISMISSED = 'dismissed',
+}
+
+export enum SegmentCriteriaOperator {
+  AND = 'AND',
+  OR = 'OR',
+}
+
+export enum ChangelogAction {
+  CREATED = 'created',
+  UPDATED = 'updated',
+  SUBMITTED = 'submitted',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  PAUSED = 'paused',
+  RESUMED = 'resumed',
+  EXPIRED = 'expired',
+  DELETED = 'deleted',
+}
+export type PercentageConfig = {
+  value: number; // e.g. 20 (= 20%)
+  cap?: number; // max discount in ₹; undefined = no cap
+};
+
+export type FixedAmountConfig = {
+  value: number; // flat ₹ discount
+};
+
+export type BuyXGetYConfig = {
+  buy_qty: number; // items customer must buy
+  get_qty: number; // items given free / discounted
+  get_product_variant_id?: string; // specific free item; null = cheapest in cart
+  get_discount_percent: number; // 100 = free; 50 = half price
+};
+
+export type FreeShippingConfig = {
+  max_shipping_waived?: number; // cap on shipping fee waived; undefined = all
+};
+
+export type TieredDiscountConfig = {
+  tiers: Array<{
+    min_cart: number; // cart subtotal threshold in ₹
+    percent: number; // discount percent at this tier
+  }>;
+};
+
+export type BundleDealConfig = {
+  product_variant_ids: string[]; // all must be in cart
+  bundle_price: number; // total price for the bundle
+};
+
+export type DiscountConfig =
+  | PercentageConfig
+  | FixedAmountConfig
+  | BuyXGetYConfig
+  | FreeShippingConfig
+  | TieredDiscountConfig
+  | BundleDealConfig;
+// ─── Updated Coupon interface (add rules field for findOne response) ───────────
+ 
 export interface Coupon {
   id: string;
-  company_id: string;
-  code: string;  
-  description: string;
-  discount_type: CouponDiscountTypeEum;
-  discount_value: string; // stored as string, e.g. "100.00"
-  min_order_amount: string;
-  max_discount_amount: string;
-  max_uses: number;
-  max_uses_per_user: number;
-  total_used: number;
-  is_auto_applied: boolean;
+  code: string;
+  description: string | null;
   is_active: boolean;
-  valid_from: string;   // ISO date string
-  valid_to: string;     // ISO date string
-  created_at: string;   // ISO timestamp
-  updated_at: string;   // ISO timestamp
+  created_at: string;
+  discount_type: string;
+  discount_value: number;
+  max_discount_amount: number | null;
+  valid_from: string;
+  valid_to: string;
+  max_uses: number | null;
+  max_uses_per_user: number | null;
+  is_auto_applied?: boolean;
+  total_used?: number;
+  min_order_amount?: number | null;
+  // NEW: rules returned by findOne so the edit form can repopulate them
+  rules?: Array<{
+    rule_type: PromotionRuleType;
+    rule_config: Record<string, unknown>;
+    negate: boolean;
+  }>;
 }
 
+export interface AppliedPromotion {
+   id: string;
+        promotion_id: string;
+        code: string;
+        discount_type: PromotionType;
+        discount_value: number;
+        max_discount_amount: Object | null;
+        isGlobal: boolean;
+        applicableProducts: string[] | null;
+         discount_config: DiscountConfig,
+        rule:  {
+    id: string;
+    created_at: Date;
+    promotion_id: string;
+    rule_type: PromotionRuleType;
+    rule_config: unknown;
+    negate: boolean;
+}[]
+}
+export interface RuleConfig_MinCartValue   { amount: number }
+export interface RuleConfig_MinQty         { qty: number }
+export interface RuleConfig_CustomerSegment{ segment_id: string }
+export interface RuleConfig_FirstOrderOnly {}   // no extra fields
+export interface RuleConfig_ProductInCart  { product_id: string }
+export interface RuleConfig_NewCustomer    { registered_within_days: number }
+export interface RuleConfig_DateRange      { days_of_week: number[] }  // 0=Sun … 6=Sat
+export interface RuleConfig_MaxUsesPerUser { max: number }
+ 
+/** Discriminated union — rule_type narrows the exact rule_config shape */
+export type PromotionRule =
+  | { rule_type: PromotionRuleType.MIN_CART_VALUE;    rule_config: RuleConfig_MinCartValue;    negate?: boolean }
+  | { rule_type: PromotionRuleType.MIN_QTY;           rule_config: RuleConfig_MinQty;          negate?: boolean }
+  | { rule_type: PromotionRuleType.CUSTOMER_SEGMENT;  rule_config: RuleConfig_CustomerSegment; negate?: boolean }
+  | { rule_type: PromotionRuleType.FIRST_ORDER_ONLY;  rule_config: RuleConfig_FirstOrderOnly;  negate?: boolean }
+  | { rule_type: PromotionRuleType.PRODUCT_IN_CART;   rule_config: RuleConfig_ProductInCart;   negate?: boolean }
+  | { rule_type: PromotionRuleType.NEW_CUSTOMER;      rule_config: RuleConfig_NewCustomer;     negate?: boolean }
+  | { rule_type: PromotionRuleType.DATE_RANGE;        rule_config: RuleConfig_DateRange;       negate?: boolean }
+  | { rule_type: PromotionRuleType.MAX_USES_PER_USER; rule_config: RuleConfig_MaxUsesPerUser;  negate?: boolean }
+ 
+/** What the UI form holds per rule row before submitting */
+export interface PromotionRuleFormRow {
+  rule_type: PromotionRuleType
+  // Each rule_config field stored flat so react-hook-form can bind them
+  amount?: number                    // MIN_CART_VALUE
+  qty?: number                       // MIN_QTY
+  segment_id?: string                // CUSTOMER_SEGMENT
+  product_id?: string                // PRODUCT_IN_CART
+  registered_within_days?: number    // NEW_CUSTOMER
+  days_of_week?: number[]            // DATE_RANGE
+  max?: number                       // MAX_USES_PER_USER
+  negate: boolean
+}
 export interface VendorUser {
   company_id: string;
   vendor_id: string | null;
+  user_id: string;
   id: string;
   role: string;
   email: string;
@@ -110,12 +277,13 @@ export interface VendorUser {
   // user_status: 'active' | 'suspended' | 'pending';
   first_name: string;
   last_name: string;
-  country_code: string
-  phone_number: string
-  store_name: string
-  category: string
-  vendor_status: string
+  country_code: string;
+  phone_number: string;
+  store_name: string;
+  category: string;
+  vendor_status: string;
   joined_at: Date;
+  password_change_required?: boolean;
 }
 
 export interface User {
@@ -132,6 +300,7 @@ export interface User {
   updated_at: Date;
   company_id: string | null;
   role_id: string | null;
+  password_change_required?: boolean;
 }
 // Supporting Interfaces based on your schema
 // used in multiple places
@@ -434,9 +603,6 @@ export enum VendorApplicationStatusEnum {
   ACCEPTED = 'accepted'
 }
  
-export enum CouponStatusEnum {
-  ACTIVE = 'active', EXPIRED = 'expired', INACTIVE = 'inactive'
-}
 export interface VendorApplicationType {
   business_profile: {
     business_name: string;
@@ -495,9 +661,11 @@ export interface VendorApplication {
   documents: VendorDocument[];
 }
 export interface NavLinkType {
-  [ key: string ]: string | null;
+  [label: string]: string | null | boolean | undefined;
+  icon?: string;
+  section?: string;
+  divider?: boolean;
 }
-
 export interface FooterLinkType {
   title: string;
   url: string;
@@ -704,3 +872,60 @@ export type ProductResponseType = {
   tax_profile: string,
 
 };
+// USED
+export interface ComplianceFieldPayload {
+  country_code: string;
+  field_key: string;
+  field_value: string;
+  is_active?: boolean;
+  valid_until?: string | null;
+}
+ 
+export interface ComplianceDocumentPayload {
+  label?: string;
+}
+ 
+export interface CompanyComplianceField {
+  id: string;
+  company_id: string;
+  country_code: string;
+  field_key: string;
+  field_value: string;
+  is_active: boolean;
+  valid_until: string | null;
+  document_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+ 
+export interface ComplianceDocument {
+  id: string;
+  compliance_field_id: string;
+  company_id: string;
+  document_url: string;
+  file_name: string;
+  mime_type: string;
+  file_size_bytes: number | null;
+  label: string | null;
+  status: 'pending_review' | 'verified' | 'rejected' | 'expired';
+  rejection_reason: string | null;
+  created_at: string;
+}
+
+export  interface CartItemDisplay {
+  id: string;
+  cart_id: string;
+  product_variant_id: string;
+  quantity: number;
+  productVariant: Variant;
+}
+export interface VariantDetails {
+  id: string;
+  variant_name: string;
+  sku: string;
+  price: string;
+  status: string;
+  stock_quantity: number;
+  images?: { image_url: string }[] | string;
+  product_id?: string;
+}

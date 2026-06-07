@@ -1,4 +1,4 @@
-﻿@import url("https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
 
 * {
@@ -26,6 +26,14 @@ select:-webkit-autofill {
         --brand-primary-foreground: oklch(0% 0 0);
         --brand-secondary: oklch(71.425% 0.12825 240.977);
         --brand-secondary-foreground: oklch(20% 0.06 237.323);
+
+        /* --- Semantic Theme Variables --- */
+        --theme-primary: var(--brand-primary);
+        --theme-primary-foreground: var(--brand-primary-foreground);
+        --theme-secondary: var(--brand-secondary);
+        --theme-accent: var(--brand-secondary);
+        --theme-background: var(--background);
+        --theme-text: var(--foreground);
 
         /* --- Backgrounds & Surfaces --- */
         --background: oklch(1 0 0);
@@ -135,6 +143,14 @@ select:-webkit-autofill {
     --color-brand-secondary: var(--brand-secondary);
     --color-brand-secondary-foreground: var(--brand-secondary-foreground);
 
+    /* --- Theme Override --- */
+    --color-theme-primary: var(--theme-primary);
+    --color-theme-primary-foreground: var(--theme-primary-foreground);
+    --color-theme-secondary: var(--theme-secondary);
+    --color-theme-accent: var(--theme-accent);
+    --color-theme-background: var(--theme-background);
+    --color-theme-text: var(--theme-text);
+
     /* --- Backgrounds --- */
     --color-background: var(--background);
     --color-foreground: var(--foreground);
@@ -235,4 +251,14 @@ select:-webkit-autofill {
 .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* AddToCart small variant styling to prevent height collapse */
+.small {
+    height: 2rem !important; /* 32px */
+    font-size: 0.725rem !important; /* text-xs */
+    border-radius: var(--radius-sm, 0.5rem) !important;
+    border: 1px solid var(--color-border, #e2e8f0) !important;
+    background-color: white !important;
+    color: var(--color-foreground, #0f172a) !important;
 }
