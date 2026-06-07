@@ -516,14 +516,7 @@ export default function HelpCenterPage() {
     activeTab: "faq",
     openFaqIndex: null,
     searchQuery: "",
-    faqVotes: (() => {
-      try {
-        const raw = localStorage.getItem("tn_faq_votes");
-        return raw ? JSON.parse(raw) : {};
-      } catch {
-        return {};
-      }
-    })(),
+    faqVotes: {},
     expandedTicketId: null,
   };
 
@@ -558,6 +551,12 @@ export default function HelpCenterPage() {
 
   useEffect(() => {
     fetchHelpArticles();
+    try {
+      const raw = localStorage.getItem("tn_faq_votes");
+      if (raw) {
+        uiDispatch({ type: "SET", key: "faqVotes", value: JSON.parse(raw) });
+      }
+    } catch {}
   }, []);
 
   useEffect(() => {

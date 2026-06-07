@@ -244,12 +244,12 @@ export default function Home() {
                     onChange={(e) => setEmailInput(e.target.value)}
                     className="bg-transparent border-none text-white text-sm focus:outline-none w-full placeholder-gray-500 font-light"
                   />
-                  <button type="submit" className="text-xs uppercase tracking-widest font-bold ml-4 text-white hover:text-gray-300 transition-colors">
+                  <button type="submit" className="text-xs p-2 uppercase tracking-wider font-bold ml-4 border border-gray-200 text-white hover:text-gray-200 transition-colors">
                     {getField('newsletter_btn_text')}
                   </button>
                 </form>
               )}
-              <p className="text-[10px] text-gray-500 mt-6 font-light">
+              <p className="text-[10px] text-gray-200 mt-6 font-light">
                 By subscribing you agree to our Terms of Use and Privacy Policy.
               </p>
             </div>
