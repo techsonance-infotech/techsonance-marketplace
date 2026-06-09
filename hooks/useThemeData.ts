@@ -3,7 +3,7 @@ import AxiosAPI from "@/lib/axios";
 import { getCachedData, cacheData } from "@/utils/cache";
 import { THEME_CACHE_KEY } from "@/constants";
 
-interface StorefrontTheme {
+export interface StorefrontTheme {
   primary_color: string;
   secondary_color: string;
   background_color: string;
