@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
     // Only list packages that are actually in package.json
     optimizePackageImports: ['lucide-react', 'motion', 'recharts', '@reduxjs/toolkit'],
     preloadEntriesOnStart: false,
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
   },
 
   // Keep heavy client-only libs out of the server-side bundle analysis.

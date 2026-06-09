@@ -1149,6 +1149,7 @@ export const upsertCompanyBranding = async (payload: FormData, token: string) =>
     revalidatePath('/');
     
     const data = await res.json();
+    console.log("company branding res", res)
     return {
       status: res.status,
       ok: res.ok,

@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 
+import { useImageColors } from '@/hooks/useImageColors';
+
 export interface HeroSlide {
   id?: string | number;
   image_url?: string;
@@ -13,6 +15,8 @@ export interface HeroSlide {
   subtitle?: string;
   btn_text?: string;
   btn_link?: string;
+  layout?: 'center-overlay' | 'left-content-right-image' | 'right-content-left-image';
+  bg_style?: 'gradient' | 'solid';
 }
 
 export interface InteractiveHeroProps {
@@ -20,6 +24,18 @@ export interface InteractiveHeroProps {
   video_url?: string;
   slides?: HeroSlide[];
   fallback_image_url?: string;
+}
+
+function getTextColorForBg(rgbaStr: string) {
+  const match = rgbaStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (!match) return '#ffffff';
+  const r = parseInt(match[1], 10);
+  const g = parseInt(match[2], 10);
+  const b = parseInt(match[3], 10);
+  
+  // Calculate relative luminance: Y = 0.299R + 0.587G + 0.114B
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.55 ? '#0f172a' : '#ffffff'; // dark slate for light bg, white for dark bg
 }
 
 export function InteractiveHero({
@@ -68,6 +84,36 @@ export function InteractiveHero({
     setIsMuted(!isMuted);
   };
 
+  // Fallback to carousel or simple image if slide list is empty
+  const activeSlides = slides.length > 0 ? slides : [{
+    image_url: fallback_image_url,
+    title: 'Define Your Modern Aesthetic',
+    subtitle: 'SEASON 2024 COLLECTION',
+    btn_text: 'Shop Now',
+    btn_link: '/store',
+    layout: 'center-overlay' as const,
+    bg_style: 'gradient' as const
+  }];
+
+  const currentSlide = activeSlides[currentIdx];
+  const activeSlideImage = currentSlide?.image_url || fallback_image_url;
+  const { bg: bgColor, solidBg } = useImageColors(activeSlideImage);
+
+  // Background style selection
+  const isGradient = (currentSlide?.bg_style || 'gradient') === 'gradient';
+  const finalBg = isGradient ? bgColor : solidBg;
+
+  // Layout selection
+  const layoutStyle = currentSlide?.layout || 'center-overlay';
+  const isOverlay = layoutStyle === 'center-overlay';
+
+  // Text color contrast check
+  const textColor = isOverlay ? '#ffffff' : getTextColorForBg(solidBg);
+  const subtitleColor = textColor === '#ffffff' ? 'rgba(255,255,255,0.7)' : 'rgba(15,23,42,0.7)';
+  const btnClass = textColor === '#ffffff'
+    ? "bg-white text-black hover:bg-slate-100"
+    : "bg-slate-900 text-white hover:bg-slate-800";
+
   // Video render helper
   if (banner_type === 'video' && video_url) {
     return (
@@ -83,7 +129,6 @@ export function InteractiveHero({
           className="absolute inset-0 w-full h-full object-cover opacity-80"
           onError={(e) => {
             console.error('Video loading failed, falling back to image');
-            // Force rendering standard fallback on video failure
           }}
         />
 
@@ -133,17 +178,11 @@ export function InteractiveHero({
     );
   }
 
-  // Fallback to carousel or simple image if slide list is empty
-  const activeSlides = slides.length > 0 ? slides : [{
-    image_url: fallback_image_url,
-    title: 'Define Your Modern Aesthetic',
-    subtitle: 'SEASON 2024 COLLECTION',
-    btn_text: 'Shop Now',
-    btn_link: '/store'
-  }];
-
   return (
-    <section className="relative w-full h-[65vh] lg:h-[75vh] min-h-[450px] bg-slate-900 overflow-hidden group">
+    <section 
+      style={{ background: finalBg }}
+      className="relative w-full h-[65vh] lg:h-[75vh] min-h-[450px] overflow-hidden group transition-colors duration-700"
+    >
       {/* Slides Carousel container */}
       <div className="relative w-full h-full">
         <AnimatePresence initial={false} mode="wait">
@@ -155,59 +194,119 @@ export function InteractiveHero({
             transition={{ duration: 0.7, ease: 'easeInOut' }}
             className="absolute inset-0 w-full h-full"
           >
-            {/* Slide Image */}
-            <div className="relative w-full h-full">
-              <Image
-                src={activeSlides[currentIdx].image_url || fallback_image_url}
-                alt={activeSlides[currentIdx].title || 'Banner'}
-                fill
-                priority
-                className="object-cover"
-                sizes="100vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-transparent" />
-            </div>
+            {isOverlay ? (
+              /* Overlay layout */
+              <div className="relative w-full h-full">
+                <Image
+                  src={currentSlide.image_url || fallback_image_url}
+                  alt={currentSlide.title || 'Banner'}
+                  fill
+                  priority
+                  className="object-contain rounded-4xl"
+                  sizes="100vw"
+                />
+                <div className="absolute inset-0 bg-black/45" />
+                <div className="absolute inset-0 flex items-center">
+                  <div className="max-w-screen-xl mx-auto px-6 lg:px-16 xl:px-24 w-full">
+                    <div style={{ color: textColor }} className="max-w-2xl">
+                      {currentSlide.subtitle && (
+                        <motion.p
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2, duration: 0.5 }}
+                          className="text-[14px] sm:text-lg font-bold uppercase tracking-[0.3em] mb-4"
+                          style={{ color: subtitleColor }}
+                        >
+                          {currentSlide.subtitle}
+                        </motion.p>
+                      )}
+                      
+                      <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3, duration: 0.6 }}
+                        className="text-3xl sm:text-5xl lg:text-6xl font-serif tracking-tight leading-[1.1] mb-6"
+                      >
+                        {currentSlide.title || 'Modern Collection'}
+                      </motion.h1>
 
-            {/* Slide Content */}
-            <div className="absolute inset-0 flex items-center">
-              <div className="max-w-screen-xl mx-auto px-6 lg:px-16 xl:px-24 w-full">
-                <div className="max-w-2xl text-white">
-                  {activeSlides[currentIdx].subtitle && (
-                    <motion.p
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
-                      className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-white/70 mb-4"
-                    >
-                      {activeSlides[currentIdx].subtitle}
-                    </motion.p>
-                  )}
-                  
-                  <motion.h1
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3, duration: 0.6 }}
-                    className="text-4xl sm:text-5xl lg:text-6xl font-serif tracking-tight leading-[1.1] mb-6"
-                  >
-                    {activeSlides[currentIdx].title || 'Modern Collection'}
-                  </motion.h1>
-
-                  {activeSlides[currentIdx].btn_text && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4, duration: 0.5 }}
-                    >
-                      <Link href={activeSlides[currentIdx].btn_link || '/store'}>
-                        <button className="bg-white text-black hover:bg-slate-100 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 px-8 py-3.5 text-[11px] uppercase tracking-[0.2em] font-bold rounded-xl shadow-lg">
-                          {activeSlides[currentIdx].btn_text}
-                        </button>
-                      </Link>
-                    </motion.div>
-                  )}
+                      {currentSlide.btn_text && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.4, duration: 0.5 }}
+                        >
+                          <Link href={currentSlide.btn_link || '/store'}>
+                            <button className={`hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 px-8 py-3.5 text-[16px] sm:text-lg uppercase tracking-[0.2em] font-bold rounded-xl shadow-lg cursor-pointer ${btnClass}`}>
+                              {currentSlide.btn_text}
+                            </button>
+                          </Link>
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              /* Split layouts (left-content-right-image or right-content-left-image) */
+              <div className="w-full h-full flex flex-col lg:flex-row items-center justify-between relative">
+                {/* Text content container */}
+                <div className={`w-full lg:w-1/2 flex items-center px-6 lg:px-16 xl:px-24 py-8 lg:py-0 ${
+                  layoutStyle === 'left-content-right-image' ? 'order-2 lg:order-1' : 'order-2'
+                }`}>
+                  <div style={{ color: textColor }} className="max-w-2xl w-full">
+                    {currentSlide.subtitle && (
+                      <motion.p
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                        className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] mb-4"
+                        style={{ color: subtitleColor }}
+                      >
+                        {currentSlide.subtitle}
+                      </motion.p>
+                    )}
+                    
+                    <motion.h1
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3, duration: 0.6 }}
+                      className="text-4xl sm:text-5xl lg:text-5xl font-serif tracking-tight leading-[1.15] mb-6"
+                    >
+                      {currentSlide.title || 'Modern Collection'}
+                    </motion.h1>
+
+                    {currentSlide.btn_text && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4, duration: 0.5 }}
+                      >
+                        <Link href={currentSlide.btn_link || '/store'}>
+                          <button className={`hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 px-8 py-3.5 text-[11px] uppercase tracking-[0.2em] font-bold rounded-xl shadow-lg cursor-pointer ${btnClass}`}>
+                            {currentSlide.btn_text}
+                          </button>
+                        </Link>
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Image container */}
+                <div className={`w-full lg:w-1/2 h-[35vh] lg:h-full relative ${
+                  layoutStyle === 'left-content-right-image' ? 'order-1 lg:order-2' : 'order-1'
+                }`}>
+                  <Image
+                    src={currentSlide.image_url || fallback_image_url}
+                    alt={currentSlide.title || 'Banner'}
+                    fill
+                    priority
+                    className="object-contain p-4 lg:p-8 rounded-4xl"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                </div>
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
