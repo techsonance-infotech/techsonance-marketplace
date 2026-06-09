@@ -262,6 +262,7 @@ export function BrandingTab({ token }: { token: string }) {
       });
       Object.entries(files).forEach(([k, v]) => fd.append(k, v));
       const res = await upsertCompanyBranding(fd, token);
+      console.log("res branding", res);
       if (res?.status === 200 || res?.status === 201 || res?.ok) {
         // Refresh local storefront cache if necessary
         try {
