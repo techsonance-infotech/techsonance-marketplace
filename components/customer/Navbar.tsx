@@ -13,6 +13,7 @@ import { useNavbarData } from "@/hooks/useNavbarData";
 import { useThemeData } from "@/hooks/useThemeData";
 import { SearchBar } from './SearchBar';
 import { BackButton } from '../ui/back-button';
+import { SearchTrigger } from './SearchOverlay';
 
 type NavState = { isMounted: boolean; isSearchOpen: boolean; searchQuery: string };
 type NavAction =
@@ -67,7 +68,7 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks: propMenuLinks 
             <nav className={`flex justify-between items-center px-4 py-1.5 bg-navbar text-navbar-foreground border-b border-gray-200 shadow-sm ${navPosCls} ${styles}`}>
                 {isHome ? null : <BackButton />}
                 <Link href="/">
-                    <img src={logoUrl} alt="brand logo" className="h-6 object-contain" />
+                    <img src={logoUrl} alt="brand logo" className="h-8 object-contain" />
                 </Link>
                 <button className="p-2 -mr-2 text-current hover:bg-black/5 rounded-md transition-colors relative">
                     <Bell strokeWidth={1.5} size={22} />
@@ -75,14 +76,13 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks: propMenuLinks 
             </nav>
         );
     }
-
     const navPosCls = themeData.navbar_position === 'sticky' ? 'sticky top-0 z-50' : 'relative';
     const logoAlignCls = themeData.logo_alignment === 'center' ? 'order-2 flex-1 flex justify-center' : 'order-1 flex-1';
     const linksAlignCls = themeData.logo_alignment === 'center' ? 'order-1 flex-1 justify-start' : 'order-2 flex-1 justify-center';
     const actionsAlignCls = 'order-3 flex-1 flex justify-end';
 
     return (
-        <nav className={`bg-navbar text-navbar-foreground flex justify-between items-center xl:px-16 lg:px-8 md:px-4 py-3 border-b border-gray-200 shadow-sm ${navPosCls} ${styles}`}>
+        <nav className={`bg-navbar text-navbar-foreground flex justify-between items-center xl:px-16 lg:px-8 md:px-4 py-1 border-b border-gray-200 shadow-sm ${navPosCls} ${styles}`}>
             <div className={logoAlignCls}>
                 <Link href="/">
                     <img src={logoUrl} alt="brand logo" className="h-14 font-black object-contain" />
@@ -115,7 +115,7 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks: propMenuLinks 
                             {isActive && (
                                 <motion.div
                                     layoutId="nav-underline"
-                                    className="absolute -bottom-4 left-0 right-0 h-[2px] bg-current z-0"
+                                    className="absolute -bottom-1 left-0 right-0 h-[2px] bg-current z-0"
                                 />
                             )}
                         </li>
@@ -148,13 +148,14 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks: propMenuLinks 
                                     <Search size={20} strokeWidth={1.5} />
                                 </button>
                             )} */}
-                            <button onClick={() => router.push('/store/search')} className="p-2 text-navbar-foreground/75 hover:bg-black/5 rounded-full transition-colors">
+                            {/* <button onClick={() => router.push('/store/search')} className="p-2 text-navbar-foreground/75 hover:bg-black/5 rounded-full transition-colors">
                                 <Search size={20} strokeWidth={1.5} />
-                            </button>
+                            </button> */}
+                            <SearchTrigger />
                         </div>
 
                         {user && (
-                            <Link href={'/customer' + (`/${user?.id}`) + '/wishlist'} className="relative p-2 text-navbar-foreground/75 hover:bg-black/5 rounded-full transition-colors">
+                            <Link href={'/customer/wishlist'} className="relative p-2 text-navbar-foreground/75 hover:bg-black/5 rounded-full transition-colors">
                                 {wishlistCount > 0 && (
                                     <span className="absolute top-0 right-0 text-[10px] font-bold bg-theme-primary text-theme-primary-foreground rounded-full w-4 h-4 flex items-center justify-center border-2 border-navbar">
                                         {wishlistCount}

@@ -213,3 +213,29 @@ export const fetchHomepageProducts = async (limit: number = 8): Promise<{ data: 
     }
 };
 
+export const fetchCategory = async (categoryId: string) => {
+    const companyDomain = await getCompanyDomain();
+    try {
+        const response = await fetch(`${BASE_API_URL}/v1/categories/${categoryId}`, {
+            method: 'GET',
+            cache: "force-cache",
+            next: { revalidate: 60 },
+            headers: {
+                'Content-Type': 'application/json',
+                'company-domain': companyDomain,
+            },
+        });
+        if (response.status !== 200) {
+            console.log('Failed to fetch category', response);
+            return null;
+        }
+        const json = await response.json();
+        const data = json?.data ?? json;
+        // The endpoint returns an array of categories, get the first element
+        return Array.isArray(data) ? data[0] : data;
+    } catch (error) {
+        console.log('Error fetching category:', error);
+        return null;
+    }
+};
+

@@ -18,12 +18,16 @@ export function BuyBtn({ id, styles, iconStyles, mode, selectedCoupon, quantity 
   useEffect(() => {
     setIsMounted(true);
   }, []);
-  console.log("selectedCoupon", selectedCoupon)
   const userId = user?.id ? user.id : '';
   const handleBuyNow = async () => {
-    console.log(userId)
     if (!user || !userId || !token) {
-      return router.push('/auth/customerLogin');
+      let redirectTarget = '/';
+      if (mode === BuyBtnMode.CART) {
+        redirectTarget = `/customer/cart?checkout=true${selectedCoupon?.id ? '&couponId=' + selectedCoupon.id : ''}`;
+      } else if (mode === BuyBtnMode.QUICK_BUY && id) {
+        redirectTarget = `/customer/checkout?type=product&id=${id}&qty=${quantity ?? 1}${selectedCoupon?.id ? '&couponId=' + selectedCoupon.id : ''}`;
+      }
+      return router.push(`/auth/customerLogin?redirect=${encodeURIComponent(redirectTarget)}`);
     }
 
     createCheckoutSession();

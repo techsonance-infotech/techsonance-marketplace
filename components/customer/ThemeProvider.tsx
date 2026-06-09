@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useMemo } from 'react';
-import { StorefrontTheme } from '@/hooks/useThemeData';
+import { StorefrontTheme, useThemeData } from '@/hooks/useThemeData';
 
 // Helper to convert hex to RGB
 function hexToRgb(hex: string) {
@@ -63,20 +63,31 @@ interface ThemeProviderProps {
   children: React.ReactNode;
 }
 
-export function ThemeProvider({ theme, children }: ThemeProviderProps) {
+export function ThemeProvider({ theme: initialTheme, children }: ThemeProviderProps) {
+  const { themeData: clientTheme } = useThemeData();
+
+  const mergedTheme = useMemo(() => {
+    // If the server-side fetched theme is empty or incomplete, fall back to client-cached theme data
+    const hasTheme = initialTheme && Object.keys(initialTheme).length > 0 && initialTheme.primary_color;
+    if (hasTheme) {
+      return { ...clientTheme, ...initialTheme };
+    }
+    return { ...initialTheme, ...clientTheme };
+  }, [initialTheme, clientTheme]);
+
   // Apply contrast correction check on background and text colors
   const correctedTheme = useMemo(() => {
-    const bg = theme.background_color || '#f8fafc';
-    const text = theme.text_color || '#0f172a';
-    const primary = theme.primary_color || '#2563eb';
+    const bg = mergedTheme.background_color || '#f8fafc';
+    const text = mergedTheme.text_color || '#0f172a';
+    const primary = mergedTheme.primary_color || '#2563eb';
 
     return {
-      ...theme,
+      ...mergedTheme,
       text_color: getSafeContrastTextColor(bg, text),
       // Validate primary color text contrast (e.g. for buttons)
       primary_color: primary,
     };
-  }, [theme]);
+  }, [mergedTheme]);
 
   // Construct styling variables mapping for root injection
   const inlineStyles = useMemo(() => {
@@ -103,11 +114,52 @@ export function ThemeProvider({ theme, children }: ThemeProviderProps) {
     if (correctedTheme.footer_bg) styles['--footer'] = correctedTheme.footer_bg;
     if (correctedTheme.footer_fg) styles['--footer-foreground'] = correctedTheme.footer_fg;
     
+    // Border radius override mapping
+    const radii: Record<string, string> = {
+      none: '0rem',
+      sm: '0.25rem',
+      md: '0.5rem',
+      lg: '0.75rem',
+      xl: '1rem',
+      full: '1.5rem',
+    };
+    if (correctedTheme.border_radius) {
+      styles['--radius'] = radii[correctedTheme.border_radius] || '0.5rem';
+    }
+    if (correctedTheme.font_family) {
+      styles['--font-family'] = `'${correctedTheme.font_family}', sans-serif`;
+    }
+    
     return styles as React.CSSProperties;
   }, [correctedTheme]);
 
+  const fontLink = useMemo(() => {
+    if (!correctedTheme.font_family) return null;
+    const font = correctedTheme.font_family;
+    const systemFonts = ['Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Verdana', 'Trebuchet MS', 'System-UI', 'sans-serif', 'serif', 'monospace'];
+    if (systemFonts.includes(font)) return null;
+
+    const formattedFont = font.replace(/\s+/g, '+');
+    return `https://fonts.googleapis.com/css2?family=${formattedFont}:wght@300;400;500;600;700&display=swap`;
+  }, [correctedTheme.font_family]);
+
+  const cssText = useMemo(() => {
+    return `
+      :root {
+        ${Object.entries(inlineStyles)
+          .map(([key, value]) => `${key}: ${value} !important;`)
+          .join('\n')}
+      }
+      body {
+        font-family: var(--font-family, 'Inter', sans-serif) !important;
+      }
+    `;
+  }, [inlineStyles]);
+
   return (
     <ThemeContext.Provider value={{ theme: correctedTheme }}>
+      {fontLink && <link rel="stylesheet" href={fontLink} />}
+      <style dangerouslySetInnerHTML={{ __html: cssText }} />
       <div style={inlineStyles} className="min-h-screen flex flex-col w-full">
         {children}
       </div>

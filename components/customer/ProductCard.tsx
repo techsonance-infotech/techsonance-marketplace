@@ -66,6 +66,7 @@ export function ProductCard({ product, idx }: { product: Product; idx: number })
                         <div className="hidden lg:flex xl:flex mt-3 pt-3  justify-between items-center border-t border-gray-100  gap-2.5 w-full">
                             <AddToCart
                                 productVariantId={variantId}
+                                productVariant={product.variants?.[0]}
                                 /* [&_span]:hidden hides the text so only the cart icon shows, matching the image exactly */
                                 styles="w-full h-10 rounded-full bg-theme-primary border border-gray-200 hover:bg-theme-secondary text-theme-primary-foreground transition-colors cursor-pointer "
                             />

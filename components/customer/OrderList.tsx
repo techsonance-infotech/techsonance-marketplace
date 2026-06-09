@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useReducer } from "react";
 import { OrderStatus, OrderStatusEnum } from "@/utils/Types";
@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Separator } from "../ui/separator";
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import AxiosAPI from '@/lib/axios';
+import { getCachedData, cacheData, subscribeLocaleChange } from '@/utils/cache';
 
 const STOREFRONT_CACHE_KEY = 'techsonance_cms_storefront';
 const LANG_KEY = 'techsonance_locale';
@@ -16,21 +17,27 @@ export function useStoreFrontCmsData() {
   const [promoContent, setPromoContent] = useState<any>(defaultPromo);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Initialize lang and subscribe to changes without polling
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedLang = localStorage.getItem(LANG_KEY) || 'en';
       setLang(savedLang);
     }
+    const unsubscribe = subscribeLocaleChange((newLang) => {
+      setLang(newLang);
+    });
+    return unsubscribe;
   }, []);
 
   const fetchStoreFrontCms = useCallback(async (currentLang: string) => {
     setIsLoading(true);
-    if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem(`${STOREFRONT_CACHE_KEY}_${currentLang}`);
-      if (cached) {
-        setPromoContent(JSON.parse(cached));
-      }
+    const cached = getCachedData(`${STOREFRONT_CACHE_KEY}_${currentLang}`);
+    if (cached) {
+      setPromoContent(cached);
+      setIsLoading(false);
+      return;
     }
+
     try {
       const res = await AxiosAPI.get(`/v1/cms/store?lang=${currentLang}`);
       const cmsRow = res.data?.data ?? res.data;
@@ -41,7 +48,7 @@ export function useStoreFrontCmsData() {
           : rawContent;
 
         setPromoContent(parsed);
-        localStorage.setItem(`${STOREFRONT_CACHE_KEY}_${currentLang}`, JSON.stringify(parsed));
+        cacheData(`${STOREFRONT_CACHE_KEY}_${currentLang}`, parsed);
       }
     } catch (err) {
       console.warn('Using default static storefront promotions');
@@ -49,19 +56,6 @@ export function useStoreFrontCmsData() {
       setIsLoading(false);
     }
   }, []);
-
-  // Sync state if user changes locale via homepage pill
-  useEffect(() => {
-    const checkLocale = setInterval(() => {
-      if (typeof window !== 'undefined') {
-        const currentSaved = localStorage.getItem(LANG_KEY) || 'en';
-        if (currentSaved !== lang) {
-          setLang(currentSaved);
-        }
-      }
-    }, 1000);
-    return () => clearInterval(checkLocale);
-  }, [lang]);
 
   useEffect(() => {
     fetchStoreFrontCms(lang);
