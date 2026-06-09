@@ -1122,33 +1122,42 @@ export const fetchUpdateTaxProfile = async (id: string, data: any, token: string
 export const fetchCompanyBranding = async (token: string) => {
   const domain = await getCompanyDomain();
   try {
-  const res = await fetch(`${BASE_API_URL}/v1/company-identity/branding`, {
-    method: 'GET',
-    cache: 'force-cache',
-    headers: { 'company-domain': domain, Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return { data: null };
-  return res.json();
-    } catch (error) {   
-        console.error('Error fetching company branding:', error);
-        return { data: null, message: 'Error fetching company branding' } 
-    }
+    const res = await fetch(`${BASE_API_URL}/v1/company-identity/branding`, {
+      method: 'GET',
+      cache: 'no-store',
+      headers: { 'company-domain': domain, Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return { data: null };
+    return res.json();
+  } catch (error) {   
+    console.error('Error fetching company branding:', error);
+    return { data: null, message: 'Error fetching company branding' };
+  }
 };
 
 export const upsertCompanyBranding = async (payload: FormData, token: string) => {
   const domain = await getCompanyDomain();
   try {
-  const res = await fetch(`${BASE_API_URL}/v1/company-identity/branding`, {
-    method: 'POST',
-    headers: { 'company-domain': domain, Authorization: `Bearer ${token}` },
-    body: payload,  
-  });
-  revalidatePath('/vendor');
-  return res.json();
-    } catch (error) {
-        console.error('Error upserting company branding:', error);
-        return { data: [], success: false, message: 'Error upserting company branding' };
-    }
+    const res = await fetch(`${BASE_API_URL}/v1/company-identity/branding`, {
+      method: 'POST',
+      headers: { 'company-domain': domain, Authorization: `Bearer ${token}` },
+      body: payload,  
+    });
+    
+    // Purge cache for both CMS and Storefront Layout
+    revalidatePath('/vendor');
+    revalidatePath('/');
+    
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data: data?.data ?? data,
+    };
+  } catch (error) {
+    console.error('Error upserting company branding:', error);
+    return { status: 500, ok: false, data: null, message: 'Error upserting company branding' };
+  }
 };
 
 // ─── Company Legal Profile ────────────────────────────────────────────────────

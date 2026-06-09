@@ -21,6 +21,20 @@ function CartSyncWatcher() {
         prevUserRef.current = user;
     }, [user, token, dispatch]);
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const handleOnline = () => {
+            console.log("Browser is online, triggering cart sync/reload...");
+            dispatch(loadCart());
+        };
+
+        window.addEventListener('online', handleOnline);
+        return () => {
+            window.removeEventListener('online', handleOnline);
+        };
+    }, [dispatch]);
+
     return null;
 }
 

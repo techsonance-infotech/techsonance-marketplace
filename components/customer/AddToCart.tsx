@@ -9,10 +9,12 @@ import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { fetchAddToCart, fetchRemoveFromCart } from "@/utils/customerApiClient";
 import { useEffect, useRef, useState } from "react";
 import { authToken } from "@/utils/authToken";
+import { Variant } from "@/utils/Types";
 
 interface AddToCartProps {
     productVariantId: string;
     styles?: string;
+    productVariant?: Variant;
 }
 
 export interface CartItemResponse {
@@ -24,29 +26,25 @@ export interface CartItemResponse {
     message?: string;
 }
 
-export function AddToCart({ productVariantId, styles }: AddToCartProps) {
+export function AddToCart({ productVariantId, styles, productVariant }: AddToCartProps) {
     const dispatch = useAppDispatch();
     const { items } = useAppSelector((state: RootState) => state.cart);
     const { user } = useAppSelector((state: RootState) => state.auth);
     const path = usePathname();
-    const router = useRouter();
     const token = authToken();
 
     const [isSyncing, setIsSyncing] = useState(false);
     const syncingRef = useRef(false);
     const rollbackRef = useRef<{ quantity: number; cartItemId?: string; cartId?: string } | null>(null);
 
-    useEffect(() => {
-        if (items.length === 0) {
-            dispatch(loadCart());
-        }
-    }, [dispatch, items.length]);
+
 
     const cartItem = items?.find((item) => item.productVariantId === productVariantId);
     const quantity = cartItem?.quantity ?? 0;
 
     const handleIncrement = async () => {
-        if (!user?.id || !token) {
+        if (!user?.id || !token || (typeof window !== 'undefined' && !navigator.onLine)) {
+            console.log('[AddToCart] Using optimistic update (no user, token, or offline)',quantity);
             const prevQuantity = quantity;
             const optimisticQuantity = prevQuantity + 1;
 
@@ -55,12 +53,12 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
                 cartItemId: '',
                 productVariantId,
                 quantity: optimisticQuantity,
+                productVariant,
             }));
 
             if (!path.includes("cart") && !path.includes("wishlist")) {
                 dispatch(toggleCartSidebar('open'));
             }
-            dispatch(loadCart());
             return;
         }
         if (isSyncing || syncingRef.current) return;
@@ -75,6 +73,7 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
             cartItemId: cartItem?.cartItemId ?? '',
             productVariantId,
             quantity: optimisticQuantity,
+            productVariant,
         }));
 
         if (!path.includes("cart") && !path.includes("wishlist")) {
@@ -87,28 +86,35 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
 
         try {
             const response = await fetchAddToCart(productVariantId, optimisticQuantity, user.id, token);
+            if (response === undefined) {
+                throw new Error('NETWORK_ERROR');
+            }
             const cartResponse: CartItemResponse = response?.data;
-            if (!cartResponse?.cart_id) throw new Error('Invalid server response');
+            if (!cartResponse?.cart_id) throw new Error('SERVER_ERROR');
             dispatch(addToCart({
                 cartId: cartResponse.cart_id,
                 cartItemId: cartResponse.cart_item_id,
                 productVariantId: cartResponse.product_variant_id,
                 quantity: cartResponse.quantity,
+                productVariant,
             }));
-            if (prevQuantity === 0) {
-                dispatch(loadCart());
-            }
-        } catch (error) {
+
+        } catch (error: any) {
             console.error("Error adding to cart:", error);
-            if (prevQuantity === 0) {
-                dispatch(removeFromCart({ productVariantId, quantity: 0 }));
+            if (error.message === 'NETWORK_ERROR' || (typeof window !== 'undefined' && !navigator.onLine)) {
+                console.log("Keeping optimistic cart update due to network/offline state.");
             } else {
-                dispatch(addToCart({
-                    cartId: prevCartId ?? '',
-                    cartItemId: prevCartItemId ?? '',
-                    productVariantId,
-                    quantity: prevQuantity,
-                }));
+                if (prevQuantity === 0) {
+                    dispatch(removeFromCart({ productVariantId, quantity: 0 }));
+                } else {
+                    dispatch(addToCart({
+                        cartId: prevCartId ?? '',
+                        cartItemId: prevCartItemId ?? '',
+                        productVariantId,
+                        quantity: prevQuantity,
+                        productVariant,
+                    }));
+                }
             }
         } finally {
             setIsSyncing(false);
@@ -118,7 +124,7 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
     };
 
     const handleDecrement = async () => {
-        if (!user?.id || !token) {
+        if (!user?.id || !token || (typeof window !== 'undefined' && !navigator.onLine)) {
             if (!cartItem) return;
             const prevQuantity = quantity;
             if (prevQuantity <= 1) {
@@ -126,7 +132,6 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
             } else {
                 dispatch(removeFromCart({ productVariantId, quantity: prevQuantity - 1 }));
             }
-            dispatch(loadCart());
             return;
         }
         if (!cartItem) return;
@@ -153,21 +158,29 @@ export function AddToCart({ productVariantId, styles }: AddToCartProps) {
                 cartItem.cartItemId,
                 token
             );
+            if (response === undefined) {
+                throw new Error('NETWORK_ERROR');
+            }
             const cartResponse: CartItemResponse = response?.data;
-            if (!cartResponse) throw new Error('Invalid server response');
+            if (!cartResponse) throw new Error('SERVER_ERROR');
             if (cartResponse.success && !cartResponse.quantity) {
                 dispatch(removeFromCart({ productVariantId, quantity: 0 }));
             } else {
                 dispatch(removeFromCart({ productVariantId, quantity: cartResponse.quantity }));
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error removing from cart:", error);
-            dispatch(addToCart({
-                cartId: prevCartId,
-                cartItemId: prevCartItemId,
-                productVariantId,
-                quantity: prevQuantity,
-            }));
+            if (error.message === 'NETWORK_ERROR' || (typeof window !== 'undefined' && !navigator.onLine)) {
+                console.log("Keeping optimistic cart update due to network/offline state.");
+            } else {
+                dispatch(addToCart({
+                    cartId: prevCartId,
+                    cartItemId: prevCartItemId,
+                    productVariantId,
+                    quantity: prevQuantity,
+                    productVariant,
+                }));
+            }
         } finally {
             setIsSyncing(false);
             syncingRef.current = false;

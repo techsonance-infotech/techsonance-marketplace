@@ -13,6 +13,7 @@ import { useNavbarData } from "@/hooks/useNavbarData";
 import { useThemeData } from "@/hooks/useThemeData";
 import { SearchBar } from './SearchBar';
 import { BackButton } from '../ui/back-button';
+import { SearchTrigger } from './SearchOverlay';
 
 type NavState = { isMounted: boolean; isSearchOpen: boolean; searchQuery: string };
 type NavAction =
@@ -147,9 +148,10 @@ export function Navbar({ styles, logoUrl = BRAND_LOGO, menuLinks: propMenuLinks 
                                     <Search size={20} strokeWidth={1.5} />
                                 </button>
                             )} */}
-                            <button onClick={() => router.push('/store/search')} className="p-2 text-navbar-foreground/75 hover:bg-black/5 rounded-full transition-colors">
+                            {/* <button onClick={() => router.push('/store/search')} className="p-2 text-navbar-foreground/75 hover:bg-black/5 rounded-full transition-colors">
                                 <Search size={20} strokeWidth={1.5} />
-                            </button>
+                            </button> */}
+                            <SearchTrigger />
                         </div>
 
                         {user && (

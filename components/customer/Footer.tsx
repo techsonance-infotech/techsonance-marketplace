@@ -7,7 +7,7 @@ import { DynamicIcon, IconName } from "lucide-react/dynamic";
 import { useFooterData } from "@/hooks/useFooterData";
 import { useEffect, useState } from "react";
 
-export function Footer({ styles }: { styles?: string }) {
+export function Footer({ styles = '' }: { styles?: string }) {
     const path = usePathname();
     const { footerContent, footerBottomText } = useFooterData();
     const [headerCount, setHeaderCount] = useState(0);
@@ -44,7 +44,7 @@ export function Footer({ styles }: { styles?: string }) {
     };
 
     return (
-        <footer className={`bg-footer xl:px-32 lg:px-8 md:px-4 sm:px-2 py-8 px-4 ${styles}`}>
+        <footer className={`bg-footer text-footer-foreground xl:px-32 lg:px-8 md:px-4 sm:px-2 py-8 px-4 ${styles}`}>
             {!isAuthPage && (
                 <motion.div
                     variants={containerVariants}
@@ -59,7 +59,7 @@ export function Footer({ styles }: { styles?: string }) {
                             variants={columnVariants}
                             className="flex flex-col lg:gap-4 gap-1  "
                         >
-                            <li className="font-bold lg:text-lg text-md text-primary-foreground lg:mb-2">
+                            <li className="font-bold lg:text-lg text-md text-current lg:mb-2">
                                 {section.header}
                             </li>
                             <div className="lg:block grid grid-cols-2 gap-0">
@@ -69,7 +69,7 @@ export function Footer({ styles }: { styles?: string }) {
                                     <motion.li
                                         key={linkIndex}
                                         whileHover={{ x: 5 }}
-                                        className="lg:text-sm text-xs text-primary-foreground hover:text-primary-foreground/80 transition-colors"
+                                        className="lg:text-sm text-xs text-current hover:opacity-80 transition-opacity"
                                     >
                                         <Link
                                             href={link.url}
@@ -105,7 +105,7 @@ export function Footer({ styles }: { styles?: string }) {
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
-                    className="font-light text-center text-primary-foreground/70 text-sm  leading-relaxed lg:mb-0 mb-12 "
+                    className="font-light text-center opacity-70 text-sm leading-relaxed lg:mb-0 mb-12 "
                 >
                     {footerBottomText}
                 </motion.p>

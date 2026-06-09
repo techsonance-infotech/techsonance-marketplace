@@ -494,7 +494,7 @@ export default function CmsManagementPage() {
           <BrandingTab token={token} />
         </div>
       ) : (
-        <form onSubmit={save} className="space-y-6">
+        <form onSubmit={save} className="space-y-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 max-h-[70vh] overflow-y-auto pr-2">
 
           {/* HOME */}
           {page === 'home' && (

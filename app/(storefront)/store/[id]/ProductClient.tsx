@@ -560,6 +560,7 @@ export default function ProductClient({ id, initialProduct }: { id: string, init
                                 {/* AddToCart owns its own quantity counter via Redux */}
                                 <AddToCart
                                     productVariantId={state.activeVariant.id}
+                                    productVariant={state.activeVariant}
                                     styles="flex-1 h-12 rounded-2xl border-2 border-gray-900 bg-white text-gray-900 hover:bg-gray-900 hover:text-white font-bold text-sm transition-all duration-200"
                                 />
                                 {inStock ? (
@@ -679,6 +680,7 @@ export default function ProductClient({ id, initialProduct }: { id: string, init
                     <div className="flex gap-3 max-w-lg mx-auto h-12">
                         <AddToCart
                             productVariantId={state.activeVariant.id}
+                            productVariant={state.activeVariant}
                             styles="flex-1 h-12 rounded-2xl border-2 border-gray-900 bg-white text-gray-900 font-bold text-sm transition-all"
                         />
                         {inStock ? (
