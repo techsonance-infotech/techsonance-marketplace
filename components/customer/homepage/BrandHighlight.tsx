@@ -1,3 +1,4 @@
+'use client'
 import { useImageColors } from "@/hooks/useImageColors";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,7 +19,7 @@ export function BrandHighlight({ getField }: { getField: (k: string) => string }
               src={img}
               alt="Brand"
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="50vw"
             />
           </div>

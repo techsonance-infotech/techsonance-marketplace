@@ -1,9 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  ChevronRight,
-} from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useHomepageData } from "@/hooks/useHomepageData";
 import { useThemeData } from "@/hooks/useThemeData";
 import { ProductCard } from "@/components/customer/ProductCard";
@@ -122,6 +120,7 @@ export default function Home() {
       case "scarcity":
         return (
           <ScarcityBlock
+            key="scarcity"
             timer_title={getStoreField("promo_timer_title")}
             expires_at={getStoreField("promo_expires_at")}
             alert_text={getStoreField("promo_alert_text")}

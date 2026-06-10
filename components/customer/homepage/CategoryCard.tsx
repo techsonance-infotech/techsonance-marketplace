@@ -1,3 +1,4 @@
+
 import { useImageColors } from "@/hooks/useImageColors";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
