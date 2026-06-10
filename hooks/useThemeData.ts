@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import AxiosAPI from "@/lib/axios";
 import { getCachedData, cacheData } from "@/utils/cache";
-import { THEME_CACHE_KEY } from "@/constants";
+import { IMAGE_PLACEHOLDER, THEME_CACHE_KEY } from "@/constants";
 
 export interface StorefrontTheme {
   primary_color: string;
@@ -44,10 +44,8 @@ export interface StorefrontTheme {
   updated_at: string; // ISO 8601 Date string;
 }
 const DEFAULT_THEME: StorefrontTheme = {
-  logo_url:
-    "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=600&auto=format&fit=crop",
-  logo_dark_url:
-    "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=600&auto=format&fit=crop",
+  logo_url: IMAGE_PLACEHOLDER,
+  logo_dark_url: IMAGE_PLACEHOLDER,
   watermark_url: "",
   favicon_url: "",
   accent_color: "#f472b6",

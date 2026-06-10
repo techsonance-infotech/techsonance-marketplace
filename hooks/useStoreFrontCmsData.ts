@@ -1,14 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import AxiosAPI from "@/lib/axios";
 import { getCachedData, cacheData, subscribeLocaleChange } from "@/utils/cache";
-import { LANG_KEY, STOREFRONT_CACHE_KEY } from "@/constants";
+import { IMAGE_PLACEHOLDER, LANG_KEY, STOREFRONT_CACHE_KEY } from "@/constants";
 
 const defaultPromo = {
   promo_banner_title: "Uncompromised High-Fidelity Audio",
   promo_banner_desc:
     "Save up to 40% on professional studio monitors, reference headphones, and smart amplifiers. Limited time collection.",
-  promo_banner_image_url:
-    "https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?q=80&w=1200&auto=format&fit=crop",
+  promo_banner_image_url: IMAGE_PLACEHOLDER,
   promo_banner_link: "/store?tag=promotion",
 };
 

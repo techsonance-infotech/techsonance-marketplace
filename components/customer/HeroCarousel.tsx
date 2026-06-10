@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { IMAGE_PLACEHOLDER } from "@/constants";
 
 export interface HeroSlide {
   id: string | number;
@@ -24,39 +25,45 @@ interface HeroCarouselProps {
 }
 
 const FALLBACK_SLIDE: HeroSlide = {
-  id: 'fallback',
-  image_url: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1400&auto=format&fit=crop',
-  title: 'Define Your Modern Aesthetic',
-  subtitle: 'SEASON 2024 COLLECTION',
-  btn_text: 'Explore',
-  search_query: '',
+  id: "fallback",
+  image_url: IMAGE_PLACEHOLDER,
+  title: "Define Your Modern Aesthetic",
+  subtitle: "SEASON 2024 COLLECTION",
+  btn_text: "Explore",
+  search_query: "",
 };
 
-export function HeroCarousel({ slides, autoPlayMs = 5000, isLoading }: HeroCarouselProps) {
+export function HeroCarousel({
+  slides,
+  autoPlayMs = 5000,
+  isLoading,
+}: HeroCarouselProps) {
   const displaySlides = slides.length > 0 ? slides : [FALLBACK_SLIDE];
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [direction, setDirection] = useState<'left' | 'right'>('right');
+  const [direction, setDirection] = useState<"left" | "right">("right");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const goTo = useCallback((index: number, dir: 'left' | 'right' = 'right') => {
+  const goTo = useCallback((index: number, dir: "left" | "right" = "right") => {
     setDirection(dir);
     setActive(index);
   }, []);
 
   const next = useCallback(() => {
-    goTo((active + 1) % displaySlides.length, 'right');
+    goTo((active + 1) % displaySlides.length, "right");
   }, [active, displaySlides.length, goTo]);
 
   const prev = useCallback(() => {
-    goTo((active - 1 + displaySlides.length) % displaySlides.length, 'left');
+    goTo((active - 1 + displaySlides.length) % displaySlides.length, "left");
   }, [active, displaySlides.length, goTo]);
 
   // Auto-play
   useEffect(() => {
     if (paused || displaySlides.length <= 1) return;
     timerRef.current = setTimeout(next, autoPlayMs);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, [active, paused, autoPlayMs, next, displaySlides.length]);
 
   const slide = displaySlides[active];
@@ -64,7 +71,7 @@ export function HeroCarousel({ slides, autoPlayMs = 5000, isLoading }: HeroCarou
   // Build the CTA href
   const ctaHref = slide.search_query
     ? `/store?search=${encodeURIComponent(slide.search_query)}`
-    : slide.link_url || '/store';
+    : slide.link_url || "/store";
 
   return (
     <section
@@ -76,12 +83,12 @@ export function HeroCarousel({ slides, autoPlayMs = 5000, isLoading }: HeroCarou
       {displaySlides.map((s, i) => (
         <div
           key={s.id}
-          className={`absolute inset-0 transition-opacity duration-700 ${i === active ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+          className={`absolute inset-0 transition-opacity duration-700 ${i === active ? "opacity-100 z-10" : "opacity-0 z-0"}`}
           aria-hidden={i !== active}
         >
           <Image
             src={s.image_url || FALLBACK_SLIDE.image_url}
-            alt={s.title || 'Hero image'}
+            alt={s.title || "Hero image"}
             fill
             className="object-cover object-center"
             priority={i === 0}
@@ -107,7 +114,7 @@ export function HeroCarousel({ slides, autoPlayMs = 5000, isLoading }: HeroCarou
         )}
         <Link href={ctaHref}>
           <button className="bg-white text-black hover:bg-gray-100 transition-all duration-300 lg:px-8 px-4 lg:py-3 py-2 text-xs uppercase tracking-widest shadow-lg hover:shadow-xl active:scale-[0.98]">
-            {slide.btn_text || 'Shop Now'}
+            {slide.btn_text || "Shop Now"}
           </button>
         </Link>
       </div>
@@ -138,12 +145,13 @@ export function HeroCarousel({ slides, autoPlayMs = 5000, isLoading }: HeroCarou
           {displaySlides.map((_, i) => (
             <button
               key={i}
-              onClick={() => goTo(i, i > active ? 'right' : 'left')}
+              onClick={() => goTo(i, i > active ? "right" : "left")}
               aria-label={`Go to slide ${i + 1}`}
-              className={`transition-all duration-300 rounded-full ${i === active
-                  ? 'w-6 h-2 bg-white'
-                  : 'w-2 h-2 bg-white/40 hover:bg-white/70'
-                }`}
+              className={`transition-all duration-300 rounded-full ${
+                i === active
+                  ? "w-6 h-2 bg-white"
+                  : "w-2 h-2 bg-white/40 hover:bg-white/70"
+              }`}
             />
           ))}
         </div>
@@ -164,8 +172,12 @@ export function HeroCarousel({ slides, autoPlayMs = 5000, isLoading }: HeroCarou
 
       <style jsx>{`
         @keyframes heroProgress {
-          from { width: 0%; }
-          to   { width: 100%; }
+          from {
+            width: 0%;
+          }
+          to {
+            width: 100%;
+          }
         }
       `}</style>
     </section>

@@ -1,30 +1,31 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { useImageColors } from "@/hooks/useImageColors";
 import Link from "next/link";
-import Image from "next/image";
-import {
-  ChevronRight,
-  Star,
-  Shield,
-  Truck,
-  RotateCcw,
-  Headphones,
-} from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useHomepageData } from "@/hooks/useHomepageData";
 import { useThemeData } from "@/hooks/useThemeData";
-import { HeroCarousel } from "@/components/customer/HeroCarousel";
 import { ProductCard } from "@/components/customer/ProductCard";
-import { InteractiveHero } from "@/components/customer/InteractiveHero";
 import { ShoppableLookbook } from "@/components/customer/ShoppableLookbook";
 import { ScarcityBlock } from "@/components/customer/ScarcityBlock";
 import { TestimonialSlider } from "@/components/customer/TestimonialSlider";
 import { CuratedDiscovery } from "@/components/customer/CuratedDiscovery";
 import AxiosAPI from "@/lib/axios";
-import { SectionHeader } from "@/components/customer/SectionHeader";
-import { NewArrivalsDesktop } from "@/components/customer/NewArrivalsDesktop";
 import { useStoreFrontCmsData } from "@/hooks/useStoreFrontCmsData";
+import {
+  InteractiveHero,
+  SectionHeader,
+  NewArrivalsDesktop,
+  MobileNewArrivalCard,
+  CategoryCard,
+  MobileCategoryPill,
+  TrustStrip,
+  PromoBannerDesktop,
+  NewsletterDesktop,
+  PromoBannerMobile,
+  TestimonialsDesktop,
+  BrandHighlight,
+  TestimonialsMobile,
+} from "@/components/customer/homepage";
 
 function Sk({
   w = "w-full",
@@ -44,494 +45,6 @@ function Sk({
   );
 }
 
-// ── Trust Badge Strip ─────────────────────────────────────────────────────────
-function TrustStrip() {
-  const badges = [
-    { icon: Truck, label: "Free Delivery", sub: "On orders above ₹499" },
-    { icon: RotateCcw, label: "Easy Returns", sub: "10-day return policy" },
-    { icon: Shield, label: "Secure Payment", sub: "100% safe checkout" },
-    { icon: Headphones, label: "24/7 Support", sub: "Dedicated help desk" },
-  ];
-  return (
-    <section className="bg-white border-y border-gray-100">
-      <div className="max-w-screen-xl mx-auto px-6 lg:px-16 xl:px-24">
-        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-gray-100">
-          {badges.map(({ icon: Icon, label, sub }) => (
-            <div
-              key={label}
-              className="flex items-center gap-3 py-5 px-4 lg:px-6"
-            >
-              <div className="shrink-0 w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center">
-                <Icon size={18} className="text-gray-700" strokeWidth={1.5} />
-              </div>
-              <div>
-                <p className="text-[13px] font-bold text-gray-900 leading-tight">
-                  {label}
-                </p>
-                <p className="text-[11px] text-gray-400 mt-0.5">{sub}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Category Card ─────────────────────────────────────────────────────────────
-function CategoryCard({
-  cat,
-  idx,
-}: {
-  cat: { title: string; url: string };
-  idx: number;
-}) {
-  const sizes = [
-    "aspect-[3/4]",
-    "aspect-[3/4]",
-    "aspect-[3/4]",
-    "aspect-[3/4]",
-  ];
-  const { bg: bgColor } = useImageColors(cat.url);
-  return (
-    <Link
-      href={`/store?category=${encodeURIComponent(cat.title)}`}
-      className="group flex flex-col"
-    >
-      <div
-        style={{ background: bgColor }}
-        className={`relative ${sizes[idx % 4]} shadow-md border border-gray-200/50 w-full overflow-hidden rounded-2xl transition-colors duration-500`}
-      >
-        {cat.url && (
-          <Image
-            src={cat.url}
-            alt={cat.title}
-            width={1500}
-            height={1500}
-            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            loading="eager"
-          />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </div>
-      <div className="pt-3 pb-1">
-        <h3 className="text-sm font-semibold text-gray-800 capitalize tracking-wide">
-          {cat.title}
-        </h3>
-        <p className="text-[11px] text-gray-400 mt-0.5 flex items-center gap-1 group-hover:gap-2 transition-all duration-200">
-          Shop now <ChevronRight size={10} />
-        </p>
-      </div>
-    </Link>
-  );
-}
-
-// ── Mobile Category Pill ──────────────────────────────────────────────────────
-function MobileCategoryPill({ cat }: { cat: { title: string; url: string } }) {
-  const { bg: bgColor } = useImageColors(cat.url);
-  return (
-    <Link
-      href={`/store?category=${encodeURIComponent(cat.title)}`}
-      className="flex flex-col items-center gap-2 shrink-0 w-[72px]"
-    >
-      <div
-        style={{ background: bgColor }}
-        className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-white shadow-md transition-colors duration-500"
-      >
-        {cat.url && (
-          <Image
-            src={cat.url}
-            alt={cat.title}
-            width={150}
-            height={150}
-            className="object-contain rounded-md -scale-2"
-            sizes="56px"
-          />
-        )}
-      </div>
-      <span className="text-[10px] font-semibold text-gray-600 text-center leading-tight capitalize line-clamp-2">
-        {cat.title}
-      </span>
-    </Link>
-  );
-}
-
-// ── Mobile New Arrival Card ──────────────────────────────────────────────────
-function MobileNewArrivalCard({ arr }: { arr: any }) {
-  const imageUrl =
-    arr.variants?.[0]?.images?.[0]?.image_url ||
-    "https://placehold.net/400x500.png";
-  const { bg: bgColor } = useImageColors(imageUrl);
-
-  return (
-    <Link
-      href={`/store/${arr.id}`}
-      className="min-w-[148px] snap-center flex flex-col bg-white border border-gray-100 rounded-2xl p-2.5 shadow-sm active:scale-[0.98] transition-transform"
-    >
-      <div
-        style={{ background: bgColor }}
-        className="relative h-32 w-full overflow-hidden rounded-xl mb-2.5 transition-colors duration-500"
-      >
-        <Image
-          src={imageUrl}
-          alt={arr.name}
-          fill
-          className="object-contain p-2"
-          sizes="148px"
-        />
-      </div>
-      <h3 className="text-[11px] font-bold text-gray-800 line-clamp-2 leading-snug mb-1">
-        {arr.name}
-      </h3>
-      <span className="text-[12px] font-black text-gray-900">
-        ₹{Number(arr.base_price).toLocaleString("en-IN")}
-      </span>
-    </Link>
-  );
-}
-
-// ── Promo Banner Desktop ──────────────────────────────────────────────────────
-function PromoBannerDesktop({
-  imageUrl,
-  subtitle,
-  title,
-  desc,
-  btnText,
-}: {
-  imageUrl: string;
-  subtitle: string;
-  title: string;
-  desc: string;
-  btnText: string;
-}) {
-  const { bg: bgColor } = useImageColors(imageUrl);
-  return (
-    <section
-      style={{ background: bgColor }}
-      className=" promo_banner_desktop relative w-full h-[52vh] min-h-[340px] overflow-hidden transition-colors duration-500"
-    >
-      <Image
-        src={imageUrl}
-        alt={title}
-        fill
-        className="object-contain  "
-        sizes="100vw"
-        priority={false}
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent" />
-      <div className="absolute inset-0 flex items-center">
-        <div className="max-w-screen-xl mx-auto px-6 lg:px-16 xl:px-24 w-full">
-          <div className="max-w-lg text-white">
-            {subtitle && (
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/70 mb-4">
-                {subtitle}
-              </p>
-            )}
-            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight leading-[1.05] mb-4">
-              {title}
-            </h2>
-            {desc && (
-              <p className="text-sm text-white/75 font-light leading-relaxed mb-8 max-w-sm">
-                {desc}
-              </p>
-            )}
-            <Link href="/store">
-              <button className="bg-white text-black hover:bg-gray-100 transition-all duration-300 px-8 py-3 text-[11px] uppercase tracking-[0.2em] font-bold">
-                {btnText || "Shop Now"}
-              </button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Promo Banner Mobile ───────────────────────────────────────────────────────
-function PromoBannerMobile({
-  imageUrl,
-  title,
-  desc,
-  btnText,
-}: {
-  imageUrl: string;
-  title: string;
-  desc: string;
-  btnText: string;
-}) {
-  const { bg: bgColor } = useImageColors(imageUrl);
-  return (
-    <section
-      style={{ background: bgColor }}
-      className="promo_banner_mobile mx-4 my-6 rounded-2xl overflow-hidden relative h-44 transition-colors duration-500"
-    >
-      <Image
-        src={imageUrl}
-        alt={title}
-        fill
-        className="object-contain"
-        sizes="(max-width: 768px) calc(100vw - 32px)"
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/20" />
-      <div className="absolute inset-0 flex flex-col justify-center px-5">
-        <h3 className="text-[18px] font-bold text-white leading-tight mb-1">
-          {title}
-        </h3>
-        {desc && (
-          <p className="text-[11px] text-white/70 mb-4 line-clamp-2">{desc}</p>
-        )}
-        <Link href="/store">
-          <button className="self-start bg-white text-black text-[10px] font-bold uppercase tracking-wider px-4 py-2 rounded-full">
-            {btnText || "Shop Now"}
-          </button>
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-// ── Newsletter Desktop ────────────────────────────────────────────────────────
-function NewsletterDesktop({ getField }: { getField: (k: string) => string }) {
-  const [email, setEmail] = useState("");
-  const [done, setDone] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setDone(true);
-      setEmail("");
-      setTimeout(() => setDone(false), 4000);
-    }
-  };
-
-  return (
-    <section className="newsletter_desktop bg-[#0a0b0f] text-white py-24 px-6 lg:px-16 xl:px-24">
-      <div className="max-w-screen-xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-4">
-              Stay Connected
-            </p>
-            <h2 className="text-4xl font-serif tracking-tight leading-tight mb-4">
-              {getField("newsletter_title")}
-            </h2>
-            <p className="text-sm text-gray-400 font-light leading-relaxed max-w-md">
-              {getField("newsletter_desc")}
-            </p>
-          </div>
-          <div>
-            {done ? (
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-4">
-                  <Star size={20} className="text-emerald-400" />
-                </div>
-                <p className="font-semibold text-white">
-                  You're in. Welcome to the inner circle.
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="flex gap-3">
-                  <input
-                    type="email"
-                    required
-                    placeholder="Enter your email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/30 transition-colors"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-white text-black hover:bg-gray-100 transition-colors px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest rounded-xl whitespace-nowrap"
-                  >
-                    {getField("newsletter_btn_text") || "Subscribe"}
-                  </button>
-                </div>
-                <p className="text-[11px] text-white/25">
-                  By subscribing you agree to our Terms of Use and Privacy
-                  Policy.
-                </p>
-              </form>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Testimonials ──────────────────────────────────────────────────────────────
-const TESTIMONIALS = [
-  {
-    name: "Priya S.",
-    location: "Mumbai",
-    rating: 5,
-    text: "Absolutely premium quality. The packaging was immaculate and delivery was faster than expected.",
-  },
-  {
-    name: "Arjun M.",
-    location: "Bangalore",
-    rating: 5,
-    text: "Best audio gear I have ever bought. Sound quality is extraordinary for the price point.",
-  },
-  {
-    name: "Meera K.",
-    location: "Delhi",
-    rating: 5,
-    text: "Seamless checkout, GST invoice generated instantly. Will definitely be a repeat customer.",
-  },
-];
-
-function TestimonialsDesktop() {
-  return (
-    <section className="testimonials_desktop py-20 px-6 lg:px-16 xl:px-24 bg-[#faf9f6]">
-      <div className="max-w-screen-xl mx-auto">
-        <SectionHeader
-          eyebrow="Customer Stories"
-          title="What Our Customers Say"
-          centered
-        />
-        <div className="grid grid-cols-3 gap-6 mt-12">
-          {TESTIMONIALS.map((t, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300"
-            >
-              <div className="flex gap-0.5 mb-5">
-                {Array.from({ length: t.rating }).map((_, j) => (
-                  <Star
-                    key={j}
-                    size={13}
-                    fill="#F59E0B"
-                    className="text-amber-400"
-                  />
-                ))}
-              </div>
-              <p className="text-sm text-gray-600 leading-relaxed font-light italic mb-6">
-                "{t.text}"
-              </p>
-              <div className="flex items-center gap-3 pt-4 border-t border-gray-50">
-                <div
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-white text-[11px] font-bold"
-                  style={{ background: `hsl(${i * 80 + 200}, 55%, 55%)` }}
-                >
-                  {t.name[0]}
-                </div>
-                <div>
-                  <p className="text-[13px] font-semibold text-gray-900">
-                    {t.name}
-                  </p>
-                  <p className="text-[11px] text-gray-400">{t.location}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function TestimonialsMobile() {
-  return (
-    <section className=" testimonials_mobile py-8 px-4">
-      <h2 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-5">
-        What Customers Say
-      </h2>
-      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none snap-x">
-        {TESTIMONIALS.map((t, i) => (
-          <div
-            key={i}
-            className="min-w-[280px] snap-center bg-white border border-gray-200 rounded-2xl p-5 shadow-sm"
-          >
-            <div className="flex gap-0.5 mb-3">
-              {Array.from({ length: t.rating }).map((_, j) => (
-                <Star
-                  key={j}
-                  size={12}
-                  fill="#F59E0B"
-                  className="text-amber-400"
-                />
-              ))}
-            </div>
-            <p className="text-[12px] text-gray-600 leading-relaxed italic mb-4">
-              "{t.text}"
-            </p>
-            <p className="text-[12px] font-bold text-gray-900">
-              {t.name} ·{" "}
-              <span className="font-normal text-gray-400">{t.location}</span>
-            </p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-// ── Featured Brand Highlight ──────────────────────────────────────────────────
-function BrandHighlight({ getField }: { getField: (k: string) => string }) {
-  const img = getField("new_arrivals_left_image_url");
-  const { bg: bgColor } = useImageColors(img);
-  if (!img) return null;
-  return (
-    <section className="brand_highlight_desktop  py-20 px-6 lg:px-16 xl:px-24 bg-white">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div
-            style={{ background: bgColor }}
-            className="relative h-[420px] rounded-2xl overflow-hidden transition-colors duration-500"
-          >
-            <Image
-              src={img}
-              alt="Brand"
-              fill
-              className="object-cover"
-              sizes="50vw"
-            />
-          </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-4">
-              Our Promise
-            </p>
-            <h2 className="text-3xl lg:text-4xl font-serif tracking-tight text-gray-900 mb-5 leading-tight">
-              Precision Engineered for Pure Sound
-            </h2>
-            <p className="text-sm text-gray-500 leading-relaxed mb-6">
-              Every product on our platform is hand-selected for build quality,
-              acoustic performance, and long-term reliability. We partner only
-              with brands that share our obsession with detail.
-            </p>
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              {[
-                ["500+", "Products"],
-                ["50K+", "Happy Customers"],
-                ["4.9★", "Avg. Rating"],
-              ].map(([val, lab]) => (
-                <div
-                  key={lab}
-                  className="text-center p-4 bg-gray-50 rounded-xl"
-                >
-                  <p className="text-xl font-black text-gray-900">{val}</p>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wider mt-1">
-                    {lab}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <Link href="/store">
-              <button className="bg-gray-900 text-white hover:bg-black transition-colors px-8 py-3.5 text-[11px] font-bold uppercase tracking-widest rounded-xl">
-                Shop the Collection
-              </button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function Home() {
   const { getField, banners, categories, heroSlides, isLoading } =
     useHomepageData();
@@ -588,7 +101,6 @@ export default function Home() {
                   layout: slide.layout || "center-overlay",
                   bg_style: slide.bg_style || "gradient",
                 }))}
-                fallback_image_url={getField("hero_image_url")}
               />
             )}
           </div>
@@ -608,6 +120,7 @@ export default function Home() {
       case "scarcity":
         return (
           <ScarcityBlock
+            key="scarcity"
             timer_title={getStoreField("promo_timer_title")}
             expires_at={getStoreField("promo_expires_at")}
             alert_text={getStoreField("promo_alert_text")}
@@ -771,7 +284,6 @@ export default function Home() {
                   layout: slide.layout || "center-overlay",
                   bg_style: slide.bg_style || "gradient",
                 }))}
-                fallback_image_url={getField("hero_image_url")}
               />
             )}
           </div>
