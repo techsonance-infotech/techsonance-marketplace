@@ -7,20 +7,24 @@ import { ProductCard } from "./ProductCard";
 import AxiosAPI from "@/lib/axios";
 import { fetchHomepageProducts } from "@/utils/commonAPiClient";
 
+export enum CuratedType {
+  TRENDING = "trending",
+  NEW_ARRIVALS = "new_arrivals",
+  CURATED = "curated",
+}
+
 export interface CuratedDiscoveryProps {
   title?: string;
   subtitle?: string;
-  type?: "trending" | "new_arrivals" | "curated";
+  type?: CuratedType;
   product_ids?: string[];
 }
 
-const getProducts = async (type: "trending" | "new_arrivals" | "curated") => {
+const getProducts = async (type: CuratedType) => {
   try {
     const res = await fetchHomepageProducts(5);
-    console.log(res, res.data);
     return res.data;
   } catch (error) {
-    console.error("Failed to fetch curated discovery items:", error);
     return [];
   }
 };
@@ -38,7 +42,7 @@ function SkeletonCard() {
 export function CuratedDiscovery({
   title = "Trending Masterpieces",
   subtitle = "Discover our hand-picked selection of high-demand aesthetic creations.",
-  type = "trending",
+  type = CuratedType.TRENDING,
   product_ids = [],
 }: CuratedDiscoveryProps) {
   const [products, setProducts] = useState<any[]>([]);
@@ -61,7 +65,6 @@ export function CuratedDiscovery({
       direction === "left" ? scrollLeft - offset : scrollLeft + offset;
     scrollRef.current.scrollTo({ left: target, behavior: "smooth" });
   };
-  console.log(products);
   if (!products || products.length == 0) {
     return null;
   }

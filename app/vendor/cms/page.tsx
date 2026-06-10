@@ -19,15 +19,20 @@ import AxiosAPI from "@/lib/axios";
 import { authToken } from "@/utils/authToken";
 import { BrandingTab } from "@/components/vendor/BrandingTab";
 
-type PageType =
-  | "home"
-  | "navbar"
-  | "footer"
-  | "about"
-  | "contact"
-  | "store"
-  | "theme";
-type LangType = "en" | "es";
+export enum PageType {
+  HOME = "home",
+  NAVBAR = "navbar",
+  FOOTER = "footer",
+  ABOUT = "about",
+  CONTACT = "contact",
+  STORE = "store",
+  THEME = "theme",
+}
+
+export enum LangType {
+  EN = "en",
+  ES = "es",
+}
 
 interface CmsState {
   page: PageType;
@@ -52,8 +57,8 @@ type CmsAction =
   | { type: "CLEAR_MESSAGE" };
 
 const initialState: CmsState = {
-  page: "home",
-  lang: "en",
+  page: PageType.HOME,
+  lang: LangType.EN,
   loading: false,
   saving: false,
   msg: null,
@@ -105,23 +110,23 @@ function cmsReducer(state: CmsState, action: CmsAction): CmsState {
 }
 
 const PAGES: PageType[] = [
-  "home",
-  "navbar",
-  "footer",
-  "about",
-  "contact",
-  "store",
-  "theme",
+  PageType.HOME,
+  PageType.NAVBAR,
+  PageType.FOOTER,
+  PageType.ABOUT,
+  PageType.CONTACT,
+  PageType.STORE,
+  PageType.THEME,
 ];
 
 const PAGE_LABELS: Record<PageType, string> = {
-  home: "Home Page",
-  navbar: "Navbar",
-  footer: "Footer",
-  about: "About Us",
-  contact: "Contact",
-  store: "Store",
-  theme: "Storefront Theme & Layout",
+  [PageType.HOME]: "Home Page",
+  [PageType.NAVBAR]: "Navbar",
+  [PageType.FOOTER]: "Footer",
+  [PageType.ABOUT]: "About Us",
+  [PageType.CONTACT]: "Contact",
+  [PageType.STORE]: "Store",
+  [PageType.THEME]: "Storefront Theme & Layout",
 };
 
 function Field({ label, value, onChange, textarea, mono }: any) {
@@ -209,14 +214,12 @@ function ImageUploadField({
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("THE RESPONSE", res.data);
       if (res.data?.data?.secure_url) {
         onChange(res.data.data.secure_url);
       } else {
         throw new Error("Upload succeeded but no URL returned.");
       }
     } catch (err: any) {
-      console.error("[CMS Image Upload] Failed:", err);
       setError(err?.response?.data?.message || "Upload failed. Try again.");
     } finally {
       setUploading(false);
@@ -490,7 +493,7 @@ export default function CmsManagementPage() {
   const token = authToken() || "";
 
   const load = async () => {
-    if (page === "theme") {
+    if (page === PageType.THEME) {
       dispatch({ type: "FETCH_SUCCESS", payload: {} });
       return;
     }
@@ -525,10 +528,8 @@ export default function CmsManagementPage() {
       content: JSON.stringify(data),
       seo_meta: {},
     };
-    console.log("[CMS Save] Sending payload to /v1/cms:", payload);
     try {
-      const res = await AxiosAPI.post("/v1/cms", payload);
-      console.log("[CMS Save] Server response:", res.data);
+      await AxiosAPI.post("/v1/cms", payload);
       // Clear ALL cache variants so the storefront picks up fresh data immediately
       localStorage.removeItem(`techsonance_cms_${page}_${lang}`);
       localStorage.removeItem(`techsonance_cms_${page}`); // legacy key format
@@ -537,7 +538,6 @@ export default function CmsManagementPage() {
         payload: "Saved! Storefront will reflect changes on next page load.",
       });
     } catch (err: any) {
-      console.error("[CMS Save] Failed:", err?.response?.data || err?.message);
       dispatch({
         type: "SAVE_FAILURE",
         payload: `Save failed: ${err?.response?.data?.message || "Try again."}`,
@@ -618,19 +618,19 @@ export default function CmsManagementPage() {
             ))}
           </div>
         </div>
-        {page !== "theme" && (
+        {page !== PageType.THEME && (
           <div>
             <p className="text-xs font-bold text-gray-400 uppercase mb-2">
               Language
             </p>
             <div className="flex gap-1.5">
-              {(["en", "es"] as LangType[]).map((l) => (
+              {([LangType.EN, LangType.ES] as LangType[]).map((l) => (
                 <button
                   key={l}
                   onClick={() => dispatch({ type: "SET_LANG", payload: l })}
                   className={`flex items-center gap-1 px-4 py-1.5 text-xs font-bold rounded-lg border transition-all ${lang === l ? "bg-purple-600 text-white border-purple-600" : "bg-gray-50 text-gray-600 border-gray-200"}`}
                 >
-                  {l === "en" ? (
+                  {l === LangType.EN ? (
                     <>
                       <Globe size={12} /> English
                     </>
@@ -658,7 +658,7 @@ export default function CmsManagementPage() {
         <div className="bg-white rounded-2xl border p-20 flex items-center justify-center">
           <Loader2 size={36} className="animate-spin text-purple-600" />
         </div>
-      ) : page === "theme" ? (
+      ) : page === PageType.THEME ? (
         <div className="space-y-6">
           <BrandingTab token={token} />
         </div>
@@ -668,7 +668,7 @@ export default function CmsManagementPage() {
           className="space-y-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 max-h-[70vh] overflow-y-auto pr-2"
         >
           {/* HOME */}
-          {page === "home" && (
+          {page === PageType.HOME && (
             <>
               <Section
                 title="Hero Carousel Slides"
@@ -927,21 +927,132 @@ export default function CmsManagementPage() {
               <Section title="Newsletter Block">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Field
-                    label="Title"
+                    label="Newsletter Title"
                     value={data.newsletter_title || ""}
                     onChange={(v: string) => set("newsletter_title", v)}
                   />
                   <Field
-                    label="Button Text"
+                    label="Newsletter Button Text"
                     value={data.newsletter_btn_text || ""}
                     onChange={(v: string) => set("newsletter_btn_text", v)}
                   />
+                  <Field
+                    label="Newsletter Eyebrow / Tag"
+                    value={data.newsletter_eyebrow || ""}
+                    onChange={(v: string) => set("newsletter_eyebrow", v)}
+                  />
+                  <Field
+                    label="Newsletter Success Message"
+                    value={data.newsletter_success_text || ""}
+                    onChange={(v: string) => set("newsletter_success_text", v)}
+                  />
                   <div className="md:col-span-2">
                     <Field
-                      label="Description"
+                      label="Newsletter Description"
                       value={data.newsletter_desc || ""}
                       onChange={(v: string) => set("newsletter_desc", v)}
+                      textarea
                     />
+                  </div>
+                  <div className="md:col-span-2">
+                    <Field
+                      label="Newsletter Terms Disclaimer"
+                      value={data.newsletter_disclaimer || ""}
+                      onChange={(v: string) => set("newsletter_disclaimer", v)}
+                    />
+                  </div>
+                </div>
+              </Section>
+
+              <Section
+                title="Brand Highlight Block"
+                action={
+                  <AddBtn
+                    onClick={() =>
+                      addItem("brand_highlight_stats", {
+                        value: "",
+                        label: "",
+                      })
+                    }
+                    label="Add Stat"
+                  />
+                }
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Field
+                    label="Highlight Eyebrow / Subtitle"
+                    value={data.brand_highlight_eyebrow || ""}
+                    onChange={(v: string) => set("brand_highlight_eyebrow", v)}
+                  />
+                  <Field
+                    label="Highlight Button Text"
+                    value={data.brand_highlight_btn_text || ""}
+                    onChange={(v: string) => set("brand_highlight_btn_text", v)}
+                  />
+                  <div className="md:col-span-2">
+                    <Field
+                      label="Highlight Title"
+                      value={data.brand_highlight_title || ""}
+                      onChange={(v: string) => set("brand_highlight_title", v)}
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <Field
+                      label="Highlight Description"
+                      value={data.brand_highlight_desc || ""}
+                      onChange={(v: string) => set("brand_highlight_desc", v)}
+                      textarea
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <ImageUploadField
+                      label="Highlight Banner Image"
+                      value={data.brand_highlight_image_url || ""}
+                      onChange={(v: string) => set("brand_highlight_image_url", v)}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4 border-t border-gray-100 pt-4">
+                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">
+                    Key Stats (Max 3 Recommended)
+                  </h4>
+                  <div className="space-y-3">
+                    {(data.brand_highlight_stats || []).map((stat: any, sIdx: number) => (
+                      <div
+                        key={stat.id || sIdx}
+                        className="flex gap-3 items-end bg-gray-50 p-4 rounded-xl border border-gray-150 relative"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => removeItem("brand_highlight_stats", stat.id)}
+                          className="absolute right-3 top-3 text-red-400 hover:text-red-600"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                        <div className="flex-1 grid grid-cols-2 gap-3">
+                          <Field
+                            label="Stat Value (e.g. 500+)"
+                            value={stat.value || ""}
+                            onChange={(v: string) =>
+                              updateItem("brand_highlight_stats", stat.id, "value", v)
+                            }
+                          />
+                          <Field
+                            label="Stat Label (e.g. Products)"
+                            value={stat.label || ""}
+                            onChange={(v: string) =>
+                              updateItem("brand_highlight_stats", stat.id, "label", v)
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    {!(data.brand_highlight_stats || []).length && (
+                      <p className="text-center text-xs text-gray-400 py-3">
+                        No stats added. Default promise stats will be shown on the storefront.
+                      </p>
+                    )}
                   </div>
                 </div>
               </Section>
@@ -963,6 +1074,41 @@ export default function CmsManagementPage() {
                     onChange={(v: string) => set("hero_video_url", v)}
                     mono
                   />
+
+                  <div className="md:col-span-2 border-t border-gray-100 pt-4 mt-2">
+                    <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">
+                      Video Background Overlay Content
+                    </h4>
+                  </div>
+                  <Field
+                    label="Video Hero Eyebrow / Tag"
+                    value={data.hero_video_eyebrow || ""}
+                    onChange={(v: string) => set("hero_video_eyebrow", v)}
+                  />
+                  <Field
+                    label="Video Hero Button Text"
+                    value={data.hero_video_btn_text || ""}
+                    onChange={(v: string) => set("hero_video_btn_text", v)}
+                  />
+                  <Field
+                    label="Video Hero Title"
+                    value={data.hero_video_title || ""}
+                    onChange={(v: string) => set("hero_video_title", v)}
+                  />
+                  <Field
+                    label="Video Hero Button Link (URL)"
+                    value={data.hero_video_btn_link || ""}
+                    onChange={(v: string) => set("hero_video_btn_link", v)}
+                    mono
+                  />
+                  <div className="md:col-span-2">
+                    <Field
+                      label="Video Hero Description"
+                      value={data.hero_video_desc || ""}
+                      onChange={(v: string) => set("hero_video_desc", v)}
+                      textarea
+                    />
+                  </div>
                 </div>
               </Section>
 
@@ -1448,7 +1594,7 @@ export default function CmsManagementPage() {
           )}
 
           {/* NAVBAR */}
-          {page === "navbar" && (
+          {page === PageType.NAVBAR && (
             <Section
               title="Navigation Links"
               action={
@@ -1498,7 +1644,7 @@ export default function CmsManagementPage() {
           )}
 
           {/* FOOTER */}
-          {page === "footer" && (
+          {page === PageType.FOOTER && (
             <>
               <Section title="Copyright / Bottom Text">
                 <Field
@@ -1665,7 +1811,7 @@ export default function CmsManagementPage() {
           )}
 
           {/* ABOUT */}
-          {page === "about" && (
+          {page === PageType.ABOUT && (
             <>
               <Section title="Hero Block">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1871,7 +2017,7 @@ export default function CmsManagementPage() {
           )}
 
           {/* CONTACT */}
-          {page === "contact" && (
+          {page === PageType.CONTACT && (
             <>
               <Section title="Hero Block">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1967,7 +2113,7 @@ export default function CmsManagementPage() {
           )}
 
           {/* storefront */}
-          {page === "store" && (
+          {page === PageType.STORE && (
             <>
               <Section title="Store Page Promotional Banner">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

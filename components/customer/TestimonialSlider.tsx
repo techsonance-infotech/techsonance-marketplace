@@ -13,9 +13,17 @@ export interface Testimonial {
   avatar_url?: string;
 }
 
+export enum BadgeIconType {
+  SHIPPING = "shipping",
+  SECURITY = "security",
+  QUALITY = "quality",
+  SUPPORT = "support",
+  DEFAULT = "default",
+}
+
 export interface TrustBadge {
   id?: string | number;
-  icon: string; // 'shipping' | 'security' | 'quality' | 'support'
+  icon: BadgeIconType | string;
   title: string;
   subtitle: string;
 }
@@ -29,11 +37,11 @@ export interface TestimonialSliderProps {
 
 // Map strings to Lucide icons
 const iconMap: Record<string, any> = {
-  shipping: Truck,
-  security: ShieldCheck,
-  quality: Award,
-  support: Headphones,
-  default: MessageCircleHeart
+  [BadgeIconType.SHIPPING]: Truck,
+  [BadgeIconType.SECURITY]: ShieldCheck,
+  [BadgeIconType.QUALITY]: Award,
+  [BadgeIconType.SUPPORT]: Headphones,
+  [BadgeIconType.DEFAULT]: MessageCircleHeart
 };
 
 export function TestimonialSlider({

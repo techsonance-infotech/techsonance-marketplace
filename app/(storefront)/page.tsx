@@ -88,6 +88,11 @@ export default function Home() {
               <InteractiveHero
                 banner_type={getField("hero_banner_type") || "carousel"}
                 video_url={getField("hero_video_url")}
+                video_eyebrow={getField("hero_video_eyebrow")}
+                video_title={getField("hero_video_title")}
+                video_desc={getField("hero_video_desc")}
+                video_btn_text={getField("hero_video_btn_text")}
+                video_btn_link={getField("hero_video_btn_link")}
                 slides={heroSlides.map((slide: any) => ({
                   image_url: slide.image_url,
                   title: slide.title,
@@ -271,6 +276,11 @@ export default function Home() {
               <InteractiveHero
                 banner_type={getField("hero_banner_type") || "carousel"}
                 video_url={getField("hero_video_url")}
+                video_eyebrow={getField("hero_video_eyebrow")}
+                video_title={getField("hero_video_title")}
+                video_desc={getField("hero_video_desc")}
+                video_btn_text={getField("hero_video_btn_text")}
+                video_btn_link={getField("hero_video_btn_link")}
                 slides={heroSlides.map((slide: any) => ({
                   image_url: slide.image_url,
                   title: slide.title,
@@ -462,8 +472,8 @@ export default function Home() {
         {/* Always-rendered supplementary sections (only if not already placed via layout key) */}
         {!layout.includes("social_proof") && (
           <>
-            <TrustStrip />
-            <TestimonialsDesktop />
+            <TrustStrip getField={getField} />
+            <TestimonialsDesktop getField={getField} />
           </>
         )}
         <BrandHighlight getField={getField} />
@@ -474,8 +484,8 @@ export default function Home() {
         {layout.map((key) => renderMobile(key))}
         {!layout.includes("social_proof") && (
           <>
-            <TrustStrip />
-            <TestimonialsMobile />
+            <TrustStrip getField={getField} />
+            <TestimonialsMobile getField={getField} />
           </>
         )}
         <div className="h-20" />
