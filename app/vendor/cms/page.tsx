@@ -10,10 +10,12 @@ import {
   CheckCircle,
   Upload,
   Image as ImageIcon,
+  X,
 } from "lucide-react";
 import AxiosAPI from "@/lib/axios";
 import { authToken } from "@/utils/authToken";
 import { BrandingTab } from "@/components/vendor/BrandingTab";
+import { fetchProductOptions } from "@/utils/commonAPiClient";
 
 export enum PageType {
   HOME = "home",
@@ -498,18 +500,81 @@ function SlideQueryPicker({
   );
 }
 
+const ProductPreviewCard = ({ productId }: { productId: string }) => {
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!productId) {
+      setProduct(null);
+      return;
+    }
+    let active = true;
+    setLoading(true);
+    AxiosAPI.get(`/v1/products/${productId}`)
+      .then((res) => {
+        if (active) {
+          setProduct(res.data?.data ?? res.data);
+        }
+      })
+      .catch(() => {
+        if (active) setProduct(null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <div className="text-[10px] text-slate-400 mt-1 animate-pulse">
+        Loading product preview...
+      </div>
+    );
+  }
+
+  if (!product) return null;
+
+  const imageUrl =
+    product.variants?.[0]?.images?.[0]?.image_url ??
+    product.images?.[0]?.image_url ??
+    "";
+  const price = product.base_price ?? product.basePrice ?? 0;
+
+  return (
+    <div className="flex items-center gap-2 mt-1 bg-white p-2 rounded-lg border border-slate-100 animate-fadeIn">
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          alt={product.name}
+          className="w-8 h-8 rounded object-cover border border-slate-100 shrink-0"
+        />
+      )}
+      <div className="text-[10px] leading-tight text-slate-500">
+        <span className="font-bold text-slate-700 block truncate">
+          {product.name}
+        </span>
+        <span>₹{Number(price).toLocaleString("en-IN")}</span>
+      </div>
+    </div>
+  );
+};
+
 export default function CmsManagementPage() {
   const [state, dispatch] = useReducer(cmsReducer, initialState);
   const { page, lang, loading, saving, msg, data } = state;
 
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<{id: string; name: string;}[]>([]);
   const [selectedHotspotId, setSelectedHotspotId] = useState<any>(null);
 
   useEffect(() => {
     (async () => {
       try {
-        const res = await AxiosAPI.get("/v1/products?limit=100");
-        setProducts(res.data?.data ?? res.data ?? []);
+        const res = await fetchProductOptions()
+        setProducts(res ?? []);
       } catch {
         // ignore
       }
@@ -622,11 +687,6 @@ export default function CmsManagementPage() {
         y: clampedY,
         productId: "",
         product_id: "",
-        variant_id: "",
-        name: "",
-        price: "",
-        image_url: "",
-        description: ""
       };
       set("lookbook_hotspots", [...(data.lookbook_hotspots || []), newHotspot]);
       setSelectedHotspotId(newId);
@@ -977,6 +1037,14 @@ export default function CmsManagementPage() {
                           }
                         />
                       </div>
+
+                      <ColorField
+                        label="Card Background Color (overrides auto-detect)"
+                        value={data[`new_arrivals_card_${num}_bg_color`] || ""}
+                        onChange={(v: string) =>
+                          set(`new_arrivals_card_${num}_bg_color`, v)
+                        }
+                      />
                     </div>
                   ))}
                 </div>
@@ -1066,6 +1134,13 @@ export default function CmsManagementPage() {
                       label="Highlight Banner Image"
                       value={data.brand_highlight_image_url || ""}
                       onChange={(v: string) => set("brand_highlight_image_url", v)}
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <ColorField
+                      label="Card Background Color (overrides auto-detect from image)"
+                      value={data.brand_highlight_bg_color || ""}
+                      onChange={(v: string) => set("brand_highlight_bg_color", v)}
                     />
                   </div>
                 </div>
@@ -1188,6 +1263,13 @@ export default function CmsManagementPage() {
                       onChange={(v: string) => set("lookbook_image_url", v)}
                     />
                   </div>
+                  <div className="md:col-span-2">
+                    <ColorField
+                      label="Section Background Color (fallback if no image or transparent)"
+                      value={data.lookbook_bg_color || ""}
+                      onChange={(v: string) => set("lookbook_bg_color", v)}
+                    />
+                  </div>
                 </div>
 
                 <div className="mt-6 border-t border-gray-150 pt-6">
@@ -1247,7 +1329,7 @@ export default function CmsManagementPage() {
                         const newId = Date.now();
                         set("lookbook_hotspots", [
                           ...(data.lookbook_hotspots || []),
-                          { id: newId, x: 50, y: 50, productId: "", product_id: "", variant_id: "", name: "", price: "", image_url: "", description: "" },
+                          { id: newId, x: 50, y: 50, productId: "", product_id: "" },
                         ]);
                         setSelectedHotspotId(newId);
                       }}
@@ -1356,46 +1438,18 @@ export default function CmsManagementPage() {
                                   onClick={(e) => e.stopPropagation()}
                                   onChange={(e) => {
                                     const pId = e.target.value;
-                                    const p = products.find((x: any) => x.id === pId);
-                                    if (p) {
-                                      const variantId = p.variants?.[0]?.id || "";
-                                      const imageUrl = p.variants?.[0]?.images?.[0]?.image_url ?? p.images?.[0]?.image_url ?? "";
-                                      set(
-                                        "lookbook_hotspots",
-                                        data.lookbook_hotspots.map((h: any) =>
-                                          h.id === hs.id
-                                            ? {
-                                                ...h,
-                                                productId: pId,
-                                                product_id: pId,
-                                                variant_id: variantId,
-                                                name: p.name,
-                                                price: p.base_price,
-                                                image_url: imageUrl,
-                                                description: p.description || "",
-                                              }
-                                            : h,
-                                        ),
-                                      );
-                                    } else {
-                                      set(
-                                        "lookbook_hotspots",
-                                        data.lookbook_hotspots.map((h: any) =>
-                                          h.id === hs.id
-                                            ? {
-                                                ...h,
-                                                productId: "",
-                                                product_id: "",
-                                                variant_id: "",
-                                                name: "",
-                                                price: "",
-                                                image_url: "",
-                                                description: "",
-                                              }
-                                            : h,
-                                        ),
-                                      );
-                                    }
+                                    set(
+                                      "lookbook_hotspots",
+                                      data.lookbook_hotspots.map((h: any) =>
+                                        h.id === hs.id
+                                          ? {
+                                              ...h,
+                                              productId: pId,
+                                              product_id: pId,
+                                            }
+                                          : h,
+                                      ),
+                                    );
                                   }}
                                   className="w-full bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none"
                                 >
@@ -1408,20 +1462,8 @@ export default function CmsManagementPage() {
                                 </select>
                               </div>
                             </div>
-                            {hs.name && (
-                              <div className="flex items-center gap-2 mt-1 bg-white p-2 rounded-lg border border-slate-100">
-                                {hs.image_url && (
-                                  <img
-                                    src={hs.image_url}
-                                    alt={hs.name}
-                                    className="w-8 h-8 rounded object-cover border border-slate-100 shrink-0"
-                                  />
-                                )}
-                                <div className="text-[10px] leading-tight text-slate-500">
-                                  <span className="font-bold text-slate-700 block truncate">{hs.name}</span>
-                                  <span>₹{Number(hs.price || 0).toLocaleString("en-IN")}</span>
-                                </div>
-                              </div>
+                            {(hs.productId || hs.product_id) && (
+                              <ProductPreviewCard productId={hs.productId || hs.product_id} />
                             )}
                           </div>
                         );
@@ -1746,26 +1788,75 @@ export default function CmsManagementPage() {
                   />
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 mb-1.5">
-                      Curated Product UUIDs (Comma separated, for 'Curated
-                      Custom' option)
+                    <label className="block text-xs font-bold text-gray-500 mb-1.5 font-sans">
+                      Curated Custom Products
                     </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000, ..."
-                      value={
-                        Array.isArray(data.curated_product_ids)
-                          ? data.curated_product_ids.join(", ")
-                          : data.curated_product_ids || ""
-                      }
-                      onChange={(e) => {
-                        const ids = e.target.value
-                          .split(",")
-                          .map((id: string) => id.trim())
-                          .filter(Boolean);
-                        set("curated_product_ids", ids);
-                      }}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-purple-400 font-mono"
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {(Array.isArray(data.curated_product_ids) ? data.curated_product_ids : [])
+                        .map((productId: string) => {
+                          const p = products.find((x) => x.id === productId);
+                          return (
+                            <div
+                              key={productId}
+                              className="flex items-center gap-1.5 bg-purple-50 text-purple-700 text-xs font-bold px-3 py-1.5 rounded-full border border-purple-100 shadow-sm"
+                            >
+                              <span>{p ? p.name : productId}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const filtered = (data.curated_product_ids || []).filter(
+                                    (id: string) => id !== productId
+                                  );
+                                  set("curated_product_ids", filtered);
+                                }}
+                                className="text-purple-400 hover:text-purple-650 transition-colors"
+                              >
+                                <X size={12} />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      {(!data.curated_product_ids || data.curated_product_ids.length === 0) && (
+                        <span className="text-xs text-gray-400">No custom products selected.</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <select
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (!val) return;
+                          const currentIds = Array.isArray(data.curated_product_ids)
+                            ? data.curated_product_ids
+                            : [];
+                          if (!currentIds.includes(val)) {
+                            set("curated_product_ids", [...currentIds, val]);
+                          }
+                          e.target.value = "";
+                        }}
+                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-purple-400"
+                        defaultValue=""
+                      >
+                        <option value="" disabled>-- Add Product to Curated List --</option>
+                        {products
+                          .filter((p) => {
+                            const currentIds = Array.isArray(data.curated_product_ids)
+                              ? data.curated_product_ids
+                              : [];
+                            return !currentIds.includes(p.id);
+                          })
+                          .map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <ColorField
+                      label="Section Background Color"
+                      value={data.curated_bg_color || ""}
+                      onChange={(v: string) => set("curated_bg_color", v)}
                     />
                   </div>
                 </div>

@@ -119,6 +119,7 @@ export default function Home() {
             subtitle={getField("lookbook_subtitle")}
             image_url={getField("lookbook_image_url")}
             hotspots={getField("lookbook_hotspots")}
+            bg_color={getField("lookbook_bg_color")}
           />
         );
 
@@ -155,6 +156,7 @@ export default function Home() {
             subtitle={getField("curated_subtitle")}
             type={getField("curated_type")}
             product_ids={getField("curated_product_ids")}
+            bg_color={getField("curated_bg_color")}
           />
         );
 
@@ -307,6 +309,7 @@ export default function Home() {
             subtitle={getField("lookbook_subtitle")}
             image_url={getField("lookbook_image_url")}
             hotspots={getField("lookbook_hotspots")}
+            bg_color={getField("lookbook_bg_color")}
           />
         );
 
@@ -343,6 +346,7 @@ export default function Home() {
             subtitle={getField("curated_subtitle")}
             type={getField("curated_type")}
             product_ids={getField("curated_product_ids")}
+            bg_color={getField("curated_bg_color")}
           />
         );
 

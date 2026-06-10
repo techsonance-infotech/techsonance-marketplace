@@ -7,7 +7,12 @@ import { BRAND_HIGHLIGHT_DEFAULT } from "@/constants/storefront";
 
 export function BrandHighlight({ getField }: { getField: (k: string) => any }) {
   const img = getField("brand_highlight_image_url") || getField("new_arrivals_left_image_url");
-  const { bg: bgColor } = useImageColors(img);
+  const cmsBgColor: string | undefined = getField("brand_highlight_bg_color") || undefined;
+
+  // CMS color overrides auto-detection; if absent, hook picks from image edges
+  const { bg: bgColor } = useImageColors(img, { fallbackColor: cmsBgColor });
+  const resolvedBg = cmsBgColor || bgColor;
+
 
   const eyebrow = getField("brand_highlight_eyebrow") || BRAND_HIGHLIGHT_DEFAULT.eyebrow;
   const title = getField("brand_highlight_title") || BRAND_HIGHLIGHT_DEFAULT.title;
@@ -23,7 +28,7 @@ export function BrandHighlight({ getField }: { getField: (k: string) => any }) {
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div
-            style={{ background: bgColor }}
+            style={{ background: resolvedBg }}
             className="relative h-[420px] rounded-2xl overflow-hidden transition-colors duration-500"
           >
             <Image

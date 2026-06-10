@@ -18,6 +18,7 @@ export interface CuratedDiscoveryProps {
   subtitle?: string;
   type?: CuratedType;
   product_ids?: string[];
+  bg_color?: string;
 }
 
 const getProducts = async (type: CuratedType) => {
@@ -46,6 +47,7 @@ export function CuratedDiscovery({
   subtitle,
   type,
   product_ids,
+  bg_color,
 }: CuratedDiscoveryProps) {
   const displayTitle = title ?? CURATED_DISCOVERY_DEFAULTS.title;
   const displaySubtitle = subtitle ?? CURATED_DISCOVERY_DEFAULTS.subtitle;
@@ -76,7 +78,10 @@ export function CuratedDiscovery({
     return null;
   }
   return (
-    <section className="curated_desktop py-16 px-6 lg:px-16 xl:px-24 bg-slate-50/50">
+    <section
+      className="curated_desktop py-16 px-6 lg:px-16 xl:px-24"
+      style={{ background: bg_color || 'rgba(248, 250, 252, 0.5)' }}
+    >
       <div className="max-w-screen-xl mx-auto flex flex-col gap-8">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">

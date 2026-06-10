@@ -136,3 +136,9 @@ export const TRUST_BADGES_SLIDER_DEFAULT = [
   { id: 3, icon: 'security', title: 'Secure Checkout', subtitle: 'Fully encrypted billing logs' },
   { id: 4, icon: 'support', title: '24/7 Support', subtitle: 'Dedicated stylist support helpline' }
 ];
+
+export const IMAGE_COLOR_DEFAULTS = {
+  bgLight: 'rgb(248, 250, 252)',
+  bgDark: 'rgb(15, 23, 42)',
+  fallbackColor: 'rgb(15, 23, 42)',
+};
