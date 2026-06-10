@@ -5,10 +5,10 @@ import { ChevronRight } from "lucide-react";
 import { useHomepageData } from "@/hooks/useHomepageData";
 import { useThemeData } from "@/hooks/useThemeData";
 import { ProductCard } from "@/components/customer/ProductCard";
-import { ShoppableLookbook } from "@/components/customer/ShoppableLookbook";
-import { ScarcityBlock } from "@/components/customer/ScarcityBlock";
-import { TestimonialSlider } from "@/components/customer/TestimonialSlider";
-import { CuratedDiscovery } from "@/components/customer/CuratedDiscovery";
+import { ShoppableLookbook } from "@/components/customer/homepage/ShoppableLookbook";
+import { ScarcityBlock } from "@/components/customer/homepage/ScarcityBlock";
+import { TestimonialSlider } from "@/components/customer/homepage/TestimonialSlider";
+import { CuratedDiscovery } from "@/components/customer/homepage/CuratedDiscovery";
 import AxiosAPI from "@/lib/axios";
 import { useStoreFrontCmsData } from "@/hooks/useStoreFrontCmsData";
 import {

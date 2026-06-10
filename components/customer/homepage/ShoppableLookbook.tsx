@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { Plus, X, ShoppingCart } from "lucide-react";
 import { AddToCart } from "@/components/customer/AddToCart";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "../../ui/skeleton";
 
 export interface LookbookHotspot {
   id: string | number;
@@ -26,12 +26,18 @@ export interface ShoppableLookbookProps {
   hotspots?: LookbookHotspot[];
 }
 
+import { LOOKBOOK_DEFAULTS, LOOKBOOK_DEFAULT_HOTSPOTS } from "@/constants/storefront";
+
 export function ShoppableLookbook({
-  title = "Shop The Look",
-  subtitle = "Click on the hot-spots to view details and add items to your cart.",
+  title,
+  subtitle,
   image_url,
-  hotspots = [],
+  hotspots,
 }: ShoppableLookbookProps) {
+  const displayTitle = title ?? LOOKBOOK_DEFAULTS.title;
+  const displaySubtitle = subtitle ?? LOOKBOOK_DEFAULTS.subtitle;
+  const currentHotspots = hotspots !== undefined && hotspots !== null ? hotspots : LOOKBOOK_DEFAULT_HOTSPOTS;
+
   const [activeHotspot, setActiveHotspot] = useState<LookbookHotspot | null>(
     null,
   );
@@ -51,36 +57,6 @@ export function ShoppableLookbook({
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  const currentHotspots =
-    hotspots.length > 0
-      ? hotspots
-      : [
-          {
-            id: 1,
-            x: 35,
-            y: 40,
-            name: "Tailored Linen Blazer",
-            price: 3499,
-            variant_id: "sample-variant-id-1",
-            image_url:
-              "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=300&auto=format&fit=crop",
-            description:
-              "Luxe blend of breathable linen. Premium fit and structure.",
-          },
-          {
-            id: 2,
-            x: 60,
-            y: 65,
-            name: "Relaxed Silk Trousers",
-            price: 2899,
-            variant_id: "sample-variant-id-2",
-            image_url:
-              "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=300&auto=format&fit=crop",
-            description:
-              "Flowing wide-leg trousers crafted from organic Mulberry silk.",
-          },
-        ];
-
   return (
     <section
       className="py-16 px-6 lg:px-16 xl:px-24 bg-white"
@@ -93,9 +69,9 @@ export function ShoppableLookbook({
             Curated Inspiration
           </span>
           <h2 className="text-3xl font-serif tracking-tight text-gray-900 mt-2 mb-3">
-            {title}
+            {displayTitle}
           </h2>
-          <p className="text-xs text-gray-400 max-w-md mx-auto">{subtitle}</p>
+          <p className="text-xs text-gray-400 max-w-md mx-auto">{displaySubtitle}</p>
         </div>
 
         {/* Interactive Image Container */}
@@ -103,7 +79,7 @@ export function ShoppableLookbook({
           {image_url ? (
             <Image
               src={image_url}
-              alt={title}
+              alt={displayTitle}
               fill
               className="object-cover"
               sizes="100vw"

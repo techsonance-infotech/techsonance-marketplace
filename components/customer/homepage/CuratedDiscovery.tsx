@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
-import { ProductCard } from "./ProductCard";
+import { ProductCard } from "../ProductCard";
 import AxiosAPI from "@/lib/axios";
 import { fetchHomepageProducts } from "@/utils/commonAPiClient";
 
@@ -39,23 +39,30 @@ function SkeletonCard() {
   );
 }
 
+import { CURATED_DISCOVERY_DEFAULTS } from "@/constants/storefront";
+
 export function CuratedDiscovery({
-  title = "Trending Masterpieces",
-  subtitle = "Discover our hand-picked selection of high-demand aesthetic creations.",
-  type = CuratedType.TRENDING,
-  product_ids = [],
+  title,
+  subtitle,
+  type,
+  product_ids,
 }: CuratedDiscoveryProps) {
+  const displayTitle = title ?? CURATED_DISCOVERY_DEFAULTS.title;
+  const displaySubtitle = subtitle ?? CURATED_DISCOVERY_DEFAULTS.subtitle;
+  const displayType = type ?? CuratedType.TRENDING;
+  const displayProductIds = product_ids ?? [];
+
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLoading(true);
-    getProducts(type).then((res) => {
+    getProducts(displayType).then((res) => {
       setProducts(res);
       setLoading(false);
     });
-  }, [type]);
+  }, [displayType]);
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -78,9 +85,9 @@ export function CuratedDiscovery({
               <Sparkles size={12} /> Live Curation
             </span>
             <h2 className="text-3xl font-serif tracking-tight text-gray-900 leading-tight">
-              {title}
+              {displayTitle}
             </h2>
-            <p className="text-xs text-gray-400 mt-2 max-w-lg">{subtitle}</p>
+            <p className="text-xs text-gray-400 mt-2 max-w-lg">{displaySubtitle}</p>
           </div>
 
           {/* Navigation Controls */}

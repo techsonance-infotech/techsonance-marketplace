@@ -8,10 +8,6 @@ import {
   Globe,
   Languages,
   CheckCircle,
-  ArrowUp,
-  ArrowDown,
-  Palette,
-  LayoutGrid,
   Upload,
   Image as ImageIcon,
 } from "lucide-react";
@@ -129,7 +125,23 @@ const PAGE_LABELS: Record<PageType, string> = {
   [PageType.THEME]: "Storefront Theme & Layout",
 };
 
-function Field({ label, value, onChange, textarea, mono }: any) {
+const toDatetimeLocal = (val: string) => {
+  if (!val) return "";
+  try {
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return "";
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, "0");
+    const min = String(d.getMinutes()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+  } catch {
+    return "";
+  }
+};
+
+function Field({ label, value, onChange, textarea, mono, type }: any) {
   const cls = `w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-purple-400 ${mono ? "font-mono" : ""}`;
   return (
     <div>
@@ -145,7 +157,7 @@ function Field({ label, value, onChange, textarea, mono }: any) {
         />
       ) : (
         <input
-          type="text"
+          type={type || "text"}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className={cls}
@@ -490,6 +502,20 @@ export default function CmsManagementPage() {
   const [state, dispatch] = useReducer(cmsReducer, initialState);
   const { page, lang, loading, saving, msg, data } = state;
 
+  const [products, setProducts] = useState<any[]>([]);
+  const [selectedHotspotId, setSelectedHotspotId] = useState<any>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await AxiosAPI.get("/v1/products?limit=100");
+        setProducts(res.data?.data ?? res.data ?? []);
+      } catch {
+        // ignore
+      }
+    })();
+  }, []);
+
   const token = authToken() || "";
 
   const load = async () => {
@@ -573,6 +599,37 @@ export default function CmsManagementPage() {
         type: "SET_DATA_FIELD",
         payload: { key: "homepage_layout", val: layout },
       });
+    }
+  };
+
+  const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.round(((e.clientX - rect.left) / rect.width) * 1000) / 10;
+    const y = Math.round(((e.clientY - rect.top) / rect.height) * 1000) / 10;
+    const clampedX = Math.max(0, Math.min(100, x));
+    const clampedY = Math.max(0, Math.min(100, y));
+
+    if (selectedHotspotId !== null && selectedHotspotId !== undefined) {
+      const updated = (data.lookbook_hotspots || []).map((h: any) =>
+        h.id === selectedHotspotId ? { ...h, x: clampedX, y: clampedY } : h
+      );
+      set("lookbook_hotspots", updated);
+    } else {
+      const newId = Date.now();
+      const newHotspot = {
+        id: newId,
+        x: clampedX,
+        y: clampedY,
+        productId: "",
+        product_id: "",
+        variant_id: "",
+        name: "",
+        price: "",
+        image_url: "",
+        description: ""
+      };
+      set("lookbook_hotspots", [...(data.lookbook_hotspots || []), newHotspot]);
+      setSelectedHotspotId(newId);
     }
   };
 
@@ -1133,122 +1190,246 @@ export default function CmsManagementPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 border-t border-gray-100 pt-4">
+                <div className="mt-6 border-t border-gray-150 pt-6">
+                  {/* Visual Preview Map */}
+                  {data.lookbook_image_url ? (
+                    <div className="mb-6 border border-gray-200 rounded-2xl p-4 bg-white shadow-sm">
+                      <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">
+                        Visual Preview & Placement
+                      </h4>
+                      <p className="text-[10px] text-gray-400 mb-3">
+                        1. Select a hotspot card from the list below (it will highlight in purple).<br/>
+                        2. Click anywhere on the image preview to position the selected hotspot. If no card is selected, clicking will add a new hotspot.
+                      </p>
+                      <div
+                        onClick={handleImageClick}
+                        className="relative w-full aspect-[16/9] bg-slate-50 border border-slate-100 rounded-xl overflow-hidden cursor-crosshair select-none group"
+                      >
+                        <img
+                          src={data.lookbook_image_url}
+                          alt="Lookbook Interactive Map"
+                          className="w-full h-full object-cover pointer-events-none"
+                        />
+                        {(data.lookbook_hotspots || []).map((spot: any, sIdx: number) => {
+                          const isSelected = spot.id === selectedHotspotId;
+                          return (
+                            <div
+                              key={spot.id || sIdx}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedHotspotId(spot.id);
+                              }}
+                              style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
+                              className={`absolute z-10 -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full border border-white flex items-center justify-center text-[10px] font-black shadow-md cursor-pointer transition-all ${
+                                isSelected
+                                  ? "bg-purple-600 text-white scale-125 ring-2 ring-purple-400 ring-offset-1"
+                                  : "bg-black/60 text-white hover:bg-black/85"
+                              }`}
+                            >
+                              {sIdx + 1}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mb-6 bg-gray-50 border border-dashed border-gray-200 rounded-2xl p-6 text-center text-xs text-gray-400">
+                      Upload a Main Lookbook Image to enable visual hotspot placement.
+                    </div>
+                  )}
+
                   <div className="flex justify-between items-center mb-3">
                     <h4 className="text-xs font-bold text-gray-500 uppercase">
                       Interactive Hotspots
                     </h4>
                     <AddBtn
-                      onClick={() =>
+                      onClick={() => {
+                        const newId = Date.now();
                         set("lookbook_hotspots", [
                           ...(data.lookbook_hotspots || []),
-                          { id: Date.now(), x: 50, y: 50, productId: "" },
-                        ])
-                      }
+                          { id: newId, x: 50, y: 50, productId: "", product_id: "", variant_id: "", name: "", price: "", image_url: "", description: "" },
+                        ]);
+                        setSelectedHotspotId(newId);
+                      }}
                       label="Add Hotspot"
                     />
                   </div>
                   <div className="space-y-3">
                     {(data.lookbook_hotspots || []).map(
-                      (hs: any, hIdx: number) => (
-                        <div
-                          key={hs.id || hIdx}
-                          className="flex gap-3 items-end bg-gray-50 p-4 rounded-xl border border-gray-150 relative"
-                        >
-                          <button
-                            type="button"
-                            onClick={() =>
-                              set(
-                                "lookbook_hotspots",
-                                data.lookbook_hotspots.filter(
-                                  (h: any) => h.id !== hs.id,
-                                ),
-                              )
-                            }
-                            className="absolute right-3 top-3 text-red-400 hover:text-red-600"
+                      (hs: any, hIdx: number) => {
+                        const isSelected = hs.id === selectedHotspotId;
+                        return (
+                          <div
+                            key={hs.id || hIdx}
+                            onClick={() => setSelectedHotspotId(hs.id)}
+                            className={`flex flex-col gap-3 p-4 rounded-xl border relative cursor-pointer transition-all ${
+                              isSelected
+                                ? "bg-purple-50/40 border-purple-300 ring-1 ring-purple-300 shadow-sm"
+                                : "bg-gray-50 border-gray-150 hover:bg-gray-100/70"
+                            }`}
                           >
-                            <Trash2 size={14} />
-                          </button>
-                          <div className="flex-1 grid grid-cols-3 gap-3">
-                            <div>
-                              <label className="block text-[10px] font-bold text-gray-400 mb-1">
-                                X Coord (%)
-                              </label>
-                              <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                value={hs.x}
-                                onChange={(e) =>
+                            <div className="absolute right-3 top-3 flex items-center gap-2">
+                              <span className="text-[10px] font-black bg-gray-200/80 text-gray-600 px-2 py-0.5 rounded-full">
+                                #{hIdx + 1}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (selectedHotspotId === hs.id) {
+                                    setSelectedHotspotId(null);
+                                  }
                                   set(
                                     "lookbook_hotspots",
-                                    data.lookbook_hotspots.map((h: any) =>
-                                      h.id === hs.id
-                                        ? {
-                                            ...h,
-                                            x: parseFloat(e.target.value) || 0,
-                                          }
-                                        : h,
+                                    data.lookbook_hotspots.filter(
+                                      (h: any) => h.id !== hs.id,
                                     ),
-                                  )
-                                }
-                                className="w-full bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none"
-                              />
+                                  );
+                                }}
+                                className="text-red-400 hover:text-red-650"
+                              >
+                                <Trash2 size={14} />
+                              </button>
                             </div>
-                            <div>
-                              <label className="block text-[10px] font-bold text-gray-400 mb-1">
-                                Y Coord (%)
-                              </label>
-                              <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                value={hs.y}
-                                onChange={(e) =>
-                                  set(
-                                    "lookbook_hotspots",
-                                    data.lookbook_hotspots.map((h: any) =>
-                                      h.id === hs.id
-                                        ? {
-                                            ...h,
-                                            y: parseFloat(e.target.value) || 0,
-                                          }
-                                        : h,
-                                    ),
-                                  )
-                                }
-                                className="w-full bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none"
-                              />
+
+                            <div className="grid grid-cols-3 gap-3">
+                              <div>
+                                <label className="block text-[10px] font-bold text-gray-400 mb-1">
+                                  X Coord (%)
+                                </label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  step="0.1"
+                                  value={hs.x}
+                                  onClick={(e) => e.stopPropagation()}
+                                  onChange={(e) =>
+                                    set(
+                                      "lookbook_hotspots",
+                                      data.lookbook_hotspots.map((h: any) =>
+                                        h.id === hs.id
+                                          ? {
+                                              ...h,
+                                              x: parseFloat(e.target.value) || 0,
+                                            }
+                                          : h,
+                                      ),
+                                    )
+                                  }
+                                  className="w-full bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-bold text-gray-400 mb-1">
+                                  Y Coord (%)
+                                </label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  step="0.1"
+                                  value={hs.y}
+                                  onClick={(e) => e.stopPropagation()}
+                                  onChange={(e) =>
+                                    set(
+                                      "lookbook_hotspots",
+                                      data.lookbook_hotspots.map((h: any) =>
+                                        h.id === hs.id
+                                          ? {
+                                              ...h,
+                                              y: parseFloat(e.target.value) || 0,
+                                            }
+                                          : h,
+                                      ),
+                                    )
+                                  }
+                                  className="w-full bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-bold text-gray-400 mb-1">
+                                  Product
+                                </label>
+                                <select
+                                  value={hs.productId || hs.product_id || ""}
+                                  onClick={(e) => e.stopPropagation()}
+                                  onChange={(e) => {
+                                    const pId = e.target.value;
+                                    const p = products.find((x: any) => x.id === pId);
+                                    if (p) {
+                                      const variantId = p.variants?.[0]?.id || "";
+                                      const imageUrl = p.variants?.[0]?.images?.[0]?.image_url ?? p.images?.[0]?.image_url ?? "";
+                                      set(
+                                        "lookbook_hotspots",
+                                        data.lookbook_hotspots.map((h: any) =>
+                                          h.id === hs.id
+                                            ? {
+                                                ...h,
+                                                productId: pId,
+                                                product_id: pId,
+                                                variant_id: variantId,
+                                                name: p.name,
+                                                price: p.base_price,
+                                                image_url: imageUrl,
+                                                description: p.description || "",
+                                              }
+                                            : h,
+                                        ),
+                                      );
+                                    } else {
+                                      set(
+                                        "lookbook_hotspots",
+                                        data.lookbook_hotspots.map((h: any) =>
+                                          h.id === hs.id
+                                            ? {
+                                                ...h,
+                                                productId: "",
+                                                product_id: "",
+                                                variant_id: "",
+                                                name: "",
+                                                price: "",
+                                                image_url: "",
+                                                description: "",
+                                              }
+                                            : h,
+                                        ),
+                                      );
+                                    }
+                                  }}
+                                  className="w-full bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none"
+                                >
+                                  <option value="">-- Select Product --</option>
+                                  {products.map((p: any) => (
+                                    <option key={p.id} value={p.id}>
+                                      {p.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
                             </div>
-                            <div className="col-span-1">
-                              <label className="block text-[10px] font-bold text-gray-400 mb-1">
-                                Product ID
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="Product UUID"
-                                value={hs.productId}
-                                onChange={(e) =>
-                                  set(
-                                    "lookbook_hotspots",
-                                    data.lookbook_hotspots.map((h: any) =>
-                                      h.id === hs.id
-                                        ? { ...h, productId: e.target.value }
-                                        : h,
-                                    ),
-                                  )
-                                }
-                                className="w-full bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs font-mono focus:outline-none"
-                              />
-                            </div>
+                            {hs.name && (
+                              <div className="flex items-center gap-2 mt-1 bg-white p-2 rounded-lg border border-slate-100">
+                                {hs.image_url && (
+                                  <img
+                                    src={hs.image_url}
+                                    alt={hs.name}
+                                    className="w-8 h-8 rounded object-cover border border-slate-100 shrink-0"
+                                  />
+                                )}
+                                <div className="text-[10px] leading-tight text-slate-500">
+                                  <span className="font-bold text-slate-700 block truncate">{hs.name}</span>
+                                  <span>₹{Number(hs.price || 0).toLocaleString("en-IN")}</span>
+                                </div>
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      ),
+                        );
+                      }
                     )}
                     {!(data.lookbook_hotspots || []).length && (
                       <p className="text-center text-xs text-gray-400 py-3">
-                        No hotspots added. Press Add Hotspot to place
-                        interactive tags.
+                        No hotspots added. Press Add Hotspot or click the image above to place interactive tags.
                       </p>
                     )}
                   </div>
@@ -1263,11 +1444,10 @@ export default function CmsManagementPage() {
                     onChange={(v: string) => set("scarcity_timer_title", v)}
                   />
                   <Field
-                    label="Expiration Date & Time (ISO/Local String)"
-                    value={data.scarcity_expires_at || ""}
+                    label="Expiration Date & Time"
+                    value={toDatetimeLocal(data.scarcity_expires_at || "")}
                     onChange={(v: string) => set("scarcity_expires_at", v)}
-                    placeholder="e.g. 2026-06-30T18:00:00Z"
-                    mono
+                    type="datetime-local"
                   />
                   <Field
                     label="CTA Action Button Text"
@@ -2155,11 +2335,10 @@ export default function CmsManagementPage() {
                   />
 
                   <Field
-                    label="Expiration Date & Time (ISO String)"
-                    value={data.promo_expires_at || ""}
+                    label="Expiration Date & Time"
+                    value={toDatetimeLocal(data.promo_expires_at || "")}
                     onChange={(v: string) => set("promo_expires_at", v)}
-                    placeholder="e.g. 2026-12-31T23:59:59"
-                    mono
+                    type="datetime-local"
                   />
 
                   <Field

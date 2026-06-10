@@ -13,15 +13,23 @@ export interface ScarcityBlockProps {
   btn_link?: string;
 }
 
+import { SCARCITY_BLOCK_DEFAULTS } from "@/constants/storefront";
+
 export function ScarcityBlock({
   timer_title,
   expires_at,
   alert_text,
-  alert_bg = "#ef4444",
-  alert_text_color = "#ffffff",
-  btn_text = "Shop the Sale",
-  btn_link = "/store",
+  alert_bg,
+  alert_text_color,
+  btn_text,
+  btn_link,
 }: ScarcityBlockProps) {
+  const bg = alert_bg ?? SCARCITY_BLOCK_DEFAULTS.alert_bg;
+  const textColor = alert_text_color ?? SCARCITY_BLOCK_DEFAULTS.alert_text_color;
+  const buttonText = btn_text ?? SCARCITY_BLOCK_DEFAULTS.btn_text;
+  const buttonLink = btn_link ?? SCARCITY_BLOCK_DEFAULTS.btn_link;
+  const title = timer_title ?? SCARCITY_BLOCK_DEFAULTS.timer_title;
+
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -67,7 +75,7 @@ export function ScarcityBlock({
   }, [expires_at]);
 
   const padZero = (num: number) => String(num).padStart(2, "0");
-  if (!alert_text || !timer_title || !expires_at) {
+  if (!alert_text || !title || !expires_at) {
     return null;
   }
   return (
@@ -76,7 +84,7 @@ export function ScarcityBlock({
         {/* Urgent Promo Alert Banner */}
         {alert_text && (
           <div
-            style={{ backgroundColor: alert_bg, color: alert_text_color }}
+            style={{ backgroundColor: bg, color: textColor }}
             className="w-full py-4 px-4 sm:px-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md relative overflow-hidden group text-center sm:text-left"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
@@ -90,9 +98,9 @@ export function ScarcityBlock({
               </p>
             </div>
 
-            <Link href={btn_link}>
+            <Link href={buttonLink}>
               <span className="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 border border-white/10 rounded-xl px-4 py-2 text-xs font-bold transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer whitespace-nowrap">
-                {btn_text} <ArrowRight size={13} />
+                {buttonText} <ArrowRight size={13} />
               </span>
             </Link>
           </div>
@@ -111,9 +119,9 @@ export function ScarcityBlock({
                 />
               </div>
               <div className="max-w-xs md:max-w-sm">
-                {timer_title && (
+                {title && (
                   <h3 className="text-[10px] sm:text-xs font-black text-slate-400 tracking-[0.25em] uppercase mb-1 sm:mb-2">
-                    {timer_title}
+                    {title}
                   </h3>
                 )}
                 <p className="text-sm sm:text-base text-slate-500 leading-relaxed">

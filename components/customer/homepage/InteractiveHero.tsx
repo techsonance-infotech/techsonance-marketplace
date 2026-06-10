@@ -68,15 +68,18 @@ function getTextColorForBg(rgbaStr: string) {
 }
 
 export function InteractiveHero({
-  banner_type = HeroBannerType.CAROUSEL,
+  banner_type,
   video_url,
   video_eyebrow,
   video_title,
   video_desc,
   video_btn_text,
   video_btn_link,
-  slides = [],
+  slides,
 }: InteractiveHeroProps) {
+  const displayBannerType = banner_type ?? HeroBannerType.CAROUSEL;
+  const displaySlides = slides ?? [];
+
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
@@ -84,21 +87,21 @@ export function InteractiveHero({
 
   // Auto-play timer for carousel
   useEffect(() => {
-    if (banner_type !== HeroBannerType.CAROUSEL || slides.length <= 1) return;
+    if (displayBannerType !== HeroBannerType.CAROUSEL || displaySlides.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentIdx((prev) => (prev + 1) % slides.length);
+      setCurrentIdx((prev) => (prev + 1) % displaySlides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, [banner_type, slides.length]);
+  }, [displayBannerType, displaySlides.length]);
 
   const handlePrev = () => {
-    if (slides.length <= 1) return;
-    setCurrentIdx((prev) => (prev - 1 + slides.length) % slides.length);
+    if (displaySlides.length <= 1) return;
+    setCurrentIdx((prev) => (prev - 1 + displaySlides.length) % displaySlides.length);
   };
 
   const handleNext = () => {
-    if (slides.length <= 1) return;
-    setCurrentIdx((prev) => (prev + 1) % slides.length);
+    if (displaySlides.length <= 1) return;
+    setCurrentIdx((prev) => (prev + 1) % displaySlides.length);
   };
 
   const toggleVideoPlay = () => {
@@ -119,8 +122,8 @@ export function InteractiveHero({
 
   // Fallback to carousel or simple image if slide list is empty
   const activeSlides =
-    slides.length > 0
-      ? slides
+    displaySlides.length > 0
+      ? displaySlides
       : [
           {
             image_url: undefined,
@@ -161,7 +164,7 @@ export function InteractiveHero({
   const btnLink = video_btn_link || VIDEO_HERO_DEFAULT.btn_link;
 
   // Video render helper
-  if (banner_type === HeroBannerType.VIDEO && video_url) {
+  if (displayBannerType === HeroBannerType.VIDEO && video_url) {
     return (
       <section className="relative w-full h-[65vh] lg:h-[75vh] min-h-[450px] bg-slate-950 overflow-hidden">
         {/* Background Video */}
