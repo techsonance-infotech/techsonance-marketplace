@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'motion/react';
-import { Plus, X, ShoppingCart } from 'lucide-react';
-import { AddToCart } from '@/components/customer/AddToCart';
+import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "motion/react";
+import { Plus, X, ShoppingCart } from "lucide-react";
+import { AddToCart } from "@/components/customer/AddToCart";
+import { Skeleton } from "../ui/skeleton";
 
 export interface LookbookHotspot {
   id: string | number;
@@ -23,55 +24,68 @@ export interface ShoppableLookbookProps {
   subtitle?: string;
   image_url?: string;
   hotspots?: LookbookHotspot[];
-  fallback_image_url?: string;
 }
 
 export function ShoppableLookbook({
-  title = 'Shop The Look',
-  subtitle = 'Click on the hot-spots to view details and add items to your cart.',
-  image_url = 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1600&auto=format&fit=crop',
+  title = "Shop The Look",
+  subtitle = "Click on the hot-spots to view details and add items to your cart.",
+  image_url,
   hotspots = [],
-  fallback_image_url = 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1600&auto=format&fit=crop'
 }: ShoppableLookbookProps) {
-  const [activeHotspot, setActiveHotspot] = useState<LookbookHotspot | null>(null);
+  const [activeHotspot, setActiveHotspot] = useState<LookbookHotspot | null>(
+    null,
+  );
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Close popover when clicking outside
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setActiveHotspot(null);
       }
     };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  const currentHotspots = hotspots.length > 0 ? hotspots : [
-    {
-      id: 1,
-      x: 35,
-      y: 40,
-      name: 'Tailored Linen Blazer',
-      price: 3499,
-      variant_id: 'sample-variant-id-1',
-      image_url: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=300&auto=format&fit=crop',
-      description: 'Luxe blend of breathable linen. Premium fit and structure.'
-    },
-    {
-      id: 2,
-      x: 60,
-      y: 65,
-      name: 'Relaxed Silk Trousers',
-      price: 2899,
-      variant_id: 'sample-variant-id-2',
-      image_url: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=300&auto=format&fit=crop',
-      description: 'Flowing wide-leg trousers crafted from organic Mulberry silk.'
-    }
-  ];
+  const currentHotspots =
+    hotspots.length > 0
+      ? hotspots
+      : [
+          {
+            id: 1,
+            x: 35,
+            y: 40,
+            name: "Tailored Linen Blazer",
+            price: 3499,
+            variant_id: "sample-variant-id-1",
+            image_url:
+              "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=300&auto=format&fit=crop",
+            description:
+              "Luxe blend of breathable linen. Premium fit and structure.",
+          },
+          {
+            id: 2,
+            x: 60,
+            y: 65,
+            name: "Relaxed Silk Trousers",
+            price: 2899,
+            variant_id: "sample-variant-id-2",
+            image_url:
+              "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=300&auto=format&fit=crop",
+            description:
+              "Flowing wide-leg trousers crafted from organic Mulberry silk.",
+          },
+        ];
 
   return (
-    <section className="py-16 px-6 lg:px-16 xl:px-24 bg-white" ref={containerRef}>
+    <section
+      className="py-16 px-6 lg:px-16 xl:px-24 bg-white"
+      ref={containerRef}
+    >
       <div className="max-w-screen-xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-10">
@@ -81,20 +95,22 @@ export function ShoppableLookbook({
           <h2 className="text-3xl font-serif tracking-tight text-gray-900 mt-2 mb-3">
             {title}
           </h2>
-          <p className="text-xs text-gray-400 max-w-md mx-auto">
-            {subtitle}
-          </p>
+          <p className="text-xs text-gray-400 max-w-md mx-auto">{subtitle}</p>
         </div>
 
         {/* Interactive Image Container */}
         <div className="relative w-full aspect-[4/3] md:aspect-[16/9] rounded-3xl overflow-hidden shadow-xl border border-slate-100 bg-slate-50">
-          <Image
-            src={image_url || fallback_image_url}
-            alt={title}
-            fill
-            className="object-cover"
-            sizes="100vw"
-          />
+          {image_url ? (
+            <Image
+              src={image_url}
+              alt={title}
+              fill
+              className="object-cover"
+              sizes="100vw"
+            />
+          ) : (
+            <Skeleton className="w-full h-full p-4 lg:p-8 rounded-4xl" />
+          )}
 
           {/* Render Hotspots */}
           {currentHotspots.map((spot) => {
@@ -114,12 +130,15 @@ export function ShoppableLookbook({
                   onClick={() => setActiveHotspot(isActive ? null : spot)}
                   className={`relative w-8 h-8 rounded-full border border-white/20 shadow-lg flex items-center justify-center transition-all duration-300 ${
                     isActive
-                      ? 'bg-purple-600 text-white scale-110 rotate-45'
-                      : 'bg-black/60 text-white hover:bg-black/85'
+                      ? "bg-purple-600 text-white scale-110 rotate-45"
+                      : "bg-black/60 text-white hover:bg-black/85"
                   }`}
                   aria-label={`View product details for ${spot.name}`}
                 >
-                  <Plus size={16} className="transition-transform duration-300" />
+                  <Plus
+                    size={16}
+                    className="transition-transform duration-300"
+                  />
                 </button>
 
                 {/* Popover Card */}
@@ -142,7 +161,7 @@ export function ShoppableLookbook({
                           <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 flex-shrink-0">
                             <Image
                               src={spot.image_url}
-                              alt={spot.name || 'Product'}
+                              alt={spot.name || "Product"}
                               fill
                               className="object-cover"
                               sizes="56px"
@@ -151,11 +170,11 @@ export function ShoppableLookbook({
                         )}
                         <div className="flex-1 min-w-0">
                           <h4 className="text-xs font-bold text-slate-800 truncate mb-0.5">
-                            {spot.name || 'Premium Item'}
+                            {spot.name || "Premium Item"}
                           </h4>
                           {spot.price && (
                             <p className="text-[13px] font-black text-purple-700">
-                              ₹{Number(spot.price).toLocaleString('en-IN')}
+                              ₹{Number(spot.price).toLocaleString("en-IN")}
                             </p>
                           )}
                           {spot.description && (

@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { SectionHeader } from "./SectionHeader";
+
 import { useImageColors } from "@/hooks/useImageColors";
+import { SectionHeader } from "./SectionHeader";
 function ArrivalCard({
   card,
 }: {
@@ -14,7 +15,7 @@ function ArrivalCard({
   return (
     <Link
       href="/store"
-      style={{ background: bg  }}
+      style={{ background: bg }}
       className="relative flex flex-col overflow-hidden rounded-2xl group transition-all duration-500 min-h-[350px] md:min-h-[450px]"
     >
       {/* Image Container */}

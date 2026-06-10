@@ -1,12 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 
-import { useImageColors } from '@/hooks/useImageColors';
+import { useImageColors } from "@/hooks/useImageColors";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export interface HeroSlide {
   id?: string | number;
@@ -15,34 +23,35 @@ export interface HeroSlide {
   subtitle?: string;
   btn_text?: string;
   btn_link?: string;
-  layout?: 'center-overlay' | 'left-content-right-image' | 'right-content-left-image';
-  bg_style?: 'gradient' | 'solid';
+  layout?:
+    | "center-overlay"
+    | "left-content-right-image"
+    | "right-content-left-image";
+  bg_style?: "gradient" | "solid";
 }
 
 export interface InteractiveHeroProps {
-  banner_type?: 'carousel' | 'video';
+  banner_type?: "carousel" | "video";
   video_url?: string;
   slides?: HeroSlide[];
-  fallback_image_url?: string;
 }
 
 function getTextColorForBg(rgbaStr: string) {
   const match = rgbaStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-  if (!match) return '#ffffff';
+  if (!match) return "#ffffff";
   const r = parseInt(match[1], 10);
   const g = parseInt(match[2], 10);
   const b = parseInt(match[3], 10);
-  
+
   // Calculate relative luminance: Y = 0.299R + 0.587G + 0.114B
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.55 ? '#0f172a' : '#ffffff'; // dark slate for light bg, white for dark bg
+  return luminance > 0.55 ? "#0f172a" : "#ffffff"; // dark slate for light bg, white for dark bg
 }
 
 export function InteractiveHero({
-  banner_type = 'carousel',
+  banner_type = "carousel",
   video_url,
   slides = [],
-  fallback_image_url = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop'
 }: InteractiveHeroProps) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
@@ -51,7 +60,7 @@ export function InteractiveHero({
 
   // Auto-play timer for carousel
   useEffect(() => {
-    if (banner_type !== 'carousel' || slides.length <= 1) return;
+    if (banner_type !== "carousel" || slides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentIdx((prev) => (prev + 1) % slides.length);
     }, 6000);
@@ -85,37 +94,44 @@ export function InteractiveHero({
   };
 
   // Fallback to carousel or simple image if slide list is empty
-  const activeSlides = slides.length > 0 ? slides : [{
-    image_url: fallback_image_url,
-    title: 'Define Your Modern Aesthetic',
-    subtitle: 'SEASON 2024 COLLECTION',
-    btn_text: 'Shop Now',
-    btn_link: '/store',
-    layout: 'center-overlay' as const,
-    bg_style: 'gradient' as const
-  }];
+  const activeSlides =
+    slides.length > 0
+      ? slides
+      : [
+          {
+            image_url: undefined,
+            title: "Define Your Modern Aesthetic",
+            subtitle: "SEASON 2024 COLLECTION",
+            btn_text: "Shop Now",
+            btn_link: "/store",
+            layout: "center-overlay" as const,
+            bg_style: "gradient" as const,
+          },
+        ];
 
   const currentSlide = activeSlides[currentIdx];
-  const activeSlideImage = currentSlide?.image_url || fallback_image_url;
+  const activeSlideImage = currentSlide?.image_url;
   const { bg: bgColor, solidBg } = useImageColors(activeSlideImage);
 
   // Background style selection
-  const isGradient = (currentSlide?.bg_style || 'gradient') === 'gradient';
+  const isGradient = (currentSlide?.bg_style || "gradient") === "gradient";
   const finalBg = isGradient ? bgColor : solidBg;
 
   // Layout selection
-  const layoutStyle = currentSlide?.layout || 'center-overlay';
-  const isOverlay = layoutStyle === 'center-overlay';
+  const layoutStyle = currentSlide?.layout || "center-overlay";
+  const isOverlay = layoutStyle === "center-overlay";
 
   // Text color contrast check
-  const textColor = isOverlay ? '#ffffff' : getTextColorForBg(solidBg);
-  const subtitleColor = textColor === '#ffffff' ? 'rgba(255,255,255,0.7)' : 'rgba(15,23,42,0.7)';
-  const btnClass = textColor === '#ffffff'
-    ? "bg-white text-black hover:bg-slate-100"
-    : "bg-slate-900 text-white hover:bg-slate-800";
+  const textColor = isOverlay ? "#ffffff" : getTextColorForBg(solidBg);
+  const subtitleColor =
+    textColor === "#ffffff" ? "rgba(255,255,255,0.7)" : "rgba(15,23,42,0.7)";
+  const btnClass =
+    textColor === "#ffffff"
+      ? "bg-white text-black hover:bg-slate-100"
+      : "bg-slate-900 text-white hover:bg-slate-800";
 
   // Video render helper
-  if (banner_type === 'video' && video_url) {
+  if (banner_type === "video" && video_url) {
     return (
       <section className="relative w-full h-[65vh] lg:h-[75vh] min-h-[450px] bg-slate-950 overflow-hidden">
         {/* Background Video */}
@@ -128,7 +144,7 @@ export function InteractiveHero({
           playsInline
           className="absolute inset-0 w-full h-full object-cover opacity-80"
           onError={(e) => {
-            console.error('Video loading failed, falling back to image');
+            console.error("Video loading failed, falling back to image");
           }}
         />
 
@@ -140,14 +156,18 @@ export function InteractiveHero({
           <button
             onClick={toggleVideoPlay}
             className="w-10 h-10 rounded-full bg-black/45 backdrop-blur-md text-white flex items-center justify-center border border-white/10 hover:bg-black/60 transition-all hover:scale-105 active:scale-95"
-            aria-label={isVideoPlaying ? 'Pause video' : 'Play video'}
+            aria-label={isVideoPlaying ? "Pause video" : "Play video"}
           >
-            {isVideoPlaying ? <Pause size={15} /> : <Play size={15} className="ml-0.5" />}
+            {isVideoPlaying ? (
+              <Pause size={15} />
+            ) : (
+              <Play size={15} className="ml-0.5" />
+            )}
           </button>
           <button
             onClick={toggleMute}
             className="w-10 h-10 rounded-full bg-black/45 backdrop-blur-md text-white flex items-center justify-center border border-white/10 hover:bg-black/60 transition-all hover:scale-105 active:scale-95"
-            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+            aria-label={isMuted ? "Unmute video" : "Mute video"}
           >
             {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
           </button>
@@ -164,7 +184,8 @@ export function InteractiveHero({
                 The Future of Aesthetic Design
               </h1>
               <p className="text-base sm:text-lg text-white/80 font-light leading-relaxed mb-8 max-w-lg">
-                Explore an immersive shopping experience defined by curation, precision, and state-of-the-art layout customization.
+                Explore an immersive shopping experience defined by curation,
+                precision, and state-of-the-art layout customization.
               </p>
               <Link href="/store">
                 <button className="bg-white text-black hover:bg-slate-100 transition-all duration-300 px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-bold rounded-xl shadow-lg hover:shadow-white/10 hover:-translate-y-0.5">
@@ -179,7 +200,7 @@ export function InteractiveHero({
   }
 
   return (
-    <section 
+    <section
       style={{ background: finalBg }}
       className="relative w-full h-[65vh] lg:h-[75vh] min-h-[450px] overflow-hidden group transition-colors duration-700"
     >
@@ -191,20 +212,25 @@ export function InteractiveHero({
             initial={{ opacity: 0, scale: 1.02 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.7, ease: 'easeInOut' }}
+            transition={{ duration: 0.7, ease: "easeInOut" }}
             className="absolute inset-0 w-full h-full"
           >
             {isOverlay ? (
               /* Overlay layout */
               <div className="relative w-full h-full">
-                <Image
-                  src={currentSlide.image_url || fallback_image_url}
-                  alt={currentSlide.title || 'Banner'}
-                  fill
-                  priority
-                  className="object-contain rounded-4xl"
-                  sizes="100vw"
-                />
+                {currentSlide.image_url && currentSlide.image_url !== "" ? (
+                  <Image
+                    src={currentSlide.image_url}
+                    alt={currentSlide.title || "Banner"}
+                    fill
+                    priority
+                    className="object-contain rounded-4xl"
+                    sizes="100vw"
+                  />
+                ) : (
+                  <Skeleton className="w-full h-full rounded-4xl" />
+                )}
+
                 <div className="absolute inset-0 bg-black/45" />
                 <div className="absolute inset-0 flex items-center">
                   <div className="max-w-screen-xl mx-auto px-6 lg:px-16 xl:px-24 w-full">
@@ -220,14 +246,14 @@ export function InteractiveHero({
                           {currentSlide.subtitle}
                         </motion.p>
                       )}
-                      
+
                       <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3, duration: 0.6 }}
                         className="text-3xl sm:text-5xl lg:text-6xl font-serif tracking-tight leading-[1.1] mb-6"
                       >
-                        {currentSlide.title || 'Modern Collection'}
+                        {currentSlide.title || "Modern Collection"}
                       </motion.h1>
 
                       {currentSlide.btn_text && (
@@ -236,8 +262,10 @@ export function InteractiveHero({
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.4, duration: 0.5 }}
                         >
-                          <Link href={currentSlide.btn_link || '/store'}>
-                            <button className={`hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 px-8 py-3.5 text-[16px] sm:text-lg uppercase tracking-[0.2em] font-bold rounded-xl shadow-lg cursor-pointer ${btnClass}`}>
+                          <Link href={currentSlide.btn_link || "/store"}>
+                            <button
+                              className={`hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 px-8 py-3.5 text-[16px] sm:text-lg uppercase tracking-[0.2em] font-bold rounded-xl shadow-lg cursor-pointer ${btnClass}`}
+                            >
                               {currentSlide.btn_text}
                             </button>
                           </Link>
@@ -251,10 +279,17 @@ export function InteractiveHero({
               /* Split layouts (left-content-right-image or right-content-left-image) */
               <div className="w-full h-full flex flex-col lg:flex-row items-center justify-between relative">
                 {/* Text content container */}
-                <div className={`w-full lg:w-1/2 flex items-center px-6 lg:px-16 xl:px-24 py-8 lg:py-0 ${
-                  layoutStyle === 'left-content-right-image' ? 'order-2 lg:order-1' : 'order-2'
-                }`}>
-                  <div style={{ color: textColor }} className="max-w-2xl w-full">
+                <div
+                  className={`w-full lg:w-1/2 flex items-center px-6 lg:px-16 xl:px-24 py-8 lg:py-0 ${
+                    layoutStyle === "left-content-right-image"
+                      ? "order-2 lg:order-1"
+                      : "order-2"
+                  }`}
+                >
+                  <div
+                    style={{ color: textColor }}
+                    className="max-w-2xl w-full"
+                  >
                     {currentSlide.subtitle && (
                       <motion.p
                         initial={{ opacity: 0, y: 15 }}
@@ -266,14 +301,14 @@ export function InteractiveHero({
                         {currentSlide.subtitle}
                       </motion.p>
                     )}
-                    
+
                     <motion.h1
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3, duration: 0.6 }}
                       className="text-4xl sm:text-5xl lg:text-5xl font-serif tracking-tight leading-[1.15] mb-6"
                     >
-                      {currentSlide.title || 'Modern Collection'}
+                      {currentSlide.title || "Modern Collection"}
                     </motion.h1>
 
                     {currentSlide.btn_text && (
@@ -282,8 +317,10 @@ export function InteractiveHero({
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4, duration: 0.5 }}
                       >
-                        <Link href={currentSlide.btn_link || '/store'}>
-                          <button className={`hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 px-8 py-3.5 text-[11px] uppercase tracking-[0.2em] font-bold rounded-xl shadow-lg cursor-pointer ${btnClass}`}>
+                        <Link href={currentSlide.btn_link || "/store"}>
+                          <button
+                            className={`hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 px-8 py-3.5 text-[11px] uppercase tracking-[0.2em] font-bold rounded-xl shadow-lg cursor-pointer ${btnClass}`}
+                          >
                             {currentSlide.btn_text}
                           </button>
                         </Link>
@@ -293,17 +330,25 @@ export function InteractiveHero({
                 </div>
 
                 {/* Image container */}
-                <div className={`w-full lg:w-1/2 h-[35vh] lg:h-full relative ${
-                  layoutStyle === 'left-content-right-image' ? 'order-1 lg:order-2' : 'order-1'
-                }`}>
-                  <Image
-                    src={currentSlide.image_url || fallback_image_url}
-                    alt={currentSlide.title || 'Banner'}
-                    fill
-                    priority
-                    className="object-contain p-4 lg:p-8 rounded-4xl"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
+                <div
+                  className={`w-full lg:w-1/2 h-[35vh] lg:h-full relative ${
+                    layoutStyle === "left-content-right-image"
+                      ? "order-1 lg:order-2"
+                      : "order-1"
+                  }`}
+                >
+                  {currentSlide.image_url ?(
+                    <Image
+                      src={currentSlide.image_url}
+                      alt={currentSlide.title || "Banner"}
+                      fill
+                      priority
+                      className="object-contain p-4 lg:p-8 rounded-4xl"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  ) :
+                  <Skeleton className="w-full h-full p-4 lg:p-8 rounded-4xl" />
+                  }
                 </div>
               </div>
             )}
@@ -336,7 +381,9 @@ export function InteractiveHero({
                 key={idx}
                 onClick={() => setCurrentIdx(idx)}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  currentIdx === idx ? 'w-6 bg-white' : 'w-1.5 bg-white/40 hover:bg-white/75'
+                  currentIdx === idx
+                    ? "w-6 bg-white"
+                    : "w-1.5 bg-white/40 hover:bg-white/75"
                 }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
