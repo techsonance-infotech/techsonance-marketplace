@@ -18,6 +18,7 @@ import { SearchTrigger } from "./SearchOverlay";
 export enum NavActionType {
   MOUNT = "MOUNT",
   TOGGLE_SEARCH = "TOGGLE_SEARCH",
+  SET_SEARCH_QUERY = "SET_SEARCH_QUERY",
 }
 
 type NavState = {
@@ -28,7 +29,7 @@ type NavState = {
 type NavAction =
   | { type: NavActionType.MOUNT }
   | { type: NavActionType.TOGGLE_SEARCH; payload: boolean }
-  | { type: "SET_SEARCH_QUERY"; payload: string };
+  | { type: NavActionType.SET_SEARCH_QUERY; payload: string };
 
 const navReducer = (state: NavState, action: NavAction): NavState => {
   switch (action.type) {
@@ -36,7 +37,7 @@ const navReducer = (state: NavState, action: NavAction): NavState => {
       return { ...state, isMounted: true };
     case NavActionType.TOGGLE_SEARCH:
       return { ...state, isSearchOpen: action.payload };
-    case "SET_SEARCH_QUERY":
+    case NavActionType.SET_SEARCH_QUERY:
       return { ...state, searchQuery: action.payload };
     default:
       return state;

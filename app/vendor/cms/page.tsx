@@ -37,13 +37,15 @@ export enum LangType {
   ES = "es",
 }
 
+export type CmsDataPayload = Record<string, any>;
+
 interface CmsState {
   page: PageType;
   lang: LangType;
   loading: boolean;
   saving: boolean;
   msg: { text: string; ok: boolean } | null;
-  data: any;
+  data: CmsDataPayload;
 }
 
 export enum CmsActionType {
@@ -69,13 +71,13 @@ type CmsAction =
   | { type: CmsActionType.SET_PAGE; payload: PageType }
   | { type: CmsActionType.SET_LANG; payload: LangType }
   | { type: CmsActionType.FETCH_START }
-  | { type: CmsActionType.FETCH_SUCCESS; payload: any }
+  | { type: CmsActionType.FETCH_SUCCESS; payload: CmsDataPayload }
   | { type: CmsActionType.FETCH_FAILURE; payload: string }
   | { type: CmsActionType.SAVE_START }
   | { type: CmsActionType.SAVE_SUCCESS; payload: string }
   | { type: CmsActionType.SAVE_FAILURE; payload: string }
   | { type: CmsActionType.SET_DATA_FIELD; payload: SetDataFieldPayload }
-  | { type: CmsActionType.SET_DATA_FULL; payload: any }
+  | { type: CmsActionType.SET_DATA_FULL; payload: CmsDataPayload }
   | { type: CmsActionType.CLEAR_MESSAGE };
 
 const initialState: CmsState = {

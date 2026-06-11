@@ -353,8 +353,12 @@ type FormState = {
   successMsg: string;
 };
 
+type FormSetActionPayload = {
+  [K in keyof FormState]: { key: K; value: FormState[K] }
+}[keyof FormState];
+
 type FormAction =
-  | { type: FormActionType.SET; key: keyof FormState; value: any }
+  | ({ type: FormActionType.SET } & FormSetActionPayload)
   | { type: FormActionType.RESET_FORM }
   | { type: FormActionType.RESET_ATTACHMENT };
 
@@ -557,8 +561,12 @@ export default function HelpCenterPage() {
     expandedTicketId: string | null;
   };
 
+  type UISetActionPayload = {
+    [K in keyof UIState]: { key: K; value: UIState[K] }
+  }[keyof UIState];
+
   type UIAction =
-    | { type: UIActionType.SET; key: keyof UIState; value: any }
+    | ({ type: UIActionType.SET } & UISetActionPayload)
     | { type: UIActionType.RESET_FAQ_VOTES };
 
   const initialUIState: UIState = {

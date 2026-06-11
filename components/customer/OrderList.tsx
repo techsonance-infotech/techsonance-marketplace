@@ -11,6 +11,10 @@ import { Truck, CheckCircle2, Package, RotateCcw, XCircle } from "lucide-react";
 export enum OrderActionType {
   FETCH_SUCCESS = "FETCH_SUCCESS",
   FETCH_START = "FETCH_START",
+  FETCH_ERROR = "FETCH_ERROR",
+  LOAD_MORE = "LOAD_MORE",
+  SET_DATE_FILTER = "SET_DATE_FILTER",
+  RESET_PAGINATION = "RESET_PAGINATION"
 }
 
 // shadcn/ui imports
@@ -87,10 +91,10 @@ type OrderAction =
       payload: OrderItemAPIResponse[];
       append: boolean;
     }
-  | { type: "FETCH_ERROR" }
-  | { type: "LOAD_MORE" }
-  | { type: "SET_DATE_FILTER"; payload: "all" | "last30" }
-  | { type: "RESET_PAGINATION" };
+  | { type: OrderActionType.FETCH_ERROR }
+  | { type: OrderActionType.LOAD_MORE }
+  | { type: OrderActionType.SET_DATE_FILTER; payload: "all" | "last30" }
+  | { type: OrderActionType.RESET_PAGINATION };
 
 const orderReducer = (state: OrderState, action: OrderAction): OrderState => {
   switch (action.type) {
@@ -104,13 +108,13 @@ const orderReducer = (state: OrderState, action: OrderAction): OrderState => {
           : action.payload,
         isLoading: false,
       };
-    case "FETCH_ERROR":
+    case OrderActionType.FETCH_ERROR:
       return { ...state, isLoading: false };
-    case "LOAD_MORE":
+    case OrderActionType.LOAD_MORE:
       return { ...state, offset: state.offset + state.limit };
-    case "SET_DATE_FILTER":
+    case OrderActionType.SET_DATE_FILTER:
       return { ...state, dateFilter: action.payload, offset: 0 };
-    case "RESET_PAGINATION":
+    case OrderActionType.RESET_PAGINATION:
       return { ...state, offset: 0 };
     default:
       return state;
@@ -413,7 +417,7 @@ export function OrdersList({
 
     const fetchOrderItems = async () => {
       if (!customerId || !token) {
-        dispatch({ type: "FETCH_ERROR" });
+        dispatch({ type: OrderActionType.FETCH_ERROR });
         return;
       }
       if (state.offset === 0) dispatch({ type: OrderActionType.FETCH_START });
@@ -437,7 +441,7 @@ export function OrdersList({
           });
         }
       } catch (error) {
-        if (isMounted) dispatch({ type: "FETCH_ERROR" });
+        if (isMounted) dispatch({ type: OrderActionType.FETCH_ERROR });
       }
     };
 
@@ -449,7 +453,7 @@ export function OrdersList({
 
   // Reset pagination when parent status changes
   useEffect(() => {
-    dispatch({ type: "RESET_PAGINATION" });
+    dispatch({ type: OrderActionType.RESET_PAGINATION });
   }, [status]);
 
   return (
@@ -465,7 +469,7 @@ export function OrdersList({
           className={`rounded-full h-8 text-xs font-semibold px-4 shrink-0 ${status === null && state.dateFilter === "all" ? "bg-black text-white hover:bg-gray-800" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
           onClick={() => {
             setStatus(null);
-            dispatch({ type: "SET_DATE_FILTER", payload: "all" });
+            dispatch({ type: OrderActionType.SET_DATE_FILTER, payload: "all" });
           }}
         >
           {ORDER_LIST_TEXT.ALL_ORDERS}
@@ -475,7 +479,7 @@ export function OrdersList({
           className={`rounded-full h-8 text-xs font-semibold px-4 shrink-0 ${state.dateFilter === "last30" ? "bg-black text-white hover:bg-gray-800" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
           onClick={() => {
             setStatus(null);
-            dispatch({ type: "SET_DATE_FILTER", payload: "last30" });
+            dispatch({ type: OrderActionType.SET_DATE_FILTER, payload: "last30" });
           }}
         >
           {ORDER_LIST_TEXT.LAST_30_DAYS}
@@ -527,7 +531,7 @@ export function OrdersList({
           {state.items.length >= state.limit && (
             <div className="flex justify-center mt-6 pt-4">
               <Button
-                onClick={() => dispatch({ type: "LOAD_MORE" })}
+                onClick={() => dispatch({ type: OrderActionType.LOAD_MORE })}
                 variant="secondary"
                 className="w-full md:w-auto px-8 h-12 md:h-10 rounded-full bg-blue-50/50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 font-semibold border border-blue-100/50 shadow-sm"
                 disabled={state.isLoading}
