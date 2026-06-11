@@ -16,6 +16,7 @@ import {
 import { useImageColors } from "@/hooks/useImageColors";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VIDEO_HERO_DEFAULT } from "@/constants/storefront";
+import { INTERACTIVE_HERO_TEXT } from "@/constants/customerText";
 
 export enum HeroLayout {
   CENTER_OVERLAY = "center-overlay",
@@ -41,7 +42,8 @@ export interface HeroSlide {
   btn_text?: string;
   btn_link?: string;
   layout?: HeroLayout;
-  bg_style?: HeroBgStyle;
+  bg_style?: HeroBgStyle | "custom";
+  bg_color?: string;
 }
 
 export interface InteractiveHeroProps {
@@ -127,9 +129,9 @@ export function InteractiveHero({
       : [
           {
             image_url: undefined,
-            title: "Define Your Modern Aesthetic",
-            subtitle: "SEASON 2024 COLLECTION",
-            btn_text: "Shop Now",
+            title: INTERACTIVE_HERO_TEXT.DEFAULT_TITLE,
+            subtitle: INTERACTIVE_HERO_TEXT.DEFAULT_SUBTITLE,
+            btn_text: INTERACTIVE_HERO_TEXT.SHOP_NOW,
             btn_link: "/store",
             layout: HeroLayout.CENTER_OVERLAY,
             bg_style: HeroBgStyle.GRADIENT,
@@ -141,8 +143,14 @@ export function InteractiveHero({
   const { bg: bgColor, solidBg } = useImageColors(activeSlideImage);
 
   // Background style selection
-  const isGradient = (currentSlide?.bg_style || HeroBgStyle.GRADIENT) === HeroBgStyle.GRADIENT;
-  const finalBg = isGradient ? bgColor : solidBg;
+  const bgStyleValue = currentSlide?.bg_style || HeroBgStyle.GRADIENT;
+  const isCustomBg = bgStyleValue === "custom";
+  const isGradient = bgStyleValue === HeroBgStyle.GRADIENT;
+  const finalBg = isCustomBg
+    ? (currentSlide?.bg_color || solidBg)
+    : isGradient
+    ? bgColor
+    : solidBg;
 
   // Layout selection
   const layoutStyle = currentSlide?.layout || HeroLayout.CENTER_OVERLAY;
@@ -290,7 +298,7 @@ export function InteractiveHero({
                         transition={{ delay: 0.3, duration: 0.6 }}
                         className="text-3xl sm:text-5xl lg:text-6xl font-serif tracking-tight leading-[1.1] mb-6"
                       >
-                        {currentSlide.title || "Modern Collection"}
+                        {currentSlide.title || INTERACTIVE_HERO_TEXT.DEFAULT_TITLE}
                       </motion.h1>
 
                       {currentSlide.btn_text && (
@@ -345,7 +353,7 @@ export function InteractiveHero({
                       transition={{ delay: 0.3, duration: 0.6 }}
                       className="text-4xl sm:text-5xl lg:text-5xl font-serif tracking-tight leading-[1.15] mb-6"
                     >
-                      {currentSlide.title || "Modern Collection"}
+                      {currentSlide.title || INTERACTIVE_HERO_TEXT.DEFAULT_TITLE}
                     </motion.h1>
 
                     {currentSlide.btn_text && (

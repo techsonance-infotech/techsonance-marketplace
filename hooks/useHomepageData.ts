@@ -1,3 +1,4 @@
+import { CmsDataKey } from "@/constants/cms";
 import { useState, useEffect, useCallback } from "react";
 import AxiosAPI from "@/lib/axios";
 import {
@@ -6,12 +7,7 @@ import {
   dispatchLocaleChange,
   subscribeLocaleChange,
 } from "@/utils/cache";
-import {
-  BANNERS_CACHE_KEY,
-  CATEGORIES_CACHE_KEY,
-  CMS_CACHE_KEY,
-  LANG_KEY,
-} from "@/constants";
+
 // Dynamic banners fallback images
 
 export function useHomepageData() {
@@ -25,7 +21,7 @@ export function useHomepageData() {
   // Initialize lang and subscribe to changes without polling
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const savedLang = localStorage.getItem(LANG_KEY) || "en";
+      const savedLang = localStorage.getItem(CmsDataKey.LANG_KEY) || "en";
       setLangState(savedLang);
     }
     const unsubscribe = subscribeLocaleChange((newLang) => {
@@ -41,12 +37,9 @@ export function useHomepageData() {
 
   const fetchData = useCallback(async (currentLang: string) => {
     setIsLoading(true);
-    console.log(`[useHomepageData] Starting fetch for lang: ${currentLang}`);
-
     // Try finding in cache first
-    const cachedCms = getCachedData(`${CMS_CACHE_KEY}_${currentLang}`);
+    const cachedCms = getCachedData(`${CmsDataKey.CMS_CACHE_KEY}_${currentLang}`);
     if (cachedCms) {
-      console.log("[useHomepageData] Found fresh CMS cache:", cachedCms);
       setCmsContent(cachedCms);
       if (
         Array.isArray(cachedCms.hero_slides) &&
@@ -61,12 +54,7 @@ export function useHomepageData() {
     try {
       // 1. Fetch CMS Home Page content (fresh from API first)
       try {
-        console.log(
-          `[useHomepageData] Fetching CMS page: /v1/cms/home?lang=${currentLang}`,
-        );
         const cmsRes = await AxiosAPI.get(`/v1/cms/home?lang=${currentLang}`);
-        console.log("[useHomepageData] CMS API raw response:", cmsRes.data);
-
         const cmsRow = cmsRes.data?.data ?? cmsRes.data;
         const rawContent = cmsRow?.content;
 
@@ -75,10 +63,6 @@ export function useHomepageData() {
             typeof rawContent === "string"
               ? JSON.parse(rawContent)
               : rawContent;
-          console.log(
-            "[useHomepageData] CMS content parsed successfully:",
-            parsedContent,
-          );
           setCmsContent(parsedContent);
           if (
             Array.isArray(parsedContent.hero_slides) &&
@@ -86,14 +70,11 @@ export function useHomepageData() {
           ) {
             setHeroSlides(parsedContent.hero_slides);
           }
-          cacheData(`${CMS_CACHE_KEY}_${currentLang}`, parsedContent);
+          cacheData(`${CmsDataKey.CMS_CACHE_KEY}_${currentLang}`, parsedContent);
         } else {
-          console.warn(
-            "[useHomepageData] CMS API returned no content — using cached or fallbacks.",
-          );
           if (!cmsContent) {
             const staleCached = localStorage.getItem(
-              `${CMS_CACHE_KEY}_${currentLang}`,
+              `${CmsDataKey.CMS_CACHE_KEY}_${currentLang}`,
             );
             if (staleCached) {
               try {
@@ -111,13 +92,9 @@ export function useHomepageData() {
           }
         }
       } catch (err: any) {
-        console.error(
-          "[useHomepageData] CMS fetch FAILED — storefront will show fallbacks.",
-          err,
-        );
         if (!cmsContent) {
           const staleCached = localStorage.getItem(
-            `${CMS_CACHE_KEY}_${currentLang}`,
+            `${CmsDataKey.CMS_CACHE_KEY}_${currentLang}`,
           );
           if (staleCached) {
             try {
@@ -147,14 +124,14 @@ export function useHomepageData() {
           if (urls.length > 0) {
             setBanners(urls);
             if (typeof window !== "undefined") {
-              localStorage.setItem(BANNERS_CACHE_KEY, JSON.stringify(urls));
+              localStorage.setItem(CmsDataKey.BANNERS_CACHE_KEY, JSON.stringify(urls));
             }
           }
         }
       } catch (err) {
         // Banners are non-critical — use defaults silently
         if (typeof window !== "undefined") {
-          const cachedBanners = localStorage.getItem(BANNERS_CACHE_KEY);
+          const cachedBanners = localStorage.getItem(CmsDataKey.BANNERS_CACHE_KEY);
           if (cachedBanners) setBanners(JSON.parse(cachedBanners));
         }
       }
@@ -173,7 +150,7 @@ export function useHomepageData() {
             setCategories(formatted);
             if (typeof window !== "undefined") {
               localStorage.setItem(
-                CATEGORIES_CACHE_KEY,
+                CmsDataKey.CATEGORIES_CACHE_KEY,
                 JSON.stringify(formatted),
               );
             }
@@ -181,15 +158,11 @@ export function useHomepageData() {
         }
       } catch (err) {
         if (typeof window !== "undefined") {
-          const cachedCategories = localStorage.getItem(CATEGORIES_CACHE_KEY);
+          const cachedCategories = localStorage.getItem(CmsDataKey.CATEGORIES_CACHE_KEY);
           if (cachedCategories) setCategories(JSON.parse(cachedCategories));
         }
       }
     } catch (error) {
-      console.error(
-        "[useHomepageData] Unexpected error during data refresh:",
-        error,
-      );
     } finally {
       setIsLoading(false);
     }
