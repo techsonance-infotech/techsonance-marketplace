@@ -1,38 +1,25 @@
 import { Star } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
+import { TESTIMONIALS_DEFAULT } from "@/constants/storefront";
+import { TESTIMONIALS_TEXT } from "@/constants/customerText";
 
-export const TESTIMONIALS = [
-  {
-    name: "Priya S.",
-    location: "Mumbai",
-    rating: 5,
-    text: "Absolutely premium quality. The packaging was immaculate and delivery was faster than expected.",
-  },
-  {
-    name: "Arjun M.",
-    location: "Bangalore",
-    rating: 5,
-    text: "Best audio gear I have ever bought. Sound quality is extraordinary for the price point.",
-  },
-  {
-    name: "Meera K.",
-    location: "Delhi",
-    rating: 5,
-    text: "Seamless checkout, GST invoice generated instantly. Will definitely be a repeat customer.",
-  },
-];
+export function TestimonialsDesktop({ getField }: { getField: (k: string) => any }) {
+  const cmsTestimonials = getField ? getField("social_proof_testimonials") : null;
+  const testimonials = Array.isArray(cmsTestimonials) && cmsTestimonials.length > 0 ? cmsTestimonials : TESTIMONIALS_DEFAULT;
 
-export function TestimonialsDesktop() {
+  const eyebrow = (getField && getField("social_proof_eyebrow")) || TESTIMONIALS_TEXT.CUSTOMER_STORIES;
+  const title = (getField && getField("social_proof_title")) || TESTIMONIALS_TEXT.WHAT_CUSTOMERS_SAY;
+
   return (
     <section className="testimonials_desktop py-20 px-6 lg:px-16 xl:px-24 bg-[#faf9f6]">
       <div className="max-w-screen-xl mx-auto">
         <SectionHeader
-          eyebrow="Customer Stories"
-          title="What Our Customers Say"
+          eyebrow={eyebrow}
+          title={title}
           centered
         />
         <div className="grid grid-cols-3 gap-6 mt-12">
-          {TESTIMONIALS.map((t, i) => (
+          {testimonials.map((t: any, i: number) => (
             <div
               key={i}
               className="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300"
@@ -55,13 +42,13 @@ export function TestimonialsDesktop() {
                   className="w-9 h-9 rounded-full flex items-center justify-center text-white text-[11px] font-bold"
                   style={{ background: `hsl(${i * 80 + 200}, 55%, 55%)` }}
                 >
-                  {t.name[0]}
+                  {t.name ? t.name[0] : "C"}
                 </div>
                 <div>
                   <p className="text-[13px] font-semibold text-gray-900">
                     {t.name}
                   </p>
-                  <p className="text-[11px] text-gray-400">{t.location}</p>
+                  <p className="text-[11px] text-gray-400">{t.location || t.role}</p>
                 </div>
               </div>
             </div>

@@ -4,21 +4,29 @@ import { ChevronRight } from "lucide-react";
 
 import { useImageColors } from "@/hooks/useImageColors";
 import { SectionHeader } from "./SectionHeader";
+import { NEW_ARRIVALS_TEXT } from "@/constants/customerText";
+
 function ArrivalCard({
   card,
 }: {
-  card: { id: number; title: string; img: string; subtitle: string };
+  card: { id: number; title: string; img: string; subtitle: string; bgColor?: string };
 }) {
-  // Extract the dominant color for this specific image
-  const { bg } = useImageColors(card.img);
+  // CMS-provided color is used as the fallbackColor so it takes priority
+  // over the auto-detected edge color. If no CMS color, the hook picks intelligently.
+  const { bg } = useImageColors(card.img, {
+    fallbackColor: card.bgColor || undefined,
+  });
+
+  // When a CMS color is explicitly set, use it directly; otherwise trust the hook.
+  const resolvedBg = card.bgColor || bg;
 
   return (
     <Link
       href="/store"
-      style={{ background: bg }}
+      style={{ background: resolvedBg }}
       className="relative flex flex-col overflow-hidden rounded-2xl group transition-all duration-500 min-h-[350px] md:min-h-[450px]"
     >
-      {/* Image Container */}
+      {/* Image Container — object-contain so full product is visible */}
       <div className="absolute inset-0 p-8 lg:p-12">
         {card.img && (
           <Image
@@ -44,7 +52,7 @@ function ArrivalCard({
           {card.title}
         </h4>
         <div className="flex items-center gap-1 text-xs font-medium text-white/90 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-          View Product <ChevronRight size={14} />
+          {NEW_ARRIVALS_TEXT.VIEW_PRODUCT} <ChevronRight size={14} />
         </div>
       </div>
     </Link>
@@ -57,19 +65,20 @@ export function NewArrivalsDesktop({
 }: {
   getField: (k: string) => string;
 }) {
-  // Map out your 4 cards
+  // Map out your 4 cards, including CMS bg color per card
   const cardsData = [1, 2, 3, 4].map((num) => ({
     id: num,
-    title: getField(`new_arrivals_card_${num}_title`) || `New Arrival ${num}`,
+    title: getField(`new_arrivals_card_${num}_title`) || `${NEW_ARRIVALS_TEXT.NEW_ARRIVAL_PREFIX} ${num}`,
     img: getField(`new_arrivals_card_${num}_image_url`),
     subtitle: getField(`new_arrivals_card_${num}_subtitle`),
+    bgColor: getField(`new_arrivals_card_${num}_bg_color`) || undefined,
   }));
 
   return (
     <section className="new_arrivals_desktop py-20 px-6 lg:px-16 xl:px-24 bg-white">
       <SectionHeader
-        eyebrow="Just Dropped"
-        title="New Arrivals"
+        eyebrow={NEW_ARRIVALS_TEXT.JUST_DROPPED}
+        title={NEW_ARRIVALS_TEXT.NEW_ARRIVALS}
         href="/store"
       />
 

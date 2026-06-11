@@ -15,6 +15,24 @@ import {
 
 import { useImageColors } from "@/hooks/useImageColors";
 import { Skeleton } from "@/components/ui/skeleton";
+import { VIDEO_HERO_DEFAULT } from "@/constants/storefront";
+import { INTERACTIVE_HERO_TEXT } from "@/constants/customerText";
+
+export enum HeroLayout {
+  CENTER_OVERLAY = "center-overlay",
+  LEFT_CONTENT_RIGHT_IMAGE = "left-content-right-image",
+  RIGHT_CONTENT_LEFT_IMAGE = "right-content-left-image",
+}
+
+export enum HeroBgStyle {
+  GRADIENT = "gradient",
+  SOLID = "solid",
+}
+
+export enum HeroBannerType {
+  CAROUSEL = "carousel",
+  VIDEO = "video",
+}
 
 export interface HeroSlide {
   id?: string | number;
@@ -23,16 +41,19 @@ export interface HeroSlide {
   subtitle?: string;
   btn_text?: string;
   btn_link?: string;
-  layout?:
-    | "center-overlay"
-    | "left-content-right-image"
-    | "right-content-left-image";
-  bg_style?: "gradient" | "solid";
+  layout?: HeroLayout;
+  bg_style?: HeroBgStyle | "custom";
+  bg_color?: string;
 }
 
 export interface InteractiveHeroProps {
-  banner_type?: "carousel" | "video";
+  banner_type?: HeroBannerType | string;
   video_url?: string;
+  video_eyebrow?: string;
+  video_title?: string;
+  video_desc?: string;
+  video_btn_text?: string;
+  video_btn_link?: string;
   slides?: HeroSlide[];
 }
 
@@ -49,10 +70,18 @@ function getTextColorForBg(rgbaStr: string) {
 }
 
 export function InteractiveHero({
-  banner_type = "carousel",
+  banner_type,
   video_url,
-  slides = [],
+  video_eyebrow,
+  video_title,
+  video_desc,
+  video_btn_text,
+  video_btn_link,
+  slides,
 }: InteractiveHeroProps) {
+  const displayBannerType = banner_type ?? HeroBannerType.CAROUSEL;
+  const displaySlides = slides ?? [];
+
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
@@ -60,21 +89,21 @@ export function InteractiveHero({
 
   // Auto-play timer for carousel
   useEffect(() => {
-    if (banner_type !== "carousel" || slides.length <= 1) return;
+    if (displayBannerType !== HeroBannerType.CAROUSEL || displaySlides.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentIdx((prev) => (prev + 1) % slides.length);
+      setCurrentIdx((prev) => (prev + 1) % displaySlides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, [banner_type, slides.length]);
+  }, [displayBannerType, displaySlides.length]);
 
   const handlePrev = () => {
-    if (slides.length <= 1) return;
-    setCurrentIdx((prev) => (prev - 1 + slides.length) % slides.length);
+    if (displaySlides.length <= 1) return;
+    setCurrentIdx((prev) => (prev - 1 + displaySlides.length) % displaySlides.length);
   };
 
   const handleNext = () => {
-    if (slides.length <= 1) return;
-    setCurrentIdx((prev) => (prev + 1) % slides.length);
+    if (displaySlides.length <= 1) return;
+    setCurrentIdx((prev) => (prev + 1) % displaySlides.length);
   };
 
   const toggleVideoPlay = () => {
@@ -95,17 +124,17 @@ export function InteractiveHero({
 
   // Fallback to carousel or simple image if slide list is empty
   const activeSlides =
-    slides.length > 0
-      ? slides
+    displaySlides.length > 0
+      ? displaySlides
       : [
           {
             image_url: undefined,
-            title: "Define Your Modern Aesthetic",
-            subtitle: "SEASON 2024 COLLECTION",
-            btn_text: "Shop Now",
+            title: INTERACTIVE_HERO_TEXT.DEFAULT_TITLE,
+            subtitle: INTERACTIVE_HERO_TEXT.DEFAULT_SUBTITLE,
+            btn_text: INTERACTIVE_HERO_TEXT.SHOP_NOW,
             btn_link: "/store",
-            layout: "center-overlay" as const,
-            bg_style: "gradient" as const,
+            layout: HeroLayout.CENTER_OVERLAY,
+            bg_style: HeroBgStyle.GRADIENT,
           },
         ];
 
@@ -114,12 +143,18 @@ export function InteractiveHero({
   const { bg: bgColor, solidBg } = useImageColors(activeSlideImage);
 
   // Background style selection
-  const isGradient = (currentSlide?.bg_style || "gradient") === "gradient";
-  const finalBg = isGradient ? bgColor : solidBg;
+  const bgStyleValue = currentSlide?.bg_style || HeroBgStyle.GRADIENT;
+  const isCustomBg = bgStyleValue === "custom";
+  const isGradient = bgStyleValue === HeroBgStyle.GRADIENT;
+  const finalBg = isCustomBg
+    ? (currentSlide?.bg_color || solidBg)
+    : isGradient
+    ? bgColor
+    : solidBg;
 
   // Layout selection
-  const layoutStyle = currentSlide?.layout || "center-overlay";
-  const isOverlay = layoutStyle === "center-overlay";
+  const layoutStyle = currentSlide?.layout || HeroLayout.CENTER_OVERLAY;
+  const isOverlay = layoutStyle === HeroLayout.CENTER_OVERLAY;
 
   // Text color contrast check
   const textColor = isOverlay ? "#ffffff" : getTextColorForBg(solidBg);
@@ -130,8 +165,14 @@ export function InteractiveHero({
       ? "bg-white text-black hover:bg-slate-100"
       : "bg-slate-900 text-white hover:bg-slate-800";
 
+  const eyebrow = video_eyebrow || VIDEO_HERO_DEFAULT.eyebrow;
+  const title = video_title || VIDEO_HERO_DEFAULT.title;
+  const desc = video_desc || VIDEO_HERO_DEFAULT.desc;
+  const btnText = video_btn_text || VIDEO_HERO_DEFAULT.btn_text;
+  const btnLink = video_btn_link || VIDEO_HERO_DEFAULT.btn_link;
+
   // Video render helper
-  if (banner_type === "video" && video_url) {
+  if (displayBannerType === HeroBannerType.VIDEO && video_url) {
     return (
       <section className="relative w-full h-[65vh] lg:h-[75vh] min-h-[450px] bg-slate-950 overflow-hidden">
         {/* Background Video */}
@@ -143,9 +184,6 @@ export function InteractiveHero({
           muted={isMuted}
           playsInline
           className="absolute inset-0 w-full h-full object-cover opacity-80"
-          onError={(e) => {
-            console.error("Video loading failed, falling back to image");
-          }}
         />
 
         {/* Video Overlay Layer */}
@@ -177,21 +215,28 @@ export function InteractiveHero({
         <div className="absolute inset-0 flex items-center z-10">
           <div className="max-w-screen-xl mx-auto px-6 lg:px-16 xl:px-24 w-full">
             <div className="max-w-2xl text-white">
-              <span className="inline-block text-[10px] font-bold tracking-[0.25em] text-blue-400 uppercase bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full mb-6">
-                Active Feature
-              </span>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif tracking-tight leading-[1.1] mb-6">
-                The Future of Aesthetic Design
-              </h1>
-              <p className="text-base sm:text-lg text-white/80 font-light leading-relaxed mb-8 max-w-lg">
-                Explore an immersive shopping experience defined by curation,
-                precision, and state-of-the-art layout customization.
-              </p>
-              <Link href="/store">
-                <button className="bg-white text-black hover:bg-slate-100 transition-all duration-300 px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-bold rounded-xl shadow-lg hover:shadow-white/10 hover:-translate-y-0.5">
-                  Explore Collection
-                </button>
-              </Link>
+              {eyebrow && (
+                <span className="inline-block text-[10px] font-bold tracking-[0.25em] text-blue-400 uppercase bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full mb-6">
+                  {eyebrow}
+                </span>
+              )}
+              {title && (
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif tracking-tight leading-[1.1] mb-6">
+                  {title}
+                </h1>
+              )}
+              {desc && (
+                <p className="text-base sm:text-lg text-white/80 font-light leading-relaxed mb-8 max-w-lg">
+                  {desc}
+                </p>
+              )}
+              {btnText && (
+                <Link href={btnLink || "/store"}>
+                  <button className="bg-white text-black hover:bg-slate-100 transition-all duration-300 px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-bold rounded-xl shadow-lg hover:shadow-white/10 hover:-translate-y-0.5">
+                    {btnText}
+                  </button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -253,7 +298,7 @@ export function InteractiveHero({
                         transition={{ delay: 0.3, duration: 0.6 }}
                         className="text-3xl sm:text-5xl lg:text-6xl font-serif tracking-tight leading-[1.1] mb-6"
                       >
-                        {currentSlide.title || "Modern Collection"}
+                        {currentSlide.title || INTERACTIVE_HERO_TEXT.DEFAULT_TITLE}
                       </motion.h1>
 
                       {currentSlide.btn_text && (
@@ -281,7 +326,7 @@ export function InteractiveHero({
                 {/* Text content container */}
                 <div
                   className={`w-full lg:w-1/2 flex items-center px-6 lg:px-16 xl:px-24 py-8 lg:py-0 ${
-                    layoutStyle === "left-content-right-image"
+                    layoutStyle === HeroLayout.LEFT_CONTENT_RIGHT_IMAGE
                       ? "order-2 lg:order-1"
                       : "order-2"
                   }`}
@@ -308,7 +353,7 @@ export function InteractiveHero({
                       transition={{ delay: 0.3, duration: 0.6 }}
                       className="text-4xl sm:text-5xl lg:text-5xl font-serif tracking-tight leading-[1.15] mb-6"
                     >
-                      {currentSlide.title || "Modern Collection"}
+                      {currentSlide.title || INTERACTIVE_HERO_TEXT.DEFAULT_TITLE}
                     </motion.h1>
 
                     {currentSlide.btn_text && (
@@ -332,7 +377,7 @@ export function InteractiveHero({
                 {/* Image container */}
                 <div
                   className={`w-full lg:w-1/2 h-[35vh] lg:h-full relative ${
-                    layoutStyle === "left-content-right-image"
+                    layoutStyle === HeroLayout.LEFT_CONTENT_RIGHT_IMAGE
                       ? "order-1 lg:order-2"
                       : "order-1"
                   }`}

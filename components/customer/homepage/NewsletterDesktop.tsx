@@ -2,7 +2,10 @@
 import { Star } from "lucide-react";
 import { useState } from "react";
 
-export function NewsletterDesktop({ getField }: { getField: (k: string) => string }) {
+import { NEWSLETTER_DEFAULT } from "@/constants/storefront";
+import { NEWSLETTER_TEXT } from "@/constants/customerText";
+
+export function NewsletterDesktop({ getField }: { getField: (k: string) => any }) {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
 
@@ -15,16 +18,22 @@ export function NewsletterDesktop({ getField }: { getField: (k: string) => strin
     }
   };
 
+  const eyebrow = getField("newsletter_eyebrow") || NEWSLETTER_DEFAULT.eyebrow;
+  const successText = getField("newsletter_success_text") || NEWSLETTER_DEFAULT.success_text;
+  const disclaimer = getField("newsletter_disclaimer") || NEWSLETTER_DEFAULT.disclaimer;
+
   return (
     <section className="newsletter_desktop bg-[#0a0b0f] text-white py-24 px-6 lg:px-16 xl:px-24">
       <div className="max-w-screen-xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-4">
-              Stay Connected
-            </p>
+            {eyebrow && (
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-4">
+                {eyebrow}
+              </p>
+            )}
             <h2 className="text-4xl font-serif tracking-tight leading-tight mb-4">
-              {getField("newsletter_title")}
+              {getField("newsletter_title") || NEWSLETTER_TEXT.SUBSCRIBE}
             </h2>
             <p className="text-sm text-gray-400 font-light leading-relaxed max-w-md">
               {getField("newsletter_desc")}
@@ -37,7 +46,7 @@ export function NewsletterDesktop({ getField }: { getField: (k: string) => strin
                   <Star size={20} className="text-emerald-400" />
                 </div>
                 <p className="font-semibold text-white">
-                  You're in. Welcome to the inner circle.
+                  {successText}
                 </p>
               </div>
             ) : (
@@ -46,7 +55,7 @@ export function NewsletterDesktop({ getField }: { getField: (k: string) => strin
                   <input
                     type="email"
                     required
-                    placeholder="Enter your email address"
+                    placeholder={NEWSLETTER_TEXT.PLACEHOLDER}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/30 transition-colors"
@@ -55,13 +64,14 @@ export function NewsletterDesktop({ getField }: { getField: (k: string) => strin
                     type="submit"
                     className="bg-white text-black hover:bg-gray-100 transition-colors px-6 py-3.5 text-[11px] font-bold uppercase tracking-widest rounded-xl whitespace-nowrap"
                   >
-                    {getField("newsletter_btn_text") || "Subscribe"}
+                    {getField("newsletter_btn_text") || NEWSLETTER_TEXT.SUBSCRIBE}
                   </button>
                 </div>
-                <p className="text-[11px] text-white/25">
-                  By subscribing you agree to our Terms of Use and Privacy
-                  Policy.
-                </p>
+                {disclaimer && (
+                  <p className="text-[11px] text-white/25">
+                    {disclaimer}
+                  </p>
+                )}
               </form>
             )}
           </div>

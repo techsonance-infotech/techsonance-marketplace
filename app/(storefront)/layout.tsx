@@ -44,8 +44,6 @@ export default async function ShopLayout({
   children: React.ReactNode;
 }) {
   const companyDomain = await getCompanyDomain();
-  console.log("company domain in shop layout", companyDomain);
-
   let themeData: any = {};
   try {
     const res = await fetch(`${BASE_API_URL}/v1/company-identity/branding`, {
@@ -55,9 +53,8 @@ export default async function ShopLayout({
       next: { revalidate: 60 },
     });
     if (res.ok) {
-        const result = await res.json();
-        console.log("Branding data fetched for storefront theme:", result);
-      const branding = result?.data ;
+      const result = await res.json();
+      const branding = result?.data;
       if (branding && typeof branding === "object") {
         let homepageLayout = branding.homepage_layout;
         if (typeof homepageLayout === "string") {
@@ -75,9 +72,7 @@ export default async function ShopLayout({
         };
       }
     }
-  } catch (err) {
-    console.error("Failed to pre-fetch storefront theme on server:", err);
-  }
+  } catch (err) {}
 
   return (
     <ThemeProvider theme={themeData}>

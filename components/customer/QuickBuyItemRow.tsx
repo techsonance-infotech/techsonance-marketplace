@@ -1,8 +1,9 @@
-﻿'use client';
+"use client";
 import { motion } from "motion/react";
 import { formatCurrency } from "@/lib/utils";
 import { Minus, Plus } from "lucide-react";
 import { VariantDetails } from "@/utils/Types";
+import { QUICK_BUY_ITEM_ROW_TEXT } from "@/constants/customerText";
 
 export function QuickBuyItemRow({
   variant,
@@ -15,9 +16,6 @@ export function QuickBuyItemRow({
 }) {
   const subtotal = Number(variant.price) * qty;
   const maxStock = variant.stock_quantity ?? 99;
-
-  console.log("  variant details in quick buy row", variant);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -29,9 +27,9 @@ export function QuickBuyItemRow({
       <div className="shrink-0 w-[52px] h-[52px] rounded-xl overflow-hidden bg-white border border-gray-100 shadow-sm">
         <img
           src={
-            typeof variant.images === 'string' && variant.images
+            typeof variant.images === "string" && variant.images
               ? variant.images
-              : 'https://imgs.search.brave.com/pnBIeHCYZeyfGKnruwbCQdsNxNOBpZP893nGmlSNntk/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9wbGFj/ZWhvbGQubmV0L3By/b2R1Y3QtZGlhbG9n/LnBuZw'
+              : "https://imgs.search.brave.com/pnBIeHCYZeyfGKnruwbCQdsNxNOBpZP893nGmlSNntk/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9wbGFj/ZWhvbGQubmV0L3By/b2R1Y3QtZGlhbG9n/LnBuZw"
           }
           alt={variant.variant_name}
           className="w-full h-full object-cover"
@@ -44,7 +42,7 @@ export function QuickBuyItemRow({
           {variant.variant_name}
         </p>
         <p className="text-xs text-blue-600 font-bold mt-0.5">
-          ₹{formatCurrency(Number(variant.price))} each
+          ₹{formatCurrency(Number(variant.price))} {QUICK_BUY_ITEM_ROW_TEXT.EACH}
         </p>
       </div>
 
@@ -81,7 +79,7 @@ export function QuickBuyItemRow({
         </p>
 
         {qty >= maxStock && (
-          <p className="text-[9px] text-amber-500 font-medium">Max stock</p>
+          <p className="text-[9px] text-amber-500 font-medium">{QUICK_BUY_ITEM_ROW_TEXT.MAX_STOCK}</p>
         )}
       </div>
     </motion.div>

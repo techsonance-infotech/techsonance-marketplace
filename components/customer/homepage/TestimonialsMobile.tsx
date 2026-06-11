@@ -1,14 +1,20 @@
 import { Star } from "lucide-react";
-import { TESTIMONIALS } from "./TestimonialsDesktop";
+import { TESTIMONIALS_DEFAULT } from "@/constants/storefront";
+import { TESTIMONIALS_TEXT } from "@/constants/customerText";
 
-export function TestimonialsMobile() {
+export function TestimonialsMobile({ getField }: { getField: (k: string) => any }) {
+  const cmsTestimonials = getField ? getField("social_proof_testimonials") : null;
+  const testimonials = Array.isArray(cmsTestimonials) && cmsTestimonials.length > 0 ? cmsTestimonials : TESTIMONIALS_DEFAULT;
+
+  const title = (getField && getField("social_proof_title")) || TESTIMONIALS_TEXT.WHAT_CUSTOMERS_SAY_MOBILE;
+
   return (
     <section className=" testimonials_mobile py-8 px-4">
       <h2 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-5">
-        What Customers Say
+        {title}
       </h2>
       <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none snap-x">
-        {TESTIMONIALS.map((t, i) => (
+        {testimonials.map((t: any, i: number) => (
           <div
             key={i}
             className="min-w-[280px] snap-center bg-white border border-gray-200 rounded-2xl p-5 shadow-sm"
@@ -28,7 +34,7 @@ export function TestimonialsMobile() {
             </p>
             <p className="text-[12px] font-bold text-gray-900">
               {t.name} ·{" "}
-              <span className="font-normal text-gray-400">{t.location}</span>
+              <span className="font-normal text-gray-400">{t.location || t.role}</span>
             </p>
           </div>
         ))}

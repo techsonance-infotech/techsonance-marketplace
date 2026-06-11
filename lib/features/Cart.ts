@@ -27,15 +27,11 @@ const saveCartToLocalStorage = (
   items: CartItem[],
   itemList: CartItemListResponse[],
 ) => {
-  console.log("[cart] save cart to localStorage", cartId, items, itemList);
   if (!isClient) return;
   try {
     localStorage.setItem(CART_KEY, JSON.stringify({ cartId, items, itemList }));
-    console.log("[cart] save cart to localStorage", cartId, items, itemList);
     const savedCart = localStorage.getItem(CART_KEY);
-    console.log("[cart] verify saved cart:", savedCart);
   } catch (e) {
-    console.error("Could not save cart to localStorage", e);
   }
 };
 
@@ -52,23 +48,14 @@ const loadCartFromLocalOrServer = async (): Promise<
     if (isCustomer?.role === "admin" || isCustomer?.role === "vendor") {
       return { cartId: "", items: [], itemList: [] };
     }
-    const serializedCart = localStorage.getItem(CART_KEY);
-    console.log(
-      "[cart] loadCart - serializedCart from localStorage:",
-      serializedCart,
-    );
+    const serializedCart: string | null = localStorage.getItem(CART_KEY);
+
     let customerId = localStorage.getItem(USER_STORAGE_KEY);
     if (customerId && customerId !== "undefined" && customerId !== "null") {
       customerId = JSON.parse(
         localStorage.getItem(USER_STORAGE_KEY) as string,
       )?.id;
     }
-    console.log(
-      "[cart] loadCart - customerId:",
-      customerId,
-      "navigator.onLine:",
-      typeof window !== "undefined" ? navigator.onLine : "N/A",
-    );
 
     // 1. If logged in and online, merge local offline cart updates to server
     if (
@@ -79,15 +66,9 @@ const loadCartFromLocalOrServer = async (): Promise<
       navigator.onLine
     ) {
       try {
-        console.log(
-          "[cart] loadCart - logged in & online, fetching server cart for customerId:",
-          customerId,
-        );
-
         // Get current server cart items
         let dbItems: any[] = [];
         const dbCartResponse = await fetchGetCartList(customerId, token);
-        console.log("[cart] loadCart - dbCartResponse:", dbCartResponse);
         if (
           dbCartResponse &&
           dbCartResponse.success &&
@@ -95,8 +76,6 @@ const loadCartFromLocalOrServer = async (): Promise<
         ) {
           dbItems = dbCartResponse.data;
         }
-        console.log("[cart] loadCart - dbItems from server:", dbItems);
-
         // Get local items
         let localItems: CartItem[] = [];
         if (serializedCart) {
@@ -105,28 +84,15 @@ const loadCartFromLocalOrServer = async (): Promise<
             localItems = parsedCart.items;
           }
         }
-        console.log(
-          "[cart] loadCart - localItems from localStorage:",
-          localItems,
-        );
 
         // Sync local changes to server (if any)
         if (localItems.length > 0) {
-          console.log(
-            "[cart] loadCart - localItems.length > 0, merging to server...",
-          );
           const syncPromises = localItems.map(async (localItem) => {
             const dbMatch = dbItems.find(
               (item: any) =>
                 item.product_variant_id === localItem.productVariantId,
             );
             if (!dbMatch || dbMatch.quantity !== localItem.quantity) {
-              console.log(
-                "[cart] loadCart - syncing local item:",
-                localItem.productVariantId,
-                "quantity:",
-                localItem.quantity,
-              );
               await fetchAddToCart(
                 localItem.productVariantId,
                 localItem.quantity,
@@ -139,10 +105,6 @@ const loadCartFromLocalOrServer = async (): Promise<
 
           // Re-fetch final server cart
           const updatedDbResponse = await fetchGetCartList(customerId, token);
-          console.log(
-            "[cart] loadCart - updatedDbResponse:",
-            updatedDbResponse,
-          );
           if (
             updatedDbResponse &&
             updatedDbResponse.success &&
@@ -150,7 +112,6 @@ const loadCartFromLocalOrServer = async (): Promise<
           ) {
             dbItems = updatedDbResponse.data;
           }
-          console.log("[cart] loadCart - final synced dbItems:", dbItems);
         }
 
         if (dbItems.length > 0) {
@@ -162,123 +123,97 @@ const loadCartFromLocalOrServer = async (): Promise<
             productVariantId: item.product_variant_id,
           }));
           const cartId = itemList[0]?.cart_id ?? "";
-          console.log(
-            "[cart] loadCart - returning populated server cart and saving local:",
-            items,
-          );
           saveCartToLocalStorage(cartId, items, itemList);
           return { cartId, items, itemList };
         } else {
-          console.log(
-            "[cart] loadCart - server cart empty, clearing local storage",
-          );
           saveCartToLocalStorage("", [], []);
           return { cartId: "", items: [], itemList: [] };
         }
       } catch (serverError) {
-        console.error(
-          "[cart] Failed to sync/fetch cart from server, trying local fallback:",
-          serverError,
-        );
       }
     }
 
-    // 2. Fallback: load from local storage
-    console.log("[cart] loadCart - falling back to local storage load");
-    if (serializedCart) {
-      const parsedCart = JSON.parse(serializedCart);
-      if (parsedCart && Array.isArray(parsedCart.items)) {
-        const items: CartItem[] = parsedCart.items;
-        let itemList: CartItemListResponse[] = parsedCart.itemList || [];
-        console.log(
-          "[cart] loadCart - local fallback loaded items:",
-          items,
-          "itemList:",
-          itemList,
-        );
+    // 2. Fallback: load from local storage    if (serializedCart) {
+    const parsedCart = JSON.parse(serializedCart ?? "{}");
+    if (parsedCart && Array.isArray(parsedCart.items)) {
+      const items: CartItem[] = parsedCart.items;
+      let itemList: CartItemListResponse[] = parsedCart.itemList || [];
 
-        // Fetch details if missing and we are online
-        if (
-          items.length > 0 &&
-          itemList.length === 0 &&
-          typeof window !== "undefined" &&
-          navigator.onLine
-        ) {
-          try {
-            const detailsPromises = items.map(async (item) => {
-              const res = await fetchProductVariantDetails(
-                item.productVariantId,
-              );
-              if (res && res.success && res.data) {
-                const variantData = res.data;
+      // Fetch details if missing and we are online
+      if (
+        items.length > 0 &&
+        itemList.length === 0 &&
+        typeof window !== "undefined" &&
+        navigator.onLine
+      ) {
+        try {
+          const detailsPromises = items.map(async (item) => {
+            const res = await fetchProductVariantDetails(item.productVariantId);
+            if (res && res.success && res.data) {
+              const variantData = res.data;
 
-                // Map VariantDetails to Variant shape
-                let imagesArray: any[] = [];
-                if (Array.isArray(variantData.images)) {
-                  imagesArray = variantData.images.map(
-                    (img: any, idx: number) => ({
-                      id: img.id || String(idx),
-                      image_url: img.image_url || img.imageUrl,
-                      alt_text: img.alt_text || variantData.variant_name,
-                      is_primary: img.is_primary || idx === 0,
-                      imgType: img.imgType || "main",
-                    }),
-                  );
-                } else if (typeof variantData.images === "string") {
-                  imagesArray = [
-                    {
-                      id: "primary",
-                      image_url: variantData.images,
-                      alt_text: variantData.variant_name,
-                      is_primary: true,
-                      imgType: "main",
-                    },
-                  ];
-                }
-
-                const transformedVariant: Variant = {
-                  id: variantData.id,
-                  variant_name: variantData.variant_name,
-                  sku: variantData.sku,
-                  price: variantData.price,
-                  status: variantData.status,
-                  product_id: variantData.product_id || "",
-                  images: imagesArray,
-                  attributes: [],
-                  stock_quantity: variantData.stock_quantity ?? 9999,
-                  created_at: "",
-                  updated_at: "",
-                  seo_meta: null,
-                  inventory: {
-                    stock_quantity: variantData.stock_quantity ?? 9999,
-                    warehouse_id: "",
+              // Map VariantDetails to Variant shape
+              let imagesArray: any[] = [];
+              if (Array.isArray(variantData.images)) {
+                imagesArray = variantData.images.map(
+                  (img: any, idx: number) => ({
+                    id: img.id || String(idx),
+                    image_url: img.image_url || img.imageUrl,
+                    alt_text: img.alt_text || variantData.variant_name,
+                    is_primary: img.is_primary || idx === 0,
+                    imgType: img.imgType || "main",
+                  }),
+                );
+              } else if (typeof variantData.images === "string") {
+                imagesArray = [
+                  {
+                    id: "primary",
+                    image_url: variantData.images,
+                    alt_text: variantData.variant_name,
+                    is_primary: true,
+                    imgType: "main",
                   },
-                } as any;
-
-                itemList.push({
-                  id: item.productVariantId,
-                  cart_id: "",
-                  product_variant_id: item.productVariantId,
-                  quantity: item.quantity,
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString(),
-                  productVariant: transformedVariant,
-                });
+                ];
               }
-            });
-            await Promise.all(detailsPromises);
-            saveCartToLocalStorage(parsedCart.cartId || "", items, itemList);
-          } catch (err) {
-            console.error("Error fetching guest variant details:", err);
-          }
-        }
 
-        return { cartId: parsedCart.cartId || "", items, itemList };
+              const transformedVariant: Variant = {
+                id: variantData.id,
+                variant_name: variantData.variant_name,
+                sku: variantData.sku,
+                price: variantData.price,
+                status: variantData.status,
+                product_id: variantData.product_id || "",
+                images: imagesArray,
+                attributes: [],
+                stock_quantity: variantData.stock_quantity ?? 9999,
+                created_at: "",
+                updated_at: "",
+                seo_meta: null,
+                inventory: {
+                  stock_quantity: variantData.stock_quantity ?? 9999,
+                  warehouse_id: "",
+                },
+              } as any;
+
+              itemList.push({
+                id: item.productVariantId,
+                cart_id: "",
+                product_variant_id: item.productVariantId,
+                quantity: item.quantity,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                productVariant: transformedVariant,
+              });
+            }
+          });
+          await Promise.all(detailsPromises);
+          saveCartToLocalStorage(parsedCart.cartId || "", items, itemList);
+        } catch (err) {}
       }
+
+      return { cartId: parsedCart.cartId || "", items, itemList };
     }
-  } catch (e) {
-    console.error("Could not load cart from localStorage or server", e);
-  }
+  } catch (e) {}
 
   return { cartId: "", items: [], itemList: [] };
 };
@@ -353,7 +288,6 @@ export const syncCartAfterLogin = createAsyncThunk(
       // 4. Reload the cart state from database
       dispatch(loadCart());
     } catch (error) {
-      console.error("Error during cart sync after login:", error);
     }
   },
 );
@@ -374,16 +308,13 @@ const CartSlice = createSlice({
       state,
       action: { payload: CartItem & { productVariant?: Variant } },
     ) => {
-      console.log("[cart] addToCart", action.payload);
       if (!state.cartId && action.payload.cartId) {
-        console.log("[cart] setting cartId", action.payload.cartId);
         state.cartId = action.payload.cartId;
       }
       const existingItem = state.items.find(
         (item) => item.productVariantId === action.payload.productVariantId,
       );
       if (existingItem) {
-        console.log("[cart] existing item", current(existingItem));
         existingItem.quantity =
           action.payload.quantity ?? existingItem.quantity + 1;
       } else {
@@ -413,12 +344,6 @@ const CartSlice = createSlice({
           productVariant: action.payload.productVariant,
         });
       }
-      console.log(
-        "[cart] after add to cart",
-        state.cartId,
-        current(state.items),
-        current(state.itemList),
-      );
       saveCartToLocalStorage(
         state.cartId,
         current(state.items),
@@ -507,7 +432,7 @@ const CartSlice = createSlice({
         state.loading = false;
         state.error = action.error.message ?? "Failed to load cart";
       })
-      .addCase('auth/logOut', (state) => {
+      .addCase("auth/logOut", (state) => {
         state.items = [];
         state.itemList = [];
         state.cartId = "";
