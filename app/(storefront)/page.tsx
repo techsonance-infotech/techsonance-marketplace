@@ -49,6 +49,58 @@ function Sk({
   );
 }
 
+function PageLoader() {
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm">
+      {/* Animated logo rings */}
+      <div className="relative flex items-center justify-center mb-8">
+        <span
+          className="absolute w-24 h-24 rounded-full border-2 border-theme-primary/20 animate-ping"
+          style={{ animationDuration: "2s" }}
+        />
+        <span
+          className="absolute w-16 h-16 rounded-full border-2 border-theme-primary/30 animate-ping"
+          style={{ animationDuration: "1.5s", animationDelay: "0.3s" }}
+        />
+        <span className="w-12 h-12 rounded-full bg-gradient-to-br from-theme-primary/80 to-theme-primary flex items-center justify-center shadow-lg shadow-theme-primary/20">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 01-8 0" />
+          </svg>
+        </span>
+      </div>
+
+      {/* Pulse dots */}
+      <div className="flex gap-2 mb-5">
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className="w-2 h-2 rounded-full bg-theme-primary/60"
+            style={{
+              animation: "pulse 1.2s ease-in-out infinite",
+              animationDelay: `${i * 0.2}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <p className="text-sm font-medium text-gray-400 tracking-widest uppercase">
+        Loading experience…
+      </p>
+    </div>
+  );
+}
+
 export default function Home() {
   const { getField, banners, categories, heroSlides, isLoading } =
     useHomepageData();
@@ -66,6 +118,8 @@ export default function Home() {
   const [products, setProducts] = useState<any[]>([]);
   const [newArrivals, setNewArrivals] = useState<any[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
+
+  const isPageLoading = isLoading && productsLoading;
 
   useEffect(() => {
     AxiosAPI.get("/v1/products/homepage?limit=8")
@@ -90,7 +144,9 @@ export default function Home() {
               <div className="w-full h-[60vh] bg-gray-100 animate-pulse" />
             ) : (
               <InteractiveHero
-                banner_type={getField(CmsDataKey.HERO_BANNER_TYPE) || "carousel"}
+                banner_type={
+                  getField(CmsDataKey.HERO_BANNER_TYPE) || "carousel"
+                }
                 video_url={getField(CmsDataKey.HERO_VIDEO_URL)}
                 video_eyebrow={getField(CmsDataKey.HERO_VIDEO_EYEBROW)}
                 video_title={getField(CmsDataKey.HERO_VIDEO_TITLE)}
@@ -132,13 +188,13 @@ export default function Home() {
         return (
           <ScarcityBlock
             key={LayoutSection.SCARCITY}
-            timer_title={getStoreField(CmsDataKey.PROMO_TIMER_TITLE)}
-            expires_at={getStoreField(CmsDataKey.PROMO_EXPIRES_AT)}
-            alert_text={getStoreField(CmsDataKey.PROMO_ALERT_TEXT)}
-            alert_bg={getStoreField(CmsDataKey.PROMO_ALERT_BG)}
-            alert_text_color={getStoreField(CmsDataKey.PROMO_ALERT_TEXT_COLOR)}
-            btn_text={getStoreField(CmsDataKey.PROMO_BTN_TEXT)}
-            btn_link={getStoreField(CmsDataKey.PROMO_BTN_LINK)}
+            timer_title={getField(CmsDataKey.SCARCITY_TIMER_TITLE)}
+            expires_at={getField(CmsDataKey.SCARCITY_EXPIRES_AT)}
+            alert_text={getField(CmsDataKey.SCARCITY_ALERT_TEXT)}
+            alert_bg={getField(CmsDataKey.SCARCITY_ALERT_BG)}
+            alert_text_color={getField(CmsDataKey.SCARCITY_ALERT_TEXT_COLOR)}
+            btn_text={getField(CmsDataKey.SCARCITY_BTN_TEXT)}
+            btn_link={getField(CmsDataKey.SCARCITY_BTN_LINK)}
           />
         );
 
@@ -260,11 +316,19 @@ export default function Home() {
             className="w-full h-[600px] bg-gray-100 animate-pulse mx-6 lg:mx-16 xl:mx-24 rounded-2xl my-20"
           />
         ) : (
-          <NewArrivalsDesktop key={LayoutSection.NEW_ARRIVALS} getField={getField} />
+          <NewArrivalsDesktop
+            key={LayoutSection.NEW_ARRIVALS}
+            getField={getField}
+          />
         );
 
       case LayoutSection.NEWSLETTER:
-        return <NewsletterDesktop key={LayoutSection.NEWSLETTER} getField={getField} />;
+        return (
+          <NewsletterDesktop
+            key={LayoutSection.NEWSLETTER}
+            getField={getField}
+          />
+        );
 
       default:
         return null;
@@ -276,12 +340,14 @@ export default function Home() {
     switch (key) {
       case LayoutSection.HERO:
         return (
-          <div key={`m-${LayoutSection.HERO}`} className="h-[52vh]">
+          <div key={`m-${LayoutSection.HERO}`}>
             {isLoading ? (
-              <div className="w-full h-full bg-gray-100 animate-pulse" />
+              <div className="w-full h-[65vh] bg-gray-100 animate-pulse" />
             ) : (
               <InteractiveHero
-                banner_type={getField(CmsDataKey.HERO_BANNER_TYPE) || "carousel"}
+                banner_type={
+                  getField(CmsDataKey.HERO_BANNER_TYPE) || "carousel"
+                }
                 video_url={getField(CmsDataKey.HERO_VIDEO_URL)}
                 video_eyebrow={getField(CmsDataKey.HERO_VIDEO_EYEBROW)}
                 video_title={getField(CmsDataKey.HERO_VIDEO_TITLE)}
@@ -300,6 +366,7 @@ export default function Home() {
                       : "/store"),
                   layout: slide.layout || HeroLayout.CENTER_OVERLAY,
                   bg_style: slide.bg_style || HeroBgStyle.GRADIENT,
+                  bg_color: slide.bg_color || "",
                 }))}
               />
             )}
@@ -358,7 +425,10 @@ export default function Home() {
       case LayoutSection.CATEGORIES:
         if (!isLoading && categories.length === 0) return null;
         return (
-          <section key={`m-${LayoutSection.CATEGORIES}`} className="mt-[14vh] pb-4 px-4">
+          <section
+            key={`m-${LayoutSection.CATEGORIES}`}
+            className="pt-5 pb-4 px-4 bg-background"
+          >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-[13px] font-bold text-gray-900 uppercase tracking-widest">
                 Explore
@@ -370,10 +440,22 @@ export default function Home() {
                 View All <ChevronRight size={12} />
               </Link>
             </div>
-            <div className="flex gap-4 overflow-x-auto scrollbar-none pb-1">
-              {categories.slice(0, 8).map((cat, idx) => (
-                <MobileCategoryPill key={idx} cat={cat} />
-              ))}
+            <div className="flex gap-4 overflow-x-auto scrollbar-none pb-2 snap-x snap-mandatory">
+              {isLoading
+                ? Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col items-center gap-2 shrink-0 snap-start"
+                    >
+                      <div className="w-14 h-14 rounded-full bg-gray-100 animate-pulse" />
+                      <div className="w-12 h-2.5 rounded bg-gray-100 animate-pulse" />
+                    </div>
+                  ))
+                : categories.slice(0, 8).map((cat, idx) => (
+                    <div key={idx} className="snap-start">
+                      <MobileCategoryPill cat={cat} />
+                    </div>
+                  ))}
             </div>
           </section>
         );
@@ -381,7 +463,10 @@ export default function Home() {
       case LayoutSection.PRODUCTS:
         if (!productsLoading && products.length === 0) return null;
         return (
-          <section key={`m-${LayoutSection.PRODUCTS}`} className="py-6 px-4 bg-[#faf9f6]">
+          <section
+            key={`m-${LayoutSection.PRODUCTS}`}
+            className="py-6 px-4 bg-[#faf9f6]"
+          >
             <div className="flex justify-between items-center mb-5">
               <h2 className="text-[13px] font-bold text-gray-900 uppercase tracking-widest">
                 Featured
@@ -436,7 +521,10 @@ export default function Home() {
       case LayoutSection.NEW_ARRIVALS:
         if (!productsLoading && newArrivals.length === 0) return null;
         return (
-          <section key={`m-${LayoutSection.NEW_ARRIVALS}`} className="py-6 px-4">
+          <section
+            key={`m-${LayoutSection.NEW_ARRIVALS}`}
+            className="py-6 px-4"
+          >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-[13px] font-bold text-gray-900 uppercase tracking-widest">
                 New Arrivals
@@ -474,6 +562,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans antialiased overflow-x-hidden">
+      {/* Full-page loader */}
+      {isPageLoading && <PageLoader />}
+
       {/* ── DESKTOP ─────────────────────────────────────────────────────────── */}
       <div className="hidden lg:block">
         {layout.map((key) => renderDesktop(key))}
@@ -497,7 +588,6 @@ export default function Home() {
             <TestimonialsMobile getField={getField} />
           </>
         )}
-        <div className="h-20" />
       </div>
     </div>
   );

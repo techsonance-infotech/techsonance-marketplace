@@ -12,7 +12,7 @@ import {
   CustomerRegisterSchemaType,
 } from "@/utils/validation";
 import { getCompanyDomain } from "@/lib/get-domain";
-import { BASE_API_URL, AUTH_TEXT } from "@/constants";
+import { BASE_API_URL, AUTH_TEXT, ENV_DEVELOPMENT } from "@/constants";
 
 export default function CustomerRegisterPage() {
   const router = useRouter();
@@ -41,7 +41,7 @@ export default function CustomerRegisterPage() {
   // Debug errors in development
   useEffect(() => {
     if (
-      process.env.NODE_ENV === "development" &&
+      process.env.NODE_ENV === ENV_DEVELOPMENT &&
       Object.keys(errors).length > 0
     ) {
     }
@@ -58,9 +58,7 @@ export default function CustomerRegisterPage() {
       if (response?.status === 201) {
         router.push("/auth/customerLogin?registered=true");
       } else {
-        setServerError(
-          response?.message || AUTH_TEXT.REGISTER.FAIL_GENERIC,
-        );
+        setServerError(response?.message || AUTH_TEXT.REGISTER.FAIL_GENERIC);
       }
     } catch (err: any) {
       setServerError(err.message || AUTH_TEXT.REGISTER.FAIL_SERVER);

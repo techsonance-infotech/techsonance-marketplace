@@ -23,9 +23,10 @@ export function ProductCard({ product, idx }: { product: Product; idx: number })
 
     return (
         <motion.li
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.03, duration: 0.25 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ delay: idx * 0.06, duration: 0.35, ease: "easeOut" }}
             className={`group flex flex-col cursor-pointer overflow-hidden transition-all duration-300 relative h-full rounded-[var(--radius)] ${cardCls} shadow`}
         >
             <div 
