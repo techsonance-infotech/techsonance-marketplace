@@ -1,0 +1,1064 @@
+'use client';
+export const dynamic = 'force-dynamic';
+import { useEffect, Suspense, useReducer, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { calculateCouponDiscount, formatCurrency, getMinOrderAmount } from "@/lib/utils";
+import { SelectedPaymentMethod } from "@/components/customer/SelectedPaymentMethod";
+import { PAYMENT_METHODS_FIELDS } from "@/constants";
+import { checkAddressExistence, fetchGetCartList } from "@/utils/customerApiClient";
+import { CreditCard, Loader2, Tag, CheckCircle2, X, AlertCircle, ShieldCheck, ChevronUp, ChevronDown } from "lucide-react";
+import { AddressSelector } from "@/components/customer/AddressSelector";
+import { fetchProductVariantDetails } from "@/utils/commonAPiClient";
+import { useCheckoutSession } from "@/hooks/UseCheckoutSession";
+import { fetchInitCheckout, fetchVerifyPayment } from "@/utils/customerApiClient-SA";
+import { authToken } from "@/utils/authToken";
+import { TaxBreakdown, TaxBreakdownPanel, TaxLoadingSkeleton } from "@/components/customer/TaxBreakdownPanel";
+import { clearCart } from "@/lib/features/Cart";
+import { AddressOperationEnum, AppliedPromotion, CartItemDisplay, VariantDetails } from "@/utils/Types";
+import AxiosAPI from "@/lib/axios";
+import { motion, AnimatePresence } from "motion/react";
+import toast, { Toaster } from "react-hot-toast";
+import { AddressModal } from "@/components/customer/AddressModel";
+import { ItemListPanel } from "@/components/customer/ItemListPanel";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export enum CheckoutActionType {
+  SET_ADDRESS_ADDED = 'SET_ADDRESS_ADDED',
+  OPEN_ADDRESS_MODAL = 'OPEN_ADDRESS_MODAL',
+  CLOSE_ADDRESS_MODAL = 'CLOSE_ADDRESS_MODAL',
+  SET_PAYMENT_METHOD = 'SET_PAYMENT_METHOD',
+  SET_PROCESSING = 'SET_PROCESSING',
+  SET_CHECKOUT_ERROR = 'SET_CHECKOUT_ERROR',
+  SET_SELECTED_ADDRESS = 'SET_SELECTED_ADDRESS',
+  LOAD_ORDER_START = 'LOAD_ORDER_START',
+  LOAD_ORDER_SUCCESS = 'LOAD_ORDER_SUCCESS',
+  LOAD_QUICK_BUY_SUCCESS = 'LOAD_QUICK_BUY_SUCCESS',
+  LOAD_ORDER_ERROR = 'LOAD_ORDER_ERROR',
+  SET_LOADING_ORDER = 'SET_LOADING_ORDER',
+  SET_CART_ITEMS_FOR_TAX = 'SET_CART_ITEMS_FOR_TAX',
+  SET_QUICK_BUY_QTY = 'SET_QUICK_BUY_QTY',
+  SET_COUPON_CODE = 'SET_COUPON_CODE',
+  START_COUPON_VALIDATION = 'START_COUPON_VALIDATION',
+  APPLY_COUPON = 'APPLY_COUPON',
+  SET_COUPON_ERROR = 'SET_COUPON_ERROR',
+  SET_COUPON_VALIDATING_STATE = 'SET_COUPON_VALIDATING_STATE',
+  REMOVE_COUPON = 'REMOVE_COUPON',
+  SET_TAX_LOADING = 'SET_TAX_LOADING',
+  SET_TAX_LOADING_STATE = 'SET_TAX_LOADING_STATE',
+  SET_TAX_BREAKDOWN = 'SET_TAX_BREAKDOWN',
+  SET_TAX_ERROR = 'SET_TAX_ERROR',
+}
+
+export interface CartItemForTaxPayload {
+  variantId: string;
+  quantity: number;
+  price: number;
+}
+
+interface State {
+  isAddressAdded: boolean;
+  isModalOpen: boolean;
+  modalMode: AddressOperationEnum;
+  editAddressId: string | null;
+  selectedPaymentMethodState: string;
+  isProcessing: boolean;
+  checkoutError: string | null;
+  selectedAddressId: string | null;
+  cartItems: CartItemDisplay[];
+  quickBuyVariant: VariantDetails | null;
+  quickBuyQty: number;
+  couponCode: string;
+  couponApplied: AppliedPromotion | null;
+  couponError: string | null;
+  isCouponValidating: boolean;
+  cartItemsForTax: CartItemForTaxPayload[];
+  productIds: string[];
+  isLoadingOrder: boolean;
+  taxBreakdown: TaxBreakdown | null;
+  isTaxLoading: boolean;
+  taxError: string | null;
+  lastTaxAddressId: string;
+}
+
+type Action =
+  | { type: CheckoutActionType.SET_ADDRESS_ADDED; payload: boolean }
+  | { type: CheckoutActionType.OPEN_ADDRESS_MODAL; payload: { mode: AddressOperationEnum; editId: string | null } }
+  | { type: CheckoutActionType.CLOSE_ADDRESS_MODAL }
+  | { type: CheckoutActionType.SET_PAYMENT_METHOD; payload: string }
+  | { type: CheckoutActionType.SET_PROCESSING; payload: boolean }
+  | { type: CheckoutActionType.SET_CHECKOUT_ERROR; payload: string | null }
+  | { type: CheckoutActionType.SET_SELECTED_ADDRESS; payload: string | null }
+  | { type: CheckoutActionType.LOAD_ORDER_START }
+  | { type: CheckoutActionType.LOAD_ORDER_SUCCESS; payload: { cartItems: CartItemDisplay[]; cartItemsForTax: CartItemForTaxPayload[]; productIds: string[] } }
+  | { type: CheckoutActionType.LOAD_QUICK_BUY_SUCCESS; payload: { variant: VariantDetails; cartItemsForTax: CartItemForTaxPayload[]; productIds: string[] } }
+  | { type: CheckoutActionType.LOAD_ORDER_ERROR; payload: string }
+  | { type: CheckoutActionType.SET_LOADING_ORDER; payload: boolean }
+  | { type: CheckoutActionType.SET_CART_ITEMS_FOR_TAX; payload: CartItemForTaxPayload[] }
+  | { type: CheckoutActionType.SET_QUICK_BUY_QTY; payload: number }
+  | { type: CheckoutActionType.SET_COUPON_CODE; payload: string }
+  | { type: CheckoutActionType.START_COUPON_VALIDATION }
+  | { type: CheckoutActionType.APPLY_COUPON; payload: AppliedPromotion }
+  | { type: CheckoutActionType.SET_COUPON_ERROR; payload: string | null }
+  | { type: CheckoutActionType.SET_COUPON_VALIDATING_STATE; payload: boolean }
+  | { type: CheckoutActionType.REMOVE_COUPON }
+  | { type: CheckoutActionType.SET_TAX_LOADING; payload: { isTaxLoading: boolean; lastTaxAddressId: string } }
+  | { type: CheckoutActionType.SET_TAX_LOADING_STATE; payload: boolean }
+  | { type: CheckoutActionType.SET_TAX_BREAKDOWN; payload: TaxBreakdown | null }
+  | { type: CheckoutActionType.SET_TAX_ERROR; payload: string | null };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case CheckoutActionType.SET_ADDRESS_ADDED:
+      return { ...state, isAddressAdded: action.payload };
+    case CheckoutActionType.OPEN_ADDRESS_MODAL:
+      return { ...state, isModalOpen: true, modalMode: action.payload.mode, editAddressId: action.payload.editId };
+    case CheckoutActionType.CLOSE_ADDRESS_MODAL:
+      return { ...state, isModalOpen: false };
+    case CheckoutActionType.SET_PAYMENT_METHOD:
+      return { ...state, selectedPaymentMethodState: action.payload };
+    case CheckoutActionType.SET_PROCESSING:
+      return { ...state, isProcessing: action.payload };
+    case CheckoutActionType.SET_CHECKOUT_ERROR:
+      return { ...state, checkoutError: action.payload };
+    case CheckoutActionType.SET_SELECTED_ADDRESS:
+      return { ...state, selectedAddressId: action.payload };
+    case CheckoutActionType.LOAD_ORDER_START:
+      return { ...state, isLoadingOrder: true, checkoutError: null };
+    case CheckoutActionType.LOAD_ORDER_SUCCESS:
+      return {
+        ...state,
+        isLoadingOrder: false,
+        cartItems: action.payload.cartItems,
+        cartItemsForTax: action.payload.cartItemsForTax,
+        productIds: action.payload.productIds,
+      };
+    case CheckoutActionType.LOAD_QUICK_BUY_SUCCESS:
+      return {
+        ...state,
+        isLoadingOrder: false,
+        quickBuyVariant: action.payload.variant,
+        cartItemsForTax: action.payload.cartItemsForTax,
+        productIds: action.payload.productIds,
+      };
+    case CheckoutActionType.LOAD_ORDER_ERROR:
+      return { ...state, isLoadingOrder: false, checkoutError: action.payload };
+    case CheckoutActionType.SET_LOADING_ORDER:
+      return { ...state, isLoadingOrder: action.payload };
+    case CheckoutActionType.SET_CART_ITEMS_FOR_TAX:
+      return { ...state, cartItemsForTax: action.payload };
+    case CheckoutActionType.SET_QUICK_BUY_QTY:
+      return { ...state, quickBuyQty: action.payload };
+    case CheckoutActionType.SET_COUPON_CODE:
+      return { ...state, couponCode: action.payload };
+    case CheckoutActionType.START_COUPON_VALIDATION:
+      return { ...state, isCouponValidating: true, couponError: null };
+    case CheckoutActionType.APPLY_COUPON:
+      return { ...state, isCouponValidating: false, couponApplied: action.payload, couponCode: '', couponError: null };
+    case CheckoutActionType.SET_COUPON_ERROR:
+      return { ...state, isCouponValidating: false, couponError: action.payload };
+    case CheckoutActionType.SET_COUPON_VALIDATING_STATE:
+      return { ...state, isCouponValidating: action.payload };
+    case CheckoutActionType.REMOVE_COUPON:
+      return { ...state, couponApplied: null, couponError: null, couponCode: '' };
+    case CheckoutActionType.SET_TAX_LOADING:
+      return { ...state, isTaxLoading: action.payload.isTaxLoading, lastTaxAddressId: action.payload.lastTaxAddressId, taxError: null };
+    case CheckoutActionType.SET_TAX_LOADING_STATE:
+      return { ...state, isTaxLoading: action.payload };
+    case CheckoutActionType.SET_TAX_BREAKDOWN:
+      return { ...state, taxBreakdown: action.payload };
+    case CheckoutActionType.SET_TAX_ERROR:
+      return { ...state, taxError: action.payload };
+    default:
+      return state;
+  }
+}
+
+// ─── Mobile Summary Sheet ─────────────────────────────────────────────────────
+
+function MobileSummarySheet({
+  isExpanded,
+  onToggle,
+  displayedTotal,
+  subtotal,
+  couponDiscount,
+  delivery,
+  taxBreakdown,
+  isTaxLoading,
+  taxError,
+  couponApplied,
+  couponLabel,
+  couponCode,
+  couponError,
+  isCouponValidating,
+  onCouponCodeChange,
+  onCouponApply,
+  onCouponRemove,
+  onCouponKeyDown,
+  isProcessing,
+  selectedAddressId,
+  onPay,
+  cartItems,
+  quickBuyVariant,
+  quickBuyQty,
+  isQuickBuy,
+  reduxCartItems,
+}: {
+  isExpanded: boolean;
+  onToggle: () => void;
+  displayedTotal: number;
+  subtotal: number;
+  couponDiscount: number;
+  delivery: number;
+  taxBreakdown: TaxBreakdown | null;
+  isTaxLoading: boolean;
+  taxError: string | null;
+  couponApplied: AppliedPromotion | null;
+  couponLabel: string | null;
+  couponCode: string;
+  couponError: string | null;
+  isCouponValidating: boolean;
+  onCouponCodeChange: (val: string) => void;
+  onCouponApply: () => void;
+  onCouponRemove: () => void;
+  onCouponKeyDown: (e: React.KeyboardEvent) => void;
+  isProcessing: boolean;
+  selectedAddressId: string | null;
+  onPay: () => void;
+  cartItems: CartItemDisplay[];
+  quickBuyVariant: VariantDetails | null;
+  quickBuyQty: number;
+  isQuickBuy: boolean;
+  reduxCartItems: any[];
+}) {
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden">
+      {/* Backdrop when expanded */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onToggle}
+            className="fixed inset-0 bg-black/30 backdrop-blur-[2px] z-30"
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        className="relative z-40 bg-white rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.10)] border-t border-gray-100"
+        animate={{ height: isExpanded ? 'auto' : 'auto' }}
+      >
+        {/* Drag handle + collapsed summary row */}
+        <button
+          onClick={onToggle}
+          className="w-full flex flex-col items-center pt-2.5 pb-3 px-5 focus:outline-none"
+          aria-label={isExpanded ? 'Collapse order summary' : 'Expand order summary'}
+        >
+          <div className="w-10 h-1 rounded-full bg-gray-200 mb-3" />
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <span className="text-[13px] font-semibold text-gray-700">Order Summary</span>
+              {isExpanded
+                ? <ChevronDown size={14} className="text-gray-400" />
+                : <ChevronUp size={14} className="text-gray-400" />
+              }
+            </div>
+            <motion.span
+              key={displayedTotal}
+              initial={{ y: 4, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="text-[15px] font-bold text-gray-900"
+            >
+              ₹{formatCurrency(displayedTotal)}
+            </motion.span>
+          </div>
+        </button>
+
+        {/* Expanded content */}
+        <AnimatePresence>
+          {isExpanded && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="px-5 pb-2 space-y-4 max-h-[55vh] overflow-y-auto">
+                {/* Coupon section */}
+                <div>
+                  {couponApplied ? (
+                    <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-3.5 py-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                        <div>
+                          <p className="text-xs font-bold text-emerald-800 uppercase tracking-wide">{couponApplied.code}</p>
+                          <p className="text-[11px] text-emerald-600">{couponLabel} · Saving ₹{formatCurrency(couponDiscount)}</p>
+                        </div>
+                      </div>
+                      <button onClick={onCouponRemove} className="p-1.5 text-emerald-400 hover:text-red-500 rounded-lg transition-colors">
+                        <X size={13} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <Tag size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                          <Input
+                            type="text"
+                            placeholder="COUPON CODE"
+                            value={couponCode}
+                            onChange={e => onCouponCodeChange(e.target.value.toUpperCase())}
+                            onKeyDown={onCouponKeyDown}
+                            className="pl-8 h-9 text-xs font-mono tracking-widest uppercase border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-200"
+                          />
+                        </div>
+                        <button
+                          onClick={onCouponApply}
+                          disabled={isCouponValidating || !couponCode.trim()}
+                          className="bg-gray-900 text-white px-4 h-9 rounded-lg text-xs font-semibold hover:bg-gray-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-1.5 shrink-0"
+                        >
+                          {isCouponValidating ? <Loader2 size={12} className="animate-spin" /> : 'Apply'}
+                        </button>
+                      </div>
+                      {couponError && (
+                        <div className="flex items-center gap-1.5 text-[11px] text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                          <AlertCircle size={11} className="shrink-0" />
+                          {couponError}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <Separator className="bg-gray-100" />
+
+                {/* Line items */}
+                <div className="space-y-2">
+                  {!isQuickBuy && cartItems.map(item => {
+                    const liveQty = reduxCartItems.find((i: any) => i.productVariantId === item.product_variant_id)?.quantity ?? item.quantity;
+                    return (
+                      <div key={item.id} className="flex justify-between text-[11px] text-gray-500">
+                        <span className="line-clamp-1 max-w-[60%]">{item.productVariant.variant_name} ×{liveQty}</span>
+                        <span className="font-medium text-gray-700">₹{formatCurrency(Number(item.productVariant.price) * liveQty)}</span>
+                      </div>
+                    );
+                  })}
+                  {isQuickBuy && quickBuyVariant && (
+                    <div className="flex justify-between text-[11px] text-gray-500">
+                      <span className="line-clamp-1 max-w-[60%]">{quickBuyVariant.variant_name} ×{quickBuyQty}</span>
+                      <span className="font-medium text-gray-700">₹{formatCurrency(Number(quickBuyVariant.price) * quickBuyQty)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-xs text-gray-600 pt-1">
+                    <span>Subtotal</span>
+                    <span>₹{formatCurrency(subtotal)}</span>
+                  </div>
+                  {delivery > 0 && (
+                    <div className="flex justify-between text-xs text-gray-600">
+                      <span>Delivery</span>
+                      <span>₹{formatCurrency(delivery)}</span>
+                    </div>
+                  )}
+                  {couponApplied && couponDiscount === 0 && (() => {
+                    const minOrder = getMinOrderAmount(couponApplied);
+                    return minOrder !== null ? (
+                      <div className="flex items-center gap-1.5 text-[11px] text-amber-600 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                        <AlertCircle size={11} className="shrink-0" />
+                        Min. order ₹{formatCurrency(minOrder)} required.
+                      </div>
+                    ) : null;
+                  })()}
+                  <div>
+                    {isTaxLoading ? <TaxLoadingSkeleton /> : (
+                      <TaxBreakdownPanel tax={taxBreakdown} deliveryFee={delivery} discount={couponDiscount} />
+                    )}
+                    {taxError && <p className="text-[11px] text-amber-600 mt-1">{taxError}</p>}
+                  </div>
+                </div>
+
+                <Separator className="border-dashed border-gray-200" />
+
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-bold text-gray-900">Total</span>
+                  <motion.span key={displayedTotal} initial={{ y: 5, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-lg font-bold text-gray-900">
+                    ₹{formatCurrency(displayedTotal)}
+                  </motion.span>
+                </div>
+                {taxBreakdown && (
+                  <p className="text-[10px] text-gray-400 text-center -mt-2">✓ Inclusive of all applicable taxes</p>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Pay button — always visible */}
+        <div className="px-5 pt-3 pb-5 space-y-2.5">
+          <button
+            onClick={onPay}
+            disabled={selectedAddressId === null || isProcessing || isTaxLoading}
+            className="w-full bg-blue-600 text-white font-semibold py-3.5 rounded-xl hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:bg-blue-300 disabled:cursor-not-allowed text-[15px] shadow-sm shadow-blue-200"
+          >
+            {isProcessing ? (
+              <><Loader2 size={16} className="animate-spin" />Processing…</>
+            ) : isTaxLoading ? (
+              <><Loader2 size={16} className="animate-spin" />Calculating taxes…</>
+            ) : (
+              <>
+                <ShieldCheck size={16} strokeWidth={2} />
+                Pay ₹{formatCurrency(displayedTotal)}
+              </>
+            )}
+          </button>
+          <p className="text-center text-[11px] text-gray-400 flex items-center justify-center gap-1.5">
+            <ShieldCheck size={11} className="text-gray-400" />
+            Safe & Secure · 100% Authentic products
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ─── Loading State ────────────────────────────────────────────────────────────
+
+function CheckoutSkeleton() {
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-10">
+      <div className="text-center mb-10 space-y-2">
+        <div className="h-7 w-48 bg-gray-100 rounded-lg mx-auto animate-pulse" />
+        <div className="h-4 w-32 bg-gray-100 rounded mx-auto animate-pulse" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-40 rounded-2xl bg-gray-100 animate-pulse" />
+          ))}
+        </div>
+        <div className="h-96 rounded-2xl bg-gray-100 animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+// ─── Inner Component ──────────────────────────────────────────────────────────
+
+function CheckoutClientInner() {
+  const { user } = useAppSelector((state) => state.auth);
+  const { items: reduxCartItems } = useAppSelector((s) => s.cart);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { clearSession } = useCheckoutSession(`/customer/cart`);
+  const dispatchRedux = useAppDispatch();
+  const qty = searchParams.get('qty') as string;
+  const checkoutType = searchParams.get('type') as 'cart' | 'product' | null;
+  const couponId = searchParams.get('couponId');
+  const id = searchParams.get('id');
+  const isQuickBuy = checkoutType === 'product';
+  const token = authToken();
+
+  // Mobile summary sheet state (local — does not need useReducer since it's pure UI)
+  const [isMobileSummaryExpanded, setIsMobileSummaryExpanded] = useState(false);
+
+  // ─── Main reducer (unchanged) ───────────────────────────────────────────────
+  const [state, dispatch] = useReducer(reducer, {
+    isAddressAdded: false,
+    isModalOpen: false,
+    modalMode: AddressOperationEnum.ADD, editAddressId: null, selectedPaymentMethodState: 'UPI',
+    isProcessing: false,
+    checkoutError: null,
+    selectedAddressId: null,
+    cartItems: [],
+    quickBuyVariant: null,
+    quickBuyQty: Number(qty ?? 1),
+    couponCode: '',
+    couponApplied: null,
+    couponError: null,
+    isCouponValidating: false,
+    cartItemsForTax: [],
+    productIds: [],
+    isLoadingOrder: true,
+    taxBreakdown: null,
+    isTaxLoading: false,
+    taxError: null,
+    lastTaxAddressId: ""
+  });
+
+  const openAdd = () => {
+    dispatch({ type: CheckoutActionType.OPEN_ADDRESS_MODAL, payload: { mode: AddressOperationEnum.ADD, editId: null } });
+  };
+
+  const openEdit = async (addressId: string) => {
+    dispatch({ type: CheckoutActionType.OPEN_ADDRESS_MODAL, payload: { mode: AddressOperationEnum.EDIT, editId: addressId } });
+  };
+  const subtotal = isQuickBuy
+    ? (Number(state.quickBuyVariant?.price) || 0) * state.quickBuyQty
+    : state.cartItems.reduce((acc, item) => {
+      const liveQty = reduxCartItems.find(i => i.productVariantId === item.product_variant_id)?.quantity ?? item.quantity;
+      return acc + Number(item.productVariant.price) * liveQty;
+    }, 0);
+
+  const delivery = 0;
+  const couponDiscount = calculateCouponDiscount(state.couponApplied, subtotal);
+  const displayedTotal = Math.max(0, subtotal + delivery - couponDiscount);
+
+  // ─── Effects (all unchanged) ────────────────────────────────────────────────
+  useEffect(() => {
+    if (!checkoutType || !id || !token) return;
+    const load = async () => {
+      dispatch({ type: CheckoutActionType.LOAD_ORDER_START });
+      try {
+        if (couponId) {
+          AxiosAPI.get(`/v1/coupon/${couponId}`)
+            .then(res => { if (res.data?.data) dispatch({ type: CheckoutActionType.APPLY_COUPON, payload: res.data.data }); })
+            .catch(() => toast.error("Couldn't restore coupon. Apply it manually."));
+        }
+        const checkAddress = await checkAddressExistence(user?.id!, token);
+        if (!checkAddress.hasAddresses || checkAddress.count === 0) {
+          dispatch({ type: CheckoutActionType.SET_SELECTED_ADDRESS, payload: null });
+        }
+        if (isQuickBuy) {
+          const res = await fetchProductVariantDetails(id);
+          if (!res.data) throw new Error("Product not found.");
+          const price = parseFloat(res.data.price) || 0;
+          dispatch({
+            type: CheckoutActionType.LOAD_QUICK_BUY_SUCCESS,
+            payload: {
+              variant: res.data as VariantDetails,
+              cartItemsForTax: [{ variantId: res.data.id, quantity: state.quickBuyQty, price }],
+              productIds: [res.data.product_id ?? res.data.id]
+            }
+          });
+        } else {
+          const res = await fetchGetCartList(user?.id || '', token);
+          const items: CartItemDisplay[] = res?.data ?? [];
+          if (!res?.success || items.length === 0) throw new Error("Your cart is empty.");
+          const mapped = items.map((item: CartItemDisplay) => ({
+            variantId: item.product_variant_id,
+            quantity: item.quantity,
+            price: Number(item.productVariant.price),
+          }));
+          dispatch({
+            type: CheckoutActionType.LOAD_ORDER_SUCCESS,
+            payload: {
+              cartItems: items,
+              cartItemsForTax: mapped,
+              productIds: items.map((item: CartItemDisplay) => item.productVariant.product_id)
+            }
+          });
+        }
+      } catch (err: any) {
+        dispatch({ type: CheckoutActionType.LOAD_ORDER_ERROR, payload: err.message ?? "Failed to load order details." });
+      } finally {
+        dispatch({ type: CheckoutActionType.SET_LOADING_ORDER, payload: false });
+      }
+    };
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, checkoutType, isQuickBuy, user?.id, token]);
+
+  useEffect(() => {
+    if (isQuickBuy || state.cartItems.length === 0) return;
+    const updated = state.cartItems.map(item => {
+      const liveQty = reduxCartItems.find(i => i.productVariantId === item.product_variant_id)?.quantity ?? item.quantity;
+      return { variantId: item.product_variant_id, quantity: liveQty, price: Number(item.productVariant.price) };
+    });
+    dispatch({ type: CheckoutActionType.SET_CART_ITEMS_FOR_TAX, payload: updated });
+  }, [reduxCartItems, state.cartItems, isQuickBuy]);
+
+  useEffect(() => {
+    if (!isQuickBuy || !state.quickBuyVariant) return;
+    dispatch({
+      type: CheckoutActionType.SET_CART_ITEMS_FOR_TAX,
+      payload: [{
+        variantId: state.quickBuyVariant.id,
+        quantity: state.quickBuyQty,
+        price: Number(state.quickBuyVariant.price),
+      }]
+    });
+  }, [state.quickBuyQty, state.quickBuyVariant, isQuickBuy]);
+
+  // ─── fetchTaxBreakdown (unchanged) ─────────────────────────────────────────
+  const fetchTaxBreakdown = async (addressId: string) => {
+    if (!addressId || !state.cartItemsForTax.length || addressId === state.lastTaxAddressId) return;
+    dispatch({ type: CheckoutActionType.SET_TAX_LOADING, payload: { isTaxLoading: true, lastTaxAddressId: addressId } });
+    try {
+      const res = await AxiosAPI.post('/v1/finances/calculate-order-taxes', {
+        customerAddressId: addressId,
+        cartItems: state.cartItemsForTax,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      const data = res.data?.data;
+      dispatch({
+        type: CheckoutActionType.SET_TAX_BREAKDOWN,
+        payload: {
+          subtotal: Number(data.subTotal ?? data.subtotal ?? subtotal),
+          totalCgst: Number(data.totalCgst ?? 0),
+          totalSgst: Number(data.totalSgst ?? 0),
+          totalIgst: Number(data.totalIgst ?? 0),
+          totalTax: Number(data.totalTax ?? 0),
+          grandTotal: Number(data.grandTotal ?? subtotal),
+          isIntraState: data.totalIgst === 0 || data.totalIgst === '0',
+          vendorState: data.vendorState,
+          customerState: data.customerState,
+        }
+      });
+    } catch {
+      dispatch({ type: CheckoutActionType.SET_TAX_BREAKDOWN, payload: null });
+    } finally {
+      dispatch({ type: CheckoutActionType.SET_TAX_LOADING_STATE, payload: false });
+    }
+  };
+
+  useEffect(() => {
+    if (state.selectedAddressId && state.selectedAddressId !== state.lastTaxAddressId && !state.isLoadingOrder) {
+      fetchTaxBreakdown(state.selectedAddressId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.selectedAddressId, state.isLoadingOrder]);
+
+  useEffect(() => {
+    if (state.selectedAddressId && state.selectedAddressId !== state.lastTaxAddressId) {
+      dispatch({ type: CheckoutActionType.SET_TAX_BREAKDOWN, payload: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.selectedAddressId]);
+
+  // ─── Coupon handlers (unchanged) ───────────────────────────────────────────
+  const handleCouponApply = async () => {
+    const code = state.couponCode.trim().toUpperCase();
+    if (!code) return;
+    dispatch({ type: CheckoutActionType.START_COUPON_VALIDATION });
+    try {
+      const res = await AxiosAPI.post('/v1/coupon/validate', {
+        userId: user?.id,
+        code,
+        cartTotal: subtotal,
+        productIds: state.productIds,
+      });
+      const data = res.data?.data ?? res.data;
+      if (data?.code) {
+        const minOrder = Number(data.min_order_amount ?? 0);
+        if (minOrder > 0 && subtotal < minOrder) {
+          dispatch({ type: CheckoutActionType.SET_COUPON_ERROR, payload: `Add ₹${formatCurrency(minOrder - subtotal)} more to use this coupon.` });
+        } else {
+          dispatch({ type: CheckoutActionType.APPLY_COUPON, payload: data as AppliedPromotion });
+          toast.success("Coupon applied!");
+        }
+      } else {
+        dispatch({ type: CheckoutActionType.SET_COUPON_ERROR, payload: data?.message ?? "Invalid coupon code." });
+      }
+    } catch (err: any) {
+      dispatch({ type: CheckoutActionType.SET_COUPON_ERROR, payload: err?.response?.data?.message ?? err?.message ?? "Failed to apply coupon." });
+    } finally {
+      dispatch({ type: CheckoutActionType.SET_COUPON_VALIDATING_STATE, payload: false });
+    }
+  };
+
+  const handleCouponRemove = () => {
+    dispatch({ type: CheckoutActionType.REMOVE_COUPON });
+  };
+
+  // ─── Payment handler (unchanged) ───────────────────────────────────────────
+  const handlePayment = async () => {
+    if (!state.selectedAddressId) {
+      toast.error("Please select a delivery address.");
+      return;
+    }
+    if (!id || !token) return;
+    dispatch({ type: CheckoutActionType.SET_PROCESSING, payload: true });
+    dispatch({ type: CheckoutActionType.SET_CHECKOUT_ERROR, payload: null });
+    try {
+      const initPayload = {
+        paymentMethod: state.selectedPaymentMethodState,
+        addressId: state.selectedAddressId,
+        promotionId: state.couponApplied?.promotion_id,
+        ...(isQuickBuy ? { productVariantId: id, qty: state.quickBuyQty } : { cartId: id }),
+      };
+      const initData = await fetchInitCheckout(user?.id || '', initPayload, token);
+      if (!initData?.success && initData?.status === 500) {
+        dispatch({ type: CheckoutActionType.SET_CHECKOUT_ERROR, payload: initData?.message ?? "Failed to initiate order." });
+        return;
+      }
+      if (initData?.status === 400) {
+        dispatch({ type: CheckoutActionType.SET_CHECKOUT_ERROR, payload: initData?.message ?? "Invalid request. Please check your order details." });
+        toast.error(initData?.message ?? "Invalid request. Please check your order details.");
+        return;
+      }
+      if (initData.data?.paymentUrl) {
+        window.location.href = initData.data.paymentUrl;
+        return;
+      }
+      const userClickedSuccess = window.confirm(
+        `SIMULATION: Pay ₹${formatCurrency(displayedTotal)}\n\nOK = Success | Cancel = Failure`
+      );
+      const result = await fetchVerifyPayment(user?.id || '', {
+        discountApplied: couponDiscount,
+        promotionId: state.couponApplied?.promotion_id,
+        orderId: initData.data.orderId,
+        isSuccess: userClickedSuccess,
+        ...(isQuickBuy ? { productVariantId: id } : { cartId: id }),
+      }, token);
+      clearSession();
+      const isPaymentSuccess = userClickedSuccess && result?.data?.success;
+      if (isPaymentSuccess) {
+        dispatchRedux(clearCart());
+        router.push(`/customer/checkout/${initData.data.orderId}?status=success`);
+      } else {
+        const errorMsg = result?.data?.message || result?.message || "Payment failed. Your order has been cancelled.";
+        router.push(`/customer/checkout/${initData.data.orderId}?status=failed&message=${encodeURIComponent(errorMsg)}`);
+      }
+    } catch {
+      dispatch({ type: CheckoutActionType.SET_CHECKOUT_ERROR, payload: "An unexpected error occurred. Please try again." });
+    } finally {
+      dispatch({ type: CheckoutActionType.SET_PROCESSING, payload: false });
+    }
+  };
+
+  // ─── Coupon label (unchanged) ───────────────────────────────────────────────
+  const couponLabel = (() => {
+    if (!state.couponApplied) return null;
+    const type = (state.couponApplied.discount_type ?? '').toLowerCase();
+    const val = Number(state.couponApplied.discount_value ?? 0);
+    if (type === 'percentage') {
+      const cap = state.couponApplied.max_discount_amount
+        ? ` (max ₹${formatCurrency(Number(state.couponApplied.max_discount_amount))})`
+        : '';
+      return `${val}% off${cap}`;
+    }
+    return `₹${formatCurrency(val)} off`;
+  })();
+
+  // ─── Guard renders ──────────────────────────────────────────────────────────
+  if (state.isLoadingOrder) return <CheckoutSkeleton />;
+
+  if (state.checkoutError && subtotal === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4">
+        <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
+          <AlertCircle className="text-red-400" size={26} />
+        </div>
+        <p className="text-gray-700 font-medium text-center">{state.checkoutError}</p>
+        <button
+          onClick={() => router.back()}
+          className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-semibold text-gray-700 transition-colors"
+        >
+          Go back
+        </button>
+      </div>
+    );
+  }
+
+  // ─── Main render ─────────────────────────────────────────────────────────────
+  return (
+    <>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            borderRadius: '12px',
+            fontSize: '13px',
+            fontWeight: '500',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+          }
+        }}
+      />
+
+      {/* Page header */}
+      <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-sm border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <ShieldCheck size={18} className="text-blue-500" />
+            <span className="text-[15px] font-bold text-gray-900 tracking-tight">Secure Checkout</span>
+          </div>
+          <Badge
+            variant="secondary"
+            className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${isQuickBuy
+              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+              : 'bg-blue-50 text-blue-700 border border-blue-200'
+              }`}
+          >
+            {isQuickBuy ? '⚡ Quick Buy' : '🛒 Cart Checkout'}
+          </Badge>
+        </div>
+      </div>
+
+      {/* Main content — padded bottom on mobile for sticky sheet */}
+      <section className="max-w-6xl mx-auto px-4 py-6 pb-[160px] lg:pb-8 min-h-[60vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 items-start">
+
+          {/* ── Left column ─────────────────────────────────────────────────── */}
+          <div className="space-y-4">
+
+            {/* Items panel */}
+            <ItemListPanel
+              isQuickBuy={isQuickBuy}
+              cartItems={state.cartItems}
+              quickBuyVariant={state.quickBuyVariant}
+              quickBuyQty={state.quickBuyQty}
+              onQuickBuyQtyChange={(qty) => dispatch({ type: CheckoutActionType.SET_QUICK_BUY_QTY, payload: qty })}
+            />
+
+            {/* Address selector */}
+            <AddressSelector
+              userId={user?.id || ''}
+              onSelect={(id) => dispatch({ type: CheckoutActionType.SET_SELECTED_ADDRESS, payload: id })}
+              selectedAddressId={state.selectedAddressId}
+              addNewAddress={openAdd}
+              onEditAddress={openEdit}
+              loadingAddresses={state.isAddressAdded}
+            />
+
+            {/* Payment method */}
+            <Card className="rounded-2xl border border-gray-100 shadow-sm">
+              <CardHeader className="pb-3 pt-4 px-4 lg:px-5">
+                <CardTitle className="flex items-center gap-2 text-[15px] font-semibold text-gray-900">
+                  <div className="w-7 h-7 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
+                    <CreditCard className="w-3.5 h-3.5 text-gray-600" />
+                  </div>
+                  Payment Method
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 lg:px-5 pb-4 space-y-2.5">
+                {PAYMENT_METHODS_FIELDS.map((method) => (
+                  <SelectedPaymentMethod
+                    key={method.id}
+                    method={method.label}
+                    selectedMethod={state.selectedPaymentMethodState}
+                    onSelect={(m) => dispatch({ type: CheckoutActionType.SET_PAYMENT_METHOD, payload: m })}
+                    description={method.description}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* ── Right column — desktop Order Summary (hidden on mobile) ───────── */}
+          <div className="hidden lg:block lg:sticky lg:top-[65px]">
+            <Card className="rounded-2xl border border-gray-100 shadow-sm">
+              <CardHeader className="pb-3 pt-5 px-5">
+                <CardTitle className="text-base font-bold text-gray-900">Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="px-5 pb-5 space-y-4">
+
+                {/* Coupon */}
+                <div>
+                  {state.couponApplied ? (
+                    <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                        <div>
+                          <p className="text-xs font-bold text-emerald-800 uppercase tracking-wide">{state.couponApplied.code}</p>
+                          <p className="text-[11px] text-emerald-600">{couponLabel} · Saving ₹{formatCurrency(couponDiscount)}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleCouponRemove}
+                        className="p-1.5 text-emerald-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        <X size={13} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <Tag size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                          <Input
+                            type="text"
+                            placeholder="COUPON CODE"
+                            value={state.couponCode}
+                            onChange={e => {
+                              dispatch({ type: CheckoutActionType.SET_COUPON_CODE, payload: e.target.value.toUpperCase() });
+                              dispatch({ type: CheckoutActionType.SET_COUPON_ERROR, payload: null });
+                            }}
+                            onKeyDown={e => e.key === 'Enter' && handleCouponApply()}
+                            className="pl-8 h-9 text-xs font-mono tracking-widest uppercase border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-200"
+                          />
+                        </div>
+                        <button
+                          onClick={handleCouponApply}
+                          disabled={state.isCouponValidating || !state.couponCode.trim()}
+                          className="bg-gray-900 text-white px-4 h-9 rounded-lg text-xs font-semibold hover:bg-gray-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-1.5 shrink-0"
+                        >
+                          {state.isCouponValidating ? <Loader2 size={12} className="animate-spin" /> : 'Apply'}
+                        </button>
+                      </div>
+                      {state.couponError && (
+                        <div className="flex items-center gap-1.5 text-[11px] text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                          <AlertCircle size={11} className="shrink-0" />
+                          {state.couponError}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <Separator className="bg-gray-100" />
+
+                {/* Line items */}
+                <div className="space-y-2">
+                  {!isQuickBuy && state.cartItems.map(item => {
+                    const liveQty = reduxCartItems.find(i => i.productVariantId === item.product_variant_id)?.quantity ?? item.quantity;
+                    return (
+                      <div key={item.id} className="flex justify-between text-[11px] text-gray-500">
+                        <span className="line-clamp-1 max-w-[60%]">{item.productVariant.variant_name} ×{liveQty}</span>
+                        <span className="font-medium text-gray-700">₹{formatCurrency(Number(item.productVariant.price) * liveQty)}</span>
+                      </div>
+                    );
+                  })}
+                  {isQuickBuy && state.quickBuyVariant && (
+                    <div className="flex justify-between text-[11px] text-gray-500">
+                      <span className="line-clamp-1 max-w-[60%]">{state.quickBuyVariant.variant_name} ×{state.quickBuyQty}</span>
+                      <span className="font-medium text-gray-700">₹{formatCurrency(Number(state.quickBuyVariant.price) * state.quickBuyQty)}</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between text-sm text-gray-600 pt-1">
+                    <span>Subtotal</span>
+                    <span className="font-medium">₹{formatCurrency(subtotal)}</span>
+                  </div>
+
+                  {delivery > 0 && (
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Delivery</span>
+                      <span>₹{formatCurrency(delivery)}</span>
+                    </div>
+                  )}
+
+                  {state.couponApplied && couponDiscount === 0 && (() => {
+                    const minOrder = getMinOrderAmount(state.couponApplied);
+                    return minOrder !== null ? (
+                      <div className="flex items-center gap-1.5 text-[11px] text-amber-600 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                        <AlertCircle size={11} className="shrink-0" />
+                        Min. order ₹{formatCurrency(minOrder)} required.
+                      </div>
+                    ) : null;
+                  })()}
+
+                  <div>
+                    {state.isTaxLoading ? <TaxLoadingSkeleton /> : (
+                      <TaxBreakdownPanel tax={state.taxBreakdown} deliveryFee={delivery} discount={couponDiscount} />
+                    )}
+                    {state.taxError && <p className="text-[11px] text-amber-600 mt-1">{state.taxError}</p>}
+                  </div>
+                </div>
+
+                <Separator className="border-dashed border-gray-200" />
+
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-bold text-gray-900">Total</span>
+                  <motion.span
+                    key={displayedTotal}
+                    initial={{ y: 6, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="text-xl font-bold text-gray-900"
+                  >
+                    ₹{formatCurrency(displayedTotal)}
+                  </motion.span>
+                </div>
+                {state.taxBreakdown && (
+                  <p className="text-[10px] text-gray-400 text-center -mt-2">✓ Inclusive of all applicable taxes</p>
+                )}
+
+                {state.checkoutError && (
+                  <div className="flex items-center gap-2 text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl px-3.5 py-2.5">
+                    <AlertCircle size={13} className="shrink-0" />
+                    {state.checkoutError}
+                  </div>
+                )}
+
+                {/* Desktop pay button */}
+                <button
+                  onClick={handlePayment}
+                  disabled={state.selectedAddressId === null || state.isProcessing || state.isTaxLoading}
+                  className="w-full bg-blue-600 text-white font-semibold py-3.5 rounded-xl hover:bg-blue-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:bg-blue-300 disabled:cursor-not-allowed text-[15px] shadow-sm shadow-blue-100"
+                >
+                  {state.isProcessing ? (
+                    <><Loader2 size={16} className="animate-spin" />Processing…</>
+                  ) : state.isTaxLoading ? (
+                    <><Loader2 size={16} className="animate-spin" />Calculating taxes…</>
+                  ) : (
+                    <>
+                      <ShieldCheck size={16} strokeWidth={2} />
+                      Pay ₹{formatCurrency(displayedTotal)}
+                    </>
+                  )}
+                </button>
+
+                <p className="text-center text-[11px] text-gray-400 flex items-center justify-center gap-1.5">
+                  <ShieldCheck size={11} className="text-gray-400" />
+                  Safe & Secure · 100% Authentic products
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile sticky bottom summary sheet */}
+      <MobileSummarySheet
+        isExpanded={isMobileSummaryExpanded}
+        onToggle={() => setIsMobileSummaryExpanded(p => !p)}
+        displayedTotal={displayedTotal}
+        subtotal={subtotal}
+        couponDiscount={couponDiscount}
+        delivery={delivery}
+        taxBreakdown={state.taxBreakdown}
+        isTaxLoading={state.isTaxLoading}
+        taxError={state.taxError}
+        couponApplied={state.couponApplied}
+        couponLabel={couponLabel}
+        couponCode={state.couponCode}
+        couponError={state.couponError}
+        isCouponValidating={state.isCouponValidating}
+        onCouponCodeChange={(val) => {
+          dispatch({ type: CheckoutActionType.SET_COUPON_CODE, payload: val });
+          dispatch({ type: CheckoutActionType.SET_COUPON_ERROR, payload: null });
+        }}
+        onCouponApply={handleCouponApply}
+        onCouponRemove={handleCouponRemove}
+        onCouponKeyDown={(e) => e.key === 'Enter' && handleCouponApply()}
+        isProcessing={state.isProcessing}
+        selectedAddressId={state.selectedAddressId}
+        onPay={handlePayment}
+        cartItems={state.cartItems}
+        quickBuyVariant={state.quickBuyVariant}
+        quickBuyQty={state.quickBuyQty}
+        isQuickBuy={isQuickBuy}
+        reduxCartItems={reduxCartItems}
+      />
+
+      {/* Address modal */}
+      <AnimatePresence>
+        {state.isModalOpen && user?.id && (
+          <AddressModal
+            user={user}
+            operation={state.modalMode}
+            addressId={state.editAddressId}
+            onClose={() => dispatch({ type: CheckoutActionType.CLOSE_ADDRESS_MODAL })}
+            onSuccess={(val) => dispatch({ type: CheckoutActionType.SET_ADDRESS_ADDED, payload: val })}
+          />
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+// ─── Export wrapper ────────────────────────────────────────────────────────────
+
+export default function CheckoutClient() {
+  return (
+    <Suspense fallback={<CheckoutSkeleton />}>
+      <CheckoutClientInner />
+    </Suspense>
+  );
+}
