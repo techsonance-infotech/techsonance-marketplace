@@ -19,7 +19,6 @@ const LOOKBOOK_BLUR_DATA_URL =
 const THUMBNAIL_BLUR_DATA_URL =
   "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Crect width='1' height='1' fill='%23f8fafc'/%3E%3C/svg%3E";
 
-
 export interface LookbookHotspot {
   id: string | number;
   x: number; // Percentage 0-100
@@ -200,8 +199,8 @@ export function ShoppableLookbook({
                   onClick={() => setActiveHotspot(isActive ? null : spot)}
                   className={`relative w-8 h-8 rounded-full border border-white/20 shadow-lg flex items-center justify-center transition-all duration-300 ${
                     isActive
-                      ? "bg-purple-600 text-white scale-110 rotate-45"
-                      : "bg-black/60 text-white hover:bg-black/85"
+                      ? "bg-theme-accent text-theme-primary-foreground scale-110 rotate-45"
+                      : "bg-theme-primary text-theme-primary-foreground hover:bg-theme-accent"
                   }`}
                   aria-label={`View product details for ${name}`}
                 >
@@ -220,10 +219,14 @@ export function ShoppableLookbook({
                       exit={{ opacity: 0, scale: 0.95, y: 10 }}
                       transition={{ duration: 0.2 }}
                       className={`absolute z-30 w-56 sm:w-64 bg-white/90 backdrop-blur-xl border border-white/25 rounded-2xl shadow-2xl p-3.5 flex flex-col gap-3.5 ${
-                          spot.y > 60 ? "bottom-11" : "top-11"
-                        } ${
-                          spot.x > 60 ? "right-0" : spot.x < 40 ? "left-0" : "-translate-x-1/2 left-1/2"
-                        }`}
+                        spot.y > 60 ? "bottom-11" : "top-11"
+                      } ${
+                        spot.x > 60
+                          ? "right-0"
+                          : spot.x < 40
+                            ? "left-0"
+                            : "-translate-x-1/2 left-1/2"
+                      }`}
                       style={{ originY: 1 }}
                     >
                       {/* Popover Arrow - points toward hotspot */}
@@ -233,7 +236,11 @@ export function ShoppableLookbook({
                             ? "-bottom-1.5 border-r border-b"
                             : "-top-1.5 border-l border-t"
                         } ${
-                          spot.x > 60 ? "right-[20px]" : spot.x < 40 ? "left-[20px]" : "left-1/2 -translate-x-1/2"
+                          spot.x > 60
+                            ? "right-[20px]"
+                            : spot.x < 40
+                              ? "left-[20px]"
+                              : "left-1/2 -translate-x-1/2"
                         }`}
                       />
 
@@ -278,7 +285,7 @@ export function ShoppableLookbook({
                               <AddToCart
                                 productVariantId={variantId}
                                 productVariant={product?.variants?.[0]}
-                                styles="w-full h-9 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                                styles="w-full h-9 bg-theme-primary hover:bg-theme-accent text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
                               />
                             </div>
                           ) : (

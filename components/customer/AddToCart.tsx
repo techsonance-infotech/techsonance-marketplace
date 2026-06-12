@@ -322,7 +322,7 @@ export function AddToCart({
             ) : (
               <ShoppingCart className="w-4 h-4 shrink-0" />
             )}
-            <span className="text-[12px] sm:text-[13px] font-semibold tracking-wide whitespace-nowrap">
+            <span className="text-xs sm:text-xs-plus font-semibold tracking-wide whitespace-nowrap">
               {ADD_TO_CART_TEXT.ADD}
             </span>
           </motion.button>

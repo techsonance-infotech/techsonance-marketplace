@@ -70,8 +70,8 @@ const MobileToast = ({ item }: { item: CartItemListResponse | undefined }) => (
 
         {/* Text */}
         <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-white/70 uppercase tracking-wider">{CART_SIDEBAR_TEXT.TOAST_ADDED}</p>
-            <p className="text-sm font-bold text-white truncate mt-0.5">
+            <p className="text-xxs sm:text-xs font-semibold text-white/70 uppercase tracking-wider">{CART_SIDEBAR_TEXT.TOAST_ADDED}</p>
+            <p className="text-xs sm:text-sm font-bold text-white truncate mt-0.5">
                 {item?.productVariant?.variant_name ?? CART_SIDEBAR_TEXT.TOAST_DEFAULT_ITEM}
             </p>
         </div>
@@ -214,15 +214,15 @@ export function CartSidebar() {
 
                                                     {/* Info */}
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2">
+                                                        <p className="text-xs sm:text-sm font-semibold text-gray-900 leading-snug line-clamp-2">
                                                             {item.productVariant?.variant_name}
                                                         </p>
                                                         <div className="flex items-center gap-2 mt-1.5">
-                                                            <span className="text-sm font-bold text-gray-900">
+                                                            <span className="text-xs sm:text-sm font-bold text-gray-900">
                                                                 ₹{Number(item.productVariant?.price ?? 0).toLocaleString('en-IN')}
                                                             </span>
                                                             {item.quantity > 1 && (
-                                                                <span className="text-xs text-gray-400">
+                                                                <span className="text-xxs sm:text-xs text-gray-400">
                                                                     × {item.quantity} = ₹{lineTotal.toLocaleString('en-IN')}
                                                                 </span>
                                                             )}
@@ -297,7 +297,7 @@ export function CartSidebar() {
                                 />
 
                                 {/* Trust micro-copy */}
-                                <p className="text-center text-[11px] text-gray-400 font-medium">
+                                <p className="text-center text-xxs sm:text-xs text-gray-400 font-medium">
                                     {CART_SIDEBAR_TEXT.SECURE_CHECKOUT}
                                 </p>
                             </div>
