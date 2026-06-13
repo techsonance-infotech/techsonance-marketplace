@@ -413,7 +413,7 @@ export default function ProductClient({ id }: { id: string }) {
       <Toaster position="top-center" />
 
       {/* ── Breadcrumb ─────────────────────────────────────────────── */}
-      <nav className="hidden lg:flex items-center gap-2 max-w-7xl mx-auto px-8 pt-6 pb-2 text-xs text-gray-400 font-medium">
+      <nav className="hidden lg:flex items-center gap-2 max-w-7xl mx-auto px-8 pt-6 pb-2 text-theme-caption text-gray-400 font-medium">
         <span className="hover:text-gray-700 cursor-pointer transition-colors">
           Home
         </span>
@@ -620,7 +620,7 @@ export default function ProductClient({ id }: { id: string }) {
               }}
               className="flex items-center justify-between"
             >
-              <span className="inline-flex items-center gap-1.5 bg-gray-900 text-white text-[11px] font-semibold tracking-widest uppercase px-3 py-1 rounded-full">
+              <span className="inline-flex items-center gap-1.5 bg-gray-900 text-white text-theme-xxs font-semibold tracking-widest uppercase px-3 py-1 rounded-full">
                 {state.product?.category?.name || "Product"}
               </span>
               {totalReviews > 0 && (
@@ -631,7 +631,7 @@ export default function ProductClient({ id }: { id: string }) {
                       payload: "reviews",
                     })
                   }
-                  className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  className="flex items-center gap-1.5 text-theme-body-sm text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   <StarRow rating={avgRating} />
                   <span className="font-semibold text-gray-800">
@@ -652,11 +652,11 @@ export default function ProductClient({ id }: { id: string }) {
                 visible: { opacity: 1, y: 0 },
               }}
             >
-              <h1 className="text-xl lg:text-2xl font-bold text-gray-900 leading-tight capitalize tracking-tight">
+              <h1 className="text-theme-h5 lg:text-theme-h4 font-bold text-gray-900 leading-tight capitalize tracking-tight">
                 {state.product?.name}
               </h1>
               {state.product?.description && (
-                <p className="mt-2 text-sm text-gray-500 leading-relaxed line-clamp-2">
+                <p className="mt-2 text-theme-body-sm text-gray-500 leading-relaxed line-clamp-2">
                   {state.product.description.split("\n")[0]}
                 </p>
               )}
@@ -673,15 +673,15 @@ export default function ProductClient({ id }: { id: string }) {
               }}
             >
               <div className="flex items-baseline gap-3 flex-wrap">
-                <span className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tight">
+                <span className="text-theme-h3 lg:text-theme-h2 font-black text-gray-900 tracking-tight">
                   ₹{formatCurrency(finalPrice)}
                 </span>
                 {hasDiscount && (
                   <>
-                    <span className="text-lg text-gray-400 line-through font-medium">
+                    <span className="text-theme-h6 text-gray-400 line-through font-medium">
                       ₹{formatCurrency(originalMRP)}
                     </span>
-                    <span className="text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full">
+                    <span className="text-theme-body-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full">
                       {discountPct > 0
                         ? `${discountPct}% OFF`
                         : `Save ₹${formatCurrency(totalSavings)}`}
@@ -689,7 +689,7 @@ export default function ProductClient({ id }: { id: string }) {
                   </>
                 )}
               </div>
-              <p className="text-xs text-gray-400 mt-1 font-medium uppercase tracking-wider">
+              <p className="text-theme-caption text-gray-400 mt-1 font-medium uppercase tracking-wider">
                 Inclusive of all taxes
               </p>
 
@@ -699,7 +699,7 @@ export default function ProductClient({ id }: { id: string }) {
                   className={`w-2 h-2 rounded-full ${inStock ? "bg-emerald-500" : "bg-red-400"}`}
                 />
                 <span
-                  className={`text-sm font-semibold ${inStock ? "text-emerald-700" : "text-red-500"}`}
+                  className={`text-theme-body-sm font-semibold ${inStock ? "text-emerald-700" : "text-red-500"}`}
                 >
                   {inStock ? "In Stock · Ready to ship" : "Out of Stock"}
                 </span>
@@ -716,7 +716,7 @@ export default function ProductClient({ id }: { id: string }) {
               >
                 {/* Attribute label */}
                 {state.activeVariant?.attributes?.[0] && (
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
+                  <p className="text-theme-caption font-semibold text-gray-500 uppercase tracking-widest mb-3">
                     {state.activeVariant.attributes[0].name}:{" "}
                     <span className="text-gray-900 normal-case tracking-normal font-bold capitalize">
                       {state.activeVariant.attributes[0].value}
@@ -743,7 +743,7 @@ export default function ProductClient({ id }: { id: string }) {
                           className="w-12 h-12 object-contain"
                         />
                       )}
-                      <span className="text-[11px] font-semibold text-gray-700 mt-1">
+                      <span className="text-theme-xxs font-semibold text-gray-700 mt-1">
                         ₹{formatCurrency(Number(variant.price) || 0)}
                       </span>
                     </button>
@@ -766,10 +766,10 @@ export default function ProductClient({ id }: { id: string }) {
                       <CheckCircle2 size={16} className="text-emerald-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-emerald-800 uppercase tracking-wide">
+                      <p className="text-theme-body-sm font-bold text-emerald-800 uppercase tracking-wide">
                         {state.selectedCoupon.code} Applied
                       </p>
-                      <p className="text-xs text-emerald-600">
+                      <p className="text-theme-caption text-emerald-600">
                         Extra ₹{formatCurrency(couponDiscount)} savings!
                       </p>
                     </div>
@@ -796,10 +796,10 @@ export default function ProductClient({ id }: { id: string }) {
                       <Tag size={15} className="text-blue-600" />
                     </div>
                     <div className="text-left">
-                      <p className="text-sm font-bold text-blue-800">
+                      <p className="text-theme-body-sm font-bold text-blue-800">
                         Available Offers
                       </p>
-                      <p className="text-xs text-blue-500">
+                      <p className="text-theme-caption text-blue-500">
                         Tap to view & apply coupons
                       </p>
                     </div>
@@ -825,17 +825,17 @@ export default function ProductClient({ id }: { id: string }) {
                 <AddToCart
                   productVariantId={state.activeVariant.id}
                   productVariant={state.activeVariant}
-                  styles="flex-1 h-12 rounded-2xl border-2 border-gray-900 bg-white text-gray-900 hover:bg-gray-900 hover:text-white font-bold text-sm transition-all duration-200"
+                  styles="flex-1 h-12 rounded-2xl border-2 border-gray-900 bg-white text-gray-900 hover:bg-gray-900 hover:text-white font-bold text-theme-body-sm transition-all duration-200"
                 />
                 {inStock ? (
                   <BuyBtn
                     id={state.activeVariant.id}
                     mode={BuyBtnMode.QUICK_BUY}
-                    styles="flex-1 h-12 rounded-2xl bg-gray-900 text-white hover:bg-black font-bold text-sm transition-all duration-200"
+                    styles="flex-1 h-12 rounded-2xl bg-gray-900 text-white hover:bg-black font-bold text-theme-body-sm transition-all duration-200"
                     selectedCoupon={state.selectedCoupon}
                   />
                 ) : (
-                  <span className="flex-1 h-12 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 font-bold text-sm">
+                  <span className="flex-1 h-12 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 font-bold text-theme-body-sm">
                     Out of Stock
                   </span>
                 )}
@@ -859,7 +859,7 @@ export default function ProductClient({ id }: { id: string }) {
                     <div className="p-2 bg-gray-50 rounded-xl">
                       <Icon size={16} className="text-gray-600" />
                     </div>
-                    <span className="text-[10px] font-semibold text-gray-500 leading-tight">
+                    <span className="text-theme-tiny font-semibold text-gray-500 leading-tight">
                       {label}
                     </span>
                   </div>
@@ -889,7 +889,7 @@ export default function ProductClient({ id }: { id: string }) {
               onClick={() =>
                 dispatch({ type: ActionType.SET_ACTIVE_TAB, payload: tab.key })
               }
-              className={`shrink-0 px-5 py-3.5 text-sm font-semibold border-b-2 transition-all duration-200 whitespace-nowrap
+              className={`shrink-0 px-5 py-3.5 text-theme-body-sm font-semibold border-b-2 transition-all duration-200 whitespace-nowrap
                                 ${
                                   state.activeTab === tab.key
                                     ? "border-gray-900 text-gray-900"
@@ -913,7 +913,7 @@ export default function ProductClient({ id }: { id: string }) {
           >
             {state.activeTab === "description" && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <div className="prose prose-gray max-w-none text-gray-600 leading-relaxed text-sm space-y-3">
+                <div className="prose prose-gray max-w-none text-gray-600 leading-relaxed text-theme-body-sm space-y-3">
                   {state.product?.description ? (
                     state.product.description
                       .split("\n")
@@ -928,7 +928,7 @@ export default function ProductClient({ id }: { id: string }) {
                 {state.product?.features &&
                   state.product.features.length > 0 && (
                     <div className="space-y-3">
-                      <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-4">
+                      <h3 className="text-theme-body-sm font-bold text-gray-900 uppercase tracking-widest mb-4">
                         Key Features
                       </h3>
                       {state.product.features.map((f, i) => (
@@ -937,10 +937,10 @@ export default function ProductClient({ id }: { id: string }) {
                             <CheckCircle2 size={12} className="text-white" />
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-gray-900">
+                            <p className="text-theme-body-sm font-semibold text-gray-900">
                               {f.title}
                             </p>
-                            <p className="text-xs text-gray-500 mt-0.5">
+                            <p className="text-theme-caption text-gray-500 mt-0.5">
                               {f.description}
                             </p>
                           </div>
@@ -955,7 +955,7 @@ export default function ProductClient({ id }: { id: string }) {
               (state.product?.features ? (
                 <ProductSpecifications product={state.product.features} />
               ) : (
-                <p className="text-gray-400 italic text-sm">
+                <p className="text-gray-400 italic text-theme-body-sm">
                   No specifications available.
                 </p>
               ))}
@@ -974,18 +974,18 @@ export default function ProductClient({ id }: { id: string }) {
             <AddToCart
               productVariantId={state.activeVariant.id}
               productVariant={state.activeVariant}
-              styles="flex-1 h-12 rounded-2xl border-2 border-gray-900 bg-white text-gray-900 font-bold text-sm transition-all"
+              styles="flex-1 h-12 rounded-2xl border-2 border-gray-900 bg-white text-gray-900 font-bold text-theme-body-sm transition-all"
             />
             {inStock ? (
               <BuyBtn
                 id={state.activeVariant.id}
                 mode={BuyBtnMode.QUICK_BUY}
-                styles="flex-1 h-12 rounded-2xl bg-gray-900 text-white font-bold text-sm transition-all"
+                styles="flex-1 h-12 rounded-2xl bg-gray-900 text-white font-bold text-theme-body-sm transition-all"
                 selectedCoupon={state.selectedCoupon}
                 quantity={state.quantity}
               />
             ) : (
-              <span className="flex-1 h-12 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 font-bold text-sm">
+              <span className="flex-1 h-12 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 font-bold text-theme-body-sm">
                 Out of Stock
               </span>
             )}
