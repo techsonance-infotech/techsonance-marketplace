@@ -99,7 +99,7 @@ export default function SearchPage() {
             <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
                 <div className="flex items-center gap-3 text-gray-500">
                     <Loader2 className="w-5 h-5 animate-spin text-theme-primary" />
-                    <span className="text-sm font-medium">Searching marketplace…</span>
+                    <span className="text-theme-body-sm font-medium">Searching marketplace…</span>
                 </div>
             </div>
         );
@@ -126,10 +126,10 @@ export default function SearchPage() {
                         transition={{ duration: 0.22 }}
                         className="text-center mb-6"
                     >
-                        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                        <h1 className="text-theme-h4 font-bold text-gray-900 tracking-tight">
                             Search the Marketplace
                         </h1>
-                        <p className="text-sm text-gray-400 mt-1">
+                        <p className="text-theme-body-sm text-gray-400 mt-1">
                             Find products, brands, and stores
                         </p>
                     </motion.div>
@@ -160,7 +160,7 @@ export default function SearchPage() {
                 >
                     {/* Popular categories */}
                     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                        <h2 className="flex items-center gap-2 text-sm font-bold text-gray-800 uppercase tracking-wider mb-5">
+                        <h2 className="flex items-center gap-2 text-theme-body-sm font-bold text-gray-800 uppercase tracking-wider mb-5">
                             <Sparkles className="w-4 h-4 text-amber-500" />
                             Popular Searches
                         </h2>
@@ -179,7 +179,7 @@ export default function SearchPage() {
                                               setSearchQuery(word);
                                               handleSearch(word);
                                           }}
-                                          className="px-4 py-2 rounded-full text-sm font-medium bg-gray-50 border border-gray-100 text-gray-700 hover:bg-theme-primary/5 hover:border-theme-primary/30 hover:text-theme-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+                                          className="px-4 py-2 rounded-full text-theme-body-sm font-medium bg-gray-50 border border-gray-100 text-gray-700 hover:bg-theme-primary/5 hover:border-theme-primary/30 hover:text-theme-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5"
                                       >
                                           {word}
                                       </button>
@@ -190,14 +190,14 @@ export default function SearchPage() {
                     {/* Explore banner */}
                     <div className="rounded-2xl p-8 bg-gradient-to-br from-theme-primary to-theme-primary/80 text-theme-primary-foreground flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-md gap-4">
                         <div className="space-y-1.5">
-                            <h3 className="text-lg font-extrabold tracking-wide">Explore All Products</h3>
-                            <p className="text-sm opacity-80">
+                            <h3 className="text-theme-h6 font-extrabold tracking-wide">Explore All Products</h3>
+                            <p className="text-theme-body-sm opacity-80">
                                 Browse and filter our entire collection of products
                             </p>
                         </div>
                         <Link
                             href="/store"
-                            className="bg-white/15 hover:bg-white/25 border border-white/20 text-current px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm shrink-0 backdrop-blur-sm"
+                            className="bg-white/15 hover:bg-white/25 border border-white/20 text-current px-6 py-2.5 rounded-xl text-theme-body-sm font-bold transition-all shadow-sm shrink-0 backdrop-blur-sm"
                         >
                             Browse All
                         </Link>

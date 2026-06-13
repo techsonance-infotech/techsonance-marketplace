@@ -84,10 +84,10 @@ export default function UserProfilePage() {
 
               <div className="flex flex-col gap-3 text-center sm:text-left w-full mt-2">
                 <div>
-                  <h1 className="text-2xl lg:text-3xl font-bold text-foreground tracking-tight">
+                  <h1 className="text-theme-h4 lg:text-theme-h3 font-bold text-foreground tracking-tight">
                     {user?.first_name} {user?.last_name}
                   </h1>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-theme-body-sm text-muted-foreground mt-1">
                     Member since{" "}
                     {new Date(
                       "created_at" in user && user.created_at
@@ -100,7 +100,7 @@ export default function UserProfilePage() {
                   </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 text-sm">
+                <div className="flex flex-col sm:flex-row gap-3 text-theme-body-sm">
                   <Badge
                     variant="secondary"
                     className="flex items-center justify-center sm:justify-start gap-2 py-1.5 px-3 font-normal text-muted-foreground"
@@ -136,12 +136,12 @@ export default function UserProfilePage() {
       >
         <Card className="shadow-sm">
           <CardContent className="p-6 flex flex-col justify-center pt-6">
-            <span className="text-xs font-bold text-muted-foreground tracking-wider uppercase mb-2">
+            <span className="text-theme-caption font-bold text-muted-foreground tracking-wider uppercase mb-2">
               Total Orders
             </span>
             <div className="flex items-center gap-2">
               <Package className="text-muted-foreground" size={24} />
-              <span className="text-3xl font-bold text-foreground">
+              <span className="text-theme-h3 font-bold text-foreground">
                 {totalOrders}
               </span>
             </div>
@@ -149,12 +149,12 @@ export default function UserProfilePage() {
         </Card>
         <Card className="shadow-sm">
           <CardContent className="p-6 flex flex-col justify-center pt-6">
-            <span className="text-xs font-bold text-muted-foreground tracking-wider uppercase mb-2">
+            <span className="text-theme-caption font-bold text-muted-foreground tracking-wider uppercase mb-2">
               Wishlist Items
             </span>
             <div className="flex items-center gap-2">
               <Heart className="text-destructive" size={24} />
-              <span className="text-3xl font-bold text-foreground">
+              <span className="text-theme-h3 font-bold text-foreground">
                 {wishlistCount}
               </span>
             </div>
@@ -164,7 +164,7 @@ export default function UserProfilePage() {
 
       {/* Account Management Grid */}
       <motion.section variants={itemVariants} className="mb-8">
-        <h2 className="font-semibold text-lg text-foreground mb-4 px-1">
+        <h2 className="font-semibold text-theme-h6 text-foreground mb-4 px-1">
           Settings & Preferences
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -176,7 +176,7 @@ export default function UserProfilePage() {
                   <div className="p-2 bg-secondary rounded-md group-hover:bg-secondary/80 transition-colors">
                     <MapPin size={20} className="text-foreground" />
                   </div>
-                  <CardTitle className="text-base">Saved Addresses</CardTitle>
+                  <CardTitle className="text-theme-body">Saved Addresses</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="flex flex-col h-[calc(100%-4rem)]">
@@ -184,10 +184,10 @@ export default function UserProfilePage() {
                   Manage delivery locations for faster checkout.
                 </CardDescription>
                 <div className="pt-4 border-t mt-auto">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  <span className="text-theme-caption font-semibold text-muted-foreground uppercase tracking-wide">
                     Default
                   </span>
-                  <p className="text-sm text-foreground font-medium mt-1 truncate">
+                  <p className="text-theme-body-sm text-foreground font-medium mt-1 truncate">
                     No default address set
                   </p>
                 </div>
@@ -203,7 +203,7 @@ export default function UserProfilePage() {
                   <div className="p-2 bg-secondary rounded-md group-hover:bg-secondary/80 transition-colors">
                     <Lock size={20} className="text-foreground" />
                   </div>
-                  <CardTitle className="text-base">Login & Security</CardTitle>
+                  <CardTitle className="text-theme-body">Login & Security</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="flex flex-col h-[calc(100%-4rem)]">
@@ -211,7 +211,7 @@ export default function UserProfilePage() {
                   Update your password and secure your account.
                 </CardDescription>
                 <div className="pt-4 border-t mt-auto">
-                  <span className="text-sm font-medium text-primary hover:underline">
+                  <span className="text-theme-body-sm font-medium text-primary hover:underline">
                     Update credentials &rarr;
                   </span>
                 </div>
@@ -230,7 +230,7 @@ export default function UserProfilePage() {
                   <div className="p-2 bg-secondary rounded-md group-hover:bg-secondary/80 transition-colors">
                     <Bell size={20} className="text-foreground" />
                   </div>
-                  <CardTitle className="text-base">Notifications</CardTitle>
+                  <CardTitle className="text-theme-body">Notifications</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="flex flex-col h-[calc(100%-4rem)]">
@@ -242,7 +242,7 @@ export default function UserProfilePage() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                   </span>
-                  <span className="text-sm font-medium text-foreground">
+                  <span className="text-theme-body-sm font-medium text-foreground">
                     All alerts enabled
                   </span>
                 </div>
