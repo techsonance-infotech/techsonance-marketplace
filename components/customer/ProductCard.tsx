@@ -23,9 +23,10 @@ export function ProductCard({ product, idx }: { product: Product; idx: number })
 
     return (
         <motion.li
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.03, duration: 0.25 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ delay: idx * 0.06, duration: 0.35, ease: "easeOut" }}
             className={`group flex flex-col cursor-pointer overflow-hidden transition-all duration-300 relative h-full rounded-[var(--radius)] ${cardCls} shadow`}
         >
             <div 
@@ -49,11 +50,11 @@ export function ProductCard({ product, idx }: { product: Product; idx: number })
             </div>
 
             <div className={`p-4 flex flex-col flex-grow ${isGlass ? 'bg-transparent' : 'bg-white'}`}>
-                <div className="mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide truncate">
+                <div className="mb-1 text-xxs font-semibold text-gray-400 uppercase tracking-wider truncate">
                     {product.category?.name || PRODUCT_CARD_TEXT.CATEGORY_FALLBACK}
                 </div>
                 <Link href={`/store/${product.id}`} className="block">
-                    <h3 className="font-semibold text-gray-900 text-sm lg:text-[15px] leading-tight mb-3 line-clamp-2">
+                    <h3 className="font-semibold text-gray-900 text-xs sm:text-sm md:text-base leading-tight mb-3 line-clamp-2">
                         {product.name}
                     </h3>
                 </Link>
@@ -61,11 +62,11 @@ export function ProductCard({ product, idx }: { product: Product; idx: number })
                 <div className="mt-auto">
                     <div className="flex items-end justify-between">
                         <div>
-                            <span className="font-bold text-gray-900 text-lg">
+                            <span className="font-bold text-gray-900 text-sm sm:text-base md:text-lg">
                                 ₹{formatCurrency(Number(product.base_price))}
                             </span>
                             {Number(product.discount_percent) > 0 && (
-                                <span className="text-xs line-through text-gray-400 ml-1.5 font-medium">
+                                <span className="text-xxs sm:text-xs line-through text-gray-400 ml-1.5 font-medium">
                                     ₹{formatCurrency(Math.floor(Number(product.base_price) / (1 - Number(product.discount_percent) / 100)))}
                                 </span>
                             )}

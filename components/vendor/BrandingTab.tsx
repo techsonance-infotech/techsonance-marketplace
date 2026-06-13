@@ -15,10 +15,11 @@ import { SaveButton } from "./SaveButton";
 import { z } from "zod";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { BRANDING_TAB_TEXT } from "@/constants/vendorText";
+import { authToken } from "@/utils/authToken";
 
 // Replaced constants
 
-export function BrandingTab({ token }: { token: string }) {
+export function BrandingTab() {
   const [isPending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
   const [files, setFiles] = useState<Record<string, File>>({});
@@ -73,43 +74,45 @@ export function BrandingTab({ token }: { token: string }) {
   });
 
   const homepageLayout = watch("homepage_layout") || [];
-
+  const token = authToken();
   useEffect(() => {
-    fetchCompanyBranding(token).then((res) => {
-      const d = res?.data?.data ?? res?.data;
-      if (d && typeof d === "object") {
-        setValue("primary_color", d.primary_color || "#000000");
-        setValue("secondary_color", d.secondary_color || "");
-        setValue("accent_color", d.accent_color || "");
-        setValue("font_family", d.font_family || "Inter");
-        setValue("logo_url", d.logo_url || "");
-        setValue("logo_dark_url", d.logo_dark_url || "");
-        setValue("watermark_url", d.watermark_url || "");
-        setValue("favicon_url", d.favicon_url || "");
-        setValue("background_color", d.background_color || "#f8fafc");
-        setValue("text_color", d.text_color || "#0f172a");
-        setValue("navbar_bg", d.navbar_bg || "#ffffff");
-        setValue("navbar_fg", d.navbar_fg || "#0f172a");
-        setValue("footer_bg", d.footer_bg || "#0f172a");
-        setValue("footer_fg", d.footer_fg || "#ffffff");
-        setValue("navbar_position", d.navbar_position || "sticky");
-        setValue("logo_alignment", d.logo_alignment || "left");
-        setValue("footer_style", d.footer_style || "detailed");
-        setValue("border_radius", d.border_radius || "md");
-        setValue("card_style", d.card_style || "standard");
-        setValue(
-          "homepage_layout",
-          d.homepage_layout || [
-            "hero",
-            "categories",
-            "products",
-            "promo",
-            "new_arrivals",
-            "newsletter",
-          ],
-        );
-      }
-    });
+    if (token) {
+      fetchCompanyBranding(token).then((res) => {
+        const d = res?.data?.data ?? res?.data;
+        if (d && typeof d === "object") {
+          setValue("primary_color", d.primary_color || "#000000");
+          setValue("secondary_color", d.secondary_color || "");
+          setValue("accent_color", d.accent_color || "");
+          setValue("font_family", d.font_family || "Inter");
+          setValue("logo_url", d.logo_url || "");
+          setValue("logo_dark_url", d.logo_dark_url || "");
+          setValue("watermark_url", d.watermark_url || "");
+          setValue("favicon_url", d.favicon_url || "");
+          setValue("background_color", d.background_color || "#f8fafc");
+          setValue("text_color", d.text_color || "#0f172a");
+          setValue("navbar_bg", d.navbar_bg || "#ffffff");
+          setValue("navbar_fg", d.navbar_fg || "#0f172a");
+          setValue("footer_bg", d.footer_bg || "#0f172a");
+          setValue("footer_fg", d.footer_fg || "#ffffff");
+          setValue("navbar_position", d.navbar_position || "sticky");
+          setValue("logo_alignment", d.logo_alignment || "left");
+          setValue("footer_style", d.footer_style || "detailed");
+          setValue("border_radius", d.border_radius || "md");
+          setValue("card_style", d.card_style || "standard");
+          setValue(
+            "homepage_layout",
+            d.homepage_layout || [
+              "hero",
+              "categories",
+              "products",
+              "promo",
+              "new_arrivals",
+              "newsletter",
+            ],
+          );
+        }
+      });
+    }
   }, [token, setValue]);
 
   const onSubmit = (data: z.infer<typeof brandingSchema>) => {
@@ -125,7 +128,7 @@ export function BrandingTab({ token }: { token: string }) {
         }
       });
       Object.entries(files).forEach(([k, v]) => fd.append(k, v));
-      const res = await upsertCompanyBranding(fd, token);
+      const res = await upsertCompanyBranding(fd, token ?? "");
       if (res?.status === 200 || res?.status === 201 || res?.ok) {
         // Refresh local storefront cache if necessary
         try {
@@ -158,7 +161,7 @@ export function BrandingTab({ token }: { token: string }) {
   const footerBg = watch("footer_bg");
   const footerFg = watch("footer_fg");
 
-// Replaced FONT_OPTIONS and SECTION_LABELS
+  // Replaced FONT_OPTIONS and SECTION_LABELS
 
   return (
     <form
@@ -339,10 +342,17 @@ export function BrandingTab({ token }: { token: string }) {
             </Select>
           </Field>
 
-          <Field label={BRANDING_TAB_TEXT.FIELDS.NAVBAR_POS} hint={BRANDING_TAB_TEXT.FIELDS.NAVBAR_POS_HINT}>
+          <Field
+            label={BRANDING_TAB_TEXT.FIELDS.NAVBAR_POS}
+            hint={BRANDING_TAB_TEXT.FIELDS.NAVBAR_POS_HINT}
+          >
             <Select {...register("navbar_position")}>
-              <option value="sticky">{BRANDING_TAB_TEXT.FIELDS.NAVBAR_STICKY}</option>
-              <option value="static">{BRANDING_TAB_TEXT.FIELDS.NAVBAR_STATIC}</option>
+              <option value="sticky">
+                {BRANDING_TAB_TEXT.FIELDS.NAVBAR_STICKY}
+              </option>
+              <option value="static">
+                {BRANDING_TAB_TEXT.FIELDS.NAVBAR_STATIC}
+              </option>
             </Select>
           </Field>
 
@@ -351,33 +361,64 @@ export function BrandingTab({ token }: { token: string }) {
             hint={BRANDING_TAB_TEXT.FIELDS.LOGO_ALIGN_HINT}
           >
             <Select {...register("logo_alignment")}>
-              <option value="left">{BRANDING_TAB_TEXT.FIELDS.LEFT_ALIGNED}</option>
-              <option value="center">{BRANDING_TAB_TEXT.FIELDS.CENTER_ALIGNED}</option>
+              <option value="left">
+                {BRANDING_TAB_TEXT.FIELDS.LEFT_ALIGNED}
+              </option>
+              <option value="center">
+                {BRANDING_TAB_TEXT.FIELDS.CENTER_ALIGNED}
+              </option>
             </Select>
           </Field>
 
-          <Field label={BRANDING_TAB_TEXT.FIELDS.FOOTER_STYLE} hint={BRANDING_TAB_TEXT.FIELDS.FOOTER_STYLE_HINT}>
+          <Field
+            label={BRANDING_TAB_TEXT.FIELDS.FOOTER_STYLE}
+            hint={BRANDING_TAB_TEXT.FIELDS.FOOTER_STYLE_HINT}
+          >
             <Select {...register("footer_style")}>
-              <option value="detailed">{BRANDING_TAB_TEXT.FIELDS.DETAILED_FOOTER}</option>
-              <option value="simple">{BRANDING_TAB_TEXT.FIELDS.SIMPLE_FOOTER}</option>
+              <option value="detailed">
+                {BRANDING_TAB_TEXT.FIELDS.DETAILED_FOOTER}
+              </option>
+              <option value="simple">
+                {BRANDING_TAB_TEXT.FIELDS.SIMPLE_FOOTER}
+              </option>
             </Select>
           </Field>
 
-          <Field label={BRANDING_TAB_TEXT.FIELDS.BORDER_RADIUS} hint={BRANDING_TAB_TEXT.FIELDS.BORDER_RADIUS_HINT}>
+          <Field
+            label={BRANDING_TAB_TEXT.FIELDS.BORDER_RADIUS}
+            hint={BRANDING_TAB_TEXT.FIELDS.BORDER_RADIUS_HINT}
+          >
             <Select {...register("border_radius")}>
-              <option value="none">{BRANDING_TAB_TEXT.FIELDS.SHARP_CORNERS}</option>
-              <option value="sm">{BRANDING_TAB_TEXT.FIELDS.SMALL_CORNERS}</option>
-              <option value="md">{BRANDING_TAB_TEXT.FIELDS.MEDIUM_CORNERS}</option>
-              <option value="lg">{BRANDING_TAB_TEXT.FIELDS.LARGE_CORNERS}</option>
+              <option value="none">
+                {BRANDING_TAB_TEXT.FIELDS.SHARP_CORNERS}
+              </option>
+              <option value="sm">
+                {BRANDING_TAB_TEXT.FIELDS.SMALL_CORNERS}
+              </option>
+              <option value="md">
+                {BRANDING_TAB_TEXT.FIELDS.MEDIUM_CORNERS}
+              </option>
+              <option value="lg">
+                {BRANDING_TAB_TEXT.FIELDS.LARGE_CORNERS}
+              </option>
               <option value="xl">{BRANDING_TAB_TEXT.FIELDS.XL_CORNERS}</option>
-              <option value="full">{BRANDING_TAB_TEXT.FIELDS.ROUNDED_CORNERS}</option>
+              <option value="full">
+                {BRANDING_TAB_TEXT.FIELDS.ROUNDED_CORNERS}
+              </option>
             </Select>
           </Field>
 
-          <Field label={BRANDING_TAB_TEXT.FIELDS.CARD_STYLE} hint={BRANDING_TAB_TEXT.FIELDS.CARD_STYLE_HINT}>
+          <Field
+            label={BRANDING_TAB_TEXT.FIELDS.CARD_STYLE}
+            hint={BRANDING_TAB_TEXT.FIELDS.CARD_STYLE_HINT}
+          >
             <Select {...register("card_style")}>
-              <option value="standard">{BRANDING_TAB_TEXT.FIELDS.STANDARD_CARD}</option>
-              <option value="glassmorphic">{BRANDING_TAB_TEXT.FIELDS.GLASSMORPHIC_CARD}</option>
+              <option value="standard">
+                {BRANDING_TAB_TEXT.FIELDS.STANDARD_CARD}
+              </option>
+              <option value="glassmorphic">
+                {BRANDING_TAB_TEXT.FIELDS.GLASSMORPHIC_CARD}
+              </option>
             </Select>
           </Field>
         </div>
@@ -440,7 +481,8 @@ export function BrandingTab({ token }: { token: string }) {
                     </span>
                     {isEnabled ? (
                       <span className="px-2 py-0.5 text-[9px] font-black tracking-wider uppercase bg-green-500/10 text-green-600 border border-green-500/25 rounded-md">
-                        {BRANDING_TAB_TEXT.FIELDS.ACTIVE_POS}{activeIdx + 1})
+                        {BRANDING_TAB_TEXT.FIELDS.ACTIVE_POS}
+                        {activeIdx + 1})
                       </span>
                     ) : (
                       <span className="px-2 py-0.5 text-[9px] font-black tracking-wider uppercase bg-gray-200/50 text-gray-500 rounded-md">

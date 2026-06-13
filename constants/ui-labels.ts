@@ -93,6 +93,7 @@ export const UILabels = {
     NEWSLETTER_TITLE: "Newsletter Title",
     PROMO_BANNER_IMAGE: "Promo Banner Image",
     PROMO_CARD_BACKGROUND_IMAGE: "Promo Card Background Image",
+    LOCATION: "Location",
     ROLE__DESIGNATION: "Role / Designation",
     SECTION_BACKGROUND_COLOR: "Section Background Color",
     SECTION_BACKGROUND_COLOR_FALLBACK_IF_NO_IMAGE_OR_TRANSPARENT: "Section Background Color (fallback if no image or transparent)",

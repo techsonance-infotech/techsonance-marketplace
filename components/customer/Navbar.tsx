@@ -46,7 +46,6 @@ const navReducer = (state: NavState, action: NavAction): NavState => {
 
 export function Navbar({
   styles,
-  //   logoUrl = BRAND_LOGO,
   menuLinks: propMenuLinks,
 }: {
   styles?: string;

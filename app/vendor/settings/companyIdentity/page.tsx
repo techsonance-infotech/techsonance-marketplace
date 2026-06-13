@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -90,7 +90,7 @@ export default function CompanyIdentityPage() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.18 }}
           >
-            {activeTab === 'branding' && <BrandingTab token={token} />}
+            {activeTab === 'branding' && <BrandingTab />}
             {activeTab === 'legal' && <LegalProfileTab token={token} />}
             {activeTab === 'documents' && <DocumentConfigTab token={token} />}
           </motion.div>

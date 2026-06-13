@@ -333,7 +333,7 @@ const CartSlice = createSlice({
       if (existingItemList) {
         existingItemList.quantity =
           action.payload.quantity ?? existingItemList.quantity + 1;
-      } else if (action.payload.productVariant) {
+      } else {
         state.itemList.push({
           id: action.payload.productVariantId,
           cart_id: action.payload.cartId || state.cartId || "",
@@ -341,7 +341,13 @@ const CartSlice = createSlice({
           quantity: action.payload.quantity ?? 1,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          productVariant: action.payload.productVariant,
+          productVariant: action.payload.productVariant || ({
+            id: action.payload.productVariantId,
+            variant_name: "Premium Product",
+            price: 0,
+            sku: "",
+            images: []
+          } as any),
         });
       }
       saveCartToLocalStorage(

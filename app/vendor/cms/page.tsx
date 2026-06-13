@@ -607,7 +607,7 @@ export default function CmsManagementPage() {
       .catch(() => setProducts([]));
   }, []);
 
-  const token = authToken() || "";
+  const token = authToken();
 
   const load = async () => {
     if (page === PageType.THEME) {
@@ -820,7 +820,7 @@ export default function CmsManagementPage() {
         </div>
       ) : page === PageType.THEME ? (
         <div className="space-y-6">
-          <BrandingTab token={token} />
+          <BrandingTab />
         </div>
       ) : (
         <form
@@ -1004,89 +1004,6 @@ export default function CmsManagementPage() {
                     </ListCard>
                   ),
                 )}
-              </Section>
-              <Section
-                title={
-                  UILabels.SECTIONS
-                    .HERO_BLOCK_LEGACY__USED_IF_NO_CAROUSEL_SLIDES_ABOVE
-                }
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Field
-                    label={UILabels.FIELDS.SUBTITLE}
-                    value={data?.[CmsDataKey.HERO_SUBTITLE] || ""}
-                    onChange={(v: string) => set(CmsDataKey.HERO_SUBTITLE, v)}
-                  />
-                  <Field
-                    label={UILabels.FIELDS.BUTTON_TEXT}
-                    value={data?.[CmsDataKey.HERO_BTN_TEXT] || ""}
-                    onChange={(v: string) => set(CmsDataKey.HERO_BTN_TEXT, v)}
-                  />
-                  <SelectField
-                    label={UILabels.FIELDS.LAYOUT_STYLE}
-                    value={
-                      data?.[CmsDataKey.HERO_LAYOUT] ||
-                      HeroLayout.CENTER_OVERLAY
-                    }
-                    onChange={(v: string) => set(CmsDataKey.HERO_LAYOUT, v)}
-                    options={[
-                      {
-                        value: HeroLayout.CENTER_OVERLAY,
-                        label: "Centered Text Overlay",
-                      },
-                      {
-                        value: HeroLayout.LEFT_CONTENT_RIGHT_IMAGE,
-                        label: "Text Left, Image Right (Split)",
-                      },
-                      {
-                        value: HeroLayout.RIGHT_CONTENT_LEFT_IMAGE,
-                        label: "Image Left, Text Right (Split)",
-                      },
-                    ]}
-                  />
-                  <SelectField
-                    label={UILabels.FIELDS.BACKGROUND_STYLE}
-                    value={
-                      data?.[CmsDataKey.HERO_BG_STYLE] || HeroBgStyle.GRADIENT
-                    }
-                    onChange={(v: string) => set(CmsDataKey.HERO_BG_STYLE, v)}
-                    options={[
-                      {
-                        value: HeroBgStyle.GRADIENT,
-                        label: "Automatic Edge Gradient",
-                      },
-                      {
-                        value: HeroBgStyle.SOLID,
-                        label: "Automatic Edge Solid Color",
-                      },
-                      { value: "custom", label: "Custom Color (Pick Below)" },
-                    ]}
-                  />
-                  <div className="md:col-span-2">
-                    <Field
-                      label={UILabels.FIELDS.TITLE}
-                      value={data?.[CmsDataKey.HERO_TITLE] || ""}
-                      onChange={(v: string) => set(CmsDataKey.HERO_TITLE, v)}
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <Field
-                      label={UILabels.FIELDS.DESCRIPTION}
-                      value={data?.[CmsDataKey.HERO_DESC] || ""}
-                      onChange={(v: string) => set(CmsDataKey.HERO_DESC, v)}
-                      textarea
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <ImageUploadField
-                      label={UILabels.FIELDS.HERO_BANNER_IMAGE}
-                      value={data?.[CmsDataKey.HERO_IMAGE_URL] || ""}
-                      onChange={(v: string) =>
-                        set(CmsDataKey.HERO_IMAGE_URL, v)
-                      }
-                    />
-                  </div>
-                </div>
               </Section>
 
               <Section title={UILabels.SECTIONS.MIDDLE_PROMO_BANNER}>
@@ -1493,7 +1410,7 @@ export default function CmsManagementPage() {
                       </p>
                       <div
                         onClick={handleImageClick}
-                        className="relative w-full max-h-64 aspect-[16/9] bg-slate-50 border border-slate-100 rounded-xl overflow-hidden cursor-crosshair select-none group"
+                        className="relative max-w-74 max-h-74 aspect-[16/9] bg-slate-50 border border-slate-100 rounded-xl overflow-hidden cursor-crosshair select-none group"
                       >
                         <img
                           src={data?.[CmsDataKey.LOOKBOOK_IMAGE_URL]}
@@ -1802,7 +1719,7 @@ export default function CmsManagementPage() {
                           {
                             id: Date.now(),
                             name: "",
-                            role: "",
+                            location: "",
                             text: "",
                             rating: 5,
                             avatar: "",
@@ -1849,15 +1766,15 @@ export default function CmsManagementPage() {
                               }
                             />
                             <Field
-                              label={UILabels.FIELDS.ROLE__DESIGNATION}
-                              value={t.role}
+                              label={UILabels.FIELDS.LOCATION}
+                              value={t.location}
                               onChange={(v: string) =>
                                 set(
                                   "social_proof_testimonials",
                                   data?.[
                                     CmsDataKey.SOCIAL_PROOF_TESTIMONIALS
                                   ].map((x: any) =>
-                                    x.id === t.id ? { ...x, role: v } : x,
+                                    x.id === t.id ? { ...x, location: v } : x,
                                   ),
                                 )
                               }
@@ -1939,7 +1856,7 @@ export default function CmsManagementPage() {
                           ...(data?.[CmsDataKey.SOCIAL_PROOF_BADGES] || []),
                           {
                             id: Date.now(),
-                            icon: "Shield",
+                            icon: "security",
                             title: "",
                             desc: "",
                           },
@@ -1970,8 +1887,8 @@ export default function CmsManagementPage() {
                             <Trash2 size={14} />
                           </button>
                           <div className="flex-1 grid grid-cols-3 gap-3">
-                            <Field
-                              label={UILabels.FIELDS.LUCIDE_ICON_NAME}
+                            <SelectField
+                              label="Select Icon"
                               value={bg.icon}
                               onChange={(v: string) =>
                                 set(
@@ -1982,7 +1899,22 @@ export default function CmsManagementPage() {
                                   ),
                                 )
                               }
-                              mono
+                              options={[
+                                {
+                                  value: "shipping",
+                                  label: "Delivery / Shipping",
+                                },
+                                {
+                                  value: "security",
+                                  label: "Shield / Security",
+                                },
+                                { value: "quality", label: "Award / Quality" },
+                                {
+                                  value: "support",
+                                  label: "Headphones / Support",
+                                },
+                                { value: "default", label: "Heart / Default" },
+                              ]}
                             />
                             <Field
                               label={UILabels.FIELDS.BADGE_TITLE}
