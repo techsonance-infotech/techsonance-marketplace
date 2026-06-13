@@ -37,7 +37,7 @@ export default function OrdersPage() {
   return (
     <>
       <div className="flex items-center gap-3 my-4">
-        <h1 className="font-bold text-xl text-gray-900">My Orders</h1>
+        <h1 className="font-bold text-theme-h5 text-gray-900">My Orders</h1>
       </div>
 
       <section className="w-full lg:px-4 px-2 min-h-[60vh]">
@@ -53,7 +53,7 @@ export default function OrdersPage() {
                   borderColor: isActive ? "#1D4ED8" : "rgba(29, 78, 216, 0)",
                 }}
                 transition={{ duration: 0.2 }}
-                className="relative lg:px-6 lg:py-2.5 px-4 py-2 font-medium transition-colors focus:outline-none border-b-2 -mb-px text-sm whitespace-nowrap"
+                className="relative lg:px-6 lg:py-2.5 px-4 py-2 font-medium transition-colors focus:outline-none border-b-2 -mb-px text-theme-body-sm whitespace-nowrap"
                 onClick={() => setOrderStatus(status)}
               >
                 {statusLabels[status] || status}

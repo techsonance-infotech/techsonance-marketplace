@@ -379,12 +379,12 @@ export default function Home() {
             className="pt-5 pb-4 px-4 bg-background"
           >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-[13px] font-bold text-gray-900 uppercase tracking-widest">
+              <h2 className="text-theme-caption-lg font-bold text-gray-900 uppercase tracking-widest">
                 Explore
               </h2>
               <Link
                 href="/store"
-                className="text-[11px] font-semibold text-theme-primary flex items-center gap-0.5"
+                className="text-theme-xxs font-semibold text-theme-primary flex items-center gap-0.5"
               >
                 View All <ChevronRight size={12} />
               </Link>
@@ -417,12 +417,12 @@ export default function Home() {
             className="py-6 px-4 bg-[#faf9f6]"
           >
             <div className="flex justify-between items-center mb-5">
-              <h2 className="text-[13px] font-bold text-gray-900 uppercase tracking-widest">
+              <h2 className="text-theme-caption-lg font-bold text-gray-900 uppercase tracking-widest">
                 Featured
               </h2>
               <Link
                 href="/store"
-                className="text-[11px] font-semibold text-theme-primary flex items-center gap-0.5"
+                className="text-theme-xxs font-semibold text-theme-primary flex items-center gap-0.5"
               >
                 See All <ChevronRight size={12} />
               </Link>
@@ -475,12 +475,12 @@ export default function Home() {
             className="py-6 px-4"
           >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-[13px] font-bold text-gray-900 uppercase tracking-widest">
+              <h2 className="text-theme-caption-lg font-bold text-gray-900 uppercase tracking-widest">
                 New Arrivals
               </h2>
               <Link
                 href="/store"
-                className="text-[11px] font-semibold text-theme-primary flex items-center gap-0.5"
+                className="text-theme-xxs font-semibold text-theme-primary flex items-center gap-0.5"
               >
                 Discover <ChevronRight size={12} />
               </Link>
