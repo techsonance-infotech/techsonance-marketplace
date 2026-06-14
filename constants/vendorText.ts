@@ -1008,3 +1008,71 @@ export const LOGO_UPLOAD_TEXT = {
   REPLACE: "Click to replace",
   UPLOAD: "Upload image"
 };
+
+export const CUSTOMER_CARE_TEXT = {
+  TITLE: "Customer Care",
+  VIEW_CONVERSATION: "View Conversation",
+  SHOWING_TICKETS: "Showing {count} of {total} tickets",
+  CREATE_NEW_TICKET: "Create New Ticket",
+  SUBJECT: "Subject",
+  DESCRIPTION: "Description",
+  PRIORITY: "Priority",
+  ATTACHMENT: "Attachment (Optional)",
+  CREATING: "Creating...",
+  CREATE_TICKET: "Create Ticket",
+  PRIORITY_OPTIONS: {
+    HIGH: "High",
+    MEDIUM: "Medium",
+    LOW: "Low",
+  },
+};
+
+export const BANNERS_TEXT = {
+  TITLE: "Banners",
+  SUBTITLE: "Manage storefront display banners across placement slots.",
+  CREATE_BANNER: "Create Banner",
+  FAILED_LOAD: "Failed to load banners",
+  FAILED_UPDATE: "Failed to update banner",
+  UNTITLED_BANNER: "Untitled banner",
+  EXPIRED: "Expired",
+  UNTIL: "Until {date}",
+  NO_EXPIRY: "No expiry",
+  NO_BANNERS_TITLE: "No banners yet",
+  NO_BANNERS_DESC: "Create a banner and assign it to a storefront placement slot.",
+  PLACEMENT_LABELS: {
+    homepage_hero: "Homepage Hero",
+    homepage_secondary: "Homepage Secondary",
+    category_page: "Category Page",
+    product_page: "Product Page",
+    cart_sidebar: "Cart Sidebar",
+    checkout: "Checkout",
+  }
+};
+
+export const GST_TEXT = {
+  TITLE: "GST Registrations",
+  ADD_GST: "Add GST Number",
+  SEARCH_PLACEHOLDER: "Search by GSTIN or Legal Name",
+  ALL_TYPES: "All Types",
+  REGULAR: "Regular",
+  COMPOSITION: "Composition",
+  NEWEST_FIRST: "Newest First",
+  OLDEST_FIRST: "Oldest First",
+  SELECT_DATE: "Select Date",
+  NO_RECORDS: "No GST configurations found.",
+  DEFAULT_BADGE: "DEFAULT",
+  ACTIVE_BADGE: "Active",
+  EDIT_LINK: "Edit →",
+  SHOWING: "showing {count} of {total}",
+  TABLE_HEADERS: {
+    GSTIN: "GSTIN",
+    LEGAL_NAME: "Legal Name",
+    STATE_CODE: "State Code",
+    TYPE: "Type",
+    STATUS: "Status",
+    EFFECTIVE_DATE: "Effective Date",
+    ACTIONS: "Actions",
+  }
+};
+
+
