@@ -9,7 +9,7 @@ import {
 import { authToken } from "@/utils/authToken";
 import { fetchGetCartList, fetchAddToCart } from "@/utils/customerApiClient";
 import { fetchProductVariantDetails } from "@/utils/commonAPiClient";
-import { Variant } from "@/utils/Types";
+import { Variant, ProductImageType } from "@/utils/Types";
 import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
 
 export interface CartState {
@@ -29,7 +29,7 @@ const normalizeProductVariant = (variant: any): any => {
       id: img.id || String(idx),
       image_url: img.image_url || img.imageUrl || "",
       is_primary: img.is_primary ?? idx === 0,
-      imgType: img.imgType || "main",
+      imgType: img.imgType || ProductImageType.MAIN,
       product_id: img.product_id || variant.product_id || "",
       variant_id: img.variant_id || variant.id || "",
     }));
@@ -39,7 +39,7 @@ const normalizeProductVariant = (variant: any): any => {
         id: "primary",
         image_url: variant.images,
         is_primary: true,
-        imgType: "main",
+        imgType: ProductImageType.MAIN,
         product_id: variant.product_id || "",
         variant_id: variant.id || "",
       },
@@ -200,7 +200,7 @@ const loadCartFromLocalOrServer = async (): Promise<
                     image_url: img.image_url || img.imageUrl,
                     alt_text: img.alt_text || variantData.variant_name,
                     is_primary: img.is_primary || idx === 0,
-                    imgType: img.imgType || "main",
+                    imgType: img.imgType || ProductImageType.MAIN,
                   }),
                 );
               } else if (typeof variantData.images === "string") {
@@ -210,7 +210,7 @@ const loadCartFromLocalOrServer = async (): Promise<
                     image_url: variantData.images,
                     alt_text: variantData.variant_name,
                     is_primary: true,
-                    imgType: "main",
+                    imgType: ProductImageType.MAIN,
                   },
                 ];
               }

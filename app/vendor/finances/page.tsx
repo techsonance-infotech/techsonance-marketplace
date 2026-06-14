@@ -73,7 +73,7 @@ function StatusBadge({ status }: { status: string }) {
   const s = status?.toUpperCase();
   if (s === "CLEARED")
     return (
-      <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 py-1 px-3 rounded-full text-xs font-semibold">
+      <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 py-1 px-3 rounded-full text-theme-caption font-semibold">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
         Cleared
       </span>
@@ -81,7 +81,7 @@ function StatusBadge({ status }: { status: string }) {
 
   if (s === "REVERSED")
     return (
-      <span className="inline-flex items-center gap-1.5 bg-red-50 text-red-600 border border-red-200 py-1 px-3 rounded-full text-xs font-semibold">
+      <span className="inline-flex items-center gap-1.5 bg-red-50 text-red-600 border border-red-200 py-1 px-3 rounded-full text-theme-caption font-semibold">
         <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />
         Reversed
       </span>
@@ -89,7 +89,7 @@ function StatusBadge({ status }: { status: string }) {
 
   // PENDING
   return (
-    <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 py-1 px-3 rounded-full text-xs font-semibold">
+    <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 py-1 px-3 rounded-full text-theme-caption font-semibold">
       <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-pulse" />
       Pending
     </span>
@@ -116,14 +116,14 @@ function SummaryCard({
     >
       <span className={`p-2.5 rounded-xl ${color}`}>{icon}</span>
       <div>
-        <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5">
+        <p className="text-theme-caption text-gray-500 font-medium uppercase tracking-wider mb-0.5">
           {label}
         </p>
-        <p className="text-xl font-bold text-gray-900 flex items-center gap-0.5">
+        <p className="text-theme-h5 font-bold text-gray-900 flex items-center gap-0.5">
           <IndianRupee size={16} className="text-gray-600" />
           {value}
         </p>
-        {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+        {sub && <p className="text-theme-caption text-gray-400 mt-0.5">{sub}</p>}
       </div>
     </div>
   );
@@ -217,15 +217,15 @@ export default function EarningsPage() {
             <Wallet size={22} className="text-emerald-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 leading-tight">
+            <h1 className="text-theme-h4 font-bold text-gray-800 leading-tight">
               Earnings & Settlements
             </h1>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-theme-caption text-gray-400 mt-0.5">
               Vendor financial ledger — orders × payments
             </p>
           </div>
           {!loading && earnings && (
-            <span className="ml-1 bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full">
+            <span className="ml-1 bg-emerald-100 text-emerald-700 text-theme-caption font-bold px-2.5 py-1 rounded-full">
               {totalTransactions}
             </span>
           )}
@@ -236,7 +236,7 @@ export default function EarningsPage() {
             token &&
             fetchEarnings(search, offset, statusFilter, date, sortBy, token)
           }
-          className="flex items-center gap-2 text-sm border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 rounded-xl px-4 py-2 transition-colors font-medium shadow-sm"
+          className="flex items-center gap-2 text-theme-body-sm border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 rounded-xl px-4 py-2 transition-colors font-medium shadow-sm"
         >
           <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
           Refresh
@@ -273,7 +273,7 @@ export default function EarningsPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="text-sm bg-transparent w-full outline-none text-gray-700 placeholder:text-gray-400"
+            className="text-theme-body-sm bg-transparent w-full outline-none text-gray-700 placeholder:text-gray-400"
             placeholder="Search by Transaction ID, Order Ref, or Txn Ref"
           />
         </span>
@@ -283,7 +283,7 @@ export default function EarningsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-sm border border-gray-200 bg-gray-50 rounded-xl px-3 py-2 text-gray-600 outline-none focus:border-emerald-400 cursor-pointer transition-colors"
+            className="text-theme-body-sm border border-gray-200 bg-gray-50 rounded-xl px-3 py-2 text-gray-600 outline-none focus:border-emerald-400 cursor-pointer transition-colors"
           >
             <option value="all">All Status</option>
             <option value="cleared">Cleared</option>
@@ -294,7 +294,7 @@ export default function EarningsPage() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as "asc" | "desc")}
-            className="text-sm border border-gray-200 bg-gray-50 rounded-xl px-3 py-2 text-gray-600 outline-none focus:border-emerald-400 cursor-pointer transition-colors"
+            className="text-theme-body-sm border border-gray-200 bg-gray-50 rounded-xl px-3 py-2 text-gray-600 outline-none focus:border-emerald-400 cursor-pointer transition-colors"
           >
             <option value="desc">Newest First</option>
             <option value="asc">Oldest First</option>
@@ -305,7 +305,7 @@ export default function EarningsPage() {
           {calendarOpen ? (
             <button
               onClick={() => setCalendarOpen(false)}
-              className="flex items-center gap-2 text-sm border border-emerald-300 bg-emerald-50 text-emerald-600 rounded-xl px-3 py-2 font-medium transition-colors"
+              className="flex items-center gap-2 text-theme-body-sm border border-emerald-300 bg-emerald-50 text-emerald-600 rounded-xl px-3 py-2 font-medium transition-colors"
             >
               {date ? date.toDateString() : "Select Date"}
               <ChevronUp size={16} />
@@ -313,7 +313,7 @@ export default function EarningsPage() {
           ) : (
             <button
               onClick={() => setCalendarOpen(true)}
-              className="flex items-center gap-2 text-sm border border-gray-200 bg-gray-50 text-gray-600 rounded-xl px-3 py-2 hover:border-gray-300 transition-colors"
+              className="flex items-center gap-2 text-theme-body-sm border border-gray-200 bg-gray-50 text-gray-600 rounded-xl px-3 py-2 hover:border-gray-300 transition-colors"
             >
               {date ? date.toDateString() : "Filter by Date"}
               <ChevronDown size={16} />
@@ -323,7 +323,7 @@ export default function EarningsPage() {
           {/* {date && (
              <button
                onClick={clearDate}
-               className="text-xs text-gray-400 hover:text-red-500 transition-colors underline underline-offset-2"
+               className="text-theme-caption text-gray-400 hover:text-red-500 transition-colors underline underline-offset-2"
              >
                Clear date
              </button>
@@ -349,7 +349,7 @@ export default function EarningsPage() {
 
       {/* ── Error state ── */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
+        <div className="bg-red-50 border border-red-200 text-red-600 text-theme-body-sm rounded-xl px-4 py-3 mb-4">
           {error}
         </div>
       )}
@@ -368,7 +368,7 @@ export default function EarningsPage() {
               {TABLE_HEADERS.map((h) => (
                 <th
                   key={h}
-                  className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  className="p-4 text-theme-caption font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap"
                 >
                   {h}
                 </th>
@@ -382,7 +382,7 @@ export default function EarningsPage() {
               <tr>
                 <td
                   colSpan={TABLE_HEADERS.length + 1}
-                  className="py-16 text-center text-gray-400 text-sm"
+                  className="py-16 text-center text-gray-400 text-theme-body-sm"
                 >
                   <Wallet size={36} className="mx-auto mb-3 opacity-25" />
                   {earnings?.length === 0
@@ -407,7 +407,7 @@ export default function EarningsPage() {
 
                   {/* TRANSACTION ID */}
                   <td className="p-4">
-                    <span className="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded-md">
+                    <span className="font-mono text-theme-caption font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded-md">
                       TRX-{shortId(item.id)}
                     </span>
                   </td>
@@ -416,7 +416,7 @@ export default function EarningsPage() {
                   <td className="p-4">
                     <Link
                       href={`/vendor/orders/${item.order_id}`}
-                      className="font-mono text-sm font-semibold text-emerald-600 hover:underline"
+                      className="font-mono text-theme-body-sm font-semibold text-emerald-600 hover:underline"
                     >
                       ORD-{shortId(item.order_id)}
                     </Link>
@@ -424,7 +424,7 @@ export default function EarningsPage() {
 
                   {/* TRANSACTION REF (from payments.transaction_ref) */}
                   <td className="p-4">
-                    <span className="font-mono text-xs text-gray-500">
+                    <span className="font-mono text-theme-caption text-gray-500">
                       {item.transaction_ref === "N/A" ? (
                         <span className="text-gray-300 italic">N/A</span>
                       ) : (
@@ -433,7 +433,7 @@ export default function EarningsPage() {
                     </span>
                   </td>
 
-                  <td className="p-4 text-sm text-gray-600">
+                  <td className="p-4 text-theme-body-sm text-gray-600">
                     ₹{formatINR(item.net_earning)}
                   </td>
 
@@ -443,7 +443,7 @@ export default function EarningsPage() {
                   </td>
 
                   {/* DATE (orders.created_at) */}
-                  <td className="p-4 text-sm text-gray-500 whitespace-nowrap">
+                  <td className="p-4 text-theme-body-sm text-gray-500 whitespace-nowrap">
                     {new Date(item.created_at).toLocaleDateString("en-GB", {
                       day: "numeric",
                       month: "short",
@@ -455,7 +455,7 @@ export default function EarningsPage() {
                   <td className="p-4">
                     <Link
                       href={`/vendor/orders/${item.order_id}`}
-                      className="text-xs font-semibold text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+                      className="text-theme-caption font-semibold text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
                     >
                       View Order →
                     </Link>
